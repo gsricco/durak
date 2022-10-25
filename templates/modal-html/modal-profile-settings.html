@@ -1,0 +1,36 @@
+<div class="popup modal-manual" id="profileSettings">
+	<div class="popup__body">
+		<div class="popup__content modal modal_fit">
+
+			<a href="#" class="popup__close close-popup">
+				<svg class="close-popup__icon ">
+					<use xlink:href="img/icons/sprite.svg#close"></use>
+				</svg>
+			</a>
+			<h3 class="modal__title">
+				Настройки профиля
+			</h3>
+			<div class="profile-settings">
+				<form class="profile-settings__row">
+					<div class="profile-settings__item-avatar">
+						<div class="profile-settings__avatar" id="imgAva">
+							<img data-value="0" src="../img/avatar/user/avatar.png" alt="nickname" id="imgAvaImg">
+						</div>
+					</div>
+					<div class="profile-settings__item">
+						<div class="profile-settings__title">
+							Сменить никнейм
+						</div>
+						<input type="text" class="form__input form profile-settings__name" value="Sellix224121">
+						<div class="profile-settings__error">Попробуйте ввести другое имя..</div>
+					</div>
+					<div class="profile-settings__btn-block">
+						<div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
+						<div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку</div>
+						<button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

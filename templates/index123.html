@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Список страниц</title>
+  <!-- <meta name="description" content="" />
+	<link rel="icon" href="img/favicon.png" type="image/x-icon">
+	<meta property="og:title" content="Список страниц" />
+	<meta property="og:description" content="" />
+	<meta property="og:image" content="" /> -->
+  <link rel="stylesheet" href="custom-css/system.css">
+  <link rel="stylesheet" href="libs/swiper@8_swiper-bundle.min.css" />
+  <link rel="stylesheet" href="css/style.css">
+  <!-- <link rel="stylesheet" href="css/style.min.css"> -->
+</head>
+
+
+<body class="scrollbar-overflow">
+
+  <div class="wrapper">
+    <ul class="container system__ul">
+      <li><a href="profil.html">Проофиль</a></li>
+      <li><a href="faq.html">Вопросы</a></li>
+      <li><a href="contact.html">Контакты</a></li>
+      <li><a href="honesty.html">Честность</a></li>
+      <li><a href="index.html">Рулетка</a></li>
+      <li><a href="bonus-currency.html">Бонусная валюта</a></li>
+      <li>
+        Модалки
+        <ul>
+          <!-- <li><a href="modal-html/payment.html">Оплата</a></li> -->
+          <!-- <li><a href="modal-html/amount-selection.html">Выбор суммы</a></li> -->
+          <!-- <li><a href="modal-html/select-amount.html">Выберите сумму</a></li> -->
+          <li><a class="popup-link instruction" href="#modalManual">Инструкция</a></li>
+          <li><a class="popup-link" href="#question">Вопрос</a></li>
+          <li><a class="popup-link" href="#choiceObjects">Вывод предметов</a></li>
+          <li><a class="popup-link" href="#profileSettings">Настройки профиля</a></li>
+          <li><a class="popup-link" href="#cases">Кейсы</a></li>
+          <li><a class="popup-link" href="#authorization">Авторизация</a></li>
+          <ul class="system__frame">
+            <li><a class="popup-link" href="#modalPayment">Оплата</a></li>
+            <li><a class="popup-link" href="#selectAmount">Выберите сумму</a></li>
+            <li><a class="popup-link" href="#selectAmountInput">Выберите сумму - вывод</a></li>
+            <li><a class="popup-link" href="#amountSelection">Введите суммы</a></li>
+            <li><a class="popup-link" href="#balanceOk">Баланс успешно пополненна</a></li>
+            <li><a class="popup-link" href="#balanceError">Баланс не пополнен</a></li>
+			<li><a class="popup-link" href="#low_balance">Недостаточно кредитов</a></li>
+			<li><a class="popup-link" href="#lvl_up">Уровень повысился</a></li>
+          </ul>
+
+        </ul>
+      </li>
+      <li>
+        Состояния
+        <ul>
+          <li><a href="states/enter.html">Вход</a></li>
+
+          <li class="system__frame" style="width:600px">
+            Состояния подписок
+            <div class="system__row">
+              <div class="system__col-2">
+                <a href="##" class="btns btns_yt add-bonus__btn">Подписаться на Youtube</a>
+                <a class="btns btns_yt btns_yt-active">Вы подписаны</a>
+              </div>
+              <div class="system__col-2">
+                <a href="##" class="btns btns_vk add-bonus__btn">Подписаться во Вконтакте</a>
+                <a class="btns btns_vk btns_vk-active">Вы подписаны</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Usual state of buttons -->
+      <li>
+        <div class="roulette__radio-wrapper"
+          style="background: #ccc; border: 1px solid; padding: 20px; margin-top: 30px;">
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-1" type="radio" name="bid">
+            <label for="bid-1" class="roulette__item-header">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#hearts_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Черви</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-2" type="radio" name="bid">
+            <label for="bid-2" class="roulette__item-header">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#coin_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Монета</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> Х14
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-3" type="radio" name="bid">
+            <label for="bid-3" class="roulette__item-header">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#spades_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Пики</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+        </div>
+      </li>
+      <!-- Disabled state of buttons -->
+      <li>
+        <div class="roulette__radio-wrapper"
+          style="background: #ccc; border: 1px solid; padding: 20px; margin-top: 30px;">
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-1" type="radio" name="bid">
+            <label for="bid-1" class="roulette__item-header disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#hearts_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Черви</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-2" type="radio" name="bid">
+            <label for="bid-2" class="roulette__item-header disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#coin_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Монета</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> Х14
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-3" type="radio" name="bid">
+            <label for="bid-3" class="roulette__item-header disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#spades_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Пики</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+        </div>
+      </li>
+      <!-- Bet state of buttons -->
+      <li>
+        <div class="roulette__radio-wrapper"
+          style="background: #ccc; border: 1px solid; padding: 20px; margin-top: 30px;">
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-1" type="radio" name="bid">
+            <label for="bid-1" class="roulette__item-header bet">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#hearts_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Черви<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-2" type="radio" name="bid">
+            <label for="bid-2" class="roulette__item-header bet">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#coin_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Монета<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> Х14
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-3" type="radio" name="bid">
+            <label for="bid-3" class="roulette__item-header bet">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#spades_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Пики<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+        </div>
+      </li>
+      <!-- Bet state of buttons + disabled -->
+      <li>
+        <div class="roulette__radio-wrapper"
+          style="background: #ccc; border: 1px solid; padding: 20px; margin-top: 30px;">
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-1" type="radio" name="bid">
+            <label for="bid-1" class="roulette__item-header bet disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#hearts_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Черви<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-2" type="radio" name="bid">
+            <label for="bid-2" class="roulette__item-header bet disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#coin_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Монета<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> Х14
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-3" type="radio" name="bid">
+            <label for="bid-3" class="roulette__item-header bet disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#spades_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Пики<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+        </div>
+      </li>
+      <!-- Lost state of buttons -->
+      <li>
+        <div class="roulette__radio-wrapper"
+          style="background: #ccc; border: 1px solid; padding: 20px; margin-top: 30px;">
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-1" type="radio" name="bid">
+            <label for="bid-1" class="roulette__item-header bet lost disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#hearts_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Черви<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-2" type="radio" name="bid">
+            <label for="bid-2" class="roulette__item-header bet lost disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#coin_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Монета<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> Х14
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-3" type="radio" name="bid">
+            <label for="bid-3" class="roulette__item-header bet lost disabled">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#spades_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Пики<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+        </div>
+      </li>
+      <!-- Won state of buttons -->
+      <li>
+        <div class="roulette__radio-wrapper"
+          style="background: #ccc; border: 1px solid; padding: 20px; margin-top: 30px;">
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-1" type="radio" name="bid">
+            <label for="bid-1" class="roulette__item-header bet won">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#hearts_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Победа<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-2" type="radio" name="bid">
+            <label for="bid-2" class="roulette__item-header bet won">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#coin_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Победа<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> Х14
+              </div>
+            </label>
+          </div>
+          <div class="roulette__radio-item">
+            <input class="roulette__radio" id="bid-3" type="radio" name="bid">
+            <label for="bid-3" class="roulette__item-header bet won">
+              <div class="roulette__item-name">
+                <div class="roulette__item-img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#spades_stroke_white"></use>
+                  </svg>
+                </div>
+                <h3 class="roulette__item-title">
+                  <span class="label">Победа<span class="separator">:</span></span>
+                  <span class="roulette__item-sum">100K</span>
+                </h3>
+              </div>
+              <div class="roulette__item-bid">
+                <span>Ставка</span> X2
+              </div>
+            </label>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+
+    <hr>
+    <!-- <div class="system">
+			<div class="system__title">Состояния входа</div>
+
+		</div> -->
+
+    <hr>
+    <div class="popup modal-manual" id="modalManual">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+          <div class="modal-manual__queries">
+            Заявка #22131
+          </div>
+          <a href="#" class="popup__close close-popup close-popup_close">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Инструкция
+          </h3>
+
+          <div class="modal-manual__text">
+            <ul>
+              <li>1. Общие положения</li>
+              <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее – Пользователь) -
+                использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее —
+                «Соглашение», «ПС»).
+                Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»). Соглашение
+                вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+              </li>
+            </ul>
+            <div class="modal-manual__footnote">
+              *в случае неудачной попытки обыгрыша валюта не возвращается
+            </div>
+
+          </div>
+          <a href="##" class="btn btn_danger modal-manual__btn btn_white" id="modalManualBtn">
+            <div class="timer" id="timerOne">0:10</div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+    <div class="popup modal-manual" id="balanceOk">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal_message modal-manual__modal">
+          <div class="modal-manual__queries">
+            Заявка #22131
+          </div>
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <div class="modal-message">
+            <div class="modal-message__img">
+              <svg class="icon-ok">
+                <use xlink:href="img/icons/sprite.svg#item"></use>
+              </svg>
+            </div>
+            <div class="modal-message__text">
+              Баланс успешно пополненна <br> 200K
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup modal-manual" id="balanceError">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal_message modal-manual__modal">
+          <div class="modal-manual__queries">
+            Заявка #22131
+          </div>
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <div class="modal-message">
+            <div class="modal-message__img">
+              <svg class="icon-error">
+                <use xlink:href="img/icons/sprite.svg#error"></use>
+              </svg>
+            </div>
+            <div class="modal-message__text">
+              Баланс не пополнен. <br> Ошибка #232131
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+	<div class="popup" id="low_balance">
+	<div class="popup__body">
+		<div class="popup__content modal modal_popup modal_authorization">
+			<a href="#" class="popup__close close-popup">
+				<svg class="close-popup__icon ">
+					<use xlink:href="img/icons/sprite.svg#close"></use>
+				</svg>
+			</a>
+
+			<div class="modal-message">
+				<div class="modal-message__img">
+					<svg class="icon-error">
+						<use xlink:href="img/icons/sprite.svg#error"></use>
+					</svg>
+				</div>
+				<div class="modal-message__text">
+					Недостаточно кредитов
+				</div>
+			</div>
+		</div>
+	</div>
+    </div>
+	
+	<div class="popup" id="lvl_up">
+	<div class="popup__body">
+		<div class="popup__content modal modal_popup modal_authorization">
+			<a href="#" class="popup__close close-popup">
+				<svg class="close-popup__icon ">
+					<use xlink:href="img/icons/sprite.svg#close"></use>
+				</svg>
+			</a>
+
+			<div class="modal-message">
+				<div class="modal-message__img">
+					<svg class="icon-lvl-up">
+						<use xlink:href="img/icons/sprite.svg#amber_case"></use>
+					</svg>
+				</div>
+				<div class="modal-message__text">
+					Уровень повышен! <br> Вам доступно 3 кейса “Янтарь”.
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	
+	<div class="popup modal-manual" id="question">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <div class="modal-question">
+            <div class="modal-question__text">
+              Вы действительно хотите продать этот предмет?
+              <br>
+              <div class="modal-question__rupture"></div>
+              Валюта зачислится на ваш баланс.
+            </div>
+            <div class="modal-question__row">
+              <a href="##" class="btn btn_danger modal-question__btn">
+                Да
+              </a>
+              <a href="##" class="btn btn_dark modal-question__btn">
+                Нет
+              </a>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+    <div class="popup modal-manual" id="choiceObjects">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Вывод предметов
+          </h3>
+
+          <form action="" class="form choice-object">
+            <ul class="choice-object__list">
+              <li class="choice-object__item">
+                <div class="choice-object__number">#1</div>
+
+                <div class="choice-object__title">
+                  Добавьте наш аккаунт в друзья
+                </div>
+                <div class="choice-object__in-block">
+                  <input type="text" class="choice-object__input choice-object__input_min form__input" disabled
+                    value="Sellix224121">
+                  <div class="btn btn_dark choice-object__btn">Скопировать</div>
+                </div>
+              </li>
+              <li class="choice-object__item">
+                <div class="choice-object__number">#2</div>
+
+                <div class="choice-object__title">
+                  Введите свой никнейм
+                </div>
+                <div class="choice-object__in-block">
+                  <input type="text" class="choice-object__input form__input" placeholder="Sellix224121">
+                </div>
+              </li>
+            </ul>
+            <button type="submit" class="btn btn_danger choice-object__submit">Вывести предмет</button>
+
+
+
+          </form>
+
+
+
+
+        </div>
+      </div>
+    </div>
+    <div class="popup modal-manual" id="profileSettings">
+      <div class="popup__body">
+        <div class="popup__content modal modal_fit">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Настройки профиля
+          </h3>
+          <div class="profile-settings">
+            <form class="profile-settings__row">
+              <div class="profile-settings__item-avatar">
+                <div class="profile-settings__avatar" id="imgAva">
+                  <img data-value="0" src="img/avatar/user/avatar.png" alt="nickname" id="profileImage">
+                </div>
+              </div>
+              <div class="profile-settings__item">
+                <div class="profile-settings__title">
+                  Сменить никнейм
+                </div>
+                <input type="text" class="form__input form profile-settings__name" value="Sellix224121">
+                <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
+              </div>
+              <div class="profile-settings__btn-block">
+                <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
+                <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку
+                </div>
+                <button type="submit"
+                  class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup" id="modalPayment">
+      <div class="popup__body">
+        <div class="popup__content modal modal_payment">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="modal-payment">
+            <a href="##" class="modal-payment__block">
+              <h3 class="modal__title modal-payment__title">
+                Пополнить деньгами
+              </h3>
+              <ul class="modal-payment__cards cards">
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img payment-system__img_big">
+                    <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                  </div>
+                  <div class="payment-system__title">
+                    Visa/Master/Мир
+                  </div>
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/qivi.png" alt="qivi">
+                  </div>
+                  <div class="payment-system__title">
+                    Киви кошелёк
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/yumani.png" alt="ЮMoney">
+                  </div>
+                  <div class="payment-system__title">
+                    ЮMoney
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Apple pay
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Google-pay.png" alt="Google pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Google pay
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Samsung pay
+                  </div>
+
+
+                </li>
+              </ul>
+
+            </a>
+            <a href="##" class="modal-payment__block">
+              <h3 class="modal__title modal-payment__title">
+                Пополнить игровой валютой
+              </h3>
+              <div class="modal-payment__game-currency game-currency">
+                <div class="game-currency__img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup" id="amountSelection">
+      <div class="popup__body">
+
+        <div class="popup__content modal modal_amount-selection amount-selection modal_popup">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="smiley amount-selection__smiley">
+            <div class="smiley__img">
+              <img src="img/gallery/smiley.png" alt="смайлик">
+            </div>
+            <div class="smiley__text">
+              - Чем больше берешь, <br> тем дешевле выходит!
+            </div>
+
+
+          </div>
+          <div class="amount-selection__content">
+            <h3 class="modal__title amount-selection__title">
+              Введите сумму или количество валюты
+            </h3>
+            <form class="scrollbar-overflow form amount-selection__form" action="">
+              <div class="amount-selection__block-input">
+                <div class="amount-selection__item">
+                  <div class="amount-selection__currency">₽</div>
+                  <input inputmode="numeric" step="1" type="tel" class="form__input amount-selection__input"
+                    placeholder="Введите сумму..." min="69" max="50000">
+                  <div class="amount-selection__info">Мин 69р. / 50 Тыс.</div>
+                </div>
+                <div class="amount-selection__item"><span class="amount-selection__smooth">=</span></div>
+                <div class="amount-selection__item">
+                  <div class="form num-game-currency">
+                    <div class="form__input num-game-currency__input num-game-currency__input_value">
+                      <svg class="num-game-currency__img-icon">
+                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                      </svg>
+                      <input inputmode="numeric" name="valuesum" step="1" placeholder="Введите кол-во..." value=""
+                        type="tel" class="num-game-currency__span-curent"></input>
+                    </div>
+                    <div class="form__input num-game-currency__input num-game-currency__input_units">
+                      Тыс.
+                    </div>
+                  </div>
+                  <div class="amount-selection__info amount-selection__info_units">+4% бонус</div>
+                </div>
+
+              </div>
+
+              <div class="mod-arrow amount-selection__right">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                </svg>
+              </div>
+              <div class="swiper amount-selection__checkbox">
+                <div class="swiper-wrapper amount-selection__wrapper">
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="selectionCard" name="paymentSystem"
+                      value="Visa/Master/Мир" checked>
+                    <label for="selectionCard" class="amount-selection__card payment-system">
+                      <div class="payment-system__img payment-system__img_big">
+                        <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                      </div>
+                      <div class="payment-system__title">
+                        Visa/Master/Мир
+                      </div>
+                    </label>
+
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem"
+                      value="Qiwi кошелёк">
+                    <label for="Qiwi" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/qivi.png" alt="Qiwi кошелёк">
+                      </div>
+                      <div class="payment-system__title">
+                        Qiwi кошелёк
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem" value="ЮMoney">
+                    <label for="yumani" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/yumani.png" alt="ЮMoney">
+                      </div>
+                      <div class="payment-system__title">
+                        ЮMoney
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Webmoney" name="paymentSystem"
+                      value="Webmoney">
+                    <label for="Webmoney" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Webmoney.png" alt="Webmoney">
+                      </div>
+                      <div class="payment-system__title">
+                        Webmoney
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="SamsungPay" name="paymentSystem"
+                      value="SamsungPay">
+                    <label for="SamsungPay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Samsung pay
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="ApplePay" name="paymentSystem"
+                      value="ApplePay">
+                    <label for="ApplePay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Apple pay
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="MobOperators" name="paymentSystem"
+                      value="Моб.операторы">
+                    <label for="MobOperators" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Mob-operators.png" alt="Моб. операторы">
+                      </div>
+                      <div class="payment-system__title">
+                        Моб. операторы
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Cryptocurrency" name="paymentSystem"
+                      value="Криптовалюта">
+                    <label for="Cryptocurrency" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Cryptocurrency.png" alt="Криптовалюта">
+                      </div>
+                      <div class="payment-system__title">
+                        Криптовалюта
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem" value="PayPal">
+                    <label for="PayPal" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/PayPal.png" alt="PayPal">
+                      </div>
+                      <div class="payment-system__title">
+                        PayPal
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="GooglePay" name="paymentSystem"
+                      value="GooglePay">
+                    <label for="GooglePay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Google-pay.png" alt="Google pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Google pay
+                      </div>
+                    </label>
+                  </div>
+
+                </div>
+              </div>
+              <div class="mod-arrow amount-selection__left">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                </svg>
+              </div>
+              <button type="submit" class="btn btn_danger amount-selection__btn btn-disable-sum">Пополнить</button>
+
+
+
+            </form>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="popup select-amount" id="selectAmount">
+      <div class="popup__body">
+        <div class="popup__content modal modal_select-amount ">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <h3 class="modal__title select-amount__title">
+            Выберите сумму
+          </h3>
+
+          <div class="scrollbar-overflow select-amount__content">
+            <div class="mod-arrow select-amount__up">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+            <div class="swiper select-amount__slider">
+              <div class="swiper-wrapper select-amount__wrapper">
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      50К
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      100К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      250К
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      500К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      1M
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      2M
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      5M
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      10M
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+            <div class="mod-arrow select-amount__down">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+    <div class="popup select-amount" id="selectAmountInput">
+      <div class="popup__body">
+        <div class="popup__content modal modal_select-amount modal_select-amount_input">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="select-amount__s-am-input s-am-input">
+            <h3 class="s-am-input__title">
+              Ваш баланс в Дурак Онлайн
+            </h3>
+
+            <div class="s-am-input__input-block">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+              </svg>
+              <input inputmode="numeric" class="s-am-input__input" placeholder="Введите ваш баланс в Дураке..."
+                type="tel" step="1" name="add-sum" class="roulette__table-input">
+              <div class="s-am-input__msg">Вы должны иметь минимум 100 кредитов!</div>
+            </div>
+          </div>
+          <h3 class="modal__title select-amount__title">
+            Выберите сумму
+          </h3>
+
+          <div class="scrollbar-overflow select-amount__content">
+            <div class="mod-arrow select-amount__up">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+            <div class="swiper select-amount__slider">
+              <div class="swiper-wrapper select-amount__wrapper">
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      50К
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      100К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      250К
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      500К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      1M
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      2M
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      5M
+                    </div>
+                  </a>
+                  <a href="##" class="select-amount__item">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      10M
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+            <div class="mod-arrow select-amount__down">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+    <div class="popup" id="cases">
+      <div class="popup__body">
+        <div class="popup__content modal modal_cases scrollbar-overflow">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="modal-cases__wrapper scrollbar-overflow">
+            <div class="modal-cases">
+              <div class="modal-cases__head">
+                <div class="modal-cases__title">Янтарный кейс</div>
+
+                <div class="modal-cases__lvl">10+ LVL</div>
+              </div>
+              <div class="modal-cases__shadow">
+                <div class="modal-cases__mum">x1</div>
+                <div class="modal-cases__pointer"></div>
+
+                <div class="modal-cases__case modal-case modal-case-overflow">
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+
+
+
+
+            </div>
+            <div class="modal-case__open">
+              <a href="##" class="btn btn_dark modal-case__btn btn_white">Открыть кейс</a>
+              <div class="modal-case__timer timer" id="timerTwo">1:05</div>
+            </div>
+            <div class="modal-cases-all">
+              <div class="modal-cases-all__case modal-case modal-case__content">
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="popup" id="authorization">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal_authorization">
+          <a href="#" class="popup__close close-popup close-popup_close">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="modal-enter">
+            <h3 class="modal__title modal-enter__title">
+              Авторизуйтесь для продолжения
+            </h3>
+            <div class="modal-enter__body">
+              <div class="modal-enter__row">
+                <div class="modal-enter__item">
+                  <div class="modal-enter__img">
+                    <svg class="yt">
+                      <use xlink:href="img/icons/sprite.svg#youtube"></use>
+                    </svg>
+                  </div>
+                  <a href="##" class="btn btns_yt modal-enter__btn">Войти через Google</a>
+                </div>
+                <div class="modal-enter__item">
+                  <div class="modal-enter__img">
+                    <svg class="vk">
+                      <use xlink:href="img/icons/sprite.svg#vk"></use>
+                    </svg>
+                  </div>
+                  <a href="##" class="btn btns_vk modal-enter__btn">Войти через Вконтакте</a>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="libs/swiper@8_swiper-bundle.min.js"></script>
+  <script type="text/javascript" src="js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>FAQ</title>
+  <!-- <meta name="description" content="Описание" />
+	<link rel="icon" href="img/favicon.png" type="image/x-icon">
+	<meta property="og:title" content="FAQ" />
+	<meta property="og:description" content="Описание" />
+	<meta property="og:image" content="img/...png" /> -->
+  <link rel="stylesheet" href="custom-css/one.css">
+  <link rel="stylesheet" href="libs/swiper@8_swiper-bundle.min.css" />
+  <link rel="stylesheet" href="css/style.css">
+  <!-- <link rel="stylesheet" href="css/style.min.css"> -->
+  <link rel="icon" href="img/icon.svg" type="image/svg">
+</head>
+
+<body class="scrollbar-overflow">
+  <div class="wrapper homepage" id="wrapper">
+
+    <div class="preloader">
+      <div class="preloader__wrapper">
+        <div class="preloader__item"></div>
+      </div>
+    </div>
+
+
+    <header class="header">
+      <div class="container">
+        <div class="header__row">
+
+          <div class="header__logo-wrapper">
+            <div class="burger-menu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <div class="header__logo">
+              <a href="https://durakroll.com">
+                <svg>
+                  <use xlink:href="img/icons/sprite-edits.svg#logo"></use>
+                </svg>
+              </a>
+            </div>
+
+            <!-- If not logged-in -->
+            <div class="header__login" style="display: none;">
+              <a href="#vk" class="header__login-link">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#vk_login"></use>
+                </svg>
+              </a>
+              <a href="#google" class="header__login-link">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#google_login"></use>
+                </svg>
+              </a>
+            </div>
+
+            <!-- If logged-in and has balance -->
+            <a href="https://durakroll.com/profil.html" class="header__balance">
+              <span>1.32m</span>
+            </a>
+          </div>
+
+          <div class="header__wrapper">
+            <nav class="header__nav">
+              <ul class="header__list">
+                <li class="header__li">
+                  <a href="https://durakroll.com/honesty.html" class="header__link">ЧЕСТНОСТЬ</a>
+                </li>
+                <li class="header__li">
+                  <a href="https://durakroll.com/faq.html" class="header__link">ПОМОЩЬ</a>
+                </li>
+
+                <li class="header__li">
+                  <a href="https://durakroll.com/contact.html" class="header__link">КОНТАКТЫ</a>
+                </li>
+
+                <li class="header__li">
+                  <a href="https://durakroll.com/bonus-currency.html" class="header__link header__link_red">FREE</a>
+                </li>
+              </ul>
+            </nav>
+
+            <div class="header__profile">
+              <a href="https://durakroll.com/profil.html" class="header__avatar">
+                <img src="img/gallery/avatar.png" alt="">
+              </a>
+
+              <div class="header__profile-info">
+                <a href="https://durakroll.com/profil.html" class="header__profile-name">
+                  <!-- If not logged-in -->
+                  <span style="display: none;">Anonymous</span>
+
+                  <!-- If logged-in -->
+                  <span>Username</span>
+
+                  <svg class="header__profile-settings">
+                    <use xlink:href="img/icons/sprite.svg#setings"></use>
+                  </svg>
+                </a>
+
+                <div class="header__profile-row">
+                  <!-- If user logged-in -->
+                  <a href="https://durakroll.com/profil.html" class="header__profile-sum">
+                    <div class="header__profile-sum-img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                      </svg>
+                    </div>
+
+                    <span>1.32m</span>
+                  </a>
+
+                  <!-- If user logged-in -->
+                  <a href="#modalPayment" class="header__profile-link popup-link">
+                    Пополнить
+                  </a>
+
+                  <!-- If user logged-in -->
+                  <a href="#selectAmountInput" class="header__profile-link popup-link">
+                    Вывести
+                  </a>
+
+                  <!-- If not logged-in -->
+                  <a href="#vk" class="header__profile-login" style="display: none;">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#vk_login"></use>
+                    </svg>
+                  </a>
+                  <a href="#google" class="header__profile-login" style="display: none;">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#google_login"></use>
+                    </svg>
+                  </a>
+
+                  <!-- Login btn mobile shown if not logged-in-->
+                  <a href="#" class="header__login-btn" style="display: none;">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#login"></use>
+                    </svg>
+                  </a>
+                </div>
+
+                <!-- If user logged-in -->
+                <a href="https://durakroll.com/profil.html" class="header__profile-progressbar">
+                  <div class="header__profile-lvl header__profile-lvl_back">
+                    17<span>ур</span>
+                  </div>
+                  <div class="header__profile-line">
+                    <span></span>
+                  </div>
+                  <div class="header__profile-lvl header__profile-lvl_next">
+                    18<span>ур.</span>
+                  </div>
+                </a>
+
+                <div class="header__btns">
+                  <a href="#modalPayment" class="header__profile-btn popup-link">
+                    Пополнить
+                  </a>
+
+                  <a href="#selectAmountInput" class="header__profile-btn popup-link">
+                    Вывести
+                  </a>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+
+
+        <section class="profil-main support-faq">
+          <div class="profil-main__row">
+
+            <section class="online-chat">
+              <div class="online-chat__header">
+                <div class="online-chat__header-left">
+                  <svg class="online-chat__icon-chat">
+                    <use xlink:href="img/icons/sprite.svg#chat"></use>
+                  </svg>
+                  <h4 class="online-chat__title">Чат</h4>
+                </div>
+
+                <svg class="online-chat__icon-close">
+                  <use xlink:href="img/icons/sprite.svg#close"></use>
+                </svg>
+                <div class="online-chat__header-rigth">
+                  <div class="online-chat__current">239</div>
+                  <span class="online-chat__torch"></span>
+                </div>
+              </div>
+
+              <div class="online-chat__body">
+                <div class="online-chat__body-wrapper">
+                  <ul class="online-chat__list scrollbar-overflow">
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+
+
+                  </ul>
+                  <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
+                    <span class="online-chat__torch"></span>
+                    <div class="online-chat__current">239</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="online-chat__footer">
+                <div class="online-chat__rules rules">
+                  <div class="rules__row">
+                    <div class="rules__title">
+                      Правила чата
+                    </div>
+                    <div class="rules__text">
+                      <div class="rules__text-title">
+                        Запрещается:
+                      </div>
+                      <ol class="rules__list">
+                        <li class="rules__item">1. Обмен/продажа игровых объектов</li>
+                        <li class="rules__item">2. Попрошайничество</li>
+                        <li class="rules__item">3. Размещение ссылок</li>
+                        <li class="rules__item">4. Однотипные сообщения</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="online-chat__input-block">
+                  <input placeholder="Написать сообщение..." name="chat-message" type="text" class="online-chat__input" autocomplete="off">
+                  <div class="online-chat__icon-doc">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#document"></use>
+                    </svg>
+                  </div>
+
+                  <a href="##" class="online-chat__icon-arrow">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#chatarrow"></use>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <div class="profil-main__content">
+              <div class="tabs">
+                <div class="tabs__nav">
+                  <a class="tabs__link tabs__link_active" href="#content-1">ПОДДЕРЖКА</a>
+                  <a class="tabs__link" href="#content-2">ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</a>
+                </div>
+                <div class="tabs__content">
+                  <div class="tabs__pane tabs__pane_show" id="content-1">
+                    <div class="support-content-block">
+                      <section class="faq">
+                        <h2 class="faq__title">Часто задаваемые вопросы</h2>
+                        <div class="accordion-wrapper faq__wrapper">
+                          <button class="accordion">
+                            <span>Как пополнить баланс сайта?</span>
+                            <svg class="accordion-icon">
+                              <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                            </svg>
+                          </button>
+                          <div class="panel">
+                            <div class="faq__text-wrapper">
+                              <div class="faq__text">
+                                <ul>
+                                  <li>
+                                    Нажмите на пополнить. Выберете метод пополнения:
+                                  </li>
+                                  <li>
+                                    1. При пополнении деньгами впишите количество кредитов/рублей и
+                                    оплатите покупку.
+                                  </li>
+                                  <li>
+                                    2. При пополнении кредитами выберете сумму и следуйте появившемся
+                                    инструкциям, а именно:
+                                  </li>
+                                </ul>
+                                <p>
+                                  1. Добавьте наш аккаунт в друзья, никнейм - (отобразится после
+                                  начала). Заявка принимается в
+                                  течение 5-10 секунд.
+                                </p>
+                                <p>
+                                  2. Отправьте нам в личные сообщения в игре ваш айди с сайта (он
+                                  отобразится в окне
+                                  пополнения), примите приглашение от нашего аккаунта и сразу
+                                  проиграйте игру. Если вы не
+                                  успели зайти/нажать готов - повторите этот пункт с начала, пока ваша
+                                  заявка открыта.
+                                </p>
+                                <p>
+                                  Не успел принять приглашение/нажать готов? Завис интернет? <br>
+                                  Повторите пункт №2, пока ваша заявка на пополнение активна.
+                                </p>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          <button class="accordion">
+                            <span>Как вывести валюту с сайта?</span>
+                            <svg class="accordion-icon">
+                              <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                            </svg>
+                          </button>
+                          <div class="panel">
+                            <div class="faq__text-wrapper">
+                              <div class="faq__text">
+                                <p>
+                                  Нажмите на Вывести (кнопка рядом с балансом). Выберете нужное
+                                  количество кредитов. Ознакомьтесь с пользовательским соглашением и
+                                  поставьте галочку, что означает ваше согласие с правилами.
+                                </p>
+                                <p>
+                                  1. Добавьте наш аккаунт в друзья (никнейм отобразится в окне с
+                                  выводом). Заявка принимается в течение 5-10 секунд.
+                                </p>
+                                <p>
+
+                                  2. Отправьте нам в личные сообщения в игре ваш айди с сайта. (он
+                                  отобразится в окне вывода). Мы будем приглашать вас в игру и
+                                  проигрывать, пока общая сумма проигрышей не будет равна сумме вывода
+                                  (игровую комиссию мы не доплачиваем). Выходить из лобби нужно только
+                                  после нас!
+                                </p>
+                                <p>
+                                  Не успел принять приглашение/нажать готов. Завис интернет. <br>
+                                  Повторите пункт №2, пока ваша заявка на вывод активна.
+                                </p>
+                              </div>
+                            </div>
+
+                          </div>
+                          <button class="accordion">
+                            <span>Вы оплачиваете игровую комиссию (4%)?</span>
+                            <svg class="accordion-icon">
+                              <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                            </svg>
+                          </button>
+                          <div class="panel">
+                            <div class="faq__text-wrapper">
+                              <div class="faq__text">
+                                <p>
+                                  Да, при пополнении баланса мы берём комиссию на себя. Но при снятии
+                                  “средств” мы проиграем вам сумму вывода, т.е. в этом случае игровую
+                                  комиссию мы не доплачиваем.
+                                </p>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          <button class="accordion">
+                            <span>У вас есть какие-либо гарантии? Вы точно меня не кинете?</span>
+                            <svg class="accordion-icon">
+                              <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                            </svg>
+                          </button>
+                          <div class="panel">
+                            <div class="faq__text-wrapper">
+                              <div class="faq__text">
+                                <p>
+                                  Точно не кинем. В сфере Дурак Онлайн мы работаем с 2019 года. 2 Года
+                                  мы просто продавали валюту в группе вконтакте, где на данный момент
+                                  уже более чем 50 000 подписчиков. А за всё это время накопилось 500+
+                                  положительных отзывов. Сейчас мы не только продаём валюту, но и даём
+                                  возможность выиграть кредитов, не играя в самого дурака ;-)
+                                </p>
+                              </div>
+                            </div>
+
+                          </div>
+
+                          <button class="accordion">
+                            <span>Могут ли менять забанить в игре? Обнулить валюту?</span>
+                            <svg class="accordion-icon">
+                              <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                            </svg>
+                          </button>
+                          <div class="panel">
+                            <div class="faq__text-wrapper">
+                              <div class="faq__text">
+                                <p>
+                                  В игре есть блокировка нинейма и авы, но она выдаётся только за
+                                  нецензурный ник и картинку. Мы не дадим 100% гарантии, что вас не
+                                  обнулят. Но за несколько тысяч сделок по продаже я ни разу не
+                                  встретился с обнулением покупателя. Можно сказать, обнуление -
+                                  формальность, о которой говорится в правилах игры, но на деле она
+                                  применяется в исключительных случаях.
+                                </p>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </section>
+
+                      <section class="support">
+                        <div class="support__overflow">
+                          <div class="support__overflow-wrapper">
+                            <div class="support__overflow-close">
+                              <img src="img/gallery/overflow-close.png" alt="">
+                            </div>
+                            <span class="support__overflow-title">
+                              ТЕХ. ПОДДЕРЖКА.
+                            </span>
+                            <p class="support__overflow-text">
+                              Найдите ваш вопрос в списке справа <br>
+                              или подождите 60 секунд.
+                            </p>
+                          </div>
+                        </div>
+                        <div class="support__chat">
+                          <div class="support__chat-wrapper">
+                            <div class="support__top-plank">
+                              <div class="support__top-plank-wrapper">
+                                <span>Чат поддержки</span>
+                              </div>
+                            </div>
+                            <ul class="support__chat-block scrollbar-overflow">
+                              <li class="support__chat-message support__chat-message_your">
+                                <div class="support__chat-message-text"><span>Здравствуйте.Как пополнить баланс
+                                    кредитами? Как пополнить баланс Как пополнить б Как пополнить баланс Как пополнить
+                                    бал</span></div>
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/avatar.png" alt="">
+                                </div>
+                              </li>
+
+                              <li class="support__chat-message">
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/support-ava.png" alt="">
+                                </div>
+                                <div class="support__chat-message-text">Читай FAQ, недоброжелательный
+                                  человек</div>
+                              </li>
+
+                              <li class="support__chat-message support__chat-message_your">
+                                <div class="support__chat-message-text">
+                                  <span class="support__chat-name">Gozavr228</span>
+                                  <div class="support__chat-smile-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="support__chat-smile-title">Смайлы “Вампир”</h3>
+                                </div>
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/avatar.png" alt="">
+                                </div>
+                              </li>
+
+                              <li class="support__chat-message support__chat-message_your">
+                                <div class="support__chat-message-text">
+                                  <span class="support__chat-name">Gozavr228</span>
+                                  <div class="support__chat-smile-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="support__chat-smile-title">Смайлы “Вампир”</h3>
+                                </div>
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/avatar.png" alt="">
+                                </div>
+                              </li>
+
+                              <li class="support__chat-message support__chat-message_your">
+                                <div class="support__chat-message-text">
+                                  <span class="support__chat-name">Gozavr228</span>
+                                  <div class="support__chat-smile-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="support__chat-smile-title">Смайлы “Вампир”</h3>
+                                </div>
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/avatar.png" alt="">
+                                </div>
+                              </li>
+                              <li class="support__chat-message">
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/support-ava.png" alt="">
+                                </div>
+                                <div class="support__chat-message-text">Читай FAQ, недоброжелательный
+                                  человек</div>
+                              </li>
+                              <li class="support__chat-message">
+                                <div class="support__chat-avatar">
+                                  <img src="img/gallery/support-ava.png" alt="">
+                                </div>
+                                <div class="support__chat-message-text">Читай FAQ, недоброжелательный
+                                  человек</div>
+                              </li>
+
+                              <div class="support__chat-answer">
+                                Ответ придёт спустя 12сек - 12ч, спам увеличивает время ответа.
+                              </div>
+                            </ul>
+
+                          </div>
+                          <div class="support__input-block">
+                            <div class="support__input-block-wrapper">
+                              <input type="file" name="file" id="file-add">
+                              <label for="file-add" class="support__input-block-attach">
+                                <svg>
+                                  <use xlink:href="img/icons/sprite.svg#attach"></use>
+                                </svg>
+                              </label>
+
+                              <input placeholder="Написать сообщение..." name="chat-message" type="text"
+                                class="support__chat-input" autocomplete="off">
+                              <span class="support__input-block-arrow">
+                                <svg>
+                                  <use xlink:href="img/icons/sprite.svg#chatarrow"></use>
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+
+                  <div class="tabs__pane" id="content-2">
+                    <section class="agreement">
+                      <h1 class="agreement__title">Пользовательское соглашение:</h1>
+                      <div class="agreement__text">
+                        <p>
+                          Пользовательское соглашение подготовлено и разработано в целях регулирования
+                          взаимоотношений между Пользователем и Администратором Сайта, определения взаимных
+                          прав и обязательств Пользователя и Администратора Сайта, в том числе правового
+                          статуса (положения) последних, условий и оснований их ответственности, оснований
+                          освобождения от нее, а также порядка применения соответствующих мер воздействия
+                          за нарушения правил использования Сайта.
+                        </p>
+                        <p>
+                          Настоящее Пользовательское соглашение признается публичной офертой, адресованной
+                          Администратором Сайта неограниченному кругу полностью право- и дееспособных
+                          физических лиц (граждан) – Пользователям, для заключения договора на оказание
+                          услуг, предусмотренных данным Соглашением, на условиях и в порядке, установленных
+                          в Соглашении.
+                        </p>
+                        <p>
+                          Акцептом настоящего Соглашения признается совершение Пользователем фактических
+                          (конклюдентных) действий, свидетельствующих о принятии условий Соглашения, в
+                          частности к таким действиям относится Авторизация Пользователя на Сайте и оплата
+                          услуг Администратора
+
+                        </p>
+                        <p>
+                          Акцепт Пользовательского соглашения означает ознакомление и согласие Пользователя
+                          с его условиями, а также обязательство Пользователя исполнять все положения и
+                          правила, установленные в тексте Пользовательского соглашения.
+                        </p>
+                        <p>
+                          Администратор Сайта и Пользователь совместно по тексту настоящего Соглашения
+                          упоминаются как «Стороны», а по отдельности как «Сторона».
+                        </p>
+                        <p>
+                        <ul>
+                          <li>
+                            1. ТЕРМИНЫ, ИСПОЛЬЗУЕМЫЕ В СОГЛАШЕНИИ
+                          </li>
+                          <li>
+                            1.1.1 Сайт – результат интеллектуальной деятельности, представляющий собой
+                            составное произведение, расположенное в сети Интернет под определенным сетевым
+                            адресом, состоящее из веб-страниц, включающих в себя и содержащих программы
+                            для ЭВМ (программное обеспечение), обеспечивающие его техническое
+                            функционирование, графическое решение (дизайн), контент, а именно текстовую
+                            информацию, фотографические изображения, картинки, видеозаписи и др.,
+                            предназначенные для оказания развлекательно-аттракционных услуг Пользователям
+                            Сайта. Под Сайтом в тексте настоящего Соглашения понимается Сайт,
+                            расположенный в сети Интернет под доменным именем (адресом) – durak-drop.com,
+                            а также его производные.
+                          </li>
+                          <li>
+                            1.1.2 Администратор Сайта - лицо, обладающее правами владения, пользования и
+                            распоряжения Сайтом на законных основаниях и предоставляющее Сайт в
+                            пользование Пользователя в целях оказания последнему развлекательных услуг,
+                            предусмотренных настоящим Соглашением.
+                          </li>
+                          <li>
+                            1.1.3 Пользователь – любое физическое лицо (гражданин), прошедшее процедуру
+                            Авторизации на Сайте и осуществляющее использование Сайта в соответствии с его
+                            основным назначением и функционалом, в частности для получения развлекательных
+                            услуг и морально-психологического удовлетворения от использования Сайта.
+                          </li>
+                          <li>
+                            1.1.4 Авторизация на Сайте – индивидуализация и идентификация Пользователя
+                            посредством присвоения Пользователю на Сайте уникального имени, осуществляемая
+                            в порядке и способом, определенным Администратором Сайта, в частности, но не
+                            ограничиваясь указанным, посредством регистрации на Сайте (заполнения
+                            регистрационной формы на Сайте), через социальную сеть «ВКонтакте», "Google"
+                            или любым иным образом по усмотрению Администратора Сайта.
+                          </li>
+                          <li>
+                            1.1.5 Виртуальный объект – 1.1.1. игровой инвентарь (валюта игры, игровой
+                            предмет и т.п.), игровой ключ и т.д., который может быть использован в
+                            многопользовательских онлайн или офлайн компьютерных играх.
+                          </li>
+                          <li>
+                            1.1.6 Счет Пользователя – личная карточка Пользователя на Сайте, состоящая из
+                            учетных записей, поступивших (предоставленных) от него (ему): Денежных
+                            (электронных) средств / Виртуальной (игровой) валюты;
+                            <ul>
+                              <li>
+                                Виртуальных объектов, представленных Пользователем на Сайте, отражающая
+                                все финансово-кредитные и имущественные операции, осуществленные
+                                Пользователем на Сайте и/или через Сайт, а также остаток
+                                неизрасходованных (неиспользованных) Пользователем средств и Виртуальных
+                                объектов;
+                              </li>
+                              <li>
+                                Игровой валюты для использования в соответствующих играх, подлежащие
+                                выводу на игровой аккаунт.
+                              </li>
+
+                            </ul>
+
+
+                          </li>
+                          <li>
+                            1.1.7 Электронная почта (E-mail) – специальная технология, которая
+                            обеспечивает пересылку и получение электронных сообщений, писем, файлов,
+                            документов и т.д. посредством использования сети Интернет.
+                          </li>
+                          <li>
+                            1.1.8 Личный кабинет – специальное виртуальное пространство на Сайте,
+                            выделяемое (предоставляемое) Пользователю после Авторизации на Сайте,
+                            содержащее определенную информацию о нем (приобретенных/полученных Виртуальных
+                            объектах и т.д.), а также иную информацию, необходимую для использования Сайта
+                            в соответствии с его основным назначением и функционалом.
+                          </li>
+                          <li>
+                            1.2 В Соглашении могут быть использованы термины, не определенные в пункте
+                            1.1. настоящего Соглашения. В этих случаях толкование терминов производится в
+                            соответствии с текстом и смыслом данного Соглашения. В случае отсутствия
+                            однозначного толкования термина в тексте настоящего Соглашения следует
+                            руководствоваться толкованием терминов: в первую очередь – определенным на
+                            Сайте, указанном в пункте 1.1.1. настоящего Соглашения, во вторую очередь – в
+                            соответствии с нормами действующего законодательства Российской Федерации.
+                          </li>
+                          <li>
+                            2. АВТОРИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ И ПЕРСОНАЛЬНЫЕ ДАННЫЕ
+                          </li>
+                          <li>
+                            2.1 Использование Сайта допускается только лицами, прошедшими процедуру
+                            Авторизации на Сайте. Пользование Сайтом лицами, не обладающими полной
+                            дееспособностью в соответствии с законодательством страны резидентства
+                            Пользователя запрещено.
+                          </li>
+                          <li>
+                            2.2 Использование Сайта допускается исключительно в некоммерческих целях,
+                            направленных на удовлетворение личных эмоционально-психологических
+                            потребностей Пользователей.
+                          </li>
+                          <li>
+                            2.3 Администратор Сайта по своему усмотрению и единоличному решению определяет
+                            порядок и сведения, необходимые для Авторизации Пользователя на Сайте.
+                          </li>
+                          <li>
+                            2.4 При Авторизации на Сайте, его использовании, а также по соответствующему
+                            запросу Пользователь обязан указывать (в том числе в Личном кабинете) и
+                            предоставлять Администратору Сайта полную и достоверную информацию, в
+                            частности о своем имени, фамилии, отчестве, адресе электронной почты, номере
+                            контактного мобильного телефона и т.д.
+                          </li>
+                          <li>
+                            2.5 Если в течение 12-ти месяцев подряд Пользователь не осуществляет
+                            авторизацию на Сайте Администратор Сайта вправе расторгнуть настоящее
+                            Соглашение, уведомив об этом Пользователя по электронной почте, через Сайт или
+                            иным доступным способом. Если в течение 30 (тридцати) календарных дней с
+                            момента направления уведомления, Пользователь не совершил авторизацию на Сайте
+                            и не возобновил пользование Услугами Сайта, настоящее Соглашение с конкретным
+                            Пользователем считается расторгнутым.
+                          </li>
+                          <li>
+                            2.6 В случае расторжения настоящего Соглашения весь остаток Виртуальных
+                            объектов, имевшихся у Пользователя при пользовании Блоками услуг на Сайте
+                            аннулируется в момент расторжения Соглашения без какой бы то ни было
+                            компенсации.
+                          </li>
+                          <li>
+                            2.7 После расторжения настоящего Соглашения Пользователь не вправе заявлять
+                            какие бы то ни было претензии или требования в адрес Администратора Сайта, в
+                            том числе, но, не ограничиваясь, требовать выплаты денежных средств,
+                            предоставления Виртуальных объектов, монет и т.д.
+                          </li>
+                          <li>
+                            2.8 Настоящим Пользователь признает и соглашается, что размещение им
+                            информации на Сайте, а также ее передача Администратору Сайта, в том числе
+                            своих персональных данных осуществляется им самостоятельно, добровольно и по
+                            своему личному усмотрению.
+                          </li>
+                          <li>
+                            2.9 Настоящим Пользователь дает согласие на обработку его персональных данных.
+                            Администратор Сайта вправе использовать персональные данные Пользователя в
+                            целях исполнения настоящего Соглашения, в частности оказания услуг.
+                          </li>
+                          <li>
+                            2.10 Настоящим Пользователь дает согласие на получение от Администратора Сайта
+                            различных sms-рассылок, e-mail-писем и иных форм направления/получения
+                            информации, в том числе рекламных и системных сообщений и уведомлений.
+                          </li>
+                          <li>
+                            2.11 Получение информации о Пользователях осуществляется Администратором Сайта
+                            из следующих основных источников:
+                          </li>
+                          <li>
+                            2.11.1 Информация, сообщенная и/или указанная и/или размещенная Пользователем
+                            на Сайте в рамках его использования, в частности:
+                          </li>
+                          <li>
+                            Данные о Пользователях, указанные при Авторизации на Сайте, вчастности имя,
+                            фамилия, пол, адрес электронной почты, псевдоним, пароль и иные данные о
+                            Пользователях, определенные по усмотрению Администратора Сайта;
+                          </li>
+                          <li>
+                            Данные о Пользователях, размещенные ими в своем Личном кабинете на Сайте;
+                          </li>
+                          <li>
+                            Данные о Пользователях, размещенные и/или указанные ими по электронной почте.
+                          </li>
+                          <li>
+                            Данные, предоставленные Пользователями по мотивированному запросу
+                            Администратора Сайта. Настоящим устанавливается, что Администратор Сайта
+                            вправе запрашивать у Пользователей любую информацию, необходимую
+                            Администратору Сайта для выполнения своих обязательств по обеспечению доступа
+                            Пользователю к Сайту, а также для выполнения иных своих обязательств перед
+                            Пользователями. При этом на Пользователей возлагается обязанность по
+                            своевременному и достоверному предоставлению соответствующей информации в
+                            адрес Администратора Сайта.
+                          </li>
+                          <li>
+                            2.12 Администратор Сайта не проверяет достоверность информации,
+                            предоставляемой или полученной от Пользователей, не осуществляет контроль за
+                            их право- и дееспособностью, поскольку презюмирует, и исходит из того, что
+                            Пользователь во всех без исключения случаях предоставляет полную и достоверную
+                            информацию о себе, и поддерживает данную информацию в актуальном состоянии.
+                          </li>
+                          <li>
+                            2.13 Учитывая, что персональные данные с согласия Пользователя являются
+                            общедоступными, тем не менее, Администратор Сайта при обработке персональных
+                            данных Пользователей обязуется принять все организационные и технические меры
+                            для их защиты от несанкционированного доступа способом, не предусмотренным
+                            Сайтом Однако не исключено, что в результате сбоя в работе Сайта, вирусной или
+                            хакерской атаки, технических неисправностей и иных обстоятельств персональные
+                            данные Пользователя могут стать доступными и другим лицам. Пользователя могут
+                            стать доступными и другим лицам. Пользователь понимает это и соглашается с
+                            тем, что не будет предъявлять претензии к Администратору Сайта в связи с этим,
+                            учитывая, что Пользователь делает свои персональные данные общедоступными.
+                          </li>
+                          <li>
+                            >2.14 Администратор Сайта будет стремиться избежать действий со стороны
+                            третьих лиц, направленных на получение, изменение, блокирование, уничтожение,
+                            распространение, копирование персональных данных Пользователей.
+                          </li>
+                          <li>
+                            2.15 В силу настоящего Соглашения, указывая свои персональные данные на Сайте,
+                            Пользователь безусловно соглашается:
+                          </li>
+                          <li>
+                            С предоставлением персональных данных неограниченному кругу лиц при помощи
+                            Сайта;
+                          </li>
+                          <li>
+                            С обработкой персональных данных Администратором Сайта;
+                          </li>
+                          <li>
+                            С распространением персональных данных при помощи Сайта;
+                          </li>
+                          <li>
+                            С иными действиями Администратора Сайта в отношении таких данных в связи с
+                            функционированием Сайта.
+                          </li>
+                          <li>
+                            2.16 Пользователь обязуется хранить данные для использования Сайта в
+                            недоступном для третьих лиц месте, а также не сообщать и не предоставлять
+                            соответствующие сведения третьим лицам. Пользователь несет полную
+                            ответственность и риск всех возможных потенциальных и реальных негативных
+                            последствий, связанных с неисполнением настоящего правила.
+                          </li>
+                          <li>
+                            2.17 Размещая на Сайте свои персональные данные, Пользователь подтверждает,
+                            что делает это добровольно, а также что он добровольно предоставляет их
+                            Администратору Сайта для обработки. Настоящим Пользователь подтверждает, что
+                            предоставление им информации в порядке, установленном в настоящем Соглашении,
+                            осуществляется исключительно по самостоятельному усмотрению и волеизъявлению
+                            Пользователя.
+                          </li>
+                          <li>
+                            2.18 Администратор Сайта обрабатывает только те персональные данные
+                            Пользователя, которые были размещены им на Сайте. Персональные данные
+                            Пользователя обрабатываются с помощью программно-аппаратных и технических
+                            средств Сайта.
+                          </li>
+                          <li>
+                            2.19 Пользователь обязуется не размещать на Сайте персональные данные третьих
+                            лиц, а также не использовать персональные данные других Пользователей
+                            каким-либо образом, не соответствующим требованиям законодательства РФ, в
+                            противоправных или противозаконных целях, в целях извлечения выгоды и любых
+                            иных целях, не соответствующих целям создания Сайта.
+                          </li>
+                          <li>
+                            2.20 Пользователь вправе потребовать исключения (удаления) информации о нем из
+                            базы данных, формируемой на Сайте. Для этого Пользователю необходимо направить
+                            соответствующее уведомление на адрес электронной почты Администратора Сайта с
+                            указанием адреса электронной почты Пользователя, информация о котором подлежит
+                            удалению.
+                          </li>
+                          <li>
+                            2.21 По общему правилу Администратор Сайта не вправе осуществлять передачу
+                            информации о Пользователях третьим лицам, за исключением случаев, когда такая
+                            передача необходима для исполнения Администратором Сайта своих обязательств
+                            перед Пользователями, атакже в случаях, указанных в пункте 2.18. Соглашения.
+                          </li>
+                          <li>
+                            2.22 Случаи, в которых информация о Пользователе может быть передана третьим
+                            лицам, без предварительного согласия Пользователя:
+                          </li>
+                          <li>
+                            Передача информации Государственным органам, в том числе органам дознания и
+                            следствия, органам прокуратуры и органам местного самоуправления по их
+                            мотивированному запросу;
+                          </li>
+                          <li>
+                            На основании судебного акта;
+                          </li>
+                          <li>
+                            Третьим лицам по их мотивированному запросу в случае нарушения или
+                            предполагаемого нарушения их прав и интересов;
+                          </li>
+                          <li>
+                            В иных случаях, определенных действующим законодательством.
+                            2.23 Администратор не несет перед Пользователем никаких обязательств по охране
+                            персональных данных Пользователя, за исключением случаев, прямо указанных в
+                            настоящем Соглашении.
+                          </li>
+                          <li>
+                            3. ПРЕДМЕТ СОГЛАШЕНИЯ
+                          </li>
+                          <li>
+                            3.1 Предметом настоящего Соглашения является установление общих условий
+                            оказания услуг Администратором Сайта Пользователям, основных прав и
+                            обязанностей последних, определение основных правил использования Сайта,
+                            указанного в пункте 1.1.1. настоящего Соглашения, а также мер ответственности
+                            за нарушение условий данного Соглашения.
+                          </li>
+                          <li>
+                            3.2 В рамках настоящего Пользовательского соглашения Администратор Сайта
+                            оказывает Пользователю услуги по предоставлению в пользование технических
+                            возможностей Сайта, установленных его функционалом, а Пользователь обязуется
+                            оплачивать услуги Администратора в размере, порядке и на условиях,
+                            установленных настоящим Соглашением.
+                          </li>
+                          <li>
+                            3.3 Предоставление услуг Администратором Сайта направлено на обеспечение
+                            возможности проведения досуга Пользователями в виде участия в безрисковых
+                            играх и развлечениях без предоставления возможности получения материального
+                            выигрыша с использованием сервисов Сайта, в частности Блоков услуг, указанных
+                            в настоящем разделе Соглашения.
+                          </li>
+                          <li>
+                            3.4 В рамках настоящего Пользовательского соглашения Администратор за плату,
+                            уплачиваемую Пользователем, предоставляет последнему
+                            развлекательно-аттракционные услуги посредством различных сервисов (разделов)
+                            Сайта.
+                          </li>
+                          <li>
+                            3.5 Описание соответствующих Блоков услуг, их характеристики, порядок
+                            предоставления и оказания, условия использования Сайта и порядок
+                            взаимодействия указываются в разделах 4-9 настоящего Соглашения.
+                            Пользователям, использующим Блоки услуг, запрещено использовать бот-программы
+                            и попытки сговора и взаимодействия друг с другом с целью влияния на результаты
+                            оказания и предоставления данных услуг в интересах одного или нескольких из
+                            таких Пользователей. Выявление Администратором Сайта таких фактов, будет
+                            служить основанием к запрету доступа Пользователя к соответствующим Блокам
+                            услуг Сайта или в целом ко всему Сайту.
+                          </li>
+                          <li>
+                            3.5.1 Пользователь не имеет права пытаться каким-либо образом заполучить
+                            виртуальный объект вместо его передачи во время пополнения баланса.
+                          </li>
+                          <li>
+                            3.6 В рамках оказания соответствующих Блоков услуг (независимо от его
+                            названия, назначения и содержания) Администратором Сайта предоставляются
+                            Пользователю следующие сопутствующие услуги:
+                          </li>
+                          <li>
+                            3.6.1 Доступ к использованию Сайта;
+                          </li>
+                          <li>
+                            3.6.2 Право на пользование техническими возможностями Сайта;
+                          </li>
+                          <li>
+                            3.6.3 Предоставление информации о тех или иных многопользовательских онлайн
+                            или офлайн компьютерных играх;
+                          </li>
+                          <li>
+                            3.6.4 Предоставление в распоряжение Пользователя Виртуальных объектов в
+                            порядке и на условиях, определенных соответствующим Блоком услуг.
+                          </li>
+                          <li>
+                            3.7 Услуги, оказываемые Администратором Сайта, являются
+                            зрелищно-развлекательными (графика/анимация, представленные на Сайте) и
+                            аттракционными (программа - симулятор). Услуги Сайта концептуально связаны с
+                            темой многопользовательских сетевых игр. Услуги, предоставляемые
+                            Администратором Сайта, направлены на удовлетворение личных
+                            эмоционально-психологических потребностей Пользователей и строятся по принципу
+                            - симулятора. Пользователь в результате пользования услугами может испытать
+                            эмоциональное удовлетворение от своего участия в симуляторе определенных
+                            игровых ситуаций, без принятия на себя бремени возможных негативных
+                            последствий того процесса (процесса, который в услугах на Сайте представлен
+                            только в виде симулятора).
+                          </li>
+                          <li>
+                            3.8 Услуги, предоставляемые Администратором Сайта, не являются услугами по
+                            организации и проведению основанных на риске игр, т.е. не являются азартными
+                            играми, лотереями, тотализаторами и не являются прочими услугами, при которых
+                            Пользователь несет какие-либо материальные риски. То есть услуги не являются
+                            процессами, при которых Пользователь заключает основанное на риске соглашение
+                            о выигрыше. Услуги, предоставляемые Администратором Сайта, не содержат
+                            элементов азартной игры, не содержат элементы и признаки основанного на риске
+                            соглашения о выигрыше (основанные на риске игры, рисковые игры).
+                          </li>
+                          <li>
+                            3.9 Администратор Сайта может отменять оказание и предоставление тех или иных
+                            Блоков услуг без предварительного уведомления Пользователей. В указанном
+                            случае Администратор Сайта восстанавливает на счете Пользователя все
+                            Виртуальные объекты, денежные средства, монеты и т.д., внесенные Пользователем
+                            для получения соответствующих услуг.
+                          </li>
+                          <li>
+                            5. РАЗДЕЛ «Главная игра»
+                          </li>
+                          <li>
+                            5.1 В рамках оказания настоящего Блока услуг, Администратор Сайта
+                            предоставляет Пользователям развлекательно-аттракционные услуги с возможностью
+                            получить тот или иной Виртуальный объект, определяемый по усмотрению
+                            Администратора Сайта и в соответствии с функционалом Сайта.
+                          </li>
+                          <li>
+                            5.2 Для получения соответствующей услуги Пользователь вносит плату в виде
+                            принадлежащих Пользователю средств, находящихся на Счете Пользователя.
+                          </li>
+                          <li>
+                            5.3 Конкретный вид Виртуального объекта, который может быть предоставлен
+                            Пользователю в рамках оказания услуги, и соответствующие ему наименование,
+                            функциональные возможности и содержание определяются в автоматическом режиме.
+                            При этом, по факту внесения платы, Пользователю предоставляется исключительно
+                            информация о категории, к которой относится соответствующая услуга
+                            (Виртуальный объект).
+                          </li>
+                          <li>
+                            5.4 Пользователь самостоятельно принимает решение о приобретении (получении)
+                            того или иного Виртуального объекта, категория которого определена в данном
+                            блоке Сайта.
+                          </li>
+                          <li>
+                            5.5
+                          </li>
+                          <li>
+                            Внесенная Пользователем плата за получение услуги по приобретению Виртуального
+                            объекта является безусловно невозвратной;
+                          </li>
+                          <li>
+                            Конкретный вид Виртуального объекта, передаваемого Пользователю в рамках
+                            предоставления услуги, определяется в автоматическом режиме посредством
+                            случайного выбора технической системой Сайта;
+                          </li>
+                          <li>
+                            Конкретный вид Виртуального объекта, передаваемого Пользователю в рамках
+                            предоставления услуги, определяется в автоматическом режиме посредством
+                            случайного выбора технической системой Сайта;
+                          </li>
+                          <li>
+                            Предоставленный Пользователю Виртуальный объект в рамках предоставления услуги
+                            по своему содержанию и рыночной стоимости может не соответствовать плате,
+                            внесенной Пользователем.
+                          </li>
+                          <li>
+                            5.6 При пополнение баланса с помощью виртуального объекта пользователь обязан
+                            отыграть (использовать в блоке развлекательно-аттракционных услуг) сумму,
+                            равную сумме пополнения, для возможности посредством вывода с сайта, получения
+                            виртуального объекта в игре.
+                          </li>
+                          <li>
+                            12. РАСЧЕТЫ МЕЖДУ СТОРОНАМИ
+                          </li>
+                          <li>
+                            12.1 За предоставление услуг, предусмотренных настоящим Соглашением,
+                            Пользователь обязуется оплатить Администратору Сайта вознаграждение в размерах
+                            и порядках, определенных соответствующими блоками услуг.
+                          </li>
+                          <li>
+                            12.2 Оплата услуг Администратора осуществляется посредством списания
+                            соответствующей суммы или удержания соответствующего Виртуального объекта или
+                            списания соответствующего количества монет со Счета Пользователя в счет оплаты
+                            услуг за пользование Сайтом, предоставляемых Администратором Сайта.
+                          </li>
+                          <li>
+                            12.3 Способы пополнения Счета Пользователя, используемые платежные системы,
+                            определяются по усмотрению Администратора Сайта и внедряются в технический
+                            функционал Сайта.
+                          </li>
+                          <li>
+                            12.4 Комиссии, связанные с оплатой услуг Администратора Сайта (с пополнением
+                            Счета Пользователя), оплачиваются Пользователем самостоятельно.
+                          </li>
+                          <li>
+                            12.5 В случае, когда у Пользователя недостаточно средств, необходимых для
+                            оплаты услуг Администратора Сайта в размере, определенным соответствующим
+                            Блоком услуг, Администратор Сайта не предоставляет такому Пользователю
+                            возможность в получении Виртуального объекта.
+                          </li>
+                          <li>
+                            12.6 В случае, если Пользователь не совершал никаких операций на сайте
+                            (Пополнение счета или принятие участия в игре) в течение 60 (шестидесяти)
+                            суток, Администратор Сайта вправе списать у такого Пользователя оставшееся на
+                            балансе золото и рубли.
+                          </li>
+                          <li>
+                            12.9.1 В случае использования пользователем уязвимостей в программном коде
+                            Сайта для получения выгоды, Администратор сайта оставляет за собой право
+                            заблокировать такого Пользователя и списать все полученные таким способом
+                            средства с баланса на Сайте.
+                          </li>
+                          <li>
+                            13. ОТВЕТСТВЕННОСТЬ
+                          </li>
+                          <li>
+                            13.1 За нарушение условий, установленных настоящим Соглашением, Пользователь и
+                            Администратор Сайта несут ответственность в соответствии с действующим
+                            законодательством.
+                          </li>
+                          <li>
+                            13.2 За нарушение настоящего Соглашения Администратор Сайта вправе применить к
+                            Пользователю следующие меры:
+                          </li>
+                          <li>
+                            Заблокировать доступ Пользователя к его Личному кабинету на определенный срок
+                            или без ограничения срока, и блокировать все аккаунты, зарегестрированные в
+                            последующем времени;
+                          </li>
+                          <li>
+                            Аннулировать (деактивировать) Личный кабинет Пользователя;
+                          </li>
+                          <li>
+                            Ограничить сферу возможного использования Пользователем Сайта на определенный
+                            срок или без определения срока.
+                          </li>
+                          <li>
+
+                          </li>
+                          <li>
+                            13.3 Администратор Сайта не несет ответственность за убытки и расходы,
+                            возникшие у Пользователя в связи с использованием Сайта, в частности:
+                          </li>
+                          <li>
+                            Убытки и расходы, вызванные использованием информации, размещенной на Сайте.
+                          </li>
+                          <li>
+                            Убытки и расходы, вызванные несанкционированным доступом третьих лиц, в том
+                            числе других Пользователей, к Личному кабинету Пользователя.
+                          </li>
+                          <li>
+                            Убытки и расходы, возникшие у Пользователя в связи с неполучением Виртуального
+                            объекта, получением Виртуального объекта, не соответствующего желаниям и/или
+                            намерениям Пользователя.
+                          </li>
+                          <li>
+                            Убытки и расходы, вызванные не зависимыми от Администрации проблемами,
+                            катаклизмами и форс-мажорными факторами и/или обстоятельствами.
+                          </li>
+                          <li>
+                            13.4 Администратор Сайта не несет ответственность за расходы, убытки и/или
+                            иной ущерб, возникший у Пользователя в связи с ознакомлением с рекламой,
+                            рекламными баннерами и объявлениями, контекстной рекламой, гиперссылками,
+                            которые размещены на Сайте.
+                          </li>
+                          <li>
+                            13.5 Пользователь обязуется не предъявлять к Администратору Сайта каких-либо
+                            требований или претензий, связанных с не предоставлением Пользователю (отказом
+                            в предоставлении Пользователю) Виртуального объекта, предоставлением
+                            Пользователю Виртуального объекта, не соответствующего желаниям и/или
+                            намерениям Пользователя.
+                          </li>
+                          <li>
+                            13.6 Администратор Сайта не несет ответственности за возможные сбои и перерывы
+                            в работе Сайта и вызванные ими потери информации.
+                          </li>
+                          <li>
+                            14. ПОРЯДОК РАЗРЕШЕНИЯ
+                          </li>
+                          <li>
+                            14.1 Настоящим Администратор Сайта и Пользователь установили претензионный
+                            досудебный порядок урегулирования разногласий и споров, вытекающих из
+                            применения настоящего Соглашения. Срок для ответа на предъявленную претензию
+                            составляет 10 (десять) рабочих дней с момента ее получения.
+                          </li>
+                          <li>
+                            14.2 О всех проблемах и недостатках, связанных с функционированием Сайта, а
+                            также с исполнением обязательств Пользователь обязан информировать
+                            Администратора Сайта не позднее, чем в течение суток с момента обнаружения
+                            соответствующих проблем и недостатков.
+                          </li>
+                          <li>
+                            14.3 В случае не достижения договоренности по спорным вопросам спор,
+                            вытекающий из данного Соглашения, подлежит рассмотрению в судебном порядке в
+                            соответствии с законодательством Российской Федерации по месту нахождения
+                            Администратора Сайта.
+                          </li>
+                          <li>
+                            15. ДЕЙСТВИЕ ПОЛЬЗОВАТЕЛЬСКОГО СОГЛАШЕНИЯ
+                          </li>
+                          <li>
+                            15.1 Настоящее Соглашение вступает в силу с момента его размещения в сети
+                            интернет на Сайте, указанном в пункте 1.
+                          </li>
+                          <li>
+                            1.1. настоящего Соглашения.
+                          </li>
+                          <li>
+                            15.2 Настоящее Соглашение заключается на неопределенный срок и утрачивает свою
+                            силу при его аннулировании Администратором Сайта.
+                          </li>
+                          <li>
+                            15.3 В случае внесения изменений в Соглашение, такие изменения вступают в силу
+                            с момента опубликования новой редакции Соглашения на Сайте, если иной срок
+                            вступления изменений в силу не определен дополнительно при их публикации.
+                          </li>
+                          <li>
+                            15.4 Пользователь обязуется самостоятельно осуществлять контроль за
+                            изменениями в положения настоящего Соглашения и несет ответственность за
+                            негативные последствия, связанные с несоблюдением данной обязанности.
+                          </li>
+                          <li>
+                            15.5 В случае, несогласия Пользователя с внесенными в настоящее Соглашение
+                            изменениями, Пользователь обязан прекратить использование Сайта. В противном
+                            случае, продолжение использования Пользователем Сайта, не соответствующего
+                            желаниям и/или намерениям Пользователя Сайта означает, что Пользователь
+                            согласен с условиями Соглашения в новой редакции.
+                          </li>
+                          <li>
+                            15.6 Актуальная версия Соглашения расположена на Сайте по
+                            адресу:durak-drop.com/rules.
+                          </li>
+                          <li>
+                            15.7 Настоящее Соглашение было составлено на русском языке. В случае наличия
+                            каких-либо несоответствий между версией Соглашения, составленной на русском
+                            языке, и версией Соглашения, переведенной на другой язык, приоритет и прямое
+                            применение будут иметь положения Соглашения, составленные на русском языке.
+                          </li>
+                        </ul>
+                        </p>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__row">
+          <div class="footer__info">
+            <a href="https://durakroll.com" class="footer__logo">
+              <svg>
+                <use xlink:href="img/icons/sprite-edits.svg#logofooter"></use>
+              </svg>
+            </a>
+
+            <a href="https://vk.com/durak24" target="_blank"
+              class="footer__soc-item footer__soc-item footer__soc-item_vk">
+              <img src="img/gallery/vk.png" alt="">
+            </a>
+            <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank"
+              class="footer__soc-item footer__soc-item_yt">
+              <svg>
+                <use xlink:href="img/icons/sprite-edits.svg#youtube"></use>
+              </svg>
+            </a>
+          </div>
+          <div class="footer__text-block">
+            <div class="footer__text-achievements">
+              С вами с 2019 года. <br>
+              Более 50 000 подписчиков в группе Вконтакте. <br>
+              Свыше 600 положительных отзывов.
+            </div>
+            <div class="footer__rights">
+              Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- @//@include('_modal.html') -->
+
+    <div class="popup" id="modalPayment">
+      <div class="popup__body">
+        <div class="popup__content modal modal_payment">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="modal-payment">
+            <a href="#amountSelection" class="modal-payment__block popup-link">
+              <h3 class="modal__title modal-payment__title">
+                Пополнить деньгами
+              </h3>
+              <ul class="modal-payment__cards cards">
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img payment-system__img_big">
+                    <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                  </div>
+                  <div class="payment-system__title">
+                    Visa/Master/Мир
+                  </div>
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/qivi.png" alt="qivi">
+                  </div>
+                  <div class="payment-system__title">
+                    Киви кошелёк
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/yumani.png" alt="ЮMoney">
+                  </div>
+                  <div class="payment-system__title">
+                    ЮMoney
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Apple pay
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Google-pay.png" alt="Google pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Google pay
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Samsung pay
+                  </div>
+
+
+                </li>
+              </ul>
+
+            </a>
+            <a href="#selectAmount" class="modal-payment__block popup-link">
+              <h3 class="modal__title modal-payment__title">
+                Пополнить игровой валютой
+              </h3>
+              <div class="modal-payment__game-currency game-currency">
+                <div class="game-currency__img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup" id="amountSelection">
+      <div class="popup__body">
+
+        <div class="popup__content modal modal_amount-selection amount-selection modal_popup">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="smiley amount-selection__smiley">
+            <div class="smiley__img">
+              <img src="img/gallery/smiley.png" alt="смайлик">
+            </div>
+            <div class="smiley__text">
+              - Чем больше берешь, <br> тем дешевле выходит!
+            </div>
+
+
+          </div>
+          <div class="amount-selection__content">
+            <h3 class="modal__title amount-selection__title">
+              Введите сумму или количество валюты
+            </h3>
+            <form class="scrollbar-overflow form amount-selection__form" action="">
+              <div class="amount-selection__block-input">
+                <div class="amount-selection__item">
+                  <div class="amount-selection__currency">₽</div>
+                  <input inputmode="numeric" step="1" type="tel" class="form__input amount-selection__input"
+                    placeholder="Введите сумму..." min="69" max="50000">
+                  <div class="amount-selection__info">Мин 69р. / 50 Тыс.</div>
+                </div>
+                <div class="amount-selection__item"><span class="amount-selection__smooth">=</span></div>
+                <div class="amount-selection__item">
+                  <div class="form num-game-currency">
+                    <div class="form__input num-game-currency__input num-game-currency__input_value">
+                      <svg class="num-game-currency__img-icon">
+                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                      </svg>
+                      <input inputmode="numeric" name="valuesum" step="1" placeholder="Введите кол-во..." value=""
+                        type="tel" class="num-game-currency__span-curent"></input>
+                    </div>
+                    <div class="form__input num-game-currency__input num-game-currency__input_units">
+                      Тыс.
+                    </div>
+                  </div>
+                  <div class="amount-selection__info amount-selection__info_units">+4% бонус</div>
+                </div>
+
+              </div>
+
+              <div class="mod-arrow amount-selection__right">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                </svg>
+              </div>
+              <div class="swiper amount-selection__checkbox">
+                <div class="swiper-wrapper amount-selection__wrapper">
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="selectionCard" name="paymentSystem"
+                      value="Visa/Master/Мир" checked>
+                    <label for="selectionCard" class="amount-selection__card payment-system">
+                      <div class="payment-system__img payment-system__img_big">
+                        <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                      </div>
+                      <div class="payment-system__title">
+                        Visa/Master/Мир
+                      </div>
+                    </label>
+
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem"
+                      value="Qiwi кошелёк">
+                    <label for="Qiwi" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/qivi.png" alt="Qiwi кошелёк">
+                      </div>
+                      <div class="payment-system__title">
+                        Qiwi кошелёк
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem" value="ЮMoney">
+                    <label for="yumani" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/yumani.png" alt="ЮMoney">
+                      </div>
+                      <div class="payment-system__title">
+                        ЮMoney
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Webmoney" name="paymentSystem"
+                      value="Webmoney">
+                    <label for="Webmoney" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Webmoney.png" alt="Webmoney">
+                      </div>
+                      <div class="payment-system__title">
+                        Webmoney
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="SamsungPay" name="paymentSystem"
+                      value="SamsungPay">
+                    <label for="SamsungPay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Samsung pay
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="ApplePay" name="paymentSystem"
+                      value="ApplePay">
+                    <label for="ApplePay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Apple pay
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="MobOperators" name="paymentSystem"
+                      value="Моб.операторы">
+                    <label for="MobOperators" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Mob-operators.png" alt="Моб. операторы">
+                      </div>
+                      <div class="payment-system__title">
+                        Моб. операторы
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Cryptocurrency" name="paymentSystem"
+                      value="Криптовалюта">
+                    <label for="Cryptocurrency" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Cryptocurrency.png" alt="Криптовалюта">
+                      </div>
+                      <div class="payment-system__title">
+                        Криптовалюта
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem" value="PayPal">
+                    <label for="PayPal" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/PayPal.png" alt="PayPal">
+                      </div>
+                      <div class="payment-system__title">
+                        PayPal
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="GooglePay" name="paymentSystem"
+                      value="GooglePay">
+                    <label for="GooglePay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Google-pay.png" alt="Google pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Google pay
+                      </div>
+                    </label>
+                  </div>
+
+                </div>
+              </div>
+              <div class="mod-arrow amount-selection__left">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                </svg>
+              </div>
+              <button type="submit" class="btn btn_danger amount-selection__btn btn-disable-sum">Пополнить</button>
+
+
+
+            </form>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="popup select-amount" id="selectAmount">
+      <div class="popup__body">
+        <div class="popup__content modal modal_select-amount ">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <h3 class="modal__title select-amount__title">
+            Выберите сумму
+          </h3>
+
+          <div class="scrollbar-overflow select-amount__content">
+            <div class="mod-arrow select-amount__up">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+            <div class="swiper select-amount__slider">
+              <div class="swiper-wrapper select-amount__wrapper">
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      50К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      100К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      250К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      500К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      1M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      2M
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      5M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      10M
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+            <div class="mod-arrow select-amount__down">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+    <div class="popup modal-manual" id="modalManual">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+          <div class="modal-manual__queries">
+            Заявка #22131
+          </div>
+          <a href="#" class="popup__close close-popup close-popup_close">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Инструкция
+          </h3>
+
+          <div class="modal-manual__text">
+            <ul>
+              <li>1. Общие положения</li>
+              <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее – Пользователь) -
+                использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее —
+                «Соглашение», «ПС»).
+                Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»). Соглашение
+                вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+              </li>
+            </ul>
+            <div class="modal-manual__footnote">
+              *в случае неудачной попытки обыгрыша валюта не возвращается
+            </div>
+
+          </div>
+          <a href="##" class="btn btn_danger modal-manual__btn btn_white" id="modalManualBtn">
+            <div class="timer" id="timerOne">0:10</div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+    <div class="popup select-amount" id="selectAmountInput">
+      <div class="popup__body">
+        <div class="popup__content modal modal_select-amount modal_select-amount_input">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="select-amount__s-am-input s-am-input">
+            <h3 class="s-am-input__title">
+              Ваш баланс в Дурак Онлайн
+            </h3>
+
+            <div class="s-am-input__input-block">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+              </svg>
+              <input inputmode="numeric" class="s-am-input__input" placeholder="Введите ваш баланс в Дураке..."
+                type="tel" step="1" name="add-sum" class="roulette__table-input">
+              <div class="s-am-input__msg">Вы должны иметь минимум 100 кредитов!</div>
+            </div>
+          </div>
+          <h3 class="modal__title select-amount__title">
+            Выберите сумму
+          </h3>
+
+          <div class="scrollbar-overflow select-amount__content">
+            <div class="mod-arrow select-amount__up">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+            <div class="swiper select-amount__slider">
+              <div class="swiper-wrapper select-amount__wrapper">
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      50К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      100К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      250К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      500К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      1M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      2M
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      5M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      10M
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+            <div class="mod-arrow select-amount__down">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="libs/swiper@8_swiper-bundle.min.js"></script>
+  <script type="text/javascript" src="js/script.js"></script>
+
+</body>
+
+</html>

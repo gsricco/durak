@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Профиль</title>
+  <!-- <meta name="description" content="Описание" />
+	<link rel="icon" href="img/favicon.png" type="image/x-icon">
+	<meta property="og:title" content="Профиль" />
+	<meta property="og:description" content="Описание" />
+	<meta property="og:image" content="img/...png" /> -->
+  <link rel="stylesheet" href="custom-css/one.css">
+  <link rel="stylesheet" href="libs/swiper@8_swiper-bundle.min.css" />
+  <link rel="stylesheet" href="css/style.css">
+  <!-- <link rel="stylesheet" href="css/style.min.css"> -->
+  <link rel="icon" href="img/icon.svg" type="image/svg">
+</head>
+
+<body class="scrollbar-overflow">
+  <div class="wrapper homepage" id="wrapper">
+
+    <div class="preloader">
+      <div class="preloader__wrapper">
+        <div class="preloader__item"></div>
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container">
+        <div class="header__row">
+
+          <div class="header__logo-wrapper">
+            <div class="burger-menu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <div class="header__logo">
+              <a href="https://durakroll.com">
+                <svg>
+                  <use xlink:href="img/icons/sprite-edits.svg#logo"></use>
+                </svg>
+              </a>
+            </div>
+
+            <!-- If not logged-in -->
+            <div class="header__login" style="display: none;">
+              <a href="#vk" class="header__login-link">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#vk_login"></use>
+                </svg>
+              </a>
+              <a href="#google" class="header__login-link">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#google_login"></use>
+                </svg>
+              </a>
+            </div>
+
+            <!-- If logged-in and has balance -->
+            <a href="https://durakroll.com/profil.html" class="header__balance">
+              <span>1.32m</span>
+            </a>
+          </div>
+
+          <div class="header__wrapper">
+            <nav class="header__nav">
+              <ul class="header__list">
+                <li class="header__li">
+                  <a href="https://durakroll.com/honesty.html" class="header__link">ЧЕСТНОСТЬ</a>
+                </li>
+                <li class="header__li">
+                  <a href="https://durakroll.com/faq.html" class="header__link">ПОМОЩЬ</a>
+                </li>
+
+                <li class="header__li">
+                  <a href="https://durakroll.com/contact.html" class="header__link">КОНТАКТЫ</a>
+                </li>
+
+                <li class="header__li">
+                  <a href="https://durakroll.com/bonus-currency.html" class="header__link header__link_red">FREE</a>
+                </li>
+              </ul>
+            </nav>
+
+            <div class="header__profile">
+              <a href="https://durakroll.com/profil.html" class="header__avatar">
+                <img src="img/gallery/avatar.png" alt="">
+              </a>
+
+              <div class="header__profile-info">
+                <a href="https://durakroll.com/profil.html" class="header__profile-name">
+                  <!-- If not logged-in -->
+                  <span style="display: none;">Anonymous</span>
+
+                  <!-- If logged-in -->
+                  <span>Username</span>
+
+                  <svg class="header__profile-settings">
+                    <use xlink:href="img/icons/sprite.svg#setings"></use>
+                  </svg>
+                </a>
+
+                <div class="header__profile-row">
+                  <!-- If user logged-in -->
+                  <a href="https://durakroll.com/profil.html" class="header__profile-sum">
+                    <div class="header__profile-sum-img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                      </svg>
+                    </div>
+
+                    <span>1.32m</span>
+                  </a>
+
+                  <!-- If user logged-in -->
+                  <a href="#modalPayment" class="header__profile-link popup-link">
+                    Пополнить
+                  </a>
+
+                  <!-- If user logged-in -->
+                  <a href="#selectAmountInput" class="header__profile-link popup-link">
+                    Вывести
+                  </a>
+
+                  <!-- If not logged-in -->
+                  <a href="#vk" class="header__profile-login" style="display: none;">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#vk_login"></use>
+                    </svg>
+                  </a>
+                  <a href="#google" class="header__profile-login" style="display: none;">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#google_login"></use>
+                    </svg>
+                  </a>
+
+                  <!-- Login btn mobile shown if not logged-in-->
+                  <a href="#" class="header__login-btn" style="display: none;">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#login"></use>
+                    </svg>
+                  </a>
+                </div>
+
+                <!-- If user logged-in -->
+                <a href="https://durakroll.com/profil.html" class="header__profile-progressbar">
+                  <div class="header__profile-lvl header__profile-lvl_back">
+                    17<span>ур</span>
+                  </div>
+                  <div class="header__profile-line">
+                    <span></span>
+                  </div>
+                  <div class="header__profile-lvl header__profile-lvl_next">
+                    18<span>ур.</span>
+                  </div>
+                </a>
+
+                <div class="header__btns">
+                  <a href="#modalPayment" class="header__profile-btn popup-link">
+                    Пополнить
+                  </a>
+
+                  <a href="#selectAmountInput" class="header__profile-btn popup-link">
+                    Вывести
+                  </a>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <section class="profil-main">
+          <div class="profil-main__row heigth-max-class">
+
+            <section class="online-chat">
+              <div class="online-chat__header">
+                <div class="online-chat__header-left">
+                  <svg class="online-chat__icon-chat">
+                    <use xlink:href="img/icons/sprite.svg#chat"></use>
+                  </svg>
+                  <h4 class="online-chat__title">Чат</h4>
+                </div>
+
+                <svg class="online-chat__icon-close">
+                  <use xlink:href="img/icons/sprite.svg#close"></use>
+                </svg>
+                <div class="online-chat__header-rigth">
+                  <div class="online-chat__current">239</div>
+                  <span class="online-chat__torch"></span>
+                </div>
+              </div>
+
+              <div class="online-chat__body">
+                <div class="online-chat__body-wrapper">
+                  <ul class="online-chat__list scrollbar-overflow">
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Васька
+                        </span>
+                        <span class="online-chat__li-sms">щя все слил!!111</span>
+
+                      </p>
+                    </li>
+
+                    <li class="online-chat__li">
+                      <div class="online-chat__li-wrapper">
+                        <div class="online-chat__li-rubin">
+                          <svg>
+                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                          </svg>
+                        </div>
+                        <div class="online-chat__li-avatar">
+                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                        </div>
+
+                      </div>
+
+
+                      <p class="online-chat__li-text">
+                        <span class="online-chat__li-name">
+                          Артемий
+                        </span>
+                        <span class="online-chat__li-sms">ща на изи буду лутать бабки</span>
+                      </p>
+                    </li>
+
+
+
+                  </ul>
+                  <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
+                    <span class="online-chat__torch"></span>
+                    <div class="online-chat__current">239</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="online-chat__footer">
+                <div class="online-chat__rules rules">
+                  <div class="rules__row">
+                    <div class="rules__title">
+                      Правила чата
+                    </div>
+                    <div class="rules__text">
+                      <div class="rules__text-title">
+                        Запрещается:
+                      </div>
+                      <ol class="rules__list">
+                        <li class="rules__item">1. Обмен/продажа игровых объектов</li>
+                        <li class="rules__item">2. Попрошайничество</li>
+                        <li class="rules__item">3. Размещение ссылок</li>
+                        <li class="rules__item">4. Однотипные сообщения</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="online-chat__input-block">
+                  <input placeholder="Написать сообщение..." name="chat-message" type="text" class="online-chat__input"
+                    autocomplete="off">
+                  <div class="online-chat__icon-doc">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#document"></use>
+                    </svg>
+                  </div>
+
+                  <a href="##" class="online-chat__icon-arrow">
+                    <svg>
+                      <use xlink:href="img/icons/sprite.svg#chatarrow"></use>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            <div class="profil-main__content">
+              <!-- <ul class="breadcrumbs">
+								<li class="breadcrumbs__item">
+									РУЛЕТКА
+								</li>
+							</ul> -->
+
+              <div class="tabs profil-main__tabs">
+                <div class="tabs__nav profil-main__nav">
+                  <a class="tabs__link profil-main__tabs-link tabs__link_active" href="#content-1">ПРОФИЛЬ</a>
+                  <a class="tabs__link profil-main__tabs-link" href="#content-2">ТРАНЗАКЦИИ</a>
+                </div>
+                <div class="tabs__content">
+                  <div class="tabs__pane tabs__pane_show" id="content-1">
+                    <section class="profil">
+                      <div class="profil__row">
+                        <div class="profil__left">
+                          <div class="profil__avatar">
+                            <img src="img/gallery/avatar.png" alt="">
+                          </div>
+                          <div class="profil__info">
+                            <div class="profil__name-wrapper">
+                              <div class="profil__name-block">
+                                <div class="profil__name">
+
+                                  <div class="profil__name-text">
+                                    <span>Nickname</span>
+                                  </div>
+                                  <a href="#profileSettings" class="popup-link">
+                                    <svg class="profil__icon-settings">
+                                      <use xlink:href="img/icons/sprite.svg#setings"></use>
+                                    </svg>
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="profil__btns">
+                              <a href="#google" class="profil__btn profil__btn_google">Войти с помощью Google</a>
+                              <a href="#vk" class="profil__btn profil__btn_vk">Войти с помощью VK</a>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="profil__progressbar">
+                          <div class="profil__progressbar-lvl">
+                            <svg class="profil__progressbar-lvl-img">
+                              <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            </svg>
+                            <p class="profil__progressbar-lvl-num">17 LVL</p>
+                            <span class="profil__progressbar-lvl-progress">300 / 1000 XP</span>
+                          </div>
+                          <div class="profil__progressbar-row">
+                            <div class="profil__progressbar-current">
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                              </svg>
+                              <p>2 <span>шт.</span></p>
+                            </div>
+
+                            <div class="profil__progressbar-line">
+                              <span></span>
+                            </div>
+
+                            <div class="profil__progressbar-current">
+                              <p>3 <span>шт.</span></p>
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="profil__block-wrapper">
+                        <h2 class="profil__title">
+                          Инвентарь
+                        </h2>
+
+                        <div class="profil__block">
+                          <div class="profil__block-row">
+                            <div class="profil__items">
+
+                              <!-- If there is no items -->
+                              <div class="profil__warning" style="display: none;">
+                                Предметы можно получить из кейсов (даются за новый уровень)..
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Медведь</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Робот</h3>
+                                </div>
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Вампир</h3>
+                                </div>
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Единорог</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_lion"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Лев</h3>
+                                </div>
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_gnome"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Гном</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Единорог</h3>
+                                </div>
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_lion"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Лев</h3>
+                                </div>
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_gnome"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Гном</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Единорог</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_lion"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Лев</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+                              <div class="profil__item">
+                                <div class="profil__item-wrapper">
+                                  <div class="profil__item-img">
+                                    <svg>
+                                      <use xlink:href="img/icons/sprite.svg#smile_gnome"></use>
+                                    </svg>
+                                  </div>
+                                  <h3 class="profil__item-title">Смайлы Гном</h3>
+                                </div>
+
+                                <div class="profil__item-tags">
+                                  <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                  <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                </div>
+                              </div>
+
+
+                            </div>
+
+                            <div class="profil__slider-block-wrapper">
+                              <div class="profil__slider">
+                                <div class="profil__slider-arrow profil__slider-arrow_back">
+                                  <svg class="online-chat__icon-chat">
+                                    <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                                  </svg>
+                                </div>
+
+                                <div class="swiper-wrapper profil__slider-wrapper">
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#amber_case"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Янтарный кейс</h3>
+                                  </a>
+
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#pearl_case"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Жемчужный кейс</h3>
+                                  </a>
+
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#rubin_purple"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Аметистовый кейс</h3>
+                                  </a>
+
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Изумрудный кейс</h3>
+                                  </a>
+
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#rubin_blue"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Сапфировый кейс</h3>
+                                  </a>
+
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Рубиновый кейс</h3>
+                                  </a>
+
+                                  <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                    <div class="profil__slider-img">
+                                      <svg>
+                                        <use xlink:href="img/icons/sprite.svg#rubin_turquoise"></use>
+                                      </svg>
+                                    </div>
+                                    <h3 class="profil__slider-title">Алмазный кейс</h3>
+                                  </a>
+                                </div>
+
+                                <div class="profil__slider-arrow profil__slider-arrow_next">
+                                  <svg class="online-chat__icon-chat">
+                                    <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                                  </svg>
+                                </div>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="tabs__pane" id="content-2">
+                    <section class="transactions">
+                      <div class="transactions__wrapper">
+                        <div class="transactions__titles">
+                          <h3 class="transactions__name">СУММА</h3>
+                          <h3 class="transactions__name">ТИП</h3>
+                          <h3 class="transactions__name">ДАТА</h3>
+                        </div>
+
+                        <div class="transactions__items">
+                          <div class="transactions__item">
+                            <div class="transactions__item-sum transactions__item-info">
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                              </svg>
+                              <span class="transactions__item-text">+2k</span>
+                            </div>
+                            <div class="transactions__item-type transactions__item-info">
+                              <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                            </div>
+                            <div class="transactions__item-date transactions__item-info">
+                              <span> 2021-06-05-05 19 PM GMT</span>
+
+                            </div>
+                          </div>
+
+                          <div class="transactions__item">
+                            <div class="transactions__item-sum transactions__item-info">
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                              </svg>
+                              <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                            </div>
+                            <div class="transactions__item-type transactions__item-info">
+                              <span> Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                            </div>
+                            <div class="transactions__item-date transactions__item-info">
+                              <span>2021-06-05-05 19 PM GMT</span>
+
+                            </div>
+                          </div>
+
+                          <div class="transactions__item">
+                            <div class="transactions__item-sum transactions__item-info">
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                              </svg>
+                              <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                            </div>
+                            <div class="transactions__item-type transactions__item-info">
+                              <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                            </div>
+                            <div class="transactions__item-date transactions__item-info">
+                              <span>2021-06-05-05 19 PM GMT</span>
+
+                            </div>
+                          </div>
+
+                          <div class="transactions__item">
+                            <div class="transactions__item-sum transactions__item-info">
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                              </svg>
+                              <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                            </div>
+                            <div class="transactions__item-type transactions__item-info">
+                              <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                            </div>
+                            <div class="transactions__item-date transactions__item-info">
+                              <span>2021-06-05-05 19 PM GMT</span>
+
+                            </div>
+                          </div>
+
+                          <div class="transactions__item">
+                            <div class="transactions__item-sum transactions__item-info">
+                              <svg>
+                                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                              </svg>
+                              <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                            </div>
+                            <div class="transactions__item-type transactions__item-info">
+                              <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                            </div>
+                            <div class="transactions__item-date transactions__item-info">
+                              <span>2021-06-05-05 19 PM GMT</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__row">
+          <div class="footer__info">
+            <a href="https://durakroll.com" class="footer__logo">
+              <svg>
+                <use xlink:href="img/icons/sprite-edits.svg#logofooter"></use>
+              </svg>
+            </a>
+
+            <a href="https://vk.com/durak24" target="_blank"
+              class="footer__soc-item footer__soc-item footer__soc-item_vk">
+              <img src="img/gallery/vk.png" alt="">
+            </a>
+            <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank"
+              class="footer__soc-item footer__soc-item_yt">
+              <svg>
+                <use xlink:href="img/icons/sprite-edits.svg#youtube"></use>
+              </svg>
+            </a>
+          </div>
+          <div class="footer__text-block">
+            <div class="footer__text-achievements">
+              С вами с 2019 года. <br>
+              Более 50 000 подписчиков в группе Вконтакте. <br>
+              Свыше 600 положительных отзывов.
+            </div>
+            <div class="footer__rights">
+              Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- @//@include('_modal.html') -->
+    <div class="popup" id="modalPayment">
+      <div class="popup__body">
+        <div class="popup__content modal modal_payment">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="modal-payment">
+            <a href="#amountSelection" class="modal-payment__block popup-link">
+              <h3 class="modal__title modal-payment__title">
+                Пополнить деньгами
+              </h3>
+              <ul class="modal-payment__cards cards">
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img payment-system__img_big">
+                    <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                  </div>
+                  <div class="payment-system__title">
+                    Visa/Master/Мир
+                  </div>
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/qivi.png" alt="qivi">
+                  </div>
+                  <div class="payment-system__title">
+                    Киви кошелёк
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/yumani.png" alt="ЮMoney">
+                  </div>
+                  <div class="payment-system__title">
+                    ЮMoney
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Apple pay
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Google-pay.png" alt="Google pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Google pay
+                  </div>
+
+
+                </li>
+                <li class="modal-payment__card payment-system">
+                  <div class="payment-system__img">
+                    <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                  </div>
+                  <div class="payment-system__title">
+                    Samsung pay
+                  </div>
+
+
+                </li>
+              </ul>
+
+            </a>
+            <a href="#selectAmount" class="modal-payment__block popup-link">
+              <h3 class="modal__title modal-payment__title">
+                Пополнить игровой валютой
+              </h3>
+              <div class="modal-payment__game-currency game-currency">
+                <div class="game-currency__img">
+                  <svg>
+                    <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup" id="amountSelection">
+      <div class="popup__body">
+
+        <div class="popup__content modal modal_amount-selection amount-selection modal_popup">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="smiley amount-selection__smiley">
+            <div class="smiley__img">
+              <img src="img/gallery/smiley.png" alt="смайлик">
+            </div>
+            <div class="smiley__text">
+              - Чем больше берешь, <br> тем дешевле выходит!
+            </div>
+
+
+          </div>
+          <div class="amount-selection__content">
+            <h3 class="modal__title amount-selection__title">
+              Введите сумму или количество валюты
+            </h3>
+            <form class="scrollbar-overflow form amount-selection__form" action="">
+              <div class="amount-selection__block-input">
+                <div class="amount-selection__item">
+                  <div class="amount-selection__currency">₽</div>
+                  <input inputmode="numeric" step="1" type="tel" class="form__input amount-selection__input"
+                    placeholder="Введите сумму..." min="69" max="50000">
+                  <div class="amount-selection__info">Мин 69р. / 50 Тыс.</div>
+                </div>
+                <div class="amount-selection__item"><span class="amount-selection__smooth">=</span></div>
+                <div class="amount-selection__item">
+                  <div class="form num-game-currency">
+                    <div class="form__input num-game-currency__input num-game-currency__input_value">
+                      <svg class="num-game-currency__img-icon">
+                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                      </svg>
+                      <input inputmode="numeric" name="valuesum" step="1" placeholder="Введите кол-во..." value=""
+                        type="tel" class="num-game-currency__span-curent"></input>
+                    </div>
+                    <div class="form__input num-game-currency__input num-game-currency__input_units">
+                      Тыс.
+                    </div>
+                  </div>
+                  <div class="amount-selection__info amount-selection__info_units">+4% бонус</div>
+                </div>
+
+              </div>
+
+              <div class="mod-arrow amount-selection__right">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                </svg>
+              </div>
+              <div class="swiper amount-selection__checkbox">
+                <div class="swiper-wrapper amount-selection__wrapper">
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="selectionCard" name="paymentSystem"
+                      value="Visa/Master/Мир" checked>
+                    <label for="selectionCard" class="amount-selection__card payment-system">
+                      <div class="payment-system__img payment-system__img_big">
+                        <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                      </div>
+                      <div class="payment-system__title">
+                        Visa/Master/Мир
+                      </div>
+                    </label>
+
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem"
+                      value="Qiwi кошелёк">
+                    <label for="Qiwi" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/qivi.png" alt="Qiwi кошелёк">
+                      </div>
+                      <div class="payment-system__title">
+                        Qiwi кошелёк
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem" value="ЮMoney">
+                    <label for="yumani" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/yumani.png" alt="ЮMoney">
+                      </div>
+                      <div class="payment-system__title">
+                        ЮMoney
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Webmoney" name="paymentSystem"
+                      value="Webmoney">
+                    <label for="Webmoney" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Webmoney.png" alt="Webmoney">
+                      </div>
+                      <div class="payment-system__title">
+                        Webmoney
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="SamsungPay" name="paymentSystem"
+                      value="SamsungPay">
+                    <label for="SamsungPay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Samsung pay
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="ApplePay" name="paymentSystem"
+                      value="ApplePay">
+                    <label for="ApplePay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Apple pay
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="MobOperators" name="paymentSystem"
+                      value="Моб.операторы">
+                    <label for="MobOperators" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Mob-operators.png" alt="Моб. операторы">
+                      </div>
+                      <div class="payment-system__title">
+                        Моб. операторы
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="Cryptocurrency" name="paymentSystem"
+                      value="Криптовалюта">
+                    <label for="Cryptocurrency" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Cryptocurrency.png" alt="Криптовалюта">
+                      </div>
+                      <div class="payment-system__title">
+                        Криптовалюта
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem" value="PayPal">
+                    <label for="PayPal" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/PayPal.png" alt="PayPal">
+                      </div>
+                      <div class="payment-system__title">
+                        PayPal
+                      </div>
+                    </label>
+                  </div>
+                  <div class="swiper-slide amount-selection__slide">
+                    <input type="radio" class="amount-selection__check" id="GooglePay" name="paymentSystem"
+                      value="GooglePay">
+                    <label for="GooglePay" class="amount-selection__card payment-system">
+                      <div class="payment-system__img">
+                        <img src="img/gallery/Google-pay.png" alt="Google pay">
+                      </div>
+                      <div class="payment-system__title">
+                        Google pay
+                      </div>
+                    </label>
+                  </div>
+
+                </div>
+              </div>
+              <div class="mod-arrow amount-selection__left">
+                <svg>
+                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                </svg>
+              </div>
+              <button type="submit" class="btn btn_danger amount-selection__btn btn-disable-sum">Пополнить</button>
+
+
+
+            </form>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="popup select-amount" id="selectAmount">
+      <div class="popup__body">
+        <div class="popup__content modal modal_select-amount ">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <h3 class="modal__title select-amount__title">
+            Выберите сумму
+          </h3>
+
+          <div class="scrollbar-overflow select-amount__content">
+            <div class="mod-arrow select-amount__up">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+            <div class="swiper select-amount__slider">
+              <div class="swiper-wrapper select-amount__wrapper">
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      50К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      100К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      250К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      500К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      1M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      2M
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      5M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      10M
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+            <div class="mod-arrow select-amount__down">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+    <div class="popup modal-manual" id="modalManual">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+          <div class="modal-manual__queries">
+            Заявка #22131
+          </div>
+          <a href="#" class="popup__close close-popup close-popup_close">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Инструкция
+          </h3>
+
+          <div class="modal-manual__text">
+            <ul>
+              <li>1. Общие положения</li>
+              <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее – Пользователь) -
+                использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее —
+                «Соглашение», «ПС»).
+                Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»). Соглашение
+                вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+              </li>
+            </ul>
+            <div class="modal-manual__footnote">
+              *в случае неудачной попытки обыгрыша валюта не возвращается
+            </div>
+
+          </div>
+          <a href="##" class="btn btn_danger modal-manual__btn btn_white" id="modalManualBtn">
+            <div class="timer" id="timerOne">0:10</div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+    <div class="popup select-amount" id="selectAmountInput">
+      <div class="popup__body">
+        <div class="popup__content modal modal_select-amount modal_select-amount_input">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="select-amount__s-am-input s-am-input">
+            <h3 class="s-am-input__title">
+              Ваш баланс в Дурак Онлайн
+            </h3>
+
+            <div class="s-am-input__input-block">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+              </svg>
+              <input inputmode="numeric" class="s-am-input__input" placeholder="Введите ваш баланс в Дураке..."
+                type="tel" step="1" name="add-sum" class="roulette__table-input">
+              <div class="s-am-input__msg">Вы должны иметь минимум 100 кредитов!</div>
+            </div>
+          </div>
+          <h3 class="modal__title select-amount__title">
+            Выберите сумму
+          </h3>
+
+          <div class="scrollbar-overflow select-amount__content">
+            <div class="mod-arrow select-amount__up">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+            <div class="swiper select-amount__slider">
+              <div class="swiper-wrapper select-amount__wrapper">
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      50К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      100К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      250К
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      500К
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      1M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      2M
+                    </div>
+                  </a>
+                </div>
+                <div class="swiper-slide select-amount__slide">
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      5M
+                    </div>
+                  </a>
+                  <a href="#modalManual" class="select-amount__item popup-link">
+                    <div class="select-amount__img">
+                      <img src="img/gallery/card.png" alt="">
+                    </div>
+                    <div class="select-amount__value">
+                      10M
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+            <div class="mod-arrow select-amount__down">
+              <svg>
+                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+              </svg>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <div class="popup modal-manual" id="profileSettings">
+      <div class="popup__body">
+        <div class="popup__content modal modal_fit">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Настройки профиля
+          </h3>
+          <div class="profile-settings">
+            <form class="profile-settings__row">
+              <div class="profile-settings__item-avatar">
+                <div class="profile-settings__avatar" id="imgAva">
+                  <img data-value="0" src="img/avatar/user/avatar.png" alt="nickname" id="profileImage">
+                </div>
+              </div>
+              <div class="profile-settings__item">
+                <div class="profile-settings__title">
+                  Сменить никнейм
+                </div>
+                <input type="text" class="form__input form profile-settings__name" value="Sellix224121">
+                <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
+              </div>
+              <div class="profile-settings__btn-block">
+                <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
+                <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку
+                </div>
+                <button type="submit"
+                  class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup modal-manual" id="choiceObjects">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <h3 class="modal__title">
+            Вывод предметов
+          </h3>
+
+          <form action="" class="form choice-object">
+            <ul class="choice-object__list">
+              <li class="choice-object__item">
+                <div class="choice-object__number">#1</div>
+
+                <div class="choice-object__title">
+                  Добавьте наш аккаунт в друзья
+                </div>
+                <div class="choice-object__in-block">
+                  <input type="text" class="choice-object__input choice-object__input_min form__input" disabled
+                    value="Sellix224121">
+                  <div class="btn btn_dark choice-object__btn">Скопировать</div>
+                </div>
+              </li>
+              <li class="choice-object__item">
+                <div class="choice-object__number">#2</div>
+
+                <div class="choice-object__title">
+                  Введите свой никнейм
+                </div>
+                <div class="choice-object__in-block">
+                  <input type="text" class="choice-object__input form__input" placeholder="Sellix224121">
+                </div>
+              </li>
+            </ul>
+            <button type="submit" class="btn btn_danger choice-object__submit">Вывести предмет</button>
+
+
+
+          </form>
+
+
+
+
+        </div>
+      </div>
+    </div>
+    <div class="popup modal-manual" id="question">
+      <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+
+          <div class="modal-question">
+            <div class="modal-question__text">
+              Вы действительно хотите продать этот предмет?
+              <br>
+              <div class="modal-question__rupture"></div>
+              Валюта зачислится на ваш баланс.
+            </div>
+            <div class="modal-question__row">
+              <a href="##" class="btn btn_danger modal-question__btn">
+                Да
+              </a>
+              <a href="##" class="btn btn_dark modal-question__btn modal-answer__no">
+                Нет
+              </a>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+    <div class="popup" id="cases">
+      <div class="popup__body">
+        <div class="popup__content modal modal_cases scrollbar-overflow">
+
+          <a href="#" class="popup__close close-popup">
+            <svg class="close-popup__icon ">
+              <use xlink:href="img/icons/sprite.svg#close"></use>
+            </svg>
+          </a>
+          <div class="modal-cases__wrapper scrollbar-overflow">
+            <div class="modal-cases">
+              <div class="modal-cases__head">
+                <div class="modal-cases__title">Янтарный кейс</div>
+
+                <div class="modal-cases__lvl">10+ LVL</div>
+              </div>
+              <div class="modal-cases__shadow">
+                <div class="modal-cases__mum">x1</div>
+                <div class="modal-cases__pointer"></div>
+
+                <div class="modal-cases__case modal-case modal-case-overflow">
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-case-overflow__item">
+                    <div class="modal-case__wrapper">
+                      <div class="modal-case__img">
+                        <svg>
+                          <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                        </svg>
+                      </div>
+                      <div class="modal-case__title">
+                        Набор смайлов
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+
+
+
+
+            </div>
+            <div class="modal-case__open">
+              <a href="##" class="btn btn_dark modal-case__btn btn_white">Открыть кейс</a>
+              <div class="modal-case__timer timer" id="timerTwo">1:05</div>
+            </div>
+            <div class="modal-cases-all">
+              <div class="modal-cases-all__case modal-case modal-case__content">
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_bear"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_robot"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_vampire"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+
+                <a href="##" class="modal-case__item">
+                  <div class="modal-case__wrapper">
+                    <div class="modal-case__img">
+                      <svg>
+                        <use xlink:href="img/icons/sprite.svg#smile_unicorn"></use>
+                      </svg>
+                    </div>
+                    <div class="modal-case__title">
+                      Набор смайлов
+                    </div>
+                  </div>
+                </a>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="libs/swiper@8_swiper-bundle.min.js"></script>
+  <script type="text/javascript" src="js/script.js"></script>
+
+</body>
+
+</html>
