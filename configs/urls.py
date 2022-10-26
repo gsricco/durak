@@ -20,7 +20,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('start_all_template.urls'))
+    path('', include('start_all_template.urls')),
+    path('social/', include('social_django.urls', namespace='social')),
+
 ]
 
 if settings.DEBUG:

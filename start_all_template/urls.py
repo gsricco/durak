@@ -9,4 +9,6 @@ urlpatterns = [
     path('faq', faq, name='faq'),
     path('honesty', honesty, name='honesty'),
     path('profil', profil, name='profil'),
+
+
 ]
