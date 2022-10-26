@@ -809,7 +809,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/qivi.png" alt="qivi">
+                    <img src="{% static 'img/gallery/qivi.png' %}" alt="qivi">
                   </div>
                   <div class="payment-system__title">
                     Киви кошелёк
@@ -819,7 +819,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/yumani.png" alt="ЮMoney">
+                    <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
                   </div>
                   <div class="payment-system__title">
                     ЮMoney
@@ -829,7 +829,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                    <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
                   </div>
                   <div class="payment-system__title">
                     Apple pay
@@ -839,7 +839,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/Google-pay.png" alt="Google pay">
+                    <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
                   </div>
                   <div class="payment-system__title">
                     Google pay
@@ -849,7 +849,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                    <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
                   </div>
                   <div class="payment-system__title">
                     Samsung pay
@@ -867,7 +867,7 @@
               <div class="modal-payment__game-currency game-currency">
                 <div class="game-currency__img">
                   <svg>
-                    <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                   </svg>
                 </div>
               </div>
@@ -883,12 +883,12 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <div class="smiley amount-selection__smiley">
             <div class="smiley__img">
-              <img src="img/gallery/smiley.png" alt="смайлик">
+              <img src="{% static 'img/gallery/smiley.png' %}" alt="смайлик">
             </div>
             <div class="smiley__text">
               - Чем больше берешь, <br> тем дешевле выходит!
@@ -913,7 +913,7 @@
                   <div class="form num-game-currency">
                     <div class="form__input num-game-currency__input num-game-currency__input_value">
                       <svg class="num-game-currency__img-icon">
-                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                       </svg>
                       <input inputmode="numeric" name="valuesum" step="1" placeholder="Введите кол-во..." value=""
                         type="tel" class="num-game-currency__span-curent"></input>
@@ -929,7 +929,7 @@
 
               <div class="mod-arrow amount-selection__right">
                 <svg>
-                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
                 </svg>
               </div>
               <div class="swiper amount-selection__checkbox">
@@ -939,7 +939,7 @@
                       value="Visa/Master/Мир" checked>
                     <label for="selectionCard" class="amount-selection__card payment-system">
                       <div class="payment-system__img payment-system__img_big">
-                        <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                        <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
                       </div>
                       <div class="payment-system__title">
                         Visa/Master/Мир
@@ -952,7 +952,7 @@
                       value="Qiwi кошелёк">
                     <label for="Qiwi" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/qivi.png" alt="Qiwi кошелёк">
+                        <img src="{% static 'img/gallery/qivi.png' %}" alt="Qiwi кошелёк">
                       </div>
                       <div class="payment-system__title">
                         Qiwi кошелёк
@@ -963,7 +963,7 @@
                     <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem" value="ЮMoney">
                     <label for="yumani" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/yumani.png" alt="ЮMoney">
+                        <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
                       </div>
                       <div class="payment-system__title">
                         ЮMoney
@@ -975,7 +975,7 @@
                       value="Webmoney">
                     <label for="Webmoney" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Webmoney.png" alt="Webmoney">
+                        <img src="{% static 'img/gallery/Webmoney.png' %}" alt="Webmoney">
                       </div>
                       <div class="payment-system__title">
                         Webmoney
@@ -987,7 +987,7 @@
                       value="SamsungPay">
                     <label for="SamsungPay" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                        <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
                       </div>
                       <div class="payment-system__title">
                         Samsung pay
@@ -999,7 +999,7 @@
                       value="ApplePay">
                     <label for="ApplePay" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                        <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
                       </div>
                       <div class="payment-system__title">
                         Apple pay
@@ -1011,7 +1011,7 @@
                       value="Моб.операторы">
                     <label for="MobOperators" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Mob-operators.png" alt="Моб. операторы">
+                        <img src="{% static 'img/gallery/Mob-operators.png' %}" alt="Моб. операторы">
                       </div>
                       <div class="payment-system__title">
                         Моб. операторы
@@ -1023,7 +1023,7 @@
                       value="Криптовалюта">
                     <label for="Cryptocurrency" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Cryptocurrency.png" alt="Криптовалюта">
+                        <img src="{% static 'img/gallery/Cryptocurrency.png' %}" alt="Криптовалюта">
                       </div>
                       <div class="payment-system__title">
                         Криптовалюта
@@ -1034,7 +1034,7 @@
                     <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem" value="PayPal">
                     <label for="PayPal" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/PayPal.png" alt="PayPal">
+                        <img src="{% static 'img/gallery/PayPal.png' %}" alt="PayPal">
                       </div>
                       <div class="payment-system__title">
                         PayPal
@@ -1046,7 +1046,7 @@
                       value="GooglePay">
                     <label for="GooglePay" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Google-pay.png" alt="Google pay">
+                        <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
                       </div>
                       <div class="payment-system__title">
                         Google pay
@@ -1058,7 +1058,7 @@
               </div>
               <div class="mod-arrow amount-selection__left">
                 <svg>
-                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg#arrow-slider' %}"></use>
                 </svg>
               </div>
               <button type="submit" class="btn btn_danger amount-selection__btn btn-disable-sum">Пополнить</button>
@@ -1079,7 +1079,7 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
 
@@ -1090,7 +1090,7 @@
           <div class="scrollbar-overflow select-amount__content">
             <div class="mod-arrow select-amount__up">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
             <div class="swiper select-amount__slider">
@@ -1098,7 +1098,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       50К
@@ -1106,7 +1106,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       100К
@@ -1116,7 +1116,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       250К
@@ -1124,7 +1124,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       500К
@@ -1134,7 +1134,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       1M
@@ -1142,7 +1142,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       2M
@@ -1152,7 +1152,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       5M
@@ -1160,7 +1160,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       10M
@@ -1172,7 +1172,7 @@
             </div>
             <div class="mod-arrow select-amount__down">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
           </div>
@@ -1190,7 +1190,7 @@
           </div>
           <a href="#" class="popup__close close-popup close-popup_close">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <h3 class="modal__title">
@@ -1225,7 +1225,7 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <div class="select-amount__s-am-input s-am-input">
@@ -1235,7 +1235,7 @@
 
             <div class="s-am-input__input-block">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
               </svg>
               <input inputmode="numeric" class="s-am-input__input" placeholder="Введите ваш баланс в Дураке..."
                 type="tel" step="1" name="add-sum" class="roulette__table-input">
@@ -1249,7 +1249,7 @@
           <div class="scrollbar-overflow select-amount__content">
             <div class="mod-arrow select-amount__up">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
             <div class="swiper select-amount__slider">
@@ -1257,7 +1257,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       50К
@@ -1265,7 +1265,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       100К
@@ -1275,7 +1275,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       250К
@@ -1283,7 +1283,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       500К
@@ -1293,7 +1293,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       1M
@@ -1301,7 +1301,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       2M
@@ -1311,7 +1311,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       5M
@@ -1319,7 +1319,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       10M
@@ -1331,7 +1331,7 @@
             </div>
             <div class="mod-arrow select-amount__down">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
           </div>
@@ -1351,3 +1351,4 @@
 </body>
 
 </html>
+
