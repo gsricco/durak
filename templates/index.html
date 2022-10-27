@@ -46,12 +46,12 @@
 
             <!-- If not logged-in -->
             <div class="header__login" style="display: none;">
-              <a href="#vk" class="header__login-link">
+              <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
                 <svg>
                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                 </svg>
               </a>
-              <a href="#google" class="header__login-link">
+              <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
                 <svg>
                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                 </svg>
@@ -125,12 +125,12 @@
                   </a>
 
                   <!-- If not logged-in -->
-                  <a href="#vk" class="header__profile-login" style="display: none;">
+                  <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login" style="display: none;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                     </svg>
                   </a>
-                  <a href="#google" class="header__profile-login" style="display: none;">
+                  <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login" style="display: none;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                     </svg>
