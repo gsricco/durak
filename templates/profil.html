@@ -694,7 +694,7 @@
                             </div>
 
                             <div class="profil__btns">
-                              <a href="#google" class="profil__btn profil__btn_google">Войти с помощью Google</a>
+                              <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Войти с помощью Google</a>
                               <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти с помощью VK</a>
                             </div>
                           </div>

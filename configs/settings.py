@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os.path
 from pathlib import Path
 
+import accaunts.models
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -130,10 +132,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.vk.VKOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
 SOCIAL_AUTH_VK_OAUTH2_KEY = '51460070'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = '8f6xFkTOUWyUGXJYuIdm'
 
-LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/profil'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '62840606293-2jckleeu3b5u7lu570ofokb54bpt5urm.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+# LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/profil'
+SOCIAL_AUTH_LOGIN_ERROR_URL = 'http://127.0.0.1:8000/profil'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/profil'
