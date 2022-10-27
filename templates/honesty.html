@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% load static %}
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -10,11 +10,11 @@
 	<meta property="og:title" content="Честность" />
 	<meta property="og:description" content="Описание" />
 	<meta property="og:image" content="img/...png" /> -->
-  <link rel="stylesheet" href="custom-css/one.css">
-  <link rel="stylesheet" href="libs/swiper@8_swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <!-- <link rel="stylesheet" href="css/style.min.css"> -->
-  <link rel="icon" href="img/icon.svg" type="image/svg">
+  <link rel="icon" href="{% static 'img/icon.svg' %}" type="image/svg">
 </head>
 
 <body class="scrollbar-overflow">
@@ -39,9 +39,9 @@
             </div>
 
             <div class="header__logo">
-              <a href="https://durakroll.com">
+              <a href="/">
                 <svg>
-                  <use xlink:href="img/icons/sprite-edits.svg#logo"></use>
+                  <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logo"></use>
                 </svg>
               </a>
             </div>
@@ -50,18 +50,18 @@
             <div class="header__login" style="display: none;">
               <a href="#vk" class="header__login-link">
                 <svg>
-                  <use xlink:href="img/icons/sprite.svg#vk_login"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                 </svg>
               </a>
               <a href="#google" class="header__login-link">
                 <svg>
-                  <use xlink:href="img/icons/sprite.svg#google_login"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                 </svg>
               </a>
             </div>
 
             <!-- If logged-in and has balance -->
-            <a href="https://durakroll.com/profil.html" class="header__balance">
+            <a href="profil" class="header__balance">
               <span>1.32m</span>
             </a>
           </div>
@@ -70,29 +70,29 @@
             <nav class="header__nav">
               <ul class="header__list">
                 <li class="header__li">
-                  <a href="https://durakroll.com/honesty.html" class="header__link">ЧЕСТНОСТЬ</a>
+                  <a href="honesty" class="header__link">ЧЕСТНОСТЬ</a>
                 </li>
                 <li class="header__li">
-                  <a href="https://durakroll.com/faq.html" class="header__link">ПОМОЩЬ</a>
-                </li>
-
-                <li class="header__li">
-                  <a href="https://durakroll.com/contact.html" class="header__link">КОНТАКТЫ</a>
+                  <a href="faq" class="header__link">ПОМОЩЬ</a>
                 </li>
 
                 <li class="header__li">
-                  <a href="https://durakroll.com/bonus-currency.html" class="header__link header__link_red">FREE</a>
+                  <a href="contact" class="header__link">КОНТАКТЫ</a>
+                </li>
+
+                <li class="header__li">
+                  <a href="bonus-currency" class="header__link header__link_red">FREE</a>
                 </li>
               </ul>
             </nav>
 
             <div class="header__profile">
-              <a href="https://durakroll.com/profil.html" class="header__avatar">
-                <img src="img/gallery/avatar.png" alt="">
+              <a href="profil" class="header__avatar">
+                <img src="{% static 'img/gallery/avatar.png' %}" alt="">
               </a>
 
               <div class="header__profile-info">
-                <a href="https://durakroll.com/profil.html" class="header__profile-name">
+                <a href="profil" class="header__profile-name">
                   <!-- If not logged-in -->
                   <span style="display: none;">Anonymous</span>
 
@@ -100,16 +100,16 @@
                   <span>Username</span>
 
                   <svg class="header__profile-settings">
-                    <use xlink:href="img/icons/sprite.svg#setings"></use>
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                   </svg>
                 </a>
 
                 <div class="header__profile-row">
                   <!-- If user logged-in -->
-                  <a href="https://durakroll.com/profil.html" class="header__profile-sum">
+                  <a href="profil" class="header__profile-sum">
                     <div class="header__profile-sum-img">
                       <svg>
-                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                       </svg>
                     </div>
 
@@ -129,25 +129,25 @@
                   <!-- If not logged-in -->
                   <a href="#vk" class="header__profile-login" style="display: none;">
                     <svg>
-                      <use xlink:href="img/icons/sprite.svg#vk_login"></use>
+                      <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                     </svg>
                   </a>
                   <a href="#google" class="header__profile-login" style="display: none;">
                     <svg>
-                      <use xlink:href="img/icons/sprite.svg#google_login"></use>
+                      <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                     </svg>
                   </a>
 
                   <!-- Login btn mobile shown if not logged-in-->
                   <a href="#" class="header__login-btn" style="display: none;">
                     <svg>
-                      <use xlink:href="img/icons/sprite.svg#login"></use>
+                      <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
                     </svg>
                   </a>
                 </div>
 
                 <!-- If user logged-in -->
-                <a href="https://durakroll.com/profil.html" class="header__profile-progressbar">
+                <a href="profil" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
                     17<span>ур</span>
                   </div>
@@ -182,20 +182,20 @@
       <div class="container">
 
 
-        <section class="profil-main support-faq">
+        <section class="profil-main">
           <div class="profil-main__row">
 
             <section class="online-chat">
               <div class="online-chat__header">
                 <div class="online-chat__header-left">
                   <svg class="online-chat__icon-chat">
-                    <use xlink:href="img/icons/sprite.svg#chat"></use>
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat"></use>
                   </svg>
                   <h4 class="online-chat__title">Чат</h4>
                 </div>
 
                 <svg class="online-chat__icon-close">
-                  <use xlink:href="img/icons/sprite.svg#close"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
                 </svg>
                 <div class="online-chat__header-rigth">
                   <div class="online-chat__current">239</div>
@@ -210,11 +210,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -233,11 +233,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -255,11 +255,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -278,11 +278,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -300,11 +300,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -323,11 +323,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -345,11 +345,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -368,11 +368,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -390,11 +390,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -413,11 +413,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -435,11 +435,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -458,11 +458,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -480,11 +480,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -503,11 +503,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -525,11 +525,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -548,11 +548,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -570,11 +570,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_red"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-two.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">
                         </div>
 
                       </div>
@@ -593,11 +593,11 @@
                       <div class="online-chat__li-wrapper">
                         <div class="online-chat__li-rubin">
                           <svg>
-                            <use xlink:href="img/icons/sprite.svg#rubin_green"></use>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                           </svg>
                         </div>
                         <div class="online-chat__li-avatar">
-                          <img src="img/gallery/chat-avatar-one.png" alt="">
+                          <img src="{% static 'img/gallery/chat-avatar-one.png' %}" alt="">
                         </div>
 
                       </div>
@@ -647,13 +647,13 @@
                     autocomplete="off">
                   <div class="online-chat__icon-doc">
                     <svg>
-                      <use xlink:href="img/icons/sprite.svg#document"></use>
+                      <use xlink:href="{% static 'img/icons/sprite.svg' %}#document"></use>
                     </svg>
                   </div>
 
                   <a href="##" class="online-chat__icon-arrow">
                     <svg>
-                      <use xlink:href="img/icons/sprite.svg#chatarrow"></use>
+                      <use xlink:href="{% static 'img/icons/sprite.svg' %}#chatarrow"></use>
                     </svg>
                   </a>
                 </div>
@@ -680,7 +680,7 @@
                         </p>
                       </div>
                       <div class="honesty__img">
-                        <img src="img/gallery/rull-img.png" alt="">
+                        <img src="{% static 'img/gallery/rull-img.png' %}" alt="">
                       </div>
                     </div>
 
@@ -849,20 +849,20 @@
       <div class="container">
         <div class="footer__row">
           <div class="footer__info">
-            <a href="https://durakroll.com" class="footer__logo">
+            <a href="/" class="footer__logo">
               <svg>
-                <use xlink:href="img/icons/sprite-edits.svg#logofooter"></use>
+                <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logofooter"></use>
               </svg>
             </a>
 
-            <a href="https://vk.com/durak24" target="_blank"
+            <a href="/" target="_blank"
               class="footer__soc-item footer__soc-item footer__soc-item_vk">
-              <img src="img/gallery/vk.png" alt="">
+              <img src="{% static 'img/gallery/vk.png' %}" alt="">
             </a>
             <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank"
               class="footer__soc-item footer__soc-item_yt">
               <svg>
-                <use xlink:href="img/icons/sprite-edits.svg#youtube"></use>
+                <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
               </svg>
             </a>
           </div>
@@ -886,7 +886,7 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <div class="modal-payment">
@@ -897,7 +897,7 @@
               <ul class="modal-payment__cards cards">
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img payment-system__img_big">
-                    <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                    <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
                   </div>
                   <div class="payment-system__title">
                     Visa/Master/Мир
@@ -905,7 +905,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/qivi.png" alt="qivi">
+                    <img src="{% static 'img/gallery/qivi.png' %}" alt="qivi">
                   </div>
                   <div class="payment-system__title">
                     Киви кошелёк
@@ -915,7 +915,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/yumani.png" alt="ЮMoney">
+                    <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
                   </div>
                   <div class="payment-system__title">
                     ЮMoney
@@ -925,7 +925,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                    <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
                   </div>
                   <div class="payment-system__title">
                     Apple pay
@@ -935,7 +935,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/Google-pay.png" alt="Google pay">
+                    <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
                   </div>
                   <div class="payment-system__title">
                     Google pay
@@ -945,7 +945,7 @@
                 </li>
                 <li class="modal-payment__card payment-system">
                   <div class="payment-system__img">
-                    <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                    <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
                   </div>
                   <div class="payment-system__title">
                     Samsung pay
@@ -963,7 +963,7 @@
               <div class="modal-payment__game-currency game-currency">
                 <div class="game-currency__img">
                   <svg>
-                    <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                   </svg>
                 </div>
               </div>
@@ -979,12 +979,12 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <div class="smiley amount-selection__smiley">
             <div class="smiley__img">
-              <img src="img/gallery/smiley.png" alt="смайлик">
+              <img src="{% static 'img/gallery/smiley.png' %}" alt="смайлик">
             </div>
             <div class="smiley__text">
               - Чем больше берешь, <br> тем дешевле выходит!
@@ -1009,7 +1009,7 @@
                   <div class="form num-game-currency">
                     <div class="form__input num-game-currency__input num-game-currency__input_value">
                       <svg class="num-game-currency__img-icon">
-                        <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                       </svg>
                       <input inputmode="numeric" name="valuesum" step="1" placeholder="Введите кол-во..." value=""
                         type="tel" class="num-game-currency__span-curent"></input>
@@ -1025,7 +1025,7 @@
 
               <div class="mod-arrow amount-selection__right">
                 <svg>
-                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
                 </svg>
               </div>
               <div class="swiper amount-selection__checkbox">
@@ -1035,7 +1035,7 @@
                       value="Visa/Master/Мир" checked>
                     <label for="selectionCard" class="amount-selection__card payment-system">
                       <div class="payment-system__img payment-system__img_big">
-                        <img src="img/gallery/cards.png" alt="Visa/Master/Мир">
+                        <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
                       </div>
                       <div class="payment-system__title">
                         Visa/Master/Мир
@@ -1044,10 +1044,11 @@
 
                   </div>
                   <div class="swiper-slide amount-selection__slide">
-                    <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem" value="Qiwi кошелёк">
+                    <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem"
+                      value="Qiwi кошелёк">
                     <label for="Qiwi" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/qivi.png" alt="Qiwi кошелёк">
+                        <img src="{% static 'img/gallery/qivi.png' %}" alt="Qiwi кошелёк">
                       </div>
                       <div class="payment-system__title">
                         Qiwi кошелёк
@@ -1058,7 +1059,7 @@
                     <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem" value="ЮMoney">
                     <label for="yumani" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/yumani.png" alt="ЮMoney">
+                        <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
                       </div>
                       <div class="payment-system__title">
                         ЮMoney
@@ -1066,10 +1067,11 @@
                     </label>
                   </div>
                   <div class="swiper-slide amount-selection__slide">
-                    <input type="radio" class="amount-selection__check" id="Webmoney" name="paymentSystem" value="Webmoney">
+                    <input type="radio" class="amount-selection__check" id="Webmoney" name="paymentSystem"
+                      value="Webmoney">
                     <label for="Webmoney" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Webmoney.png" alt="Webmoney">
+                        <img src="{% static 'img/gallery/Webmoney.png' %}" alt="Webmoney">
                       </div>
                       <div class="payment-system__title">
                         Webmoney
@@ -1081,7 +1083,7 @@
                       value="SamsungPay">
                     <label for="SamsungPay" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Samsung-pay.png" alt="Samsung pay">
+                        <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
                       </div>
                       <div class="payment-system__title">
                         Samsung pay
@@ -1089,10 +1091,11 @@
                     </label>
                   </div>
                   <div class="swiper-slide amount-selection__slide">
-                    <input type="radio" class="amount-selection__check" id="ApplePay" name="paymentSystem" value="ApplePay">
+                    <input type="radio" class="amount-selection__check" id="ApplePay" name="paymentSystem"
+                      value="ApplePay">
                     <label for="ApplePay" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Apple-pay.png" alt="Apple pay">
+                        <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
                       </div>
                       <div class="payment-system__title">
                         Apple pay
@@ -1104,7 +1107,7 @@
                       value="Моб.операторы">
                     <label for="MobOperators" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Mob-operators.png" alt="Моб. операторы">
+                        <img src="{% static 'img/gallery/Mob-operators.png' %}" alt="Моб. операторы">
                       </div>
                       <div class="payment-system__title">
                         Моб. операторы
@@ -1116,7 +1119,7 @@
                       value="Криптовалюта">
                     <label for="Cryptocurrency" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Cryptocurrency.png" alt="Криптовалюта">
+                        <img src="{% static 'img/gallery/Cryptocurrency.png' %}" alt="Криптовалюта">
                       </div>
                       <div class="payment-system__title">
                         Криптовалюта
@@ -1127,7 +1130,7 @@
                     <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem" value="PayPal">
                     <label for="PayPal" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/PayPal.png" alt="PayPal">
+                        <img src="{% static 'img/gallery/PayPal.png' %}" alt="PayPal">
                       </div>
                       <div class="payment-system__title">
                         PayPal
@@ -1139,7 +1142,7 @@
                       value="GooglePay">
                     <label for="GooglePay" class="amount-selection__card payment-system">
                       <div class="payment-system__img">
-                        <img src="img/gallery/Google-pay.png" alt="Google pay">
+                        <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
                       </div>
                       <div class="payment-system__title">
                         Google pay
@@ -1151,7 +1154,7 @@
               </div>
               <div class="mod-arrow amount-selection__left">
                 <svg>
-                  <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                  <use xlink:href="{% static 'img/icons/sprite.svg#arrow-slider' %}"></use>
                 </svg>
               </div>
               <button type="submit" class="btn btn_danger amount-selection__btn btn-disable-sum">Пополнить</button>
@@ -1172,7 +1175,7 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
 
@@ -1183,7 +1186,7 @@
           <div class="scrollbar-overflow select-amount__content">
             <div class="mod-arrow select-amount__up">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
             <div class="swiper select-amount__slider">
@@ -1191,7 +1194,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       50К
@@ -1199,7 +1202,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       100К
@@ -1209,7 +1212,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       250К
@@ -1217,7 +1220,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       500К
@@ -1227,7 +1230,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       1M
@@ -1235,7 +1238,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       2M
@@ -1245,7 +1248,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       5M
@@ -1253,7 +1256,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       10M
@@ -1265,7 +1268,7 @@
             </div>
             <div class="mod-arrow select-amount__down">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
           </div>
@@ -1283,7 +1286,7 @@
           </div>
           <a href="#" class="popup__close close-popup close-popup_close">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <h3 class="modal__title">
@@ -1318,7 +1321,7 @@
 
           <a href="#" class="popup__close close-popup">
             <svg class="close-popup__icon ">
-              <use xlink:href="img/icons/sprite.svg#close"></use>
+              <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
             </svg>
           </a>
           <div class="select-amount__s-am-input s-am-input">
@@ -1328,10 +1331,10 @@
 
             <div class="s-am-input__input-block">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#dollar"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
               </svg>
-              <input inputmode="numeric" class="s-am-input__input" placeholder="Введите ваш баланс в Дураке..." type="tel"
-                step="1" name="add-sum" class="roulette__table-input">
+              <input inputmode="numeric" class="s-am-input__input" placeholder="Введите ваш баланс в Дураке..."
+                type="tel" step="1" name="add-sum" class="roulette__table-input">
               <div class="s-am-input__msg">Вы должны иметь минимум 100 кредитов!</div>
             </div>
           </div>
@@ -1342,7 +1345,7 @@
           <div class="scrollbar-overflow select-amount__content">
             <div class="mod-arrow select-amount__up">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
             <div class="swiper select-amount__slider">
@@ -1350,7 +1353,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       50К
@@ -1358,7 +1361,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       100К
@@ -1368,7 +1371,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       250К
@@ -1376,7 +1379,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       500К
@@ -1386,7 +1389,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       1M
@@ -1394,7 +1397,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       2M
@@ -1404,7 +1407,7 @@
                 <div class="swiper-slide select-amount__slide">
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       5M
@@ -1412,7 +1415,7 @@
                   </a>
                   <a href="#modalManual" class="select-amount__item popup-link">
                     <div class="select-amount__img">
-                      <img src="img/gallery/card.png" alt="">
+                      <img src="{% static 'img/gallery/card.png' %}" alt="">
                     </div>
                     <div class="select-amount__value">
                       10M
@@ -1424,7 +1427,7 @@
             </div>
             <div class="mod-arrow select-amount__down">
               <svg>
-                <use xlink:href="img/icons/sprite.svg#arrow-slider"></use>
+                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
               </svg>
             </div>
           </div>
@@ -1438,9 +1441,10 @@
   </div>
 
 
-  <script src="libs/swiper@8_swiper-bundle.min.js"></script>
-  <script type="text/javascript" src="js/script.js"></script>
+  <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 
 </body>
 
 </html>
+
