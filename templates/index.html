@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-
+{% load static %}
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -9,9 +9,9 @@
 	<meta property="og:title" content="Рулетка" />
 	<meta property="og:description" content="Описание" />
 	<meta property="og:image" content="img/...png" /> -->
-  <link rel="stylesheet" href="custom-css/one.css">
-  <link rel="stylesheet" href="libs/swiper@8_swiper-bundle.min.css" />
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <!-- <link rel="stylesheet" href="css/style.min.css"> -->
   <link rel="icon" href="img/icon.ico" type="image/x-icon">
 </head>
@@ -51,8 +51,8 @@
                   <use xlink:href="img/icons/sprite.svg#vk_login"></use>
                 </svg>
               </a>
-              <a href="#google" class="header__login-link">
-                <svg>
+              <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
+                login google<svg>
                   <use xlink:href="img/icons/sprite.svg#google_login"></use>
                 </svg>
               </a>
@@ -2035,8 +2035,8 @@
   </div>
 
 
-  <script src="libs/swiper@8_swiper-bundle.min.js"></script>
-  <script type="text/javascript" src="js/script.js"></script>
+  <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 
 </body>
 
