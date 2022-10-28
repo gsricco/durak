@@ -144,7 +144,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', #возможно отключить, если не будет доступа кроме гугла и вк
     ]
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/profil'
 
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 

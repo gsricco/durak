@@ -36,6 +36,7 @@
               <span></span>
             </div>
 
+
             <div class="header__logo">
               <a href="/">
                 <svg>
@@ -45,27 +46,23 @@
             </div>
 
             <!-- If not logged-in -->
-            {% if user.is_authenticated == False %}
             <div class="header__login" style="display: none;">
-              <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
+              <a href="#vk" class="header__login-link">
                 <svg>
                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                 </svg>
               </a>
-              <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
+              <a href="#google" class="header__login-link">
                 <svg>
                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                 </svg>
               </a>
             </div>
-            {% endif %}
 
             <!-- If logged-in and has balance -->
-            {% if user.is_authenticated %}
             <a href="profil" class="header__balance">
               <span>1.32m</span>
             </a>
-            {% endif %}
           </div>
 
           <div class="header__wrapper">
@@ -90,20 +87,19 @@
 
             <div class="header__profile">
               <a href="profil" class="header__avatar">
-                <img src="{{ user.avatar.url }}" alt="Аватар">
+                <img src="{% static 'img/gallery/avatar.png' %}" alt="">
               </a>
 
               <div class="header__profile-info">
                 <a href="profil" class="header__profile-name">
                   <!-- If not logged-in -->
-                  {% if user.is_authenticated == False %}
-                  <span>Anonymous</span>
-                    {% endif %}
-
+                  <span style="display: none;">Anonymous</span>
                   <!-- If logged-in -->
-                  {% if user.is_authenticated %}
-                  <span>{{ user.username }}</span>
-
+{% if request.user.is_authenticated %}
+                  <span>{{ request.user }}</span>
+{% else %}
+                  <span>{{ request.user }}</span>
+{% endif %}
                   <svg class="header__profile-settings">
                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                   </svg>
@@ -130,21 +126,18 @@
                   <a href="#selectAmountInput" class="header__profile-link popup-link">
                     Вывести
                   </a>
-                  {% endif %}
 
                   <!-- If not logged-in -->
-                    {% if user.is_authenticated == False %}
-                  <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login" style="display: block!important;">
+                  <a href="#vk" class="header__profile-login" style="display: none;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                     </svg>
                   </a>
-                  <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login" style="display: block!important;">
+                  <a href="#google" class="header__profile-login" style="display: none;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                     </svg>
                   </a>
-                    {% endif %}
 
                   <!-- Login btn mobile shown if not logged-in-->
                   <a href="#" class="header__login-btn" style="display: none;">
@@ -155,19 +148,31 @@
                 </div>
 
                 <!-- If user logged-in -->
-              {% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
                 <a href="profil" class="header__profile-progressbar">
-                  <div class="header__profile-lvl header__profile-lvl_back">
-                    17<span>ур</span>
+                  <div class="header__profile-lvl header__profile-lvl_back" >
+                    <span>{{ request.user.level }} ур.</span>
                   </div>
                   <div class="header__profile-line">
                     <span></span>
                   </div>
                   <div class="header__profile-lvl header__profile-lvl_next">
-                    18<span>ур.</span>
+                    <span>{{ request.user.level|add:"1" }} ур.</span>
                   </div>
                 </a>
-              {% endif %}
+{% else %}
+                <a href="profil" class="header__profile-progressbar">
+                  <div class="header__profile-lvl header__profile-lvl_back">
+                    <span>{{ request.user.level }} ур.</span>
+                  </div>
+                  <div class="header__profile-line">
+                    <span></span>
+                  </div>
+                  <div class="header__profile-lvl header__profile-lvl_next">
+                    <span>{{ request.user.level|add:"1" }} ур.</span>
+                  </div>
+                </a>
+{% endif %}
 
                 <div class="header__btns">
                   <a href="#modalPayment" class="header__profile-btn popup-link">
@@ -686,7 +691,7 @@
                       <div class="profil__row">
                         <div class="profil__left">
                           <div class="profil__avatar">
-                            <img src="{{ user.avatar.url }}" alt="Аватар">
+                            <img src="{% static 'img/gallery/avatar.png' %}" alt="">
                           </div>
                           <div class="profil__info">
                             <div class="profil__name-wrapper">
@@ -694,7 +699,7 @@
                                 <div class="profil__name">
 
                                   <div class="profil__name-text">
-                                    <span>{{ user.username }}</span>
+                                    <span>{{ request.user }}</span>
                                   </div>
                                   <a href="#profileSettings" class="popup-link">
                                     <svg class="profil__icon-settings">
@@ -706,8 +711,13 @@
                             </div>
 
                             <div class="profil__btns">
+{% if request.user.is_authenticated %}
+                              <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Выйти из Google</a>
+                              <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Выйти из VK</a>
+{% else %}
                               <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Войти с помощью Google</a>
                               <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти с помощью VK</a>
+{% endif %}
                             </div>
                           </div>
                         </div>
@@ -2106,4 +2116,3 @@
 </body>
 
 </html>
-
