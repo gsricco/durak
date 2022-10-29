@@ -667,30 +667,29 @@
                   <div class="contact__top-info">
                     <div class="contact__soc">
                       <div class="contact__soc-item">
-                        <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank" class="contact__soc-ing">
+{% for i in sitecontent %}
+ <a href="{{ i.url_youtube }}" target="_blank" class="contact__soc-ing">
                           <svg class="youtube">
                             <use xlink:href="{% static 'img/icons/sprite.svg' %}#youtube"></use>
                           </svg>
                         </a>
-                        <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank" 
+<a href="{{ i.url_youtube }}" target="_blank"
                           class="contact__soc-text-block">
                           <h3 class="contact__soc-title contact__soc-title_red">ЮТУБ КАНАЛ</h3>
                           <p class="contact__soc-text">Durak24 | Дурак онлайн</p>
                         </a>
                       </div>
-
                       <div class="contact__soc-item">
-                        <a href="https://vk.com/durak24" target="_blank" class="contact__soc-ing">
+<a href="{{ i.url_vk }}" target="_blank" class="contact__soc-ing">
                           <svg class="vk">
                             <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk"></use>
                           </svg>
                         </a>
-                        <a href="https://vk.com/durak24" target="_blank" class="contact__soc-text-block">
+<a href="{{ i.url_vk }}" target="_blank" class="contact__soc-text-block">
                           <h3 class="contact__soc-title contact__soc-title_blue">ГРУППА ВК</h3>
                           <p class="contact__soc-text">Durak24 | Дурак онлайн</p>
                         </a>
                       </div>
-
                     </div>
                     <div class="contact__support">
                       <a href="faq" class="contact__support-img">
@@ -699,10 +698,9 @@
                         </svg>
                         <h3 class="contact__support-title">Поддержка</h3>
                       </a>
-
                       <p class="contact__support-text">
                         Почта для связи <br>
-                        <a target="_blank" href="mailto:support@durakroll.com">support@durakroll.com</a>
+{{ i.support_email }}
                       </p>
                     </div>
                   </div>
@@ -711,33 +709,7 @@
                     <h3 class="contact__aboutus-title">О нас:</h3>
 
                     <div class="contact__aboutus-text">
-                      <p>
-                        DurakROLL - первый и единственный проект в виде игры на кредиты Дурак Онлайн вне самого
-                        приложения. Сайт появился в 2022г.
-                      </p>
-                      <p>
-                        <span>Зачем сайт, когда есть приложение Дурак Онлайн?</span>
-                      </p>
-                      <p>
-                        Верно, тем не менее, везде есть свои достатки. <br>
-                        Наша главная цель - расширить область игр на кредиты. Например, если вам просто надоест играть в
-                        карты, то вы можете поиграть на те же кредиты уже в рулетку. Здесь вы можете попытать свою удачу
-                        точно так же, как в Дураке, а ваши шансы на победу ни чуть не уменьшаться! Ну и в наилучшем
-                        случае закинуть кредиты обратно (при этом трансфер валюты между сайтом и игрой занимает всего 5
-                        минут).
-                      </p>
-                      <p>
-                        Помимо этого, всем ночивкам мы даём моментальный бонус в виде 50 000 кредитов (промо-код,
-                        подписка на вк и ютуб). Дурак выдаст вам гораздо больше, но на это уйдёт уже целый месяц
-                        еждневного входа в игру.
-                      </p>
-                      <p>
-                        Кстати, в сфере Дурак Онлайн мы работаем с 2019 года. 2 Года мы просто продавали валюту в группе
-                        вконтакте, где на данный момент уже более чем 50 000 подписчиков. А за всё это время накопилось
-                        500+ положительных отзывов. У нас есть свой "блог" на ютуб, где мы делимся лайфхаками и фишками
-                        игры. Ссылки во вкладке "КОНТАКТЫ". И на данный момент мы уже не только продаём валюту, но и
-                        даём игрокам возможность безопасно(без бана и обнуления) сыграть на неё.
-                      </p>
+{{ i.about_us|safe }}
                     </div>
                   </div>
                 </div>
@@ -747,7 +719,7 @@
         </section>
       </div>
     </main>
-
+{% endfor %}
 
     <footer class="footer">
       <div class="container">
@@ -759,11 +731,12 @@
               </svg>
             </a>
 
-            <a href="/" target="_blank"
+{% for i in sitecontent %}
+<a href="{{ i.url_vk }}" target="_blank"
               class="footer__soc-item footer__soc-item footer__soc-item_vk">
               <img src="{% static 'img/gallery/vk.png' %}" alt="">
             </a>
-            <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank"
+<a href="{{ i.url_youtube }}" target="_blank"
               class="footer__soc-item footer__soc-item_yt">
               <svg>
                 <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
@@ -772,13 +745,13 @@
           </div>
           <div class="footer__text-block">
             <div class="footer__text-achievements">
-              С вами с 2019 года. <br>
-              Более 50 000 подписчиков в группе Вконтакте. <br>
-              Свыше 600 положительных отзывов.
+{{ i.description|safe }}
+
             </div>
             <div class="footer__rights">
               Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.</div>
           </div>
+{% endfor %}
         </div>
       </div>
     </footer>

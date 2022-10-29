@@ -20,8 +20,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('ckeditor/', include('ckeditor_uploader.urls')),  # редактор текста в админке
     path('', include('start_all_template.urls')),
-    path('', include('social_django.urls', namespace='social')),
+    path('', include('django.contrib.auth.urls')),  # выход из личного кабинета
+    path('', include('social_django.urls', namespace='social')),  # авторизация через соц сети
 ]
 
 if settings.DEBUG:

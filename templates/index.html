@@ -1462,11 +1462,12 @@
               </svg>
             </a>
 
-            <a href="https://vk.com/durak24" target="_blank"
+{% for i in sitecontent %}
+<a href="{{ i.url_vk }}" target="_blank"
               class="footer__soc-item footer__soc-item footer__soc-item_vk">
               <img src="{% static 'img/gallery/vk.png' %}" alt="">
             </a>
-            <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank"
+<a href="{{ i.url_youtube }}" target="_blank"
               class="footer__soc-item footer__soc-item_yt">
               <svg>
                 <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
@@ -1475,13 +1476,13 @@
           </div>
           <div class="footer__text-block">
             <div class="footer__text-achievements">
-              С вами с 2019 года. <br>
-              Более 50 000 подписчиков в группе Вконтакте. <br>
-              Свыше 600 положительных отзывов.
+{{ i.description|safe }}
+
             </div>
             <div class="footer__rights">
               Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.</div>
           </div>
+{% endfor %}
         </div>
       </div>
     </footer>

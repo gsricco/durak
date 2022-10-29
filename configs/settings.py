@@ -12,9 +12,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os.path
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -27,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'ckeditor',
+    'ckeditor_uploader',
 
     'social_django',
 
@@ -80,7 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'configs.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -90,7 +92,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -110,7 +111,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -121,7 +121,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -141,15 +140,28 @@ AUTH_USER_MODEL = 'accaunts.CustomUser'
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.vk.VKOAuth2',
     'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend', #возможно отключить, если не будет доступа кроме гугла и вк
-    ]
+    'django.contrib.auth.backends.ModelBackend',  # возможно отключить, если не будет доступа кроме гугла и вк
+]
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/profil'
-
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
-
 SOCIAL_AUTH_VK_OAUTH2_KEY = '51460070'
 SOCIAL_AUTH_VK_OAUTH2_SECRET = '8f6xFkTOUWyUGXJYuIdm'
-
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '65579223746-ua86fskgjg0c5bqd3p4fqb53bvvaqu6s.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+LOGOUT_REDIRECT_URL = "/profil"
+
+CKEDITOR_UPLOAD_PATH = ''
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            [
+                'Styles', 'Format', 'Font', 'FontSize', 'BGColor', 'TextColor', "-",
+                'Bold', 'Italic', 'Underline', "SpecialChar", 'RemoveFormat', "Undo", "Redo", "NumberedList", "-",
+                "JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock", "-",
+            ],
+        ]
+    }
+}
