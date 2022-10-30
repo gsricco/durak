@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'accaunts',
     'start_all_template',
+    'caseapp',
 
     'social_django',
 ]
