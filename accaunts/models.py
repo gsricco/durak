@@ -9,7 +9,7 @@ class CustomUser(AbstractUser):
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Пользователи'
+        verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
@@ -27,9 +27,6 @@ class Level(models.Model):
     level = models.PositiveIntegerField(verbose_name='Уровень', unique=True)
     experience_for_lvl = models.IntegerField(verbose_name='Количество опыта до следующего уровня')
     image = models.ImageField(verbose_name='Аватар', upload_to='img/level/', blank=True, null=True)
-
-    def __str__(self):
-        return (f"{self.level} уровень")
 
 
 class DetailUser(models.Model):

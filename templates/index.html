@@ -99,21 +99,25 @@
 
               <div class="header__profile-info">
                 <a href="profil" class="header__profile-name">
-                  <span>{{ request.user }}</span>
+                     {% if user.is_authenticated == False %}
+                  <span>Anonimus</span>
+                  {% else %}
+                  <span>{{ request.user.username }}</span>
+                  {% endif %}
                   <svg class="header__profile-settings">
                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                   </svg>
                 </a>
 
                 <div class="header__profile-row">
-{% if request.user.is_authenticated %}
+{% if user.is_authenticated %}
                   <a href="profil" class="header__profile-sum">
                     <div class="header__profile-sum-img">
                       <svg>
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                       </svg>
                     </div>
-                    <span>{{ user.balance }}m</span>
+                    <span>{{ detail_user.balance }}</span>
                   </a>
                   <a href="#modalPayment" class="header__profile-link popup-link">
                     Пополнить
@@ -147,16 +151,16 @@
 
                 <!-- If user logged-in -->
                 <!-- На этом участке не войдя в систему видимо отрабатывает js в месте, где должен быть profile-line, и выдаёт постоянные null -->
-{% if request.user.is_authenticated %}
+{% if user.is_authenticated %}
                 <a href="profil" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
-                    <span>{{ user.level }} ур.</span>
+                    <span>{{ level_data.level }} ур.</span>
                   </div>
                   <div class="header__profile-line">
                     <span></span>
                   </div>
                   <div class="header__profile-lvl header__profile-lvl_next">
-                    <span>{{ user.level|add:"1" }} ур.</span>
+                    <span>{{ level_data.level|add:"1" }} ур.</span>
                   </div>
                 </a>
 {% else %}
