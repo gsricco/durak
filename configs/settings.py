@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
     'accaunts',
     'start_all_template',
+    'content_manager',
 ]
 
 MIDDLEWARE = [
