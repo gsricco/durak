@@ -46,6 +46,7 @@
             </div>
 
             <!-- If not logged-in -->
+            {% if user.is_authenticated == False %}
             <div class="header__login" style="display: none;">
               <a href="#vk" class="header__login-link">
                 <svg>
@@ -58,11 +59,14 @@
                 </svg>
               </a>
             </div>
+            {% endif %}
 
             <!-- If logged-in and has balance -->
+            {% if user.is_authenticated %}
             <a href="profil" class="header__balance">
               <span>1.32m</span>
             </a>
+            {% endif %}
           </div>
 
           <div class="header__wrapper">
@@ -87,16 +91,16 @@
 
             <div class="header__profile">
               <a href="profil" class="header__avatar">
-                <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                  {% if user.is_authenticated == False %}
+                <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                  {% else %}
+                <img src="{{ user.avatar.url }}" alt="Аватар">
+                  {% endif %}
               </a>
 
               <div class="header__profile-info">
-{% if request.user.is_authenticated %}
                 <a href="profil" class="header__profile-name">
                   <span>{{ request.user }}</span>
-{% else %}
-                  <span>{{ request.user }}</span>
-{% endif %}
                   <svg class="header__profile-settings">
                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                   </svg>
@@ -120,12 +124,13 @@
                   </a>
 {% endif %}
                   <!-- If not logged-in -->
-                  <a href="#vk" class="header__profile-login" style="display: none;">
+                  {% if user.is_authenticated == False %}
+                  <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login" style="display: block!important;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                     </svg>
                   </a>
-                  <a href="#google" class="header__profile-login" style="display: none;">
+                  <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login" style="display: block!important;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                     </svg>
@@ -137,31 +142,32 @@
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
                     </svg>
                   </a>
+                  {% endif %}
                 </div>
 
                 <!-- If user logged-in -->
 {% if request.user.is_authenticated %}
                 <a href="profil" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
-                    <span>{{ request.user.level|add:"1" }} ур.</span>
+                    <span>{{ request.user.level }} ур.</span>
                   </div>
                   <div class="header__profile-line">
                     <span></span>
                   </div>
                   <div class="header__profile-lvl header__profile-lvl_next">
-                    <span>{{ request.user.level|add:"2" }} ур.</span>
+                    <span>{{ request.user.level|add:"1" }} ур.</span>
                   </div>
                 </a>
 {% else %}
                 <a href="profil" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
-                    <span>{{ request.user.level|add:"1"  }} ур.</span>
+                    <span>1 ур.</span>
                   </div>
                   <div class="header__profile-line">
                     <span></span>
                   </div>
                   <div class="header__profile-lvl header__profile-lvl_next">
-                    <span>{{ request.user.level|add:"2" }} ур.</span>
+                    <span>2 ур.</span>
                   </div>
                 </a>
 {% endif %}
@@ -718,8 +724,8 @@
                             <svg class="profil__progressbar-lvl-img">
                               <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                             </svg>
-                            <p class="profil__progressbar-lvl-num">17 LVL</p>
-                            <span class="profil__progressbar-lvl-progress">300 / 1000 XP</span>
+                            <p class="profil__progressbar-lvl-num">{{ request.user.level }} LVL</p>
+                            <span class="profil__progressbar-lvl-progress">{{ request.user.experience }} / 1000 XP</span>
                           </div>
                           <div class="profil__progressbar-row">
                             <div class="profil__progressbar-current">

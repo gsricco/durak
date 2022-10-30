@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser
+from .models import CustomUser, Level
 
 
 @admin.register(CustomUser)
@@ -10,3 +10,9 @@ class CustomUserAdmin(admin.ModelAdmin):
     search_fields = 'username',
 
 
+@admin.register(Level)
+class LevelAdmin(admin.ModelAdmin):
+    list_display = 'level', 'experience_for_lvl', 'image'
+    list_editable = 'experience_for_lvl', 'image'
+    list_filter = 'level',
+    search_fields = 'level',

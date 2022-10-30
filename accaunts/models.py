@@ -9,11 +9,11 @@ class IPUser(models.Model):
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.ImageField(verbose_name='Аватар', upload_to='img/avatar/user/',
-                               default='img/avatar/user/avatar.png')
+                               default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
-    level = models.IntegerField(verbose_name="Уровень", default=1)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
     ip_user = models.ForeignKey('IPUser', verbose_name="IP пользовтаеля", on_delete=models.CASCADE, blank=True,
                                 null=True)
     ref_code = models.CharField(verbose_name="Реферальный код", max_length=200, blank=True, null=True)
@@ -30,3 +30,11 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+class Level(models.Model):
+    """Модель уровней пользователей"""
+    level = models.IntegerField(unique=True)
+    experience_for_lvl = models.IntegerField()
+    image = models.ImageField(verbose_name='Аватар', upload_to='img/level/', blank=True, null=True)
+
+    def __str__(self):
+        return (f"{self.level} уровень")
