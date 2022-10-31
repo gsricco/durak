@@ -5,27 +5,27 @@ class Item(models.Model):
     """
     Model stores information about an item
     """
-    name = models.CharField(max_length=255)
-    selling_price = models.IntegerField()
-    chance_price = models.IntegerField()
+    name = models.CharField(verbose_name='Название', max_length=255)
+    selling_price = models.IntegerField(verbose_name='Цена продажи')
+    chance_price = models.IntegerField(verbose_name='Цена для расчёта шансов')
 
 
 class Grade(models.Model):
     """
     Model represents grade of a case
     """
-    name = models.CharField(max_length=255)
-    min_lvl = models.IntegerField()
+    name = models.CharField(verbose_name='Название', max_length=255)
+    min_lvl = models.IntegerField(verbose_name='Минимальный уровень')
 
 
 class Case(models.Model):
     """
     Model stores information about a case
     """
-    name = models.CharField(max_length=255)
-    grade = models.ForeignKey('Grade', on_delete=models.PROTECT)
-    number_of_cases = models.IntegerField()
-    avg_win = models.IntegerField()
+    name = models.CharField(verbose_name='Название', max_length=255)
+    grade = models.ForeignKey('Grade', verbose_name='Качество', on_delete=models.PROTECT)
+    number_of_cases = models.IntegerField(verbose_name='Число кейсов для пользователя')
+    avg_win = models.IntegerField(verbose_name='Средний выигрыш')
 
 
 class ItemForCase(models.Model):
@@ -33,20 +33,20 @@ class ItemForCase(models.Model):
     Model stores information about an item in the specific case
     It creates many-to-many relation between Item and Case taking into account a chance of dropping an item
     """
-    chance = models.DecimalField(max_digits=6, decimal_places=3)
-    item = models.ForeignKey('Item', on_delete=models.CASCADE)
-    case = models.ForeignKey('Case', on_delete=models.PROTECT)
+    chance = models.DecimalField(verbose_name='Вероятность выпадения', max_digits=6, decimal_places=3)
+    item = models.ForeignKey('Item', verbose_name='Предмет', on_delete=models.CASCADE)
+    case = models.ForeignKey('Case', verbose_name='Кейс', on_delete=models.PROTECT)
 
 
 class OwnedCase(models.Model):
     """
     Model stores information about users cases
     """
-    case = models.ForeignKey('Case', on_delete=models.CASCADE)
+    case = models.ForeignKey('Case', verbose_name='Кейс', on_delete=models.CASCADE)
 
     # owner = models.ForeignKey('User', on_delete=models.PROTECT)
-    owner = models.IntegerField()
+    owner = models.IntegerField(verbose_name='Владелец')
 
-    date_owned = models.DateTimeField(auto_now_add=True)
-    date_opened = models.DateTimeField(null=True)
-    item = models.ForeignKey('Item', on_delete=models.PROTECT, null=True)
+    date_owned = models.DateTimeField(verbose_name='Дата получения', auto_now_add=True)
+    date_opened = models.DateTimeField(verbose_name='Дата открытия', null=True)
+    item = models.ForeignKey('Item', verbose_name='Выпавший предмет', on_delete=models.PROTECT, null=True)
