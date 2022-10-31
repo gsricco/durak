@@ -8,6 +8,12 @@ class CustomUser(AbstractUser):
                                default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not DetailUser.objects.filter(user=self):
+            detail = DetailUser(user=self, level_id=1)
+            detail.save()
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'

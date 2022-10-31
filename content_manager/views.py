@@ -8,7 +8,7 @@ def index(request):
     """ГЛАВНАЯ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        detail_user = DetailUser.objects.get(pk=request.user.id)
+        detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         context = {
             'sitecontent': sitecontent,
@@ -26,7 +26,7 @@ def bonus_currency(request):
     """FREE"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        detail_user = DetailUser.objects.get(pk=request.user.id)
+        detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         context = {
             'sitecontent': sitecontent,
@@ -44,7 +44,7 @@ def contact(request):
     """КОНТАКТЫ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        detail_user = DetailUser.objects.get(pk=request.user.id)
+        detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         context = {
             'sitecontent': sitecontent,
@@ -63,7 +63,7 @@ def faq(request):
     faq = FAQ.objects.filter(is_active=True)
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        detail_user = DetailUser.objects.get(pk=request.user.id)
+        detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         context = {
             'sitecontent': sitecontent,
@@ -83,7 +83,7 @@ def honesty(request):
     """ЧЕСТНОСТЬ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        detail_user = DetailUser.objects.get(pk=request.user.id)
+        detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         context = {
             'sitecontent': sitecontent,
@@ -103,7 +103,7 @@ def profil(request):
     """ПРОФИЛЬ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        detail_user = DetailUser.objects.get(pk=request.user.id)
+        detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         context = {
             'sitecontent': sitecontent,
