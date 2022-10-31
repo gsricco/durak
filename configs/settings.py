@@ -140,8 +140,9 @@ AUTH_USER_MODEL = 'accaunts.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.vk.VKOAuth2',
-    'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',  # возможно отключить, если не будет доступа кроме гугла и вк
+    # 'social_core.backends.google.GoogleOAuth2', # выключен в пользу кастомного
+    'accaunts.backends.CustomGoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/profil'

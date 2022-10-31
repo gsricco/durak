@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
     avatar = models.ImageField(verbose_name='Аватар', upload_to='img/avatar/user/',
                                default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
+    photo = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
