@@ -12,7 +12,10 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self):
-            detail = DetailUser(user=self, level_id=1)
+            if not Level.objects.exists(): #создание первого лвл при регистрации первого пользователя
+                level_1 = Level(level=1, experience_for_lvl=600)
+                level_1.save()
+            detail = DetailUser(user=self, level=Level.objects.get(level=1))
             detail.save()
 
     class Meta:
@@ -41,8 +44,8 @@ class DetailUser(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", to_field='level', on_delete=models.CASCADE, blank=True,
-                              null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True,
+                              null=True) #to_field работает корректно (возможно из-за sqlite) в одну сторону тянет, в другую нет
 
 
 class ReferalCode(models.Model):
