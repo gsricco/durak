@@ -63,7 +63,7 @@
             <!-- If logged-in and has balance -->
             {% if user.is_authenticated %}
             <a href="profil" class="header__balance">
-              <span>1.32m</span>
+              <span>{{ detail_user.balance }}</span>
             </a>
             {% endif %}
           </div>
@@ -99,7 +99,11 @@
 
               <div class="header__profile-info">
                 <a href="profil" class="header__profile-name">
-                  <span>{{ user.username }}</span>
+                  {% if user.is_authenticated == False %}
+                  <span>Anonymous</span>
+                  {% else %}
+                  <span>{{ request.user.username }}</span>
+                  {% endif %}
                   <svg class="header__profile-settings">
                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                   </svg>
@@ -726,8 +730,13 @@
                             <svg class="profil__progressbar-lvl-img">
                               <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                             </svg>
+                            {% if user.is_authenticated %}
                             <p class="profil__progressbar-lvl-num">{{ level_data.level }} LVL</p>
                             <span class="profil__progressbar-lvl-progress">{{ detail_user.experience }} / {{ level_data.experience_for_lvl }} XP</span>
+                            {% else %}
+                            <p class="profil__progressbar-lvl-num">1 LVL</p>
+                            <span class="profil__progressbar-lvl-progress">0 / {{ level_data.experience_for_lvl }} XP</span>
+                            {% endif %}
                           </div>
                           <div class="profil__progressbar-row">
                             <div class="profil__progressbar-current">
