@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'caseapp',
 
     'social_django',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
