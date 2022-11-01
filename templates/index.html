@@ -63,7 +63,7 @@
             <!-- If logged-in and has balance -->
             {% if user.is_authenticated %}
             <a href="profil" class="header__balance">
-              <span>1.32m</span>
+              <span>{{ detail_user.balance }}</span>
             </a>
             {% endif %}
           </div>
@@ -100,7 +100,7 @@
               <div class="header__profile-info">
                 <a href="profil" class="header__profile-name">
                      {% if user.is_authenticated == False %}
-                  <span>Anonimus</span>
+                  <span>Anonymous</span>
                   {% else %}
                   <span>{{ request.user.username }}</span>
                   {% endif %}
