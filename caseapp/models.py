@@ -59,8 +59,8 @@ class OwnedCase(models.Model):
     owner = models.IntegerField(verbose_name='Владелец')
 
     date_owned = models.DateTimeField(verbose_name='Дата получения', auto_now_add=True)
-    date_opened = models.DateTimeField(verbose_name='Дата открытия', null=True)
-    item = models.ForeignKey('Item', verbose_name='Выпавший предмет', on_delete=models.PROTECT, null=True)
+    date_opened = models.DateTimeField(verbose_name='Дата открытия', null=True, blank=True)
+    item = models.ForeignKey('Item', verbose_name='Выпавший предмет', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f"{self.case.name} for {self.owner}"
