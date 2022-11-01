@@ -9,6 +9,9 @@ class Item(models.Model):
     selling_price = models.IntegerField(verbose_name='Цена продажи')
     chance_price = models.IntegerField(verbose_name='Цена для расчёта шансов')
 
+    def __str__(self):
+        return self.name
+
 
 class Grade(models.Model):
     """
@@ -17,6 +20,8 @@ class Grade(models.Model):
     name = models.CharField(verbose_name='Название', max_length=255)
     min_lvl = models.IntegerField(verbose_name='Минимальный уровень')
 
+    def __str__(self):
+        return self.name
 
 class Case(models.Model):
     """
@@ -27,6 +32,9 @@ class Case(models.Model):
     number_of_cases = models.IntegerField(verbose_name='Число кейсов для пользователя')
     avg_win = models.IntegerField(verbose_name='Средний выигрыш')
 
+    def __str__(self):
+        return self.name
+
 
 class ItemForCase(models.Model):
     """
@@ -36,6 +44,9 @@ class ItemForCase(models.Model):
     chance = models.DecimalField(verbose_name='Вероятность выпадения', max_digits=6, decimal_places=3)
     item = models.ForeignKey('Item', verbose_name='Предмет', on_delete=models.CASCADE)
     case = models.ForeignKey('Case', verbose_name='Кейс', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f"{self.item.name} from {self.case.name}"
 
 
 class OwnedCase(models.Model):
@@ -50,3 +61,6 @@ class OwnedCase(models.Model):
     date_owned = models.DateTimeField(verbose_name='Дата получения', auto_now_add=True)
     date_opened = models.DateTimeField(verbose_name='Дата открытия', null=True)
     item = models.ForeignKey('Item', verbose_name='Выпавший предмет', on_delete=models.PROTECT, null=True)
+
+    def __str__(self):
+        return f"{self.case.name} for {self.owner}"
