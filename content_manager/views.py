@@ -112,9 +112,11 @@ def profil(request):
             "faq": faq,
         }
     else:
+        level_data = Level.objects.get(level=1)
         context = {
             'sitecontent': sitecontent,
             "faq": faq,
+            'level_data': level_data,
         }
     return render(request, 'profil.html', context)
 
