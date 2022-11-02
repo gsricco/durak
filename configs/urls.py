@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('start_all_template.urls')),
     path('social/', include('social_django.urls', namespace='social')),
-
+    path('api/v1/', include('caseapp.urls')),
 ]
 
 if settings.DEBUG:
