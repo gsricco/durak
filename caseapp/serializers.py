@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Case, Grade, Item
+from .models import Case, Grade, Item, OwnedCase
 
 
 class GradeModelSerializer(serializers.ModelSerializer):
@@ -27,3 +27,14 @@ class ItemSerializer(serializers.Serializer):
 
     class Meta:
         model = Item
+
+
+class OwnedCaseSerializer(serializers.Serializer):
+    case = CaseSerializer()
+    owner = serializers.IntegerField()
+    date_owned = serializers.DateTimeField()
+    date_opened = serializers.DateTimeField()
+    item = ItemSerializer()
+
+    class Meta:
+        model = OwnedCase
