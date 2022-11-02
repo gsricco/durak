@@ -23,13 +23,13 @@ class Grade(models.Model):
     def __str__(self):
         return self.name
 
+
 class Case(models.Model):
     """
     Model stores information about a case
     """
     name = models.CharField(verbose_name='Название', max_length=255)
     grade = models.ForeignKey('Grade', verbose_name='Качество', on_delete=models.PROTECT)
-    number_of_cases = models.IntegerField(verbose_name='Число кейсов для пользователя')
     avg_win = models.IntegerField(verbose_name='Средний выигрыш')
 
     def __str__(self):
