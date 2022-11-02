@@ -6,11 +6,16 @@ class Item(models.Model):
     Model stores information about an item
     """
     name = models.CharField(verbose_name='Название', max_length=255)
+    image = models.ImageField(verbose_name='Изображение', upload_to='items')
     selling_price = models.IntegerField(verbose_name='Цена продажи')
     chance_price = models.IntegerField(verbose_name='Цена для расчёта шансов')
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Предмет'
+        verbose_name_plural = 'Предметы'
 
 
 class Grade(models.Model):
@@ -18,10 +23,15 @@ class Grade(models.Model):
     Model represents grade of a case
     """
     name = models.CharField(verbose_name='Название', max_length=255)
+    image = models.ImageField(verbose_name='Изображение', upload_to='grades', null=True, blank=True)
     min_lvl = models.IntegerField(verbose_name='Минимальный уровень')
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Уровень кейса'
+        verbose_name_plural = 'Уровни кейсов'
 
 
 class Case(models.Model):
@@ -35,6 +45,10 @@ class Case(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Кейс'
+        verbose_name_plural = 'Кейсы'
+
 
 class ItemForCase(models.Model):
     """
@@ -47,6 +61,10 @@ class ItemForCase(models.Model):
 
     def __str__(self):
         return f"{self.item.name} from {self.case.name}"
+
+    class Meta:
+        verbose_name = 'Предмет в кейсе'
+        verbose_name_plural = 'Предметы в кейсах'
 
 
 class OwnedCase(models.Model):
@@ -64,3 +82,7 @@ class OwnedCase(models.Model):
 
     def __str__(self):
         return f"{self.case.name} for {self.owner}"
+
+    class Meta:
+        verbose_name = 'Кейс пользователя'
+        verbose_name_plural = 'Кейсы пользователей'
