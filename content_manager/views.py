@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from social_django.models import UserSocialAuth
 
 from accaunts.models import DetailUser, Level
 from .models import FAQ, SiteContent
@@ -105,11 +106,21 @@ def profil(request):
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
+        if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
+            social_google = True
+        else:
+            social_google = False
+        if UserSocialAuth.objects.filter(user_id=request.user.id, provider='vk-oauth2'):
+            social_vk = True
+        else:
+            social_vk = False
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
             "faq": faq,
+            'social_google': social_google,
+            'social_vk': social_vk,
         }
     else:
         level_data = Level.objects.get(level=1)
