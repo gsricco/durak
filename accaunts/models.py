@@ -54,7 +54,7 @@ class DetailUser(models.Model):
     balance = models.IntegerField(verbose_name="Баланс", default=0)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
     level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True,
-                              null=True) #to_field работает корректно (возможно из-за sqlite) в одну сторону тянет, в другую нет
+                              null=True)
 
 
 class ReferalCode(models.Model):
