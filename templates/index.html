@@ -99,7 +99,7 @@
 
               <div class="header__profile-info">
                 <a href="profil" class="header__profile-name">
-                     {% if user.is_authenticated == False %}
+                  {% if user.is_authenticated == False %}
                   <span>Anonymous</span>
                   {% else %}
                   <span>{{ request.user.username }}</span>
