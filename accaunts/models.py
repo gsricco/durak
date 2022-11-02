@@ -1,15 +1,24 @@
+from tempfile import NamedTemporaryFile
+from urllib.request import urlopen
+
+from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
     """Пользователи"""
-    avatar = models.ImageField(verbose_name='Аватар', upload_to='img/avatar/user/',
+    avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
                                default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
+            img_temp = NamedTemporaryFile(delete=True)
+            img_temp.write(urlopen(self.photo).read())
+            img_temp.flush()
+            self.avatar.save(f"image_{self.pk}", File(img_temp))
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self):
             if not Level.objects.exists(): #создание первого лвл при регистрации первого пользователя
