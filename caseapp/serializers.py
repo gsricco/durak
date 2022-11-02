@@ -31,7 +31,7 @@ class ItemSerializer(serializers.Serializer):
 
 class OwnedCaseSerializer(serializers.Serializer):
     case = CaseSerializer()
-    owner = serializers.IntegerField()
+    owner = serializers.PKOnlyObject('auth.User')
     date_owned = serializers.DateTimeField()
     date_opened = serializers.DateTimeField()
     item = ItemSerializer()
