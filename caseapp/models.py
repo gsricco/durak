@@ -9,6 +9,7 @@ class Item(models.Model):
     image = models.ImageField(verbose_name='Изображение', upload_to='items')
     selling_price = models.IntegerField(verbose_name='Цена продажи')
     chance_price = models.IntegerField(verbose_name='Цена для расчёта шансов')
+    is_money = models.BooleanField(verbose_name='Предмет является кредитами')
 
     def __str__(self):
         return self.name
