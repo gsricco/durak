@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Level, IPUser, DetailUser, ReferalUser, ReferalCode, GameID, Ban
+from .models import CustomUser, Level, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban
 
 
 # @admin.register(CustomUser)
@@ -11,7 +11,7 @@ from .models import CustomUser, Level, IPUser, DetailUser, ReferalUser, ReferalC
 
 
 admin.site.register(CustomUser)
-admin.site.register(IPUser)
+admin.site.register(UserAgent)
 admin.site.register(DetailUser)
 admin.site.register(ReferalUser)
 admin.site.register(ReferalCode)
