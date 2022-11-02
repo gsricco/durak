@@ -695,7 +695,11 @@
                       <div class="profil__row">
                         <div class="profil__left">
                           <div class="profil__avatar">
+                              {% if user.is_authenticated %}
+                              <img src="{{ user.avatar.url }}" alt="">
+                              {% else %}
                             <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
+                              {% endif %}
                           </div>
                           <div class="profil__info">
                             <div class="profil__name-wrapper">
@@ -703,7 +707,12 @@
                                 <div class="profil__name">
 
                                   <div class="profil__name-text">
-                                    <span>{{ user.username }}</span>
+                                    {% if user.is_authenticated %}
+                                      <span>{{ user.username }}</span>
+                                    {% else %}
+                                      <span>Anonymous</span>
+                                    {% endif %}
+
                                   </div>
                                   <a href="#profileSettings" class="popup-link">
                                     <svg class="profil__icon-settings">
@@ -716,7 +725,15 @@
 
                             <div class="profil__btns">
 {% if user.is_authenticated %}
-                              <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% if social_google and social_vk %}
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% elif social_vk %}
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% elif social_google %}
+        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить аккаунт VK</a>
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% endif %}
 {% else %}
                               <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Войти с помощью Google</a>
                               <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти с помощью VK</a>
@@ -1773,7 +1790,11 @@
             <form class="profile-settings__row">
               <div class="profile-settings__item-avatar">
                 <div class="profile-settings__avatar" id="imgAva">
+                     {% if user.is_authenticated %}
+                  <img data-value="0" src="{{ user.avatar.url }}" alt="nickname" id="profileImage">
+                      {% else %}
                   <img data-value="0" src="{% static 'img/avatar/user/avatar.svg' %}" alt="nickname" id="profileImage">
+                     {% endif %}
                 </div>
               </div>
               <div class="profile-settings__item">
