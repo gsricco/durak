@@ -139,7 +139,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accaunts.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.vk.VKOAuth2',
+    # 'social_core.backends.vk.VKOAuth2', # выключен в пользу кастомного
+    'accaunts.backends.CustomVKOAuth2',
     # 'social_core.backends.google.GoogleOAuth2', # выключен в пользу кастомного
     'accaunts.backends.CustomGoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
