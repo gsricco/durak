@@ -74,8 +74,7 @@ class OwnedCase(models.Model):
     """
     case = models.ForeignKey('Case', verbose_name='Кейс', on_delete=models.CASCADE)
 
-    # owner = models.ForeignKey('User', on_delete=models.PROTECT)
-    owner = models.IntegerField(verbose_name='Владелец')
+    owner = models.ForeignKey('auth.User', on_delete=models.PROTECT)
 
     date_owned = models.DateTimeField(verbose_name='Дата получения', auto_now_add=True)
     date_opened = models.DateTimeField(verbose_name='Дата открытия', null=True, blank=True)
