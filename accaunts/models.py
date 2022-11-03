@@ -58,6 +58,7 @@ class DetailUser(models.Model):
     level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
 
     def lvl_up(self):
+        """Метод увеличивающий уровень пользователя"""
         current_level = Level.objects.get(pk=self.level_id)
         next_level = Level.objects.get(level=current_level.level + 1)
         self.experience -= current_level.experience_for_lvl
@@ -65,6 +66,12 @@ class DetailUser(models.Model):
         self.save()
         if self.experience >= next_level.experience_for_lvl:
             self.lvl_up()
+
+    def change_balance(self, change):
+        """Метод меняющий баланс пользователя"""
+        self.balance += change
+        self.save()
+
 
 class ReferalCode(models.Model):
     """Модель реферальных ссылок"""
