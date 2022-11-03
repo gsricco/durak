@@ -3,12 +3,13 @@ from rest_framework import routers
 
 from support_chat.views import MessageViewSet
 
+app_name = 'support_chat'
 
-router_get = routers.DefaultRouter()
-router_get.register(r'message', MessageViewSet, basename='message')
+router = routers.DefaultRouter()
+router.register(r'message', MessageViewSet, basename='message_chat')
 
 
 urlpatterns = [
-    path('', include(router_get.urls)),
+    path('', include(router.urls)),
 
 ]

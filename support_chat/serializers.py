@@ -1,13 +1,14 @@
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from rest_framework.parsers import MultiPartParser, FormParser
 
+from rest_framework import serializers
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
+
+from accaunts.models import CustomUser
 from .models import Message
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = ('id', 'username', 'avatar')
 
 
@@ -19,15 +20,14 @@ class MessageGetSerializer(serializers.Serializer):
     date = serializers.DateTimeField()
 
 
-class MessageFileCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        parser_classes = (MultiPartParser, FormParser)
-        fields = ('file_message',)
-
+# class MessageFileCreateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Message
+#         parser_classes = (FileUploadParser,)
+#         fields = ('file_message',)
 
 class MessageCreateSerializer(serializers.ModelSerializer):
-    file_message = MessageFileCreateSerializer()
+    # file_message = MessageFileCreateSerializer(default=None)
     class Meta:
         model = Message
         fields = ('user_posted', 'user_received', 'message', 'file_message')
