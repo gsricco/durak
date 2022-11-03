@@ -1371,10 +1371,13 @@ window.addEventListener("DOMContentLoaded", () => {
     const inviteBtn = document.querySelector('.invite__btn')
 
     inviteBtn.addEventListener('click', (e) => {
+
         if (isAuthenticated === 'False') {
             const modal = document.querySelector('#authorization')
             modal.classList.add('open')
         }
+
         e.preventDefault()
+
     })
 });
