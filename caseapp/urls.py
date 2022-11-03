@@ -6,6 +6,7 @@ from .api_views import (
     get_items_in_case,
     open_case,
     get_user_cases,
+    get_time_for_next_case,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('items_for_case/<int:case_pk>/', get_items_in_case, name='api_items_in_case'),
     path('get_user_cases/', get_user_cases, name='api_get_user_cases'),
     path('open/<int:owned_case_id>', open_case, name="api_open_case"),
+    path('get_time_for_case/', get_time_for_next_case, name="api_time_for_next_case"),
 ]
