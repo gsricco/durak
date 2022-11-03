@@ -3,12 +3,9 @@ from accaunts.models import CustomUser
 
 
 class UserEditName(forms.ModelForm):
-    usname = forms.CharField(max_length=50, label='Сменить никнейм')
+    username = forms.CharField(max_length=20, widget=forms.TextInput(
+        attrs={'class': "form__input form profile-settings__name", 'type': "text", }))
 
     class Meta:
         model = CustomUser
-        fields = 'usname',
-
-    # def clean_username(self):
-    #     name = self.cleaned_data.get('username')
-    #     CustomUser.objects.update(username=name)
+        fields = 'username',

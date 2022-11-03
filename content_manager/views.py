@@ -104,17 +104,13 @@ def honesty(request):
 def profil(request):
     """ПРОФИЛЬ"""
     sitecontent = SiteContent.objects.all()
-    # form_user = UserEditName(request.POST or None)
-    # print(request.method, 'methodsa')
-    # if request.method == 'POST':
-    #     print(request.POST, '123123')
-    #     if form_user.is_valid():
-    #         print(form_user.data, 'штаффыв')
-    #         form_user.save()
-    #         return render(request, 'profil.html')
-    # else:
-    #     print('OK')
     if request.user.is_authenticated:
+        form_user = UserEditName(request.POST)  # Смена имени для пользователя
+        user_ed = CustomUser.objects.get(username=request.user)
+        if request.method == 'POST' and form_user.is_valid():
+            user_ed.username = form_user.cleaned_data['username']
+            user_ed.save()
+            return redirect('profil')
         agent = (request.META['HTTP_USER_AGENT'])
         us = CustomUser.objects.get(username=request.user)
         user_agent, created = UserAgent.objects.get_or_create(user=us, useragent=agent)
@@ -136,7 +132,8 @@ def profil(request):
             "faq": faq,
             'social_google': social_google,
             'social_vk': social_vk,
-            # 'form_user': form_user,
+            'form_user': form_user,
+            'user_ed': user_ed,
         }
     else:
         level_data = Level.objects.get(level=1)
@@ -144,22 +141,20 @@ def profil(request):
             'sitecontent': sitecontent,
             "faq": faq,
             'level_data': level_data,
-            # 'form_user': form_user,
         }
     return render(request, 'profil.html', context)
 
-
-def update_profil(request):
-    form_user = UserEditName(request.POST or None)
-    print(form_user.data, 'methodsa')
-    if request.method == 'POST':
-        print(form_user, '++++')
-        if form_user.is_valid():
-            form_user.save()
-            return render(request, 'test.html')
-    else:
-        print('OK')
-    context = {
-        'form_user': form_user,
-    }
-    return render(request, 'test.html', context)
+# def update_profil(request):
+#     form_user = UserEditName(request.POST)
+#     user_ed = CustomUser.objects.get(username=request.user)
+#     if request.method == 'POST':
+#         if form_user.is_valid():
+#             user_ed.username = form_user.cleaned_data['username']
+#             user_ed.save()
+#             return render(request, 'test.html')
+#     else:
+#         print('OK')
+#     context = {
+#         'form_user': form_user,
+#     }
+#     return render(request, 'test.html', context)
