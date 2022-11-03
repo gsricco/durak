@@ -3,10 +3,31 @@ import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .serializers import CaseSerializer, ItemSerializer, OwnedCaseSerializer
+from .serializers import CaseSerializer, ItemSerializer, OwnedCaseSerializer, OwnedCaseTimeSerializer
 from .models import Case, Item, ItemForCase, OwnedCase
 
 from random import choices
+
+
+@api_view(['GET'])
+def get_time_for_next_case(request):
+    """
+    Return time to wait before case can be opened
+    """
+    if not request.user.is_authenticated:
+        return Response(status=401)
+
+    user_case = OwnedCase.objects.filter(owner_id=request.user.pk)\
+        .exclude(date_opened=None)\
+        .order_by("-date_opened")\
+        .first()
+
+    if user_case is None:
+        user_case = OwnedCase.objects.get(owner_id=request.user.pk)
+
+    serializer = OwnedCaseTimeSerializer(user_case)
+
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -25,6 +46,16 @@ def open_case(request, owned_case_id):
 
     if owned_case.item is not None:
         return Response({"details": "Case is already opened"}, status=403)
+
+    last_user_case = OwnedCase.objects.filter(owner_id=request.user.pk)\
+        .exclude(date_opened=None)\
+        .order_by("-date_opened")\
+        .first()
+
+    if last_user_case is not None:
+        delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
+        if delta_time < datetime.timedelta(hours=1):
+            return Response({"details": "Wait before you can open next case"}, status=403)
 
     case = owned_case.case
     case_items = ItemForCase.objects.filter(case=case)
@@ -65,8 +96,8 @@ def get_items_in_case(request, case_pk=None):
 
 @api_view(['GET'])
 def get_items(request):
-    """Returns list of all items"""
-    items = Item.objects.all()
+    """Returns list of all items except money items (credits in cases)"""
+    items = Item.objects.filter(is_money=False)
     serializer = ItemSerializer(items, many=True)
 
     return Response(serializer.data)
