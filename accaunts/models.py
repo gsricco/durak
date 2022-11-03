@@ -40,6 +40,9 @@ class UserAgent(models.Model):
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     useragent = models.CharField(verbose_name="UserAgent пользователя", max_length=200, blank=True, null=True)
 
+    def __str__(self):
+        return f'{self.user} {self.useragent}'
+
 
 class Level(models.Model):
     """Модель уровней пользователей"""
