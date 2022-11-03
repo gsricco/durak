@@ -725,15 +725,15 @@
 
                             <div class="profil__btns">
 {% if user.is_authenticated %}
-    {% if social_google and social_vk %}
-        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
-    {% elif social_vk %}
+    {% if not social_google and not social_vk %}
         <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
-        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
-    {% elif social_google %}
         <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить аккаунт VK</a>
-        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% elif not social_vk %}
+        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить аккаунт VK</a>
+    {% elif not social_google %}
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
     {% endif %}
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
 {% else %}
                               <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Войти с помощью Google</a>
                               <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти с помощью VK</a>

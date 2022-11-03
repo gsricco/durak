@@ -14,7 +14,9 @@ class CustomUser(AbstractUser):
     photo = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
+        if self.vk_url and not ("https://vk.com/" in self.vk_url): #добавление ссылки на вк
+            self.vk_url = f"https://vk.com/{self.vk_url}"
+        if self.photo and self.avatar == 'img/avatar/user/avatar.svg': #сохранение аватарки с внешнего аккаунта
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
