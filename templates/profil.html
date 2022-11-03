@@ -707,18 +707,20 @@
                                 <div class="profil__name">
 
                                   <div class="profil__name-text">
-                                    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
                                       <span>{{ user.username }}</span>
-                                    {% else %}
+{% else %}
                                       <span>Anonymous</span>
-                                    {% endif %}
+{% endif %}
 
                                   </div>
+{% if user.is_authenticated %}
                                   <a href="#profileSettings" class="popup-link">
                                     <svg class="profil__icon-settings">
                                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                     </svg>
                                   </a>
+{% endif %}
                                 </div>
                               </div>
                             </div>
@@ -1801,10 +1803,11 @@
 {% endif %}
                 </div>
               </div>
+{% if user and not user.is_anonymous %}
               <div class="profile-settings__item">
                 <div class="profile-settings__title"> Сменить никнейм </div>
-{% if user and not user.is_anonymous %}
-                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}"  {{ form_user.username }}
+                {{ form_user.username }}
+<!--                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}" {{ form_user.username }}-->
                 <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
               </div>
               <div class="profile-settings__btn-block">
