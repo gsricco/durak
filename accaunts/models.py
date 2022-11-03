@@ -55,9 +55,14 @@ class DetailUser(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True,
-                              null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
 
+    def lvl_up(self):
+        current_level = Level.objects.get(pk=self.level_id)
+        next_level = Level.objects.get(level=current_level.level + 1)
+        self.experience -= current_level.experience_for_lvl
+        self.level = next_level
+        self.save()
 
 class ReferalCode(models.Model):
     """Модель реферальных ссылок"""
