@@ -41,3 +41,14 @@ class FAQ(models.Model):
     def __str__(self):
         return self.name
 
+class BadSlang(models.Model):
+    """Запрещенные слова"""
+    name = models.CharField(verbose_name='Запрещенное слово', max_length=100)
+
+    class Meta:
+        verbose_name = 'Запрещенные слова'
+        verbose_name_plural = 'Запрещенные слова'
+
+    def __str__(self):
+        return self.name
+
