@@ -1365,4 +1365,26 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
+
+  /* Создание бонусного кода */
+  const inviteBtn = document.querySelector('.invite__btn');
+  inviteBtn.addEventListener('click',function(e){
+    const inviteInput = document.querySelector('.invite__input');
+    if (inviteInput.value !==''){
+      inviteBtn.disabled = true;
+      inviteInput.disabled = true;
+
+      // * при ответе с бэкенда
+      const textStatus = document.querySelectorAll('.form__msg');
+      for (let i = 0; i < textStatus.length; i++) {
+        textStatus[i].style.color = 'green';
+      }
+
+    }
+
+
+    e.preventDefault();
+
+  })
+
 });
