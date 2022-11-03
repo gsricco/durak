@@ -85,3 +85,5 @@ class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     ban = models.BooleanField(verbose_name='Бан', default=False)  # расписать виды банов
+
+

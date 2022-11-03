@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteContent, FAQ
+from .models import SiteContent, FAQ, BadSlang
 
 
 @admin.register(SiteContent)
@@ -14,4 +14,10 @@ class FAQAdmin(admin.ModelAdmin):
     list_display = 'name', 'description', 'is_active'
     list_editable = 'is_active',
     list_filter = 'is_active',
+
+
+@admin.register(BadSlang)
+class BadSlangAdmin(admin.ModelAdmin):
+    """Помощь"""
+    list_display = 'name',
 
