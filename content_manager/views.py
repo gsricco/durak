@@ -117,6 +117,10 @@ def profil(request):
         print(user_agent)
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
+        if detail_user.experience >= level_data.experience_for_lvl:
+            detail_user.lvl_up()
+            detail_user = DetailUser.objects.get(user_id=request.user.id)
+            level_data = Level.objects.get(pk=detail_user.level_id)
         if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
             social_google = True
         else:
@@ -132,8 +136,6 @@ def profil(request):
             "faq": faq,
             'social_google': social_google,
             'social_vk': social_vk,
-            'form_user': form_user,
-            'user_ed': user_ed,
         }
     else:
         level_data = Level.objects.get(level=1)
@@ -141,20 +143,7 @@ def profil(request):
             'sitecontent': sitecontent,
             "faq": faq,
             'level_data': level_data,
+
         }
     return render(request, 'profil.html', context)
 
-# def update_profil(request):
-#     form_user = UserEditName(request.POST)
-#     user_ed = CustomUser.objects.get(username=request.user)
-#     if request.method == 'POST':
-#         if form_user.is_valid():
-#             user_ed.username = form_user.cleaned_data['username']
-#             user_ed.save()
-#             return render(request, 'test.html')
-#     else:
-#         print('OK')
-#     context = {
-#         'form_user': form_user,
-#     }
-#     return render(request, 'test.html', context)

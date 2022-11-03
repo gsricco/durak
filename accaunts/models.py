@@ -14,7 +14,9 @@ class CustomUser(AbstractUser):
     photo = models.URLField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
+        if self.vk_url and not ("https://vk.com/" in self.vk_url):  # добавление ссылки на вк
+            self.vk_url = f"https://vk.com/{self.vk_url}"
+        if self.photo and self.avatar == 'img/avatar/user/avatar.svg':  # сохранение аватарки с внешнего аккаунта
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
@@ -56,8 +58,22 @@ class DetailUser(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True,
-                              null=True)  # to_field работает корректно (возможно из-за sqlite) в одну сторону тянет, в другую нет
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
+
+    def lvl_up(self):
+        """Метод увеличивающий уровень пользователя"""
+        current_level = Level.objects.get(pk=self.level_id)
+        next_level = Level.objects.get(level=current_level.level + 1)
+        self.experience -= current_level.experience_for_lvl
+        self.level = next_level
+        self.save()
+        if self.experience >= next_level.experience_for_lvl:
+            self.lvl_up()
+
+    def change_balance(self, change):
+        """Метод меняющий баланс пользователя"""
+        self.balance += change
+        self.save()
 
 
 class ReferalCode(models.Model):
@@ -85,5 +101,3 @@ class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     ban = models.BooleanField(verbose_name='Бан', default=False)  # расписать виды банов
-
-

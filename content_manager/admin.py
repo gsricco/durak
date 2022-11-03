@@ -7,6 +7,11 @@ class SiteContentAdmin(admin.ModelAdmin):
     """Контент сайта"""
     list_display = '__str__', 'support_email',
 
+    def has_add_permission(self, request):  # позволяет создать только одну модель
+        if self.model.objects.count() >= 1:
+            return False
+        return super().has_add_permission(request)
+
 
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):

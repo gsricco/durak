@@ -31,15 +31,16 @@ class CustomGoogleOAuth2(GoogleOAuth2):
 class CustomVKOAuth2(VKOAuth2):
     def get_user_details(self, response):
         """Return user details from VK.com account. Переопределил для извлечения аватара (picture)"""
-        print(response)
         fullname, first_name, last_name = self.get_user_names(
             first_name=response.get('first_name'),
             last_name=response.get('last_name')
         )
         photo = (response.get('photo', ''))
+        screen_name = (response.get('screen_name', ''))
         return {'username': response.get('screen_name'),
                 'email': response.get('email', ''),
                 'fullname': fullname,
                 'first_name': first_name,
                 'last_name': last_name,
-                'photo': photo}
+                'photo': photo,
+                'vk_url': screen_name}
