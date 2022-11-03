@@ -63,6 +63,8 @@ class DetailUser(models.Model):
         self.experience -= current_level.experience_for_lvl
         self.level = next_level
         self.save()
+        if self.experience >= next_level.experience_for_lvl:
+            self.lvl_up()
 
 class ReferalCode(models.Model):
     """Модель реферальных ссылок"""
