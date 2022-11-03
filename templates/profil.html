@@ -1788,41 +1788,32 @@
           </h3>
           <div class="profile-settings">
 
-            <form method="POST">
-                {% csrf_token %}
 
-
-            </form>
 
             <form class="profile-settings__row" method="POST">
+{% csrf_token %}
               <div class="profile-settings__item-avatar">
                 <div class="profile-settings__avatar" id="imgAva">
-                     {% if user.is_authenticated %}
+{% if user.is_authenticated %}
                   <img data-value="0" src="{{ user.avatar.url }}" alt="nickname" id="profileImage">
-                      {% else %}
+{% else %}
                   <img data-value="0" src="{% static 'img/avatar/user/avatar.svg' %}" alt="nickname" id="profileImage">
-                     {% endif %}
+{% endif %}
                 </div>
               </div>
               <div class="profile-settings__item">
-                <div class="profile-settings__title">
-                  Сменить никнейм
-                </div>
-
-  {% csrf_token %}
-
-                <input type="text" class="form__input form profile-settings__name" value="{{ user_form.as_p }}">
-                <button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
-
+                <div class="profile-settings__title"> Сменить никнейм </div>
+{% if user and not user.is_anonymous %}
+                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}"  {{ form_user.username }}
 
                 <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
               </div>
               <div class="profile-settings__btn-block">
                 <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
-                <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку
-                </div>
-<!--                <button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>-->
+                <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку</div>
+                <button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
               </div>
+{% endif %}
             </form>
           </div>
         </div>
