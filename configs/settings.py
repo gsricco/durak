@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+
     'ckeditor',
     'ckeditor_uploader',
 
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     'accaunts',
     'start_all_template',
     'content_manager',
+
     'support_chat',
 ]
 
