@@ -7,16 +7,20 @@ class SiteContentAdmin(admin.ModelAdmin):
     """Контент сайта"""
     list_display = '__str__', 'support_email',
     fieldsets = (
-        ('ЧЕСТНОСТЬ', {
+        ('Страница ЧЕСТНОСТЬ', {
+            'classes': ('collapse',),
             'fields': ('honesty_game', 'roll')
         }),
-        ('ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ', {
+        ('Страница ПОМОЩЬ', {
+            'classes': ('collapse',),
             'fields': ('agreement',)
         }),
-        ('КОНТАКТЫ', {
+        ('Страница КОНТАКТЫ', {
+            'classes': ('collapse',),
             'fields': ('about_us', 'description', 'support_email', 'url_vk', 'url_youtube')
         }),
-        ('FREE', {
+        ('Страница FREE', {
+            'classes': ('collapse',),
             'fields': ('info2', 'info3', 'bonus_vk', 'bonus_youtube')
         }),
     )
