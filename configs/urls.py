@@ -29,6 +29,7 @@ urlpatterns = [
     path('', include('content_manager.urls')),  # управление контентом на сайте
     path('', include('django.contrib.auth.urls')),  # выход из личного кабинета
     path('', include('social_django.urls', namespace='social')),  # авторизация через соц сети
+    path('api/v1/', include('support_chat.urls', namespace='support_chat')),  # чат поддержки
 ]
 
 if settings.DEBUG:
