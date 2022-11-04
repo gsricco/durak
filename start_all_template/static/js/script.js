@@ -1368,37 +1368,54 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-  }
 
-  /* Создание бонусного кода */
-  const inviteBtn = document.querySelector('.invite__btn');
-  inviteBtn.addEventListener('click',function(e){
-    const inviteInput = document.querySelector('.invite__input');
-    if (inviteInput.value !==''){
-      inviteBtn.disabled = true;
-      inviteInput.disabled = true;
+    /* Создание бонусного кода */
 
-      // * при ответе с бэкенда
-      const textStatus = document.querySelectorAll('.form__msg');
-      for (let i = 0; i < textStatus.length; i++) {
-        textStatus[i].style.color = 'green';
-      }
+    const inviteBtn = document.querySelector('.invite__btn');
 
-    }
-
-
-    e.preventDefault();
-
-  })
-    inviteBtn.addEventListener('click', (e) => {
+    inviteBtn.addEventListener('click', function (e) {
+        const inviteInput = document.querySelector('.invite__input');
 
         if (isAuthenticated === 'False') {
             const modal = document.querySelector('#authorization')
             modal.classList.add('open')
+            modal.addEventListener("click", function (e) {
+                if (!e.target.closest(".popup__content")) {
+                    popupClose(e.target.closest(".popup"));
+                }
+            });
+
+        } else {
+            const promoCode = inviteInput.value; /* заглушка - ответ с бэкенда*/
+
+            if (inviteInput.value !== '') {
+                inviteBtn.disabled = true;
+                inviteInput.disabled = true;
+                inviteInput.value = '';
+
+                // * при ответе с бэкенда
+
+                setTimeout(() => {
+                    const textStatus = document.querySelectorAll('.form__msg');
+                    // for (let i = 0; i < textStatus.length; i++) {
+                    textStatus[2].style.color = 'green';
+                    textStatus[2].textContent = 'Введенный промокод доступен';
+                    // }
+                    alert(`Ответ (${promoCode}) с бэкенда пришел`);
+
+                    inviteInput.value = promoCode;
+
+                }, 3000);
+
+
+            }
         }
 
-        e.preventDefault()
+        e.preventDefault();
 
     })
 
+
 });
+
+
