@@ -28,10 +28,14 @@ class MessageViewSet(viewsets.ViewSet):
     def create(self, request, *args, **kwargs):
         """Сохранение сообщения пользователя"""
         ### Или сделать с выборкой авториз пользователя, но как автоматом знать принимающую сторону
-        file = request.data.get('file_message')
+        user = request.user
+        file = request.data.get("file_message")
         serializer = MessageCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data['file_message'] = file
+        serializer.validated_data["file_message"] = file
+        serializer.validated_data["user_posted"] = user
+        # Для ПАШИ - Если просто тестить отправку(не с сайта), то надо закоментить стр.31 и 36. А раскоментить надо стр38
+        # serializer.validated_data["user_posted"] = CustomUser.objects.get(username='admin')
         serializer.save()
         return Response(status=200)
 

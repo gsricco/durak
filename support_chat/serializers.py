@@ -30,4 +30,4 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     # file_message = MessageFileCreateSerializer(default=None)
     class Meta:
         model = Message
-        fields = ('user_posted', 'user_received', 'message', 'file_message')
+        fields = ('message', 'file_message')
