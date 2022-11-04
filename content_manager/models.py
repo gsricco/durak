@@ -25,6 +25,7 @@ class SiteContent(models.Model):
         verbose_name = 'Контент сайта'
         verbose_name_plural = 'Контент сайта'
 
+
     def __str__(self):
         return f'Контент сайта'
 
