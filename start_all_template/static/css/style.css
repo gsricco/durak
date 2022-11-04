@@ -2741,8 +2741,8 @@ h3 {
 
 .profil__avatar {
   border-radius: 50%;
-  min-width: 130px;
-  min-height: 135px;
+  width: 130px;
+  height: 135px;
   margin-right: 15px;
 }
 

@@ -40,9 +40,11 @@ urlpatterns = [
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
-    path('', include('start_all_template.urls')),
-    path('social/', include('social_django.urls', namespace='social')),
-    path('api/v1/', include('caseapp.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),  # редактор текста в админке
+    path('', include('content_manager.urls')), #управление контентом на сайте
+    path('', include('django.contrib.auth.urls')),  # выход из личного кабинета
+    path('', include('social_django.urls', namespace='social')),  # авторизация через соц сети
+    path('api/v1/', include('caseapp.urls')), # кейсы
 ]
 
 if settings.DEBUG:

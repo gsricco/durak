@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Профиль</title>
+  <title>Рулетка</title>
   <!-- <meta name="description" content="Описание" />
 	<meta property="og:title" content="Рулетка" />
 	<meta property="og:description" content="Описание" />
@@ -45,23 +45,27 @@
             </div>
 
             <!-- If not logged-in -->
+            {% if user.is_authenticated == False %}
             <div class="header__login" style="display: none;">
-              <a href="#vk" class="header__login-link">
+              <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
                 <svg>
                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                 </svg>
               </a>
-              <a href="#google" class="header__login-link">
+              <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
                 <svg>
                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                 </svg>
               </a>
             </div>
+            {% endif %}
 
             <!-- If logged-in and has balance -->
+            {% if user.is_authenticated %}
             <a href="profil" class="header__balance">
-              <span>1.32m</span>
+              <span>{{ detail_user.balance }}</span>
             </a>
+            {% endif %}
           </div>
 
           <div class="header__wrapper">
@@ -86,51 +90,51 @@
 
             <div class="header__profile">
               <a href="profil" class="header__avatar">
-                <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                  {% if user.is_authenticated == False %}
+                <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                  {% else %}
+                <img src="{{ user.avatar.url }}" alt="Аватар">
+                  {% endif %}
               </a>
 
               <div class="header__profile-info">
                 <a href="profil" class="header__profile-name">
-                  <!-- If not logged-in -->
-                  <span style="display: none;">Anonymous</span>
-
-                  <!-- If logged-in -->
-                  <span>Username</span>
-
+                  {% if user.is_authenticated == False %}
+                  <span>Anonymous</span>
+                  {% else %}
+                  <span>{{ request.user.username }}</span>
+                  {% endif %}
                   <svg class="header__profile-settings">
                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                   </svg>
                 </a>
 
                 <div class="header__profile-row">
-                  <!-- If user logged-in -->
+{% if user.is_authenticated %}
                   <a href="profil" class="header__profile-sum">
                     <div class="header__profile-sum-img">
                       <svg>
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                       </svg>
                     </div>
-
-                    <span>1.32m</span>
+                    <span>{{ detail_user.balance }}</span>
                   </a>
-
-                  <!-- If user logged-in -->
                   <a href="#modalPayment" class="header__profile-link popup-link">
                     Пополнить
                   </a>
-
-                  <!-- If user logged-in -->
                   <a href="#selectAmountInput" class="header__profile-link popup-link">
                     Вывести
                   </a>
+{% endif %}
 
                   <!-- If not logged-in -->
-                  <a href="#vk" class="header__profile-login" style="display: none;">
+                  {% if user.is_authenticated == False %}
+                  <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login" style="display: block!important;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                     </svg>
                   </a>
-                  <a href="#google" class="header__profile-login" style="display: none;">
+                  <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login" style="display: block!important;">
                     <svg>
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                     </svg>
@@ -142,20 +146,36 @@
                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
                     </svg>
                   </a>
+                  {% endif %}
                 </div>
 
                 <!-- If user logged-in -->
+                <!-- На этом участке не войдя в систему видимо отрабатывает js в месте, где должен быть profile-line, и выдаёт постоянные null -->
+{% if user.is_authenticated %}
                 <a href="profil" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
-                    17<span>ур</span>
+                    <span>{{ level_data.level }} ур.</span>
                   </div>
                   <div class="header__profile-line">
                     <span></span>
                   </div>
                   <div class="header__profile-lvl header__profile-lvl_next">
-                    18<span>ур.</span>
+                    <span>{{ level_data.level|add:"1" }} ур.</span>
                   </div>
                 </a>
+{% else %}
+                <a href="profil" class="header__profile-progressbar">
+                  <div class="header__profile-lvl header__profile-lvl_back">
+                    <span>1 ур.</span>
+                  </div>
+                  <div class="header__profile-line">
+                    <span></span>
+                  </div>
+                  <div class="header__profile-lvl header__profile-lvl_next">
+                    <span>2 ур.</span>
+                  </div>
+                </a>
+{% endif %}
 
                 <div class="header__btns">
                   <a href="#modalPayment" class="header__profile-btn popup-link">
@@ -175,6 +195,7 @@
         </div>
       </div>
     </header>
+
 
     <main>
       <div class="container">
@@ -674,7 +695,11 @@
                       <div class="profil__row">
                         <div class="profil__left">
                           <div class="profil__avatar">
-                            <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                              {% if user.is_authenticated %}
+                              <img src="{{ user.avatar.url }}" alt="">
+                              {% else %}
+                            <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
+                              {% endif %}
                           </div>
                           <div class="profil__info">
                             <div class="profil__name-wrapper">
@@ -682,20 +707,39 @@
                                 <div class="profil__name">
 
                                   <div class="profil__name-text">
-                                    <span>Nickname</span>
+{% if user.is_authenticated %}
+                                      <span>{{ user.username }}</span>
+{% else %}
+                                      <span>Anonymous</span>
+{% endif %}
+
                                   </div>
+{% if user.is_authenticated %}
                                   <a href="#profileSettings" class="popup-link">
                                     <svg class="profil__icon-settings">
                                       <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                     </svg>
                                   </a>
+{% endif %}
                                 </div>
                               </div>
                             </div>
 
                             <div class="profil__btns">
+{% if user.is_authenticated %}
+    {% if social_google and social_vk %}
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% elif social_vk %}
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% elif social_google %}
+        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить аккаунт VK</a>
+        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+    {% endif %}
+{% else %}
                               <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Войти с помощью Google</a>
                               <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти с помощью VK</a>
+{% endif %}
                             </div>
                           </div>
                         </div>
@@ -705,8 +749,13 @@
                             <svg class="profil__progressbar-lvl-img">
                               <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
                             </svg>
-                            <p class="profil__progressbar-lvl-num">17 LVL</p>
-                            <span class="profil__progressbar-lvl-progress">300 / 1000 XP</span>
+                            {% if user.is_authenticated %}
+                            <p class="profil__progressbar-lvl-num">{{ level_data.level }} LVL</p>
+                            <span class="profil__progressbar-lvl-progress">{{ detail_user.experience }} / {{ level_data.experience_for_lvl }} XP</span>
+                            {% else %}
+                            <p class="profil__progressbar-lvl-num">1 LVL</p>
+                            <span class="profil__progressbar-lvl-progress">0 / {{ level_data.experience_for_lvl }} XP</span>
+                            {% endif %}
                           </div>
                           <div class="profil__progressbar-row">
                             <div class="profil__progressbar-current">
@@ -739,11 +788,11 @@
                           <div class="profil__block-row">
                             <div class="profil__items">
 
-                              <!-- If there is no items -->
+
                               <div class="profil__warning" style="display: none;">
                                 Предметы можно получить из кейсов (даются за новый уровень)..
                               </div>
-
+{% if user.is_authenticated %}
                               <div class="profil__item">
                                 <div class="profil__item-wrapper">
                                   <div class="profil__item-img">
@@ -1010,7 +1059,7 @@
                                     <h3 class="profil__slider-title">Алмазный кейс</h3>
                                   </a>
                                 </div>
-
+{% endif %}
                                 <div class="profil__slider-arrow profil__slider-arrow_next">
                                   <svg class="online-chat__icon-chat">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
@@ -1141,11 +1190,12 @@
               </svg>
             </a>
 
-            <a href="https://vk.com/durak24" target="_blank"
+{% for i in sitecontent %}
+<a href="{{ i.url_vk }}" target="_blank"
               class="footer__soc-item footer__soc-item footer__soc-item_vk">
               <img src="{% static 'img/gallery/vk.png' %}" alt="">
             </a>
-            <a href="https://www.youtube.com/channel/UCVwr3DUjn1LRrTkt44RC3_w" target="_blank"
+<a href="{{ i.url_youtube }}" target="_blank"
               class="footer__soc-item footer__soc-item_yt">
               <svg>
                 <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
@@ -1154,13 +1204,13 @@
           </div>
           <div class="footer__text-block">
             <div class="footer__text-achievements">
-              С вами с 2019 года. <br>
-              Более 50 000 подписчиков в группе Вконтакте. <br>
-              Свыше 600 положительных отзывов.
+{{ i.description|safe }}
+
             </div>
             <div class="footer__rights">
               Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.</div>
           </div>
+{% endfor %}
         </div>
       </div>
     </footer>
@@ -1739,26 +1789,33 @@
             Настройки профиля
           </h3>
           <div class="profile-settings">
-            <form class="profile-settings__row">
+
+
+
+            <form class="profile-settings__row" method="POST">
+{% csrf_token %}
               <div class="profile-settings__item-avatar">
                 <div class="profile-settings__avatar" id="imgAva">
-                  <img data-value="0" src="{% static 'img/avatar/user/avatar.png' %}" alt="nickname" id="profileImage">
+{% if user.is_authenticated %}
+                  <img data-value="0" src="{{ user.avatar.url }}" alt="nickname" id="profileImage">
+{% else %}
+                  <img data-value="0" src="{% static 'img/avatar/user/avatar.svg' %}" alt="nickname" id="profileImage">
+{% endif %}
                 </div>
               </div>
+{% if user and not user.is_anonymous %}
               <div class="profile-settings__item">
-                <div class="profile-settings__title">
-                  Сменить никнейм
-                </div>
-                <input type="text" class="form__input form profile-settings__name" value="Sellix224121">
+                <div class="profile-settings__title"> Сменить никнейм </div>
+                {{ form_user.username }}
+<!--                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}" {{ form_user.username }}-->
                 <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
               </div>
               <div class="profile-settings__btn-block">
                 <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
-                <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку
-                </div>
-                <button type="submit"
-                  class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
+                <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку</div>
+                <button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
               </div>
+{% endif %}
             </form>
           </div>
         </div>
@@ -2094,4 +2151,3 @@
 </body>
 
 </html>
-
