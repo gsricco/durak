@@ -16,10 +16,10 @@ class SiteContent(models.Model):
     url_vk = models.URLField(verbose_name="Ссылка на VK")
     url_youtube = models.URLField(verbose_name="Ссылка на Youtube")
     # FREE
-    info2 = RichTextField(verbose_name='Информация #2')
-    info3 = RichTextField(verbose_name='Информация #3')
-    bonus_vk = models.IntegerField(verbose_name="Бонус за подписку на VK")
-    bonus_youtube = models.IntegerField(verbose_name="Бонус за подписку на YouTube")
+    info2 = RichTextField(verbose_name='Информация #2', null=True)
+    info3 = RichTextField(verbose_name='Информация #3', null=True)
+    bonus_vk = models.IntegerField(verbose_name="Бонус за подписку на VK", null=True)
+    bonus_youtube = models.IntegerField(verbose_name="Бонус за подписку на YouTube", null=True)
 
     class Meta:
         verbose_name = 'Контент сайта'
