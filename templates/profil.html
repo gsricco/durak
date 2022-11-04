@@ -707,11 +707,11 @@
                                 <div class="profil__name">
 
                                   <div class="profil__name-text">
-                                    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
                                       <span>{{ user.username }}</span>
-                                    {% else %}
+{% else %}
                                       <span>Anonymous</span>
-                                    {% endif %}
+{% endif %}
 
                                   </div>
 {% if user.is_authenticated %}

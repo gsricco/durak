@@ -18,10 +18,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+admin.site.site_header = "Администрирование Durak Roll"
+admin.site.site_title = "Администрирование Durak Roll"
+admin.site.index_title = ""
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('ckeditor/', include('ckeditor_uploader.urls')),  # редактор текста в админке
-    path('', include('content_manager.urls')), #управление контентом на сайте
+    path('', include('content_manager.urls')),  # управление контентом на сайте
     path('', include('django.contrib.auth.urls')),  # выход из личного кабинета
     path('', include('social_django.urls', namespace='social')),  # авторизация через соц сети
 ]

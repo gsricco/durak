@@ -25,4 +25,3 @@ class FAQAdmin(admin.ModelAdmin):
 class BadSlangAdmin(admin.ModelAdmin):
     """Помощь"""
     list_display = 'name',
-
