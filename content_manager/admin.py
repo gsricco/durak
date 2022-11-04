@@ -6,6 +6,20 @@ from .models import SiteContent, FAQ, BadSlang
 class SiteContentAdmin(admin.ModelAdmin):
     """Контент сайта"""
     list_display = '__str__', 'support_email',
+    fieldsets = (
+        ('ЧЕСТНОСТЬ', {
+            'fields': ('honesty_game', 'roll')
+        }),
+        ('ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ', {
+            'fields': ('agreement',)
+        }),
+        ('КОНТАКТЫ', {
+            'fields': ('about_us', 'description', 'support_email', 'url_vk', 'url_youtube')
+        }),
+        ('FREE', {
+            'fields': ('info2', 'info3', 'bonus_vk', 'bonus_youtube')
+        }),
+    )
 
     def has_add_permission(self, request):  # позволяет создать только одну модель
         if self.model.objects.count() >= 1:

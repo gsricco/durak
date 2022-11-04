@@ -28,6 +28,7 @@ class SiteContent(models.Model):
     def __str__(self):
         return f'Контент сайта'
 
+
 class FAQ(models.Model):
     """Помощь"""
     name = models.CharField(verbose_name='Название вопроса', max_length=250)
@@ -41,6 +42,7 @@ class FAQ(models.Model):
     def __str__(self):
         return self.name
 
+
 class BadSlang(models.Model):
     """Запрещенные слова"""
     name = models.CharField(verbose_name='Запрещенное слово', max_length=100)
@@ -51,4 +53,3 @@ class BadSlang(models.Model):
 
     def __str__(self):
         return self.name
-
