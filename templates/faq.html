@@ -127,6 +127,7 @@
                   <a href="#selectAmountInput" class="header__profile-link popup-link">
                     Вывести
                   </a>
+                  <a href="/logout" class="header__profile-link logout-btn">Выйти</a>
 {% endif %}
 
                   <!-- If not logged-in -->
@@ -738,7 +739,8 @@
                               </div>
                             </div>
                             <ul class="support__chat-block scrollbar-overflow">
-                              <li class="support__chat-message support__chat-message_your">
+                              <div class="messageContainer"></div>
+                              <!--<li class="support__chat-message support__chat-message_your">
                                 <div class="support__chat-message-text"><span>Здравствуйте.Как пополнить баланс
                                     кредитами? Как пополнить баланс Как пополнить б Как пополнить баланс Как пополнить
                                     бал</span></div>
@@ -753,9 +755,9 @@
                                 </div>
                                 <div class="support__chat-message-text">Читай FAQ, недоброжелательный
                                   человек</div>
-                              </li>
+                              </li>-->
 
-                              <li class="support__chat-message support__chat-message_your">
+                              <!--<li class="support__chat-message support__chat-message_your">
                                 <div class="support__chat-message-text">
                                   <span class="support__chat-name">Gozavr228</span>
                                   <div class="support__chat-smile-img">
@@ -783,9 +785,9 @@
                                 <div class="support__chat-avatar">
                                   <img src="{% static 'img/gallery/avatar.png' %}" alt="">
                                 </div>
-                              </li>
+                              </li>-->
 
-                              <li class="support__chat-message support__chat-message_your">
+                              <!--<li class="support__chat-message support__chat-message_your">
                                 <div class="support__chat-message-text">
                                   <span class="support__chat-name">Gozavr228</span>
                                   <div class="support__chat-smile-img">
@@ -798,25 +800,23 @@
                                 <div class="support__chat-avatar">
                                   <img src="{% static 'img/gallery/avatar.png' %}" alt="">
                                 </div>
-                              </li>
+                              </li>-->
 
-                                <li class="support__chat-message">
+                              <!--<li class="support__chat-message">
                                 <div class="support__chat-avatar">
                                   <img src="{% static 'img/gallery/support-ava.png' %}" alt="">
                                 </div>
                                 <div class="support__chat-message-text">Читай FAQ, недоброжелательный
                                   человек</div>
-                              </li>
+                              </li>-->
 
-                              <li class="support__chat-message">
+                              <!--<li class="support__chat-message">
                                 <div class="support__chat-avatar">
                                   <img src="{% static 'img/gallery/support-ava.png' %}" alt="">
                                 </div>
                                 <div class="support__chat-message-text">Читай FAQ, недоброжелательный
                                   человек</div>
-                              </li>
-
-
+                              </li>-->
 
                               <div class="support__chat-answer">
                                 Ответ придёт спустя 12сек - 12ч, спам увеличивает время ответа.
@@ -842,6 +842,58 @@
                               </span>
                             </div>
                           </div>
+
+                          <script>
+                              const sendBtn = document.querySelector('.support__input-block-arrow')
+                              let inputValue = document.querySelector('.support__chat-input')
+                              const chatBlock = document.querySelector('.support__chat-block')
+                              const blockMessage = (messageArray) => {
+                                  chatBlock.innerHTML = ''
+                                  messageArray = messageArray.reverse()
+                                  messageArray.map(el => {
+                                      newUserMessage(el)
+                                  })
+                                  console.log(messageArray)
+                              }
+                              const newUserMessage = (message, avatar, file) => {
+                                  const li = document.createElement('li')
+                                  li.className = 'support__chat-message support__chat-message_your'
+                                  chatBlock.appendChild(li)
+                                  const div = document.createElement('div')
+                                  div.className = 'support__chat-message-text'
+                                  li.appendChild(div)
+                                  const span = document.createElement('span')
+                                  span.innerHTML = message
+                                  div.appendChild(span)
+                              }
+                              const getResponse = () => {
+                                  fetch('http://127.0.0.1:8000/api/v1/message/')
+                                      .then((response) => {
+                                          return response.json();
+                                      })
+                                      .then((data) => {
+                                          blockMessage(data.map(el => el.message))
+                                          chatBlock.scrollTop = chatBlock.scrollHeight
+                                      });
+                              }
+                              getResponse()
+                              sendBtn.addEventListener('click', () => {
+                                  async function postData(url, data) {
+                                      const response = await fetch(url, {
+                                          method: 'POST',
+                                          headers: {
+                                              'Content-Type': 'application/json',
+                                              "X-CSRFToken": '{{csrf_token}}',
+                                          },
+                                          body: JSON.stringify(data)
+                                      }).then(() => getResponse());
+                                  }
+
+                                  postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})
+                                  inputValue.value = ''
+                              })
+                          </script>
+
                         </div>
                       </section>
                     </div>
