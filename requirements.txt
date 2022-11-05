@@ -6,6 +6,7 @@ cryptography==38.0.1
 defusedxml==0.7.1
 Django==4.1.2
 django-ckeditor==6.5.1
+django-cors-headers==3.13.0
 django-js-asset==2.0.0
 django-rest-framework==0.1.0
 djangorestframework==3.14.0

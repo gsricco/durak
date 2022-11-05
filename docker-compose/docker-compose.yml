@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  durak_db:
+    container_name: durak_db
+    image: postgres:14-alpine
+    ports:
+      - '5433:5432'
+    env_file:
+      - ../.env
+    volumes:
+      - durak_pgdata:/var/lib/postgresql/data
+  durak_backend:
+    container_name: durak_backend
+    restart: unless-stopped
+    build:
+      context: ../
+    env_file:
+      - ../.env
+    ports:
+      - "8888:8000"
+    depends_on:
+      - durak_db
+    volumes:
+      - durak_static:/app/start_all_template/static
+      - durak_media:/app/media
+volumes:
+  durak_pgdata:
+  durak_static:
+  durak_media:
