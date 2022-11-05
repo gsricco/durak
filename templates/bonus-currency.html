@@ -41,7 +41,7 @@
                   <use xlink:href="img/icons/sprite.svg#youtube"></use>
                 </svg>
               </div>
-              <a href="##" class="btn btns_yt modal-enter__btn">Войти через Google</a>
+              <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btns_yt modal-enter__btn">Войти через Google</a>
             </div>
             <div class="modal-enter__item">
               <div class="modal-enter__img">
@@ -49,7 +49,7 @@
                   <use xlink:href="img/icons/sprite.svg#vk"></use>
                 </svg>
               </div>
-              <a href="##" class="btn btns_vk modal-enter__btn">Войти через Вконтакте</a>
+              <a href="{% url 'social:begin' 'vk-oauth2' %}" class="btn btns_vk modal-enter__btn">Войти через Вконтакте</a>
             </div>
           </div>
         </div>
