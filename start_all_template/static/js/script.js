@@ -1398,7 +1398,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 setTimeout(() => {
                     const textStatus = document.querySelectorAll('.form__msg');
                     // for (let i = 0; i < textStatus.length; i++) {
+                    textStatus[1].style.color = 'green';
                     textStatus[2].style.color = 'green';
+                    textStatus[1].textContent = 'Введенный промокод доступен';
                     textStatus[2].textContent = 'Введенный промокод доступен';
                     // }
                     alert(`Ответ (${promoCode}) с бэкенда пришел`);
