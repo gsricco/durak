@@ -650,10 +650,9 @@
                         Запрещается:
                       </div>
                       <ol class="rules__list">
-                        <li class="rules__item">1. Обмен/продажа игровых объектов</li>
-                        <li class="rules__item">2. Попрошайничество</li>
-                        <li class="rules__item">3. Размещение ссылок</li>
-                        <li class="rules__item">4. Однотипные сообщения</li>
+{% for i in sitecontent %}
+{{ i.chat_rule|safe }}
+{% endfor %}
                       </ol>
                     </div>
                   </div>
@@ -1803,19 +1802,24 @@
 {% endif %}
                 </div>
               </div>
-{% if user and not user.is_anonymous %}
+{% if user.is_authenticated %}
               <div class="profile-settings__item">
                 <div class="profile-settings__title"> Сменить никнейм </div>
-                {{ form_user.username }}
+{{ form_user.username }}
 <!--                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}" {{ form_user.username }}-->
+{% endif %}
+
+{% if user.username == username %}
+
                 <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
+{% endif %}
               </div>
               <div class="profile-settings__btn-block">
                 <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
                 <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку</div>
                 <button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">Сохранить</button>
               </div>
-{% endif %}
+
             </form>
           </div>
         </div>

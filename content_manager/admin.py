@@ -7,6 +7,10 @@ class SiteContentAdmin(admin.ModelAdmin):
     """Контент сайта"""
     list_display = '__str__', 'support_email',
     fieldsets = (
+        ('ПРАВИЛО ЧАТА', {
+            'classes': ('collapse',),
+            'fields': ('chat_rule',)
+        }),
         ('Страница ЧЕСТНОСТЬ', {
             'classes': ('collapse',),
             'fields': ('honesty_game', 'roll')
@@ -34,7 +38,7 @@ class SiteContentAdmin(admin.ModelAdmin):
 @admin.register(FAQ)
 class FAQAdmin(admin.ModelAdmin):
     """Помощь"""
-    list_display = 'name', 'description', 'is_active'
+    list_display = 'name', 'body_description', 'is_active'
     list_editable = 'is_active',
     list_filter = 'is_active',
 
