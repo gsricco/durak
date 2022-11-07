@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from social_django.models import UserSocialAuth
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent
+from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP
 from .models import FAQ, SiteContent
 
 
@@ -91,12 +91,10 @@ def honesty(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
-            "faq": faq,
         }
     else:
         context = {
             'sitecontent': sitecontent,
-            "faq": faq,
         }
     return render(request, 'honesty.html', context)
 
@@ -111,10 +109,13 @@ def profil(request):
             user_ed.username = form_user.cleaned_data['username']
             user_ed.save()
             return redirect('profil')
-        agent = (request.META['HTTP_USER_AGENT'])
+        agent = (request.META['HTTP_USER_AGENT'])  # Информация пользователя useragent
+        ip = (request.META['REMOTE_ADDR'])  # Информация пользователя ip
         us = CustomUser.objects.get(username=request.user)
         user_agent, created = UserAgent.objects.get_or_create(user=us, useragent=agent)
-        print(user_agent)
+        user_ip, created = UserIP.objects.get_or_create(user=us, userip=ip)
+        # print(user_agent, ' - USER AGENT')
+        # print(user_ip, ' - IP USER')
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
         if detail_user.experience >= level_data.experience_for_lvl:
@@ -133,7 +134,6 @@ def profil(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
-            "faq": faq,
             'social_google': social_google,
             'social_vk': social_vk,
             'form_user': form_user,
@@ -143,23 +143,7 @@ def profil(request):
         level_data = Level.objects.get(level=1)
         context = {
             'sitecontent': sitecontent,
-            "faq": faq,
             'level_data': level_data,
 
         }
     return render(request, 'profil.html', context)
-
-# def update_profil(request):
-#     form_user = UserEditName(request.POST)
-#     user_ed = CustomUser.objects.get(username=request.user)
-#     if request.method == 'POST':
-#         if form_user.is_valid():
-#             user_ed.username = form_user.cleaned_data['username']
-#             user_ed.save()
-#             return render(request, 'test.html')
-#     else:
-#         print('OK')
-#     context = {
-#         'form_user': form_user,
-#     }
-#     return render(request, 'test.html', context)

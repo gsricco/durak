@@ -693,10 +693,9 @@
                         Запрещается:
                       </div>
                       <ol class="rules__list">
-                        <li class="rules__item">1. Обмен/продажа игровых объектов</li>
-                        <li class="rules__item">2. Попрошайничество</li>
-                        <li class="rules__item">3. Размещение ссылок</li>
-                        <li class="rules__item">4. Однотипные сообщения</li>
+{% for i in sitecontent %}
+{{ i.chat_rule|safe }}
+{% endfor %}
                       </ol>
                     </div>
                   </div>

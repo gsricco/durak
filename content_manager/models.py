@@ -4,6 +4,8 @@ from django.db import models
 
 class SiteContent(models.Model):
     """Контент сайта"""
+    # ПРАВИЛО ЧАТА
+    chat_rule = RichTextField(verbose_name='Правила чата')
     # ЧЕСТНОСТЬ
     honesty_game = RichTextField(verbose_name='Как мне убедиться в честности игры?')
     roll = RichTextField(verbose_name='Рулетка')
@@ -29,6 +31,7 @@ class SiteContent(models.Model):
     def __str__(self):
         return f'Контент сайта'
 
+
 class FAQ(models.Model):
     """Помощь"""
     name = models.CharField(verbose_name='Название вопроса', max_length=250)
@@ -42,6 +45,11 @@ class FAQ(models.Model):
     def __str__(self):
         return self.name
 
+    def body_description(self):
+        return f"%s..." % (self.description[:200],)
+
+    body_description.short_description = 'Описание вопроса'
+
 class BadSlang(models.Model):
     """Запрещенные слова"""
     name = models.CharField(verbose_name='Запрещенное слово', max_length=100)
@@ -52,4 +60,3 @@ class BadSlang(models.Model):
 
     def __str__(self):
         return self.name
-

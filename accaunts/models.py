@@ -34,11 +34,38 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
+    def user_info(self):
+        return f'{self.last_name} {self.first_name}'
+
+    user_info.short_description = 'Фамилия имя с аккаунта'
+
+    def usernameinfo(self):
+        return f'{self.username}'
+
+    usernameinfo.short_description = 'Никнейм в игре'
+
 
 class UserAgent(models.Model):
     """Модель UserAgent адресов с которых заходил пользователь"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     useragent = models.CharField(verbose_name="UserAgent пользователя", max_length=200, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'UserAgent пользователя'
+        verbose_name_plural = 'UserAgent пользователя'
+
+    def __str__(self):
+        return f'{self.user}'
+
+
+class UserIP(models.Model):
+    """Модель UserIP адресов с которых заходил пользователь"""
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    userip = models.CharField(verbose_name="IP пользователя", max_length=200, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'IP пользователя'
+        verbose_name_plural = 'IP пользователя'
 
     def __str__(self):
         return f'{self.user}'
