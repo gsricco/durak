@@ -1,0 +1,12 @@
+.system__ul {
+  padding: 50px;
+}
+
+.system__ul ul {
+  padding-left: 50px;
+}
+
+.system__ul {
+  line-height: 25px;
+  font-size: 18px;
+}
