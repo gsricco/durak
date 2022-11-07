@@ -1384,3 +1384,36 @@ window.addEventListener("DOMContentLoaded", () => {
                     popupClose(e.target.closest(".popup"));
                 }
             });
+
+        } else {
+            const promoCode = inviteInput.value; /* заглушка - ответ с бэкенда*/
+
+            if (inviteInput.value !== '') {
+                inviteBtn.disabled = true;
+                inviteInput.disabled = true;
+                inviteInput.value = '';
+
+                // * при ответе с бэкенда
+
+                setTimeout(() => {
+                    const textStatus = document.querySelectorAll('.form__msg');
+                    // for (let i = 0; i < textStatus.length; i++) {
+                    textStatus[2].style.color = 'green';
+                    textStatus[2].textContent = 'Введенный промокод доступен';
+                    // }
+                    alert(`Ответ (${promoCode}) с бэкенда пришел`);
+
+                    inviteInput.value = promoCode;
+
+                }, 3000);
+
+
+            }
+        }
+
+        e.preventDefault();
+
+    })
+
+
+});
