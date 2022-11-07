@@ -5,18 +5,18 @@ from django.db import models
 class SiteContent(models.Model):
     """Контент сайта"""
     # ПРАВИЛО ЧАТА
-    chat_rule = RichTextField(verbose_name='Правила чата')
+    chat_rule = RichTextField(verbose_name='Правила чата', null=True)
     # ЧЕСТНОСТЬ
-    honesty_game = RichTextField(verbose_name='Как мне убедиться в честности игры?')
-    roll = RichTextField(verbose_name='Рулетка')
+    honesty_game = RichTextField(verbose_name='Как мне убедиться в честности игры?', null=True)
+    roll = RichTextField(verbose_name='Рулетка', null=True)
     # ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ
-    agreement = RichTextField(verbose_name='Пользовательское соглашение')
+    agreement = RichTextField(verbose_name='Пользовательское соглашение', null=True)
     # КОНТАКТЫ
-    about_us = RichTextField(verbose_name='О нас')
-    description = RichTextField(verbose_name='Описание снизу')
-    support_email = models.EmailField(verbose_name='Почта для связи с поддержкой')
-    url_vk = models.URLField(verbose_name="Ссылка на VK")
-    url_youtube = models.URLField(verbose_name="Ссылка на Youtube")
+    about_us = RichTextField(verbose_name='О нас', null=True)
+    description = RichTextField(verbose_name='Описание снизу', null=True)
+    support_email = models.EmailField(verbose_name='Почта для связи с поддержкой', null=True)
+    url_vk = models.URLField(verbose_name="Ссылка на VK", null=True)
+    url_youtube = models.URLField(verbose_name="Ссылка на Youtube", null=True)
     # FREE
     info2 = RichTextField(verbose_name='Информация #2', null=True)
     info3 = RichTextField(verbose_name='Информация #3', null=True)
