@@ -7,6 +7,8 @@ databases.sqlite3
 __pycache__/
 *.py[cod]
 *$py.class
+!migrations/__init__.py
+migrations/*.py
 
 # C extensions
 *.so

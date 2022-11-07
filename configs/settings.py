@@ -33,6 +33,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    "ws_chat",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -111,7 +113,6 @@ DATABASES = {
         # 'PORT': os.getenv('DB_PORT'),
     }
 }
-# print(DATABASES['default']['NAME'])
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -186,3 +187,18 @@ CKEDITOR_CONFIGS = {
         ]
     }
 }
+# Channels
+ASGI_APPLICATION = "configs.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }

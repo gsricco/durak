@@ -24,7 +24,7 @@ admin.site.index_title = ""
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path('ws_chat/', include('ws_chat.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),  # редактор текста в админке
     path('', include('content_manager.urls')),  # управление контентом на сайте
     path('', include('django.contrib.auth.urls')),  # выход из личного кабинета
