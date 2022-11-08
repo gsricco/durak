@@ -7,9 +7,11 @@ databases.sqlite3
 __pycache__/
 *.py[cod]
 *$py.class
-!migrations/__init__.py
-migrations/*.py
-
+!accaunts/migrations/__init__.py
+!content_manager/migrations/__init__.py
+content_manager/migrations/*.py
+accaunts/migrations/*.py
+*/migrations/*.py
 # C extensions
 *.so
 /media
@@ -133,7 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+.env
 # Spyder project settings
 .spyderproject
 .spyproject
