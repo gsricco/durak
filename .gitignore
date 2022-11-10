@@ -9,8 +9,10 @@ __pycache__/
 *$py.class
 !accaunts/migrations/__init__.py
 !content_manager/migrations/__init__.py
+!support_chat/migrations/__init__.py
 content_manager/migrations/*.py
 accaunts/migrations/*.py
+support_chat/migrations/*.py
 */migrations/*.py
 # C extensions
 *.so
