@@ -74,24 +74,24 @@
             <nav class="header__nav">
               <ul class="header__list">
                 <li class="header__li">
-                  <a href="honesty" class="header__link">ЧЕСТНОСТЬ</a>
+                  <a href="{% url 'honesty' %}" class="header__link">ЧЕСТНОСТЬ</a>
                 </li>
                 <li class="header__li">
-                  <a href="faq" class="header__link">ПОМОЩЬ</a>
-                </li>
-
-                <li class="header__li">
-                  <a href="contact" class="header__link">КОНТАКТЫ</a>
+                  <a href="{% url 'faq' %}" class="header__link">ПОМОЩЬ</a>
                 </li>
 
                 <li class="header__li">
-                  <a href="bonus-currency" class="header__link header__link_red">FREE</a>
+                  <a href="{% url 'contact' %}" class="header__link">КОНТАКТЫ</a>
+                </li>
+
+                <li class="header__li">
+                  <a href="{% url 'bonus-currency' %}" class="header__link header__link_red">FREE</a>
                 </li>
               </ul>
             </nav>
 
             <div class="header__profile">
-              <a href="profil" class="header__avatar">
+              <a href="{$ url 'profil' %}" class="header__avatar">
                   {% if user.is_authenticated == False %}
                 <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
                   {% else %}
