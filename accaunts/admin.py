@@ -1,11 +1,24 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from social_django.models import UserSocialAuth, Nonce, Association
 from .models import CustomUser, Level, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP
-from django.contrib.auth.models import Group
+
+"""Модели которые не нужно отображать в Admin из SocialAuth"""
+admin.site.unregister(UserSocialAuth)
+admin.site.unregister(Nonce)
+admin.site.unregister(Association)
 
 
-# class DetailUserInline(admin.TabularInline):
-#     model = DetailUser
+@admin.register(ReferalUser)
+class ReferalUserAdmin(admin.ModelAdmin):
+    list_display = 'user_with_bonus', 'invited_user', 'date',
+
+
+class DetailUserInline(admin.TabularInline):
+    model = DetailUser
+    extra = 0
+
+
 class UserAgentInline(admin.TabularInline):
     model = UserAgent
     extra = 0
@@ -16,27 +29,32 @@ class UserIPInline(admin.TabularInline):
     extra = 0
 
 
+class ReferalCodeInline(admin.TabularInline):
+    model = ReferalCode
+    extra = 0
+
+
+class GameIDInline(admin.TabularInline):
+    model = GameID
+    extra = 0
+
+
+class BanInline(admin.TabularInline):
+    model = Ban
+    extra = 0
+
+
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = 'usernameinfo', 'preview', 'user_info', 'email', 'vk_url',
     search_fields = 'usernameinfo',
-    inlines = [UserAgentInline, UserIPInline]
+    inlines = [UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline]
     readonly_fields = 'preview',
 
     def preview(self, obj):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')
 
     preview.short_description = 'Аватар'
-
-
-# @admin.register(UserAgent)
-# class UserAgentAdmin(admin.ModelAdmin):
-#     list_display = 'user', 'useragent'
-#
-#
-# @admin.register(UserIP)
-# class UserIPAdmin(admin.ModelAdmin):
-#     list_display = 'user', 'userip'
 
 
 @admin.register(Level)
@@ -55,10 +73,16 @@ class LevelAdmin(admin.ModelAdmin):
 
     preview.short_description = 'Аватар'
 
-
-admin.site.unregister(Group)
-admin.site.register(DetailUser)
-admin.site.register(ReferalUser)
-admin.site.register(ReferalCode)
-admin.site.register(GameID)
-admin.site.register(Ban)
+# admin.site.register(ReferalUser)
+# admin.site.unregister(Group)
+# admin.site.register(ReferalCode)
+# admin.site.register(GameID)
+# admin.site.register(Ban)
+# @admin.register(UserAgent)
+# class UserAgentAdmin(admin.ModelAdmin):
+#     list_display = 'user', 'useragent'
+#
+#
+# @admin.register(UserIP)
+# class UserIPAdmin(admin.ModelAdmin):
+#     list_display = 'user', 'userip'
