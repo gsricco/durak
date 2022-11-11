@@ -19,7 +19,9 @@ class CustomUser(AbstractUser):
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
+        super().set_password(self.password)
         super().save(*args, **kwargs)
+
         if not DetailUser.objects.filter(user=self):
             if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
                 level_1 = Level(level=1, experience_for_lvl=600)
