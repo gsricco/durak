@@ -77,20 +77,40 @@ class Level(models.Model):
     experience_for_lvl = models.IntegerField(verbose_name='Количество опыта до следующего уровня')
     image = models.ImageField(verbose_name='Аватар', upload_to='img/level/', blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Уровни в игре'
+        verbose_name_plural = 'Уровни в игре'
+
+    def __str__(self):
+        return f'{self.level}'
+
 
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True,
-                              null=True)  # to_field работает корректно (возможно из-за sqlite) в одну сторону тянет, в другую нет
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Данные пользователя'
+        verbose_name_plural = 'Данные пользователя'
+
+    def __str__(self):
+        return f'{self.user}'
 
 
 class ReferalCode(models.Model):
     """Модель реферальных ссылок"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     ref_code = models.CharField(verbose_name="Реферальный код", unique=True, max_length=200, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Реферальный код'
+        verbose_name_plural = 'Реферальный код'
+
+    def __str__(self):
+        return f'{self.ref_code}'
 
 
 class ReferalUser(models.Model):
@@ -101,14 +121,35 @@ class ReferalUser(models.Model):
                                         verbose_name="Приглашенный пользователь")
     date = models.DateTimeField(verbose_name="Дата входа в систему", auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Приглашенный пользователь'
+        verbose_name_plural = 'Приглашенный пользователь'
+
+    def __str__(self):
+        return f'{self.user_with_bonus}'
+
 
 class GameID(models.Model):
     """Модель игровых id с дурак онлайн"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     game_id = models.IntegerField(verbose_name="Игрвой id дурак онлайн", blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Игровой id'
+        verbose_name_plural = 'Игровой id'
+
+    def __str__(self):
+        return f'{self.user}'
+
 
 class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     ban = models.BooleanField(verbose_name='Бан', default=False)  # расписать виды банов
+
+    class Meta:
+        verbose_name = 'Баны'
+        verbose_name_plural = 'Баны'
+
+    def __str__(self):
+        return f'{self.user}'
