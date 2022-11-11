@@ -64,7 +64,7 @@
 
             <!-- If logged-in and has balance -->
             {% if user.is_authenticated %}
-            <a href="profil" class="header__balance">
+            <a href="{% url 'profil' %}" class="header__balance">
               <span>{{ detail_user.balance }}</span>
             </a>
             {% endif %}
@@ -100,7 +100,7 @@
               </a>
 
               <div class="header__profile-info">
-                <a href="profil" class="header__profile-name">
+                <a href="{% url 'profil' %}" class="header__profile-name">
                   {% if user.is_authenticated == False %}
                   <span>Anonymous</span>
                   {% else %}
@@ -113,7 +113,7 @@
 
                 <div class="header__profile-row">
 {% if user.is_authenticated %}
-                  <a href="profil" class="header__profile-sum">
+                  <a href="{% url 'profil' %}" class="header__profile-sum">
                     <div class="header__profile-sum-img">
                       <svg>
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
@@ -155,7 +155,7 @@
                 <!-- If user logged-in -->
                 <!-- На этом участке не войдя в систему видимо отрабатывает js в месте, где должен быть profile-line, и выдаёт постоянные null -->
 {% if user.is_authenticated %}
-                <a href="profil" class="header__profile-progressbar">
+                <a href="{% url 'profil' %}" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
                     <span>{{ level_data.level }} ур.</span>
                   </div>
@@ -167,7 +167,7 @@
                   </div>
                 </a>
 {% else %}
-                <a href="profil" class="header__profile-progressbar">
+                <a href="{% url 'profil' %}" class="header__profile-progressbar">
                   <div class="header__profile-lvl header__profile-lvl_back">
                     <span>1 ур.</span>
                   </div>
