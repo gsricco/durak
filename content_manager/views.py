@@ -16,12 +16,14 @@ def index(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
+            'title': 'Рулетка',
         }
     else:
         context = {
             'sitecontent': sitecontent,
+            'title': 'Рулетка',
         }
-    return render(request, 'index.html', context)
+    return render(request, 'new_index.html', context)
 
 
 def bonus_currency(request):
@@ -34,12 +36,14 @@ def bonus_currency(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
+            'title': 'Free',
         }
     else:
         context = {
             'sitecontent': sitecontent,
+            'title': 'Free',
         }
-    return render(request, 'bonus-currency.html', context)
+    return render(request, 'new_bonus-currency.html', context)
 
 
 def contact(request):
@@ -52,12 +56,14 @@ def contact(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
+            'title': 'Контакты',
         }
     else:
         context = {
             'sitecontent': sitecontent,
+            'title': 'Контакты',
         }
-    return render(request, 'contact.html', context)
+    return render(request, 'new_contact.html', context)
 
 
 def faq(request):
@@ -72,13 +78,15 @@ def faq(request):
             'detail_user': detail_user,
             'level_data': level_data,
             "faq": faq,
+            'title': 'Помощь',
         }
     else:
         context = {
             'sitecontent': sitecontent,
             "faq": faq,
+            'title': 'Помощь',
         }
-    return render(request, 'faq.html', context)
+    return render(request, 'new_faq.html', context)
 
 
 def honesty(request):
@@ -91,12 +99,14 @@ def honesty(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             'level_data': level_data,
+            'title': 'Честность',
         }
     else:
         context = {
             'sitecontent': sitecontent,
+            'title': 'Честность',
         }
-    return render(request, 'honesty.html', context)
+    return render(request, 'new_honesty.html', context)
 
 
 def profil(request):
@@ -138,12 +148,13 @@ def profil(request):
             'social_vk': social_vk,
             'form_user': form_user,
             'user_ed': user_ed,
+            'title': 'Профиль',
         }
     else:
         level_data = Level.objects.get(level=1)
         context = {
             'sitecontent': sitecontent,
             'level_data': level_data,
-
+            'title': 'Профиль',
         }
-    return render(request, 'profil.html', context)
+    return render(request, 'new_profil.html', context)

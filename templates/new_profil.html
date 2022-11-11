@@ -1,0 +1,875 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block maincontent %}
+<div class="profil-main__content">
+    <div class="tabs profil-main__tabs">
+        <div class="tabs__nav profil-main__nav">
+            <a class="tabs__link profil-main__tabs-link tabs__link_active" href="#content-1">ПРОФИЛЬ</a>
+            <a class="tabs__link profil-main__tabs-link" href="#content-2">ТРАНЗАКЦИИ</a>
+        </div>
+        <div class="tabs__content">
+            <div class="tabs__pane tabs__pane_show" id="content-1">
+                <section class="profil">
+                    <div class="profil__row">
+                        <div class="profil__left">
+                            <div class="profil__avatar">
+                                {% if user.is_authenticated %}
+                                <img src="{{ user.avatar.url }}" alt="">
+                                {% else %}
+                                <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
+                                {% endif %}
+                            </div>
+                            <div class="profil__info">
+                                <div class="profil__name-wrapper">
+                                    <div class="profil__name-block">
+                                        <div class="profil__name">
+
+                                            <div class="profil__name-text">
+                                                {% if user.is_authenticated %}
+                                                <span>{{ user.username }}</span>
+                                                {% else %}
+                                                <span>Anonymous</span>
+                                                {% endif %}
+
+                                            </div>
+                                            {% if user.is_authenticated %}
+                                            <a href="#profileSettings" class="popup-link">
+                                                <svg class="profil__icon-settings">
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
+                                                </svg>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="profil__btns">
+                                    {% if user.is_authenticated %}
+                                    {% if not social_google and not social_vk %}
+                                    <a href="{% url 'social:begin' 'google-oauth2' %}"
+                                       class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
+                                        аккаунт VK</a>
+                                    {% elif not social_vk %}
+                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
+                                        аккаунт VK</a>
+                                    {% elif not social_google %}
+                                    <a href="{% url 'social:begin' 'google-oauth2' %}"
+                                       class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+                                    {% endif %}
+                                    <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+                                    {% else %}
+                                    <a href="{% url 'social:begin' 'google-oauth2' %}"
+                                       class="profil__btn profil__btn_google">Войти с помощью Google</a>
+                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти
+                                        с помощью VK</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profil__progressbar">
+                            <div class="profil__progressbar-lvl">
+                                <svg class="profil__progressbar-lvl-img">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
+                                </svg>
+                                {% if user.is_authenticated %}
+                                <p class="profil__progressbar-lvl-num">{{ level_data.level }} LVL</p>
+                                <span class="profil__progressbar-lvl-progress">{{ detail_user.experience }} / {{ level_data.experience_for_lvl }} XP</span>
+                                {% else %}
+                                <p class="profil__progressbar-lvl-num">1 LVL</p>
+                                <span class="profil__progressbar-lvl-progress">0 / {{ level_data.experience_for_lvl }} XP</span>
+                                {% endif %}
+                            </div>
+                            <div class="profil__progressbar-row">
+                                <div class="profil__progressbar-current">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
+                                    </svg>
+                                    <p>2 <span>шт.</span></p>
+                                </div>
+
+                                <div class="profil__progressbar-line">
+                                    <span></span>
+                                </div>
+
+                                <div class="profil__progressbar-current">
+                                    <p>3 <span>шт.</span></p>
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profil__block-wrapper">
+                        <h2 class="profil__title">
+                            Инвентарь
+                        </h2>
+
+                        <div class="profil__block">
+                            <div class="profil__block-row">
+                                <div class="profil__items">
+
+
+                                    <div class="profil__warning" style="display: none;">
+                                        Предметы можно получить из кейсов (даются за новый уровень)..
+                                    </div>
+                                    {% if user.is_authenticated %}
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Медведь</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Робот</h3>
+                                        </div>
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Вампир</h3>
+                                        </div>
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Единорог</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_lion"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Лев</h3>
+                                        </div>
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_gnome"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Гном</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Единорог</h3>
+                                        </div>
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_lion"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Лев</h3>
+                                        </div>
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_gnome"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Гном</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Единорог</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_lion"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Лев</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="profil__item">
+                                        <div class="profil__item-wrapper">
+                                            <div class="profil__item-img">
+                                                <svg>
+                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_gnome"></use>
+                                                </svg>
+                                            </div>
+                                            <h3 class="profil__item-title">Смайлы Гном</h3>
+                                        </div>
+
+                                        <div class="profil__item-tags">
+                                            <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
+                                            <a href="#question" class="profil__item-tag popup-link">Продать за 30K</a>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="profil__slider-block-wrapper">
+                                    <div class="profil__slider">
+                                        <div class="profil__slider-arrow profil__slider-arrow_back">
+                                            <svg class="online-chat__icon-chat">
+                                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                                            </svg>
+                                        </div>
+
+                                        <div class="swiper-wrapper profil__slider-wrapper">
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#amber_case"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Янтарный кейс</h3>
+                                            </a>
+
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#pearl_case"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Жемчужный кейс</h3>
+                                            </a>
+
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_purple"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Аметистовый кейс</h3>
+                                            </a>
+
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Изумрудный кейс</h3>
+                                            </a>
+
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_blue"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Сапфировый кейс</h3>
+                                            </a>
+
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Рубиновый кейс</h3>
+                                            </a>
+
+                                            <a href="#cases" class="swiper-slide profil__slider-slide popup-link">
+                                                <div class="profil__slider-img">
+                                                    <svg>
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_turquoise"></use>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="profil__slider-title">Алмазный кейс</h3>
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                        <div class="profil__slider-arrow profil__slider-arrow_next">
+                                            <svg class="online-chat__icon-chat">
+                                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="tabs__pane" id="content-2">
+                <section class="transactions">
+                    <div class="transactions__wrapper">
+                        <div class="transactions__titles">
+                            <h3 class="transactions__name">СУММА</h3>
+                            <h3 class="transactions__name">ТИП</h3>
+                            <h3 class="transactions__name">ДАТА</h3>
+                        </div>
+
+                        <div class="transactions__items">
+                            <div class="transactions__item">
+                                <div class="transactions__item-sum transactions__item-info">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                    </svg>
+                                    <span class="transactions__item-text">+2k</span>
+                                </div>
+                                <div class="transactions__item-type transactions__item-info">
+                                    <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                                </div>
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span> 2021-06-05-05 19 PM GMT</span>
+
+                                </div>
+                            </div>
+
+                            <div class="transactions__item">
+                                <div class="transactions__item-sum transactions__item-info">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                    </svg>
+                                    <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                                </div>
+                                <div class="transactions__item-type transactions__item-info">
+                                    <span> Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                                </div>
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span>2021-06-05-05 19 PM GMT</span>
+
+                                </div>
+                            </div>
+
+                            <div class="transactions__item">
+                                <div class="transactions__item-sum transactions__item-info">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                    </svg>
+                                    <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                                </div>
+                                <div class="transactions__item-type transactions__item-info">
+                                    <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                                </div>
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span>2021-06-05-05 19 PM GMT</span>
+
+                                </div>
+                            </div>
+
+                            <div class="transactions__item">
+                                <div class="transactions__item-sum transactions__item-info">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                    </svg>
+                                    <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                                </div>
+                                <div class="transactions__item-type transactions__item-info">
+                                    <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                                </div>
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span>2021-06-05-05 19 PM GMT</span>
+
+                                </div>
+                            </div>
+
+                            <div class="transactions__item">
+                                <div class="transactions__item-sum transactions__item-info">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                    </svg>
+                                    <span class="transactions__item-text transactions__item-text_red">+2k</span>
+                                </div>
+                                <div class="transactions__item-type transactions__item-info">
+                                    <span>Roullete Bet (round #2992921 Dice tontane test)</span>
+
+                                </div>
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span>2021-06-05-05 19 PM GMT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="popup modal-manual" id="profileSettings">
+    <div class="popup__body">
+        <div class="popup__content modal modal_fit">
+
+            <a href="#" class="popup__close close-popup">
+                <svg class="close-popup__icon ">
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                </svg>
+            </a>
+            <h3 class="modal__title">
+                Настройки профиля
+            </h3>
+            <div class="profile-settings">
+
+
+                <form class="profile-settings__row" method="POST">
+                    {% csrf_token %}
+                    <div class="profile-settings__item-avatar">
+                        <div class="profile-settings__avatar" id="imgAva">
+                            {% if user.is_authenticated %}
+                            <img data-value="0" src="{{ user.avatar.url }}" alt="nickname" id="profileImage">
+                            {% else %}
+                            <img data-value="0" src="{% static 'img/avatar/user/avatar.svg' %}" alt="nickname"
+                                 id="profileImage">
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="profile-settings__item">
+                        <div class="profile-settings__title"> Сменить никнейм</div>
+                        {{ form_user.username }}
+                        <!--                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}" {{ form_user.username }}-->
+                        {% endif %}
+
+                        {% if user.username == username %}
+
+                        <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
+                        {% endif %}
+                    </div>
+                    <div class="profile-settings__btn-block">
+                        <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
+                        <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать
+                            аватарку
+                        </div>
+                        <button type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">
+                            Сохранить
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="popup modal-manual" id="choiceObjects">
+    <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+
+            <a href="#" class="popup__close close-popup">
+                <svg class="close-popup__icon ">
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                </svg>
+            </a>
+            <h3 class="modal__title">
+                Вывод предметов
+            </h3>
+
+            <form action="" class="form choice-object">
+                <ul class="choice-object__list">
+                    <li class="choice-object__item">
+                        <div class="choice-object__number">#1</div>
+
+                        <div class="choice-object__title">
+                            Добавьте наш аккаунт в друзья
+                        </div>
+                        <div class="choice-object__in-block">
+                            <input type="text" class="choice-object__input choice-object__input_min form__input"
+                                   disabled
+                                   value="Sellix224121">
+                            <div class="btn btn_dark choice-object__btn">Скопировать</div>
+                        </div>
+                    </li>
+                    <li class="choice-object__item">
+                        <div class="choice-object__number">#2</div>
+
+                        <div class="choice-object__title">
+                            Введите свой никнейм
+                        </div>
+                        <div class="choice-object__in-block">
+                            <input type="text" class="choice-object__input form__input" placeholder="Sellix224121">
+                        </div>
+                    </li>
+                </ul>
+                <button type="submit" class="btn btn_danger choice-object__submit">Вывести предмет</button>
+
+
+            </form>
+
+
+        </div>
+    </div>
+</div>
+<div class="popup modal-manual" id="question">
+    <div class="popup__body">
+        <div class="popup__content modal modal_popup modal-manual__modal">
+            <a href="#" class="popup__close close-popup">
+                <svg class="close-popup__icon ">
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                </svg>
+            </a>
+
+            <div class="modal-question">
+                <div class="modal-question__text">
+                    Вы действительно хотите продать этот предмет?
+                    <br>
+                    <div class="modal-question__rupture"></div>
+                    Валюта зачислится на ваш баланс.
+                </div>
+                <div class="modal-question__row">
+                    <a href="##" class="btn btn_danger modal-question__btn">
+                        Да
+                    </a>
+                    <a href="##" class="btn btn_dark modal-question__btn modal-answer__no">
+                        Нет
+                    </a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<div class="popup" id="cases">
+    <div class="popup__body">
+        <div class="popup__content modal modal_cases scrollbar-overflow">
+
+            <a href="#" class="popup__close close-popup">
+                <svg class="close-popup__icon ">
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                </svg>
+            </a>
+            <div class="modal-cases__wrapper scrollbar-overflow">
+                <div class="modal-cases">
+                    <div class="modal-cases__head">
+                        <div class="modal-cases__title">Янтарный кейс</div>
+
+                        <div class="modal-cases__lvl">10+ LVL</div>
+                    </div>
+                    <div class="modal-cases__shadow">
+                        <div class="modal-cases__mum">x1</div>
+                        <div class="modal-cases__pointer"></div>
+
+                        <div class="modal-cases__case modal-case modal-case-overflow">
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-case-overflow__item">
+                                <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        Набор смайлов
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-case__open">
+                    <a href="##" class="btn btn_dark modal-case__btn btn_white">Открыть кейс</a>
+                    <div class="modal-case__timer timer" id="timerTwo">1:05</div>
+                </div>
+                <div class="modal-cases-all">
+                    <div class="modal-cases-all__case modal-case modal-case__content">
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="##" class="modal-case__item">
+                            <div class="modal-case__wrapper">
+                                <div class="modal-case__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
+                                    </svg>
+                                </div>
+                                <div class="modal-case__title">
+                                    Набор смайлов
+                                </div>
+                            </div>
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

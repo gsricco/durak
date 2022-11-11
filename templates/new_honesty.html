@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block maincontent %}
+<div class="profil-main__content">
+    <section class="honesty">
+        <h1 class="honesty__title">Честность</h1>
+        <div class="honesty__block">
+            <div class="honesty__row">
+                <div class="honesty__how">
+                    <h2 class="honesty__how-title">Как мне убедиться в честности игры?</h2>
+                    {% for i in sitecontent %}
+                    <div class="honesty__how-text">
+                        {{ i.honesty_game|safe }}
+                    </div>
+                    <div class="honesty__img">
+                        <img src="{% static 'img/gallery/rull-img.png' %}" alt="">
+                    </div>
+                </div>
+                <div class="honesty__rull">
+                    <h2 class="honesty__rull-title">Рулетка</h2>
+                    <div class="honesty__rull-wrapper">
+                        <div class="honesty__rull-text">
+                            {{ i.roll|safe }}
+                        </div>
+                        {% endfor %}
+                        <div class="honesty__rull-code">
+                            <p>
+                                const crypto = require('crypto');
+                            </p>
+                            <p>
+                                const ROUND_ID = 54519; <br>
+                                const PUBLIC_SEED = '001206023522'; <br>
+                                const SERVER_SEED = 'd309cb8a0123201db12ac74061ea1f9<br class="br-mobile">6<br
+                                    class="br-min">621691579c87b3b12e086aef6c1594<br class="br-mobile">b5';
+                            </p>
+                            <p>
+                                const hashString = string => crypto.createHash('sha256').update(s<br
+                                    class="br-mobile">tring).digest('hex');
+                            </p>
+                            <p>
+                                const generateRouletteTicket = <br class="br-mobile"> (serverSeed, publicSeed, round) =>
+                                {
+                                <br>
+                                <span class="left-margin">const hash = <br class="br-mobile"> hashString(`${serverSeed}:<br
+                                        class="br-mobile">${publicSeed}:${round}`);</span> <br>
+                                <span class="left-margin">return parseInt(hash.substr(0, 8), 16) <br class="br-mobile"> %
+                              15;</span> <br>
+
+                                }
+                            </p>
+                            <p>
+                                console.log(generateRouletteTicket<br class="br-mobile">(SERVER_SEED, PUBLIC_SEED,
+                                ROUND_ID));
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="transactions transactions_honesty">
+                <div class="transactions__wrapper">
+                    <div class="transactions__titles">
+                        <h3 class="transactions__name">ДАТА</h3>
+                        <h3 class="transactions__name">Public seed</h3>
+                        <h3 class="transactions__name">Hash</h3>
+                        <h3 class="transactions__name">Rounds</h3>
+                    </div>
+
+                    <div class="transactions__items">
+                        <div class="transactions__item">
+                            <div class="transactions__item-date transactions__item-info">
+                                <span>2021-06-05-05 19 PM GMT</span>
+                            </div>
+                            <div class="transactions__item-seed transactions__item-info">
+                                <span>13322402141201</span>
+                            </div>
+                            <div class="transactions__item-hash transactions__item-info">
+                                <span>bfb820d40e606d48e4c9dd0b621e2235f0d340885dd755a5340885dd755a5</span>
+                            </div>
+                            <div class="transactions__item-rounds transactions__item-info">
+                                <span>1234567-1234567</span>
+                            </div>
+                        </div>
+
+                        <div class="transactions__item">
+                            <div class="transactions__item-date transactions__item-info">
+                                <span>2021-06-05-05 19 PM GMT</span>
+                            </div>
+                            <div class="transactions__item-seed transactions__item-info">
+                                <span>13322402141201</span>
+                            </div>
+                            <div class="transactions__item-hash transactions__item-info">
+                                <span>bfb820d40e606d48e4c9dd0b621e2235f0d340885dd755a5340885dd755a5</span>
+                            </div>
+                            <div class="transactions__item-rounds transactions__item-info">
+                                <span>1234567-1234567</span>
+                            </div>
+                        </div>
+
+                        <div class="transactions__item">
+                            <div class="transactions__item-date transactions__item-info">
+                                <span>2021-06-05-05 19 PM GMT</span>
+                            </div>
+                            <div class="transactions__item-seed transactions__item-info">
+                                <span>13322402141201</span>
+                            </div>
+                            <div class="transactions__item-hash transactions__item-info">
+                                <span>bfb820d40e606d48e4c9dd0b621e2235f0d340885dd755a5340885dd755a5</span>
+                            </div>
+                            <div class="transactions__item-rounds transactions__item-info">
+                                <span>1234567-1234567</span>
+                            </div>
+                        </div>
+
+                        <div class="transactions__item">
+                            <div class="transactions__item-date transactions__item-info">
+                                <span>2021-06-05-05 19 PM GMT</span>
+                            </div>
+                            <div class="transactions__item-seed transactions__item-info">
+                                <span>13322402141201</span>
+                            </div>
+                            <div class="transactions__item-hash transactions__item-info">
+                                <span>bfb820d40e606d48e4c9dd0b621e2235f0d340885dd755a5340885dd755a5</span>
+                            </div>
+                            <div class="transactions__item-rounds transactions__item-info">
+                                <span>1234567-1234567</span>
+                            </div>
+                        </div>
+
+                        <div class="transactions__item">
+                            <div class="transactions__item-date transactions__item-info">
+                                <span>2021-06-05-05 19 PM GMT</span>
+                            </div>
+                            <div class="transactions__item-seed transactions__item-info">
+                                <span>13322402141201</span>
+                            </div>
+                            <div class="transactions__item-hash transactions__item-info">
+                                <span>bfb820d40e606d48e4c9dd0b621e2235f0d340885dd755a5340885dd755a5</span>
+                            </div>
+                            <div class="transactions__item-rounds transactions__item-info">
+                                <span>1234567-1234567</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

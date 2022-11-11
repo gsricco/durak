@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block maincontent %}
+<div class="profil-main__content">
+    {% for i in sitecontent %}
+    <section class="contact">
+        <h1 class="contact__title">Контакты</h1>
+        <div class="contact__block">
+            <div class="contact__top-info">
+                <div class="contact__soc">
+                    <div class="contact__soc-item">
+
+                        <a href="{{ i.url_youtube }}" target="_blank" class="contact__soc-ing">
+                            <svg class="youtube">
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#youtube"></use>
+                            </svg>
+                        </a>
+                        <a href="{{ i.url_youtube }}" target="_blank"
+                           class="contact__soc-text-block">
+                            <h3 class="contact__soc-title contact__soc-title_red">ЮТУБ КАНАЛ</h3>
+                            <p class="contact__soc-text">Durak24 | Дурак онлайн</p>
+                        </a>
+                    </div>
+                    <div class="contact__soc-item">
+                        <a href="{{ i.url_vk }}" target="_blank" class="contact__soc-ing">
+                            <svg class="vk">
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk"></use>
+                            </svg>
+                        </a>
+                        <a href="{{ i.url_vk }}" target="_blank" class="contact__soc-text-block">
+                            <h3 class="contact__soc-title contact__soc-title_blue">ГРУППА ВК</h3>
+                            <p class="contact__soc-text">Durak24 | Дурак онлайн</p>
+                        </a>
+                    </div>
+                </div>
+                <div class="contact__support">
+                    <a href="{% url 'faq' %}" class="contact__support-img">
+                        <svg class="support-icon">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#support"></use>
+                        </svg>
+                        <h3 class="contact__support-title">Поддержка</h3>
+                    </a>
+                    <p class="contact__support-text">
+                        Почта для связи <br>
+                        {{ i.support_email }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="contact__aboutus">
+                <h3 class="contact__aboutus-title">О нас:</h3>
+
+                <div class="contact__aboutus-text">
+                    {{ i.about_us|safe }}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block maincontent %}
+<div class="profil-main__content">
+    <div class="tabs">
+        <div class="tabs__nav">
+            <a class="tabs__link tabs__link_active" href="#content-1">ПОДДЕРЖКА</a>
+            <a class="tabs__link" href="#content-2">ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</a>
+        </div>
+        <div class="tabs__content">
+            <div class="tabs__pane tabs__pane_show" id="content-1">
+                <div class="support-content-block">
+
+                    <section class="faq">
+                        <h2 class="faq__title">Часто задаваемые вопросы</h2>
+                        <div class="accordion-wrapper faq__wrapper">
+                            {% for i in faq %}
+                            <button class="accordion">
+                                {{ i.name }}
+                                <svg class="accordion-icon">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                                </svg>
+                            </button>
+                            <div class="panel">
+                                <div class="faq__text-wrapper">
+                                    <div class="faq__text">
+                                        {{ i.description|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+
+                    <section class="support">
+                        <div class="support__overflow">
+                            <div class="support__overflow-wrapper">
+                                <div class="support__overflow-close">
+                                    <img src="{% static 'img/gallery/overflow-close.png' %}" alt="">
+                                </div>
+                                <span class="support__overflow-title">
+                              ТЕХ. ПОДДЕРЖКА.
+                            </span>
+                                <p class="support__overflow-text">
+                                    Найдите ваш вопрос в списке справа <br>
+                                    или подождите 60 секунд.
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <div class="support__chat">
+                            <div class="support__chat-wrapper">
+                                <div class="support__top-plank">
+                                    <div class="support__top-plank-wrapper">
+                                        <span>Чат поддержки</span>
+                                    </div>
+                                </div>
+                                <ul class="support__chat-block scrollbar-overflow">
+                                    <div class="messageContainer"></div>
+                                    <!--<li class="support__chat-message support__chat-message_your">
+                                      <div class="support__chat-message-text"><span>Здравствуйте.Как пополнить баланс
+                                          кредитами? Как пополнить баланс Как пополнить б Как пополнить баланс Как пополнить
+                                          бал</span></div>
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                                      </div>
+                                    </li>
+
+                                    <li class="support__chat-message">
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/support-ava.png' %}" alt="">
+                                      </div>
+                                      <div class="support__chat-message-text">Читай FAQ, недоброжелательный
+                                        человек</div>
+                                    </li>-->
+
+                                    <!--<li class="support__chat-message support__chat-message_your">
+                                      <div class="support__chat-message-text">
+                                        <span class="support__chat-name">Gozavr228</span>
+                                        <div class="support__chat-smile-img">
+                                          <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
+                                          </svg>
+                                        </div>
+                                        <h3 class="support__chat-smile-title">Смайлы “Вампир”</h3>
+                                      </div>
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                                      </div>
+                                    </li>
+
+                                    <li class="support__chat-message support__chat-message_your">
+                                      <div class="support__chat-message-text">
+                                        <span class="support__chat-name">Gozavr228</span>
+                                        <div class="support__chat-smile-img">
+                                          <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                          </svg>
+                                        </div>
+                                        <h3 class="support__chat-smile-title">Смайлы “Вампир”</h3>
+                                      </div>
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                                      </div>
+                                    </li>-->
+
+                                    <!--<li class="support__chat-message support__chat-message_your">
+                                      <div class="support__chat-message-text">
+                                        <span class="support__chat-name">Gozavr228</span>
+                                        <div class="support__chat-smile-img">
+                                          <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
+                                          </svg>
+                                        </div>
+                                        <h3 class="support__chat-smile-title">Смайлы “Вампир”</h3>
+                                      </div>
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/avatar.png' %}" alt="">
+                                      </div>
+                                    </li>-->
+
+                                    <!--<li class="support__chat-message">
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/support-ava.png' %}" alt="">
+                                      </div>
+                                      <div class="support__chat-message-text">Читай FAQ, недоброжелательный
+                                        человек</div>
+                                    </li>-->
+
+                                    <!--<li class="support__chat-message">
+                                      <div class="support__chat-avatar">
+                                        <img src="{% static 'img/gallery/support-ava.png' %}" alt="">
+                                      </div>
+                                      <div class="support__chat-message-text">Читай FAQ, недоброжелательный
+                                        человек</div>
+                                    </li>-->
+
+                                    <div class="support__chat-answer">
+                                        Ответ придёт спустя 12сек - 12ч, спам увеличивает время ответа.
+                                    </div>
+                                </ul>
+
+                            </div>
+                            <div class="support__input-block">
+                                <div class="support__input-block-wrapper">
+                                    <input type="file" name="file" id="file-add">
+                                    <label for="file-add" class="support__input-block-attach">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#attach"></use>
+                                        </svg>
+                                    </label>
+
+                                    <input placeholder="Написать сообщение..." name="chat-message" type="text"
+                                           class="support__chat-input" autocomplete="off">
+                                    <span class="support__input-block-arrow">
+                                <svg>
+                                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#chatarrow"></use>
+                                </svg>
+                              </span>
+                                </div>
+                            </div>
+
+                            <script>
+                              const sendBtn = document.querySelector('.support__input-block-arrow')
+                              let inputValue = document.querySelector('.support__chat-input')
+                              const chatBlock = document.querySelector('.support__chat-block')
+                              const blockMessage = (messageArray) => {
+                                  chatBlock.innerHTML = ''
+                                  messageArray = messageArray.reverse()
+                                  messageArray.map(el => {
+                                      newUserMessage(el)
+                                  })
+                                  console.log(messageArray)
+                              }
+                              const newUserMessage = (message, avatar, file) => {
+                                  const li = document.createElement('li')
+                                  li.className = 'support__chat-message support__chat-message_your'
+                                  chatBlock.appendChild(li)
+                                  const div = document.createElement('div')
+                                  div.className = 'support__chat-message-text'
+                                  li.appendChild(div)
+                                  const span = document.createElement('span')
+                                  span.innerHTML = message
+                                  div.appendChild(span)
+                              }
+                              const getResponse = () => {
+                                  fetch('http://127.0.0.1:8000/api/v1/message/')
+                                      .then((response) => {
+                                          return response.json();
+                                      })
+                                      .then((data) => {
+                                          blockMessage(data.map(el => el.message))
+                                          chatBlock.scrollTop = chatBlock.scrollHeight
+                                      });
+                              }
+                              getResponse()
+                              sendBtn.addEventListener('click', () => {
+                                  async function postData(url, data) {
+                                      const response = await fetch(url, {
+                                          method: 'POST',
+                                          headers: {
+                                              'Content-Type': 'application/json',
+                                              "X-CSRFToken": '{{csrf_token}}',
+                                          },
+                                          body: JSON.stringify(data)
+                                      }).then(() => getResponse());
+                                  }
+
+                                  postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})
+                                  inputValue.value = ''
+                              })
+
+                            </script>
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+
+            <div class="tabs__pane" id="content-2">
+                <section class="agreement">
+                    <h1 class="agreement__title">Пользовательское соглашение:</h1>
+                    {% for i in sitecontent %}
+                    <div class="agreement__text">
+                        {{ i.agreement|safe }}
+                    </div>
+                    {% endfor %}
+
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

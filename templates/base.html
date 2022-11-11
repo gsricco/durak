@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'img/icon.svg' %}" type="image/svg">
+</head>
+
+<body class="scrollbar-overflow">
+<div class="wrapper homepage" id="wrapper">
+
+    <div class="preloader">
+        <div class="preloader__wrapper">
+            <div class="preloader__item"></div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            {% block header %}
+            <div class="header__row">
+
+                <div class="header__logo-wrapper">
+                    <div class="burger-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <div class="header__logo">
+                        <a href="{% url 'index' %}">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logo"></use>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- If not logged-in -->
+                    {% if user.is_authenticated == False %}
+                    <div class="header__login" style="display: none;">
+                        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
+                            </svg>
+                        </a>
+                        <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
+                            </svg>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- If logged-in and has balance -->
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'profil' %}" class="header__balance">
+                        <span>{{ detail_user.balance }}</span>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="header__wrapper">
+                    <nav class="header__nav">
+                        <ul class="header__list">
+                            <li class="header__li">
+                                <a href="{% url 'honesty' %}" class="header__link">ЧЕСТНОСТЬ</a>
+                            </li>
+                            <li class="header__li">
+                                <a href="{% url 'faq' %}" class="header__link">ПОМОЩЬ</a>
+                            </li>
+
+                            <li class="header__li">
+                                <a href="{% url 'contact' %}" class="header__link">КОНТАКТЫ</a>
+                            </li>
+
+                            <li class="header__li">
+                                <a href="{% url 'bonus-currency' %}" class="header__link header__link_red">FREE</a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="header__profile">
+                        <a href="{% url 'profil' %}" class="header__avatar">
+                            {% if user.is_authenticated == False %}
+                            <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                            {% else %}
+                            <img src="{{ user.avatar.url }}" alt="Аватар">
+                            {% endif %}
+                        </a>
+
+                        <div class="header__profile-info">
+                            <a href="{% url 'profil' %}" class="header__profile-name">
+                                {% if user.is_authenticated == False %}
+                                <span>Anonymous</span>
+                                {% else %}
+                                <span>{{ request.user.username }}</span>
+                                {% endif %}
+                                <svg class="header__profile-settings">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
+                                </svg>
+                            </a>
+
+                            <div class="header__profile-row">
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'profil' %}" class="header__profile-sum">
+                                    <div class="header__profile-sum-img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                        </svg>
+                                    </div>
+                                    <span>{{ detail_user.balance }}</span>
+                                </a>
+                                <a href="#modalPayment" class="header__profile-link popup-link">
+                                    Пополнить
+                                </a>
+                                <a href="#selectAmountInput" class="header__profile-link popup-link">
+                                    Вывести
+                                </a>
+                                <a href="/logout" class="header__profile-link logout-btn">Выйти</a>
+                                {% endif %}
+
+                                <!-- If not logged-in -->
+                                {% if user.is_authenticated == False %}
+                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login"
+                                   style="display: block!important;">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
+                                    </svg>
+                                </a>
+                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login"
+                                   style="display: block!important;">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
+                                    </svg>
+                                </a>
+
+                                <!-- Login btn mobile shown if not logged-in-->
+                                <a href="#" class="header__login-btn" style="display: none;">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- If user logged-in -->
+                            <!-- На этом участке не войдя в систему видимо отрабатывает js в месте, где должен быть profile-line, и выдаёт постоянные null -->
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'profil' %}" class="header__profile-progressbar">
+                                <div class="header__profile-lvl header__profile-lvl_back">
+                                    <span>{{ level_data.level }} ур.</span>
+                                </div>
+                                <div class="header__profile-line">
+                                    <span></span>
+                                </div>
+                                <div class="header__profile-lvl header__profile-lvl_next">
+                                    <span>{{ level_data.level|add:"1" }} ур.</span>
+                                </div>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'profil' %}" class="header__profile-progressbar">
+                                <div class="header__profile-lvl header__profile-lvl_back">
+                                    <span>1 ур.</span>
+                                </div>
+                                <div class="header__profile-line">
+                                    <span></span>
+                                </div>
+                                <div class="header__profile-lvl header__profile-lvl_next">
+                                    <span>2 ур.</span>
+                                </div>
+                            </a>
+                            {% endif %}
+
+                            <div class="header__btns">
+                                <a href="#modalPayment" class="header__profile-btn popup-link">
+                                    Пополнить
+                                </a>
+
+                                <a href="#selectAmountInput" class="header__profile-btn popup-link">
+                                    Вывести
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            {% endblock %}
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+
+
+            <section class="profil-main">
+
+                <div class="profil-main__row">
+
+                    <section class="online-chat">
+                        <div class="online-chat__header">
+                            <div class="online-chat__header-left">
+                                <svg class="online-chat__icon-chat">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat"></use>
+                                </svg>
+                                <h4 class="online-chat__title">Чат</h4>
+                            </div>
+
+                            <svg class="online-chat__icon-close">
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                            </svg>
+                            <div class="online-chat__header-rigth">
+                                <div class="online-chat__current">239</div>
+                                <span class="online-chat__torch"></span>
+                            </div>
+                        </div>
+
+                        <div class="online-chat__body">
+                            <div class="online-chat__body-wrapper">
+                                <ul class="online-chat__list scrollbar-overflow">
+
+                                </ul>
+                                <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
+                                    <span class="online-chat__torch"></span>
+                                    <div class="online-chat__current">239</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="online-chat__footer">
+                            <div class="online-chat__rules rules">
+                                <div class="rules__row">
+                                    <div class="rules__title">
+                                        Правила чата
+                                    </div>
+                                    <div class="rules__text">
+                                        <div class="rules__text-title">
+                                            Запрещается:
+                                        </div>
+                                        <ol class="rules__list">
+                                            {% for i in sitecontent %}
+                                            {{ i.chat_rule|safe }}
+                                            {% endfor %}
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="online-chat__input-block">
+                                <input placeholder="Написать сообщение..." name="chat-message" type="text"
+                                       class="online-chat__input" autocomplete="off">
+                                <div class="online-chat__icon-doc">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#document"></use>
+                                    </svg>
+                                </div>
+
+                                <a href="##" class="online-chat__icon-arrow">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#chatarrow"></use>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    {{ room_name|json_script:"room-name" }}
+                    {{ user.is_authenticated|json_script:"auth-user" }}
+                    {{ user.username|json_script:"username" }}
+
+                    <script>
+              const roomName = JSON.parse(document.getElementById('room-name').textContent);
+              const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
+              const username = JSON.parse(document.getElementById('username').textContent);
+
+              const messageBlock = document.querySelector('.online-chat__list')
+              const buttonSend = document.querySelector('.online-chat__icon-arrow')
+              const messageInput = document.querySelector('.online-chat__input');
+
+              const chatSocket = new WebSocket(
+                      'ws://'
+                      + window.location.host
+                      + '/ws/chat/'
+              );
+
+              chatSocket.onmessage = function(e) {
+
+                const data = JSON.parse(e.data);
+
+                const li = document.createElement('li')
+                li.className = 'online-chat__li'
+                messageBlock.appendChild(li)
+
+                const divWrap = document.createElement('div')
+                divWrap.className = 'online-chat__li-wrapper'
+                li.appendChild(divWrap)
+
+                const divRub = document.createElement('div')
+                divRub.className = 'online-chat__li-rubin'
+                divWrap.appendChild(divRub)
+
+                const svg = document.createElement('svg')
+                svg.innerHTML = `<use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_red"></use>`
+                divRub.appendChild(svg)
+
+                const divAva = document.createElement('div')
+                divAva.className = 'online-chat__li-avatar'
+                divAva.innerHTML = `<img src="{% static 'img/gallery/chat-avatar-two.png' %}" alt="">`
+                divWrap.appendChild(divAva)
+
+                const p = document.createElement('p')
+                p.className = 'online-chat__li-text'
+                li.appendChild(p)
+
+                const spanName = document.createElement('span')
+                spanName.className = 'online-chat__li-name'
+                spanName.innerHTML = `${data.user} </br>`
+                p.appendChild(spanName)
+
+                const spanMessage = document.createElement('span')
+                spanMessage.className = 'online-chat__li-sms'
+                spanMessage.innerHTML = `${data.message}`
+                p.appendChild(spanMessage)
+
+                console.log(data.message)
+                console.log(data.user)
+
+              };
+
+              //    chatSocket.onclose = function(e) {
+              //        console.error('Chat socket closed unexpectedly');
+              //    };
+
+              messageInput.focus();
+              messageInput.onkeyup = function(e) {
+                if (e.keyCode === 13) {  // enter, return
+                  buttonSend.click();
+                }
+              };
+
+              buttonSend.onclick = function(e) {
+                const message = messageInput.value;
+                if(is_auth === true) {
+                  chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'user': username,
+                  }));
+                }
+                else {
+                  alert('No auth user, sorry')
+                }
+                messageInput.value = '';
+
+              }
+
+                    </script>
+                    {% block maincontent %}
+                    {% endblock %}
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            {% block footer %}
+            <div class="footer__row">
+                <div class="footer__info">
+                    <a href="/" class="footer__logo">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logofooter"></use>
+                        </svg>
+                    </a>
+
+                    {% for i in sitecontent %}
+                    <a href="{{ i.url_vk }}" target="_blank"
+                       class="footer__soc-item footer__soc-item footer__soc-item_vk">
+                        <img src="{% static 'img/gallery/vk.png' %}" alt="">
+                    </a>
+                    <a href="{{ i.url_youtube }}" target="_blank"
+                       class="footer__soc-item footer__soc-item_yt">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
+                        </svg>
+                    </a>
+                </div>
+                <div class="footer__text-block">
+                    <div class="footer__text-achievements">
+                        {{ i.description|safe }}
+
+                    </div>
+                    <div class="footer__rights">
+                        Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endblock %}
+        </div>
+    </footer>
+
+    <div class="popup" id="modalPayment">
+        <div class="popup__body">
+            <div class="popup__content modal modal_payment">
+
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <div class="modal-payment">
+                    <a href="#amountSelection" class="modal-payment__block popup-link">
+                        <h3 class="modal__title modal-payment__title">
+                            Пополнить деньгами
+                        </h3>
+                        <ul class="modal-payment__cards cards">
+                            <li class="modal-payment__card payment-system">
+                                <div class="payment-system__img payment-system__img_big">
+                                    <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
+                                </div>
+                                <div class="payment-system__title">
+                                    Visa/Master/Мир
+                                </div>
+                            </li>
+                            <li class="modal-payment__card payment-system">
+                                <div class="payment-system__img">
+                                    <img src="{% static 'img/gallery/qivi.png' %}" alt="qivi">
+                                </div>
+                                <div class="payment-system__title">
+                                    Киви кошелёк
+                                </div>
+
+
+                            </li>
+                            <li class="modal-payment__card payment-system">
+                                <div class="payment-system__img">
+                                    <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
+                                </div>
+                                <div class="payment-system__title">
+                                    ЮMoney
+                                </div>
+
+
+                            </li>
+                            <li class="modal-payment__card payment-system">
+                                <div class="payment-system__img">
+                                    <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
+                                </div>
+                                <div class="payment-system__title">
+                                    Apple pay
+                                </div>
+
+
+                            </li>
+                            <li class="modal-payment__card payment-system">
+                                <div class="payment-system__img">
+                                    <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
+                                </div>
+                                <div class="payment-system__title">
+                                    Google pay
+                                </div>
+
+
+                            </li>
+                            <li class="modal-payment__card payment-system">
+                                <div class="payment-system__img">
+                                    <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
+                                </div>
+                                <div class="payment-system__title">
+                                    Samsung pay
+                                </div>
+
+
+                            </li>
+                        </ul>
+
+                    </a>
+                    <a href="#selectAmount" class="modal-payment__block popup-link">
+                        <h3 class="modal__title modal-payment__title">
+                            Пополнить игровой валютой
+                        </h3>
+                        <div class="modal-payment__game-currency game-currency">
+                            <div class="game-currency__img">
+                                <svg>
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="amountSelection">
+        <div class="popup__body">
+
+            <div class="popup__content modal modal_amount-selection amount-selection modal_popup">
+
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <div class="smiley amount-selection__smiley">
+                    <div class="smiley__img">
+                        <img src="{% static 'img/gallery/smiley.png' %}" alt="смайлик">
+                    </div>
+                    <div class="smiley__text">
+                        - Чем больше берешь, <br> тем дешевле выходит!
+                    </div>
+
+
+                </div>
+                <div class="amount-selection__content">
+                    <h3 class="modal__title amount-selection__title">
+                        Введите сумму или количество валюты
+                    </h3>
+                    <form class="scrollbar-overflow form amount-selection__form" action="">
+                        <div class="amount-selection__block-input">
+                            <div class="amount-selection__item">
+                                <div class="amount-selection__currency">₽</div>
+                                <input inputmode="numeric" step="1" type="tel"
+                                       class="form__input amount-selection__input"
+                                       placeholder="Введите сумму..." min="69" max="50000">
+                                <div class="amount-selection__info">Мин 69р. / 50 Тыс.</div>
+                            </div>
+                            <div class="amount-selection__item"><span class="amount-selection__smooth">=</span></div>
+                            <div class="amount-selection__item">
+                                <div class="form num-game-currency">
+                                    <div class="form__input num-game-currency__input num-game-currency__input_value">
+                                        <svg class="num-game-currency__img-icon">
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                        </svg>
+                                        <input inputmode="numeric" name="valuesum" step="1"
+                                               placeholder="Введите кол-во..." value=""
+                                               type="tel" class="num-game-currency__span-curent"></input>
+                                    </div>
+                                    <div class="form__input num-game-currency__input num-game-currency__input_units">
+                                        Тыс.
+                                    </div>
+                                </div>
+                                <div class="amount-selection__info amount-selection__info_units">+4% бонус</div>
+                            </div>
+
+                        </div>
+
+                        <div class="mod-arrow amount-selection__right">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                            </svg>
+                        </div>
+                        <div class="swiper amount-selection__checkbox">
+                            <div class="swiper-wrapper amount-selection__wrapper">
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="selectionCard"
+                                           name="paymentSystem"
+                                           value="Visa/Master/Мир" checked>
+                                    <label for="selectionCard" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img payment-system__img_big">
+                                            <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Visa/Master/Мир
+                                        </div>
+                                    </label>
+
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem"
+                                           value="Qiwi кошелёк">
+                                    <label for="Qiwi" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/qivi.png' %}" alt="Qiwi кошелёк">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Qiwi кошелёк
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem"
+                                           value="ЮMoney">
+                                    <label for="yumani" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            ЮMoney
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="Webmoney"
+                                           name="paymentSystem"
+                                           value="Webmoney">
+                                    <label for="Webmoney" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/Webmoney.png' %}" alt="Webmoney">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Webmoney
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="SamsungPay"
+                                           name="paymentSystem"
+                                           value="SamsungPay">
+                                    <label for="SamsungPay" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Samsung pay
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="ApplePay"
+                                           name="paymentSystem"
+                                           value="ApplePay">
+                                    <label for="ApplePay" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Apple pay
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="MobOperators"
+                                           name="paymentSystem"
+                                           value="Моб.операторы">
+                                    <label for="MobOperators" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/Mob-operators.png' %}"
+                                                 alt="Моб. операторы">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Моб. операторы
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="Cryptocurrency"
+                                           name="paymentSystem"
+                                           value="Криптовалюта">
+                                    <label for="Cryptocurrency" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/Cryptocurrency.png' %}" alt="Криптовалюта">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Криптовалюта
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem"
+                                           value="PayPal">
+                                    <label for="PayPal" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/PayPal.png' %}" alt="PayPal">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            PayPal
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="swiper-slide amount-selection__slide">
+                                    <input type="radio" class="amount-selection__check" id="GooglePay"
+                                           name="paymentSystem"
+                                           value="GooglePay">
+                                    <label for="GooglePay" class="amount-selection__card payment-system">
+                                        <div class="payment-system__img">
+                                            <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
+                                        </div>
+                                        <div class="payment-system__title">
+                                            Google pay
+                                        </div>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="mod-arrow amount-selection__left">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg#arrow-slider' %}"></use>
+                            </svg>
+                        </div>
+                        <button type="submit" class="btn btn_danger amount-selection__btn btn-disable-sum">Пополнить
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="popup select-amount" id="selectAmount">
+        <div class="popup__body">
+            <div class="popup__content modal modal_select-amount ">
+
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+
+                <h3 class="modal__title select-amount__title">
+                    Выберите сумму
+                </h3>
+
+                <div class="scrollbar-overflow select-amount__content">
+                    <div class="mod-arrow select-amount__up">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </div>
+                    <div class="swiper select-amount__slider">
+                        <div class="swiper-wrapper select-amount__wrapper">
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        50К
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        100К
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        250К
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        500К
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        1M
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        2M
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        5M
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        10M
+                                    </div>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="mod-arrow select-amount__down">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+    <div class="popup modal-manual" id="modalManual">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal-manual__modal">
+                <div class="modal-manual__queries">
+                    Заявка #22131
+                </div>
+                <a href="#" class="popup__close close-popup close-popup_close">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <h3 class="modal__title">
+                    Инструкция
+                </h3>
+
+                <div class="modal-manual__text">
+                    <ul>
+                        <li>1. Общие положения</li>
+                        <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее –
+                            Пользователь) -
+                            использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее
+                            —
+                            «Соглашение», «ПС»).
+                            Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+                            Соглашение
+                            вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+                        </li>
+                    </ul>
+                    <div class="modal-manual__footnote">
+                        *в случае неудачной попытки обыгрыша валюта не возвращается
+                    </div>
+
+                </div>
+                <a href="##" class="btn btn_danger modal-manual__btn btn_white" id="modalManualBtn">
+                    <div class="timer" id="timerOne">0:10</div>
+                </a>
+
+            </div>
+        </div>
+    </div>
+    <div class="popup select-amount" id="selectAmountInput">
+        <div class="popup__body">
+            <div class="popup__content modal modal_select-amount modal_select-amount_input">
+
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <div class="select-amount__s-am-input s-am-input">
+                    <h3 class="s-am-input__title">
+                        Ваш баланс в Дурак Онлайн
+                    </h3>
+
+                    <div class="s-am-input__input-block">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                        </svg>
+                        <input inputmode="numeric" class="s-am-input__input"
+                               placeholder="Введите ваш баланс в Дураке..."
+                               type="tel" step="1" name="add-sum" class="roulette__table-input">
+                        <div class="s-am-input__msg">Вы должны иметь минимум 100 кредитов!</div>
+                    </div>
+                </div>
+                <h3 class="modal__title select-amount__title">
+                    Выберите сумму
+                </h3>
+
+                <div class="scrollbar-overflow select-amount__content">
+                    <div class="mod-arrow select-amount__up">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </div>
+                    <div class="swiper select-amount__slider">
+                        <div class="swiper-wrapper select-amount__wrapper">
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        50К
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        100К
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        250К
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        500К
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        1M
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        2M
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="swiper-slide select-amount__slide">
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        5M
+                                    </div>
+                                </a>
+                                <a href="#modalManual" class="select-amount__item popup-link">
+                                    <div class="select-amount__img">
+                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
+                                    </div>
+                                    <div class="select-amount__value">
+                                        10M
+                                    </div>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="mod-arrow select-amount__down">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block maincontent %}
+<div class="profil-main__content">
+    <section class="bonus-currency">
+        <h1 class="bonus-currency__title">Бонусная валюта</h1>
+        <div class="content-block">
+            <div class="bonus-currency__row">
+                <div class="bonus-currency__item bonus-currency__item_promo-code promo-code">
+                    <form class="promo-code__form form">
+                        <div class="promo-code__title">Введите промокод (<span>25k
+                            <svg class="promo-code__img-title">
+                              <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                            </svg>
+                          </span>)
+                        </div>
+                        <div class="promo-code__input-block">
+                            <input type="text" class="form__input promo-code__input">
+                            <button class="btn btn_danger promo-code__btn">Активировать</button>
+                        </div>
+                        <div class="promo-code__msg form__msg">Вы уже активировали промо-код.</div>
+                    </form>
+                </div>
+                <div class="bonus-currency__item add-bonus">
+                    <div class="add-bonus__item">
+                        <div class="add-bonus__title-block">
+                            <div class="add-bonus__logo">
+                                <svg class="icon icon_yt">
+                                    <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
+                                </svg>
+                            </div>
+                            <div class="add-bonus__title">
+                                Подпишиcь на наш YouTube канал
+                            </div>
+                        </div>
+                        <hr>
+                        {% for i in sitecontent %}
+                        <div class="add-bonus__value-block">
+                            <div class="add-bonus__value">
+                                +{{ i.bonus_youtube }}K
+                            </div>
+
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                            </svg>
+                        </div>
+
+                        <a href="{{ i.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn">Подписаться на
+                            Youtube</a>
+                    </div>
+                    <div class="add-bonus__item">
+                        <div class="add-bonus__title-block">
+                            <div class="add-bonus__logo">
+                                <svg class="icon icon_vk">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk"></use>
+                                </svg>
+                            </div>
+                            <div class="add-bonus__title">
+                                Подпишиcь на наш YouTube канал
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="add-bonus__value-block">
+                            <div class="add-bonus__value">
+                                +{{ i.bonus_vk }}K
+                            </div>
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                            </svg>
+                        </div>
+                        <a href="{{ i.url_vk }}" target="_blank" class="btns btns_vk add-bonus__btn">Подписаться во
+                            Вконтакте</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="bonus-currency__invite invite">
+                <div class="accordion invite__head">
+                    <div class="invite__title">
+                        Пригласи друга - получи валюту! <span>(Партнерка)</span>
+                    </div>
+                    <svg class="accordion-icon invite__accordion-icon">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                    </svg>
+                </div>
+                <div class="panel invite__panel">
+                    <ul class="invite__steps">
+                        <li class="invite__step">
+                            <div class="invite__wrapper">
+                                <div class="invite__num">#1</div>
+                                <div class="invite__step-title">Придумай свой бонусный код</div>
+                                <form action="" class="form invite__form">
+                                    <div class="invite__input-block">
+                                        <input type="text" class="form__input invite__input" placeholder="Введите код">
+
+
+                                        <button type="submit" class="btn btn_dark invite__btn">Создать</button>
+
+
+                                        <div class="invite__msg invite__msg_mob form__msg">Введённый промокод не
+                                            доступен.
+                                        </div>
+                                    </div>
+                                    <div class="invite__msg form__msg">Введённый промокод не доступен.</div>
+                                </form>
+                                <div class="invite__arrow invite__arrow_min">
+                                    <svg class="icon">
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#Arrow5-min"></use>
+                                    </svg>
+                                </div>
+                            </div>
+
+                        </li>
+                        <li class="invite__step">
+                            <div class="invite__wrapper invite__wrapper_text">
+                                <div class="invite__num">#2</div>
+                                <div class="invite__text-block">
+                                    <div class="invite__img">
+                                        <img src="{% static 'img/gallery/bulb.png' %}" alt="">
+                                    </div>
+                                    {% for i in sitecontent %}
+                                    <div class="invite__text">
+                                        {{ i.info2|safe }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="invite__arrow invite__arrow_max">
+                                    <svg class="icon">
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#Arrow6-max"></use>
+                                    </svg>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="invite__step">
+                            <div class="invite__wrapper invite__wrapper_text">
+                                <div class="invite__num">#3</div>
+                                <div class="invite__text-block">
+                                    <div class="invite__img">
+                                        <img src="{% static 'img/gallery/handshake.png' %}" alt="">
+                                    </div>
+                                    {% for i in sitecontent %}
+                                    <div class="invite__text">
+                                        {{ i.info3|safe }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                    <div class="bonus-currency__conclusion conclusion">
+                        <div class="conclusion__title">На текущий момент доступно</div>
+                        <div class="form num-game-currency">
+                            <div class="form__input num-game-currency__input num-game-currency__input_value">
+                                <svg class="num-game-currency__img-icon">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                </svg>
+                                <span class="num-game-currency__span-curent">352</span>
+                            </div>
+                            <div
+                                    class="form__input num-game-currency__input num-game-currency__input_units conclusion_units">
+                                Тыс.
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn__danger-min conclusion__btn">Забрать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -681,13 +681,14 @@
             </section>
 
             <div class="profil-main__content">
+{% for i in sitecontent %}
               <section class="contact">
                 <h1 class="contact__title">Контакты</h1>
                 <div class="contact__block">
                   <div class="contact__top-info">
                     <div class="contact__soc">
                       <div class="contact__soc-item">
-{% for i in sitecontent %}
+
  <a href="{{ i.url_youtube }}" target="_blank" class="contact__soc-ing">
                           <svg class="youtube">
                             <use xlink:href="{% static 'img/icons/sprite.svg' %}#youtube"></use>
@@ -734,12 +735,14 @@
                   </div>
                 </div>
               </section>
+              {% endfor %}
             </div>
+
           </div>
         </section>
       </div>
     </main>
-{% endfor %}
+
 
     <footer class="footer">
       <div class="container">
