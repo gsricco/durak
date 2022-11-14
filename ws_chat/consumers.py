@@ -19,27 +19,44 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-        user = text_data_json["user"]
-        avatar = text_data_json["avatar"]
-        rubin = text_data_json.get("rubin")
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message",
-                                   "message": message,
-                                   "user": user,
-                                   "avatar": avatar,
-                                   "rubin": rubin
-                                   }
-        )
+        print(text_data_json)
+        if text_data_json.get('online') == "online":
+            online = self.channel_layer.receive_count
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "get_online",
+                                       "get_online": online
+                                       }
+            )
+        else:
+            message = text_data_json["message"]
+            user = text_data_json["user"]
+            avatar = text_data_json["avatar"]
+            rubin = text_data_json.get("rubin")
+            # online = self.channel_layer.receive_count
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "chat_message",
+                                       "message": message,
+                                       "user": user,
+                                       "avatar": avatar,
+                                       "rubin": rubin,
+                                       }
+            )
         # self.send(text_data=json.dumps({'message': message}))
-
+    async def get_online(self, event):
+        print(event['get_online'])
+        online = event['get_online']
+        await self.send(text_data=json.dumps({
+            "get_online": online
+        }))
     async def chat_message(self, event):
-        user = event['user']
-        message = event["message"]
-        avatar = event["avatar"]
+        user = event.get('user')
+        message = event.get("message")
+        avatar = event.get("avatar")
         rubin = event.get("rubin")
+        # online = event.get("online")
         await self.send(text_data=json.dumps({"message": message,
                                               "user": user,
                                               "avatar": avatar,
-                                              "rubin": rubin
+                                              "rubin": rubin,
+                                              # "online": online
                                               }))
