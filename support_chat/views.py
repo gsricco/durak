@@ -28,6 +28,8 @@ class MessageViewSet(viewsets.ViewSet):
     def create(self, request, *args, **kwargs):
         """Сохранение сообщения пользователя"""
         ### Или сделать с выборкой авториз пользователя, но как автоматом знать принимающую сторону
+        # if not request.user.is_authenticated:            ## ПРоставить на методах???
+        #     return Response(status=401)
         user = request.user
         file = request.data.get("file_message")
         serializer = MessageCreateSerializer(data=request.data)
