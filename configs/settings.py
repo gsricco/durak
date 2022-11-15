@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'drf_yasg',
 
     'ckeditor',
     'ckeditor_uploader',
@@ -52,8 +53,8 @@ INSTALLED_APPS = [
     'accaunts',
     'start_all_template',
     'content_manager',
-
     'support_chat',
+    'api_router',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +75,7 @@ ROOT_URLCONF = 'configs.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'configs.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
+#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

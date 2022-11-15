@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
-            self.avatar.save(f"image_{self.pk}.png", File(img_temp))
+            self.avatar.save(f"image_{self.pk}", File(img_temp))
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self):
             if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
