@@ -374,43 +374,43 @@ window.addEventListener("DOMContentLoaded", () => {
         activeAccardin();
     }
 
-    //! Таймер рулетка
-    if (document.querySelector(".roulette")) {
-        let timerWrapper = document.querySelector(".roulette__rull-timer-wrapper");
-        let timerNums = document.querySelector(".roulette__rull-timer");
-        let wrapperItems = document.querySelector(".roulette__rull-wrapper");
-        let rull_line = document.querySelector(".roulette__rull-line");
-        let num = 12.5;
-
-        let intervalTimerRull = setInterval(function () {
-            if (num.toFixed(1) <= 0.1) {
-                clearInterval(intervalTimerRull);
-                wrapperItems.classList.remove("roulette__rull-wrapper_blur");
-                timerWrapper.style.display = "none";
-                rull_line.style.display = "block";
-            } else {
-                num -= 0.1;
-                timerNums.innerHTML = num.toFixed(1);
-            }
-        }, 100);
-    }
-
-    //! Плавные скроллбары
-    if (document.querySelector(".scrollbar-overflow")) {
-        let blockArrow = document.querySelectorAll(".scrollbar-overflow");
-
-        blockArrow.forEach(function (item) {
-            item.addEventListener("touchmove", function () {
-                item.classList.add("scrollbar-overflow_active");
-            });
-
-            item.addEventListener("touchend", function () {
-                setTimeout(function () {
-                    item.classList.remove("scrollbar-overflow_active");
-                }, 1000);
-            });
-        });
-    }
+    // //! Таймер рулетка
+    // if (document.querySelector(".roulette")) {
+    //     let timerWrapper = document.querySelector(".roulette__rull-timer-wrapper");
+    //     let timerNums = document.querySelector(".roulette__rull-timer");
+    //     let wrapperItems = document.querySelector(".roulette__rull-wrapper");
+    //     let rull_line = document.querySelector(".roulette__rull-line");
+    //     let num = 12.5;
+    //
+    //     let intervalTimerRull = setInterval(function () {
+    //         if (num.toFixed(1) <= 0.1) {
+    //             clearInterval(intervalTimerRull);
+    //             wrapperItems.classList.remove("roulette__rull-wrapper_blur");
+    //             timerWrapper.style.display = "none";
+    //             rull_line.style.display = "block";
+    //         } else {
+    //             num -= 0.1;
+    //             timerNums.innerHTML = num.toFixed(1);
+    //         }
+    //     }, 100);
+    // }
+    //
+    // //! Плавные скроллбары
+    // if (document.querySelector(".scrollbar-overflow")) {
+    //     let blockArrow = document.querySelectorAll(".scrollbar-overflow");
+    //
+    //     blockArrow.forEach(function (item) {
+    //         item.addEventListener("touchmove", function () {
+    //             item.classList.add("scrollbar-overflow_active");
+    //         });
+    //
+    //         item.addEventListener("touchend", function () {
+    //             setTimeout(function () {
+    //                 item.classList.remove("scrollbar-overflow_active");
+    //             }, 1000);
+    //         });
+    //     });
+    // }
 
     //!Таймер
     let target_date = new Date().getTime() + /*(1000 * 60 * 5)*/ 1000 * 30; // установить дату обратного отсчета
