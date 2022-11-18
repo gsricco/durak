@@ -1,7 +1,6 @@
 import json
-
 from channels.generic.websocket import AsyncWebsocketConsumer
-
+# from configs.celery import debug_task
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -10,6 +9,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(
             self.room_group_name, self.channel_name
         )
+        # a = debug_task.apply_async()
         await self.accept()
 
     async def disconnect(self, code):
@@ -60,3 +60,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                               "rubin": rubin,
                                               # "online": online
                                               }))
+# начинает отсчёт
+    async def korney_task(self, event):
+        await self.send(text_data=json.dumps({
+            "roulette": 20,
+        }))
+# начинает крутиться рулетка
+    async def rolling(self, event):
+        await self.send(text_data=json.dumps({
+            "roll": 'rolling'
+        }))
+
+    # async def

@@ -277,6 +277,9 @@
                     {{ user.username|json_script:"username" }}
 
                     <script>
+                        {#import {timerCounter} from "../start_all_template/static/js/roulette";#}
+
+
                         const roomName = JSON.parse(document.getElementById('room-name').textContent);
                         const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
                         const username = JSON.parse(document.getElementById('username').textContent);
@@ -296,7 +299,10 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
-
+                            if (data.roulette){
+                                console.log('hihihi')
+                                timerCounter(data.roulette)
+                            }
                             if (data.get_online > 0) {
                                 console.log(data)
                                 online.innerHTML = `${data.get_online}`
@@ -998,6 +1004,6 @@
 
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
-
+<script type="text/javascript" src="{% static 'js/roulette.js'%}"></script>
 </body>
 </html>

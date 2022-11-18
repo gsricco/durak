@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'drf_yasg',
-
+    'django_celery_beat',
+    'django_celery_results',
     'ckeditor',
     'ckeditor_uploader',
 
@@ -202,3 +203,11 @@ CHANNEL_LAYERS = {
 #         "BACKEND": "channels.layers.InMemoryChannelLayer"
 #     }
 # }
+# CELERY
+REDIS_URL = "redis://127.0.0.1:6379/2"
+BROKER_URL = REDIS_URL
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
