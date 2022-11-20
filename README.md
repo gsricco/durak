@@ -42,5 +42,7 @@ python manage.py runserver
 To run Celery tasks:
 
 celery -A configs flower beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
 celery -A configs beat -l INGO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
 celery -A configs worker --loglevel=info
