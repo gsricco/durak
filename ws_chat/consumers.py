@@ -71,4 +71,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "roll": 'rolling'
         }))
 
-    # async def
+    async def stopper(self, event):
+        await self.send(text_data=json.dumps({
+            "stop": "stopping"
+        }))

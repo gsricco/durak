@@ -16,9 +16,9 @@ channel_layer = get_channel_layer()
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(30.03, debug_task.s(), name='add every 10')
 
-
-def sender():
-    print('HI Korney ANd OLEG', '*' * 50)
+@shared_task(bind=True)
+def sender(self):
+    print(self)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'korney_task',
@@ -30,4 +30,14 @@ def sender():
 # @app.task
 @shared_task
 def debug_task():
-    sender()
+    sender.apply_async()
+    stop.apply_async(countdown=20)
+
+@shared_task(bind=True)
+def stop(self):
+    print(self)
+    async_to_sync(channel_layer.group_send)('chat_go',
+                                            {
+                                                'type':'stopper',
+
+                                            })
