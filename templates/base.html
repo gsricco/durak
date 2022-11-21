@@ -286,22 +286,45 @@
                         const buttonSend = document.querySelector('.online-chat__icon-arrow')
                         const messageInput = document.querySelector('.online-chat__input');
                         const scrollBlock = document.querySelector('.online-chat__body')
+                        {#console.log(chatBlock)#}
 
                         const chatSocket = new WebSocket(
                             'ws://'
                             + window.location.host
                             + '/ws/chat/'
+
                         );
                         const online = document.querySelector('.online-chat__current')
 
+                                 const newUserMessage = (message) => {
+                                  const li = document.createElement('li')
+                                  li.className = 'support__chat-message support__chat-message_your'
+                                  chatBlock.appendChild(li)
+                                  const div = document.createElement('div')
+                                  div.className = 'support__chat-message-text'
+                                  li.appendChild(div)
+                                  const span = document.createElement('span')
+                                  span.innerHTML = message
+                                  div.appendChild(span)
+                              }
+
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
+                            console.log(data)
 
                             if (data.get_online > 0) {
                                 console.log(data)
                                 online.innerHTML = `${data.get_online}`
                             }
-                            if (data.message) {
+
+
+                            if (data.chat_type === 'support'){
+                              newUserMessage(`${data.message}`)
+                            }
+
+
+
+                            if (data.message && data.chat_type === 'all_chat') {
                                 const li = document.createElement('li')
                                 li.className = 'online-chat__li'
                                 messageBlock.appendChild(li)
@@ -356,6 +379,7 @@
                             const message = messageInput.value;
                             if (is_auth === true) {
                                 chatSocket.send(JSON.stringify({
+                                    "chat_type": "all_chat",
                                     'message': message,
                                     'user': username,
                                     'avatar': ava,

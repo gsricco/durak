@@ -537,7 +537,7 @@
                                   messageArray.map(el => {
                                       newUserMessage(el)
                                   })
-                                  console.log(messageArray)
+                                  console.log('hihihihih')
                               }
                               const newUserMessage = (message, avatar, file) => {
                                   const li = document.createElement('li')
@@ -561,20 +561,36 @@
                                       });
                               }
                               getResponse()
-                              sendBtn.addEventListener('click', () => {
-                                  async function postData(url, data) {
-                                      const response = await fetch(url, {
-                                          method: 'POST',
-                                          headers: {
-                                              'Content-Type': 'application/json',
-                                              "X-CSRFToken": '{{csrf_token}}',
-                                          },
-                                          body: JSON.stringify(data)
-                                      }).then(() => getResponse());
-                                  }
+                              {#sendBtn.addEventListener('click', () => {#}
+                              {#    async function postData(url, data) {#}
+                              {#        const response = await fetch(url, {#}
+                              {#            method: 'POST',#}
+                              {#            headers: {#}
+                              {#                'Content-Type': 'application/json',#}
+                              {#                "X-CSRFToken": '{{csrf_token}}',#}
+                              {#            },#}
+                              {#            body: JSON.stringify(data)#}
+                              {#        }).then(() => getResponse());#}
+                              {#    }#}
 
-                                  postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})
-                                  inputValue.value = ''
+                                  {#postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})#}
+                                  {#inputValue.value = ''#}
+                              sendBtn.addEventListener('click', () =>{
+                                  alert('мы тут')
+                            const message = inputValue.value;
+                            if (is_auth === true) {
+                                chatSocket.send(JSON.stringify({
+                                    'type':'support_chat',
+                                    'message': message,
+                                    'user': username,
+                                    'avatar': ava,
+                                    'rubin': rubin
+                                }));
+                            } else {
+                                alert('No auth user, sorry')
+                            }
+                            messageInput.value = '';
+
                               })
                           </script>
 
