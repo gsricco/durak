@@ -12,6 +12,7 @@ class CustomUser(AbstractUser):
                               default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
+    experience = models.IntegerField(verbose_name="Опыт", default=0)
 
     def save(self, *args, **kwargs):
         if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
@@ -89,7 +90,6 @@ class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
-    experience = models.IntegerField(verbose_name="Опыт", default=0)
     level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
