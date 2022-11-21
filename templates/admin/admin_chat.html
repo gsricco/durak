@@ -1,10 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat</title>
-</head>
-<body>
+     {% load static %}
+    <link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<div class="support__chat">
+                            <div class="support__chat-wrapper">
+                                <div class="support__top-plank">
+                                    <div class="support__top-plank-wrapper">
+                                        <span>Чат поддержки</span>
+                                    </div>
+                                </div>
+                                <ul class="support__chat-block scrollbar-overflow">
+                                    <div class="messageContainer"></div>
 
-</body>
-</html>
+                                    <div class="support__chat-answer">
+                                                                            </div>
+                                </ul>
+
+                            </div>
+                            <div class="support__input-block">
+                                <div class="support__input-block-wrapper">
+                                    <input type="file" name="file" id="file-add">
+                                    <label for="file-add" class="support__input-block-attach">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#attach"></use>
+                                        </svg>
+                                    </label>
+
+                                    <input placeholder="Написать сообщение..." name="chat-message" type="text"
+                                           class="support__chat-input" autocomplete="off">
+                                    <span class="support__input-block-arrow">
+                                <svg>
+                                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#chatarrow"></use>
+                                </svg>
+                              </span>
+                                </div>
+                            </div>
+
+                            <script>
+                                const chatSocket = new WebSocket(
+                            'ws://'
+                            + window.location.host
+                            + '/ws/chat/'
+
+                        );
+                              const sendBtn = document.querySelector('.support__input-block-arrow')
+                              let inputValue = document.querySelector('.support__chat-input')
+                              const chatBlock = document.querySelector('.support__chat-block')
+
+                            sendBtn.addEventListener('click', () =>{
+
+                            if (true) {
+                                chatSocket.send(JSON.stringify({
+                                    'type':'support_chat',
+                                    "chat_type": "support",
+                                    'message': inputValue.value,
+                                    'user': 'ffgdsf',
+                                    'avatar': 'fsdfds',
+                                }));
+                            } else {
+                                alert('No auth user, sorry')
+                            }
+                            inputValue.value = '';
+
+                              })
+
+                            </script>
+
+                        </div>

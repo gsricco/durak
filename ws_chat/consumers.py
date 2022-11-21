@@ -39,7 +39,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except:
             pass
     async def connect(self):
-        print(self.channel_layer.__dict__)
         user = self.scope['user']
         self.room_name = 'go'  # self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
@@ -85,7 +84,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
     async def get_online(self, event):
-        print(event['get_online'])
+        # print(event['get_online'])
         online = event['get_online']
         await self.send(text_data=json.dumps({
             "get_online": online
