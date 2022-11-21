@@ -4,6 +4,9 @@ from urllib.request import urlopen
 from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
+from django.contrib.postgres.constraints import ExclusionConstraint
+from psycopg2.extras import NumericRange
 
 
 class CustomUser(AbstractUser):
@@ -72,15 +75,39 @@ class UserIP(models.Model):
         return f'{self.user}'
 
 
+class LevelRange(models.Model):
+    """Модель уровня игрока"""
+    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True, default=1)
+    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', default=NumericRange(lower=0, upper=601))
+    image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
+
+    def __str__(self):
+        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
+
+    class Meta:
+        constraints = [
+            ExclusionConstraint(
+                name='exclude_overlapped_levels',
+                expressions=[
+                    ('experience_range', RangeOperators.OVERLAPS),
+                ],
+                violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
+            ),
+        ]
+        verbose_name = 'Уровень в игре'
+        verbose_name_plural = 'Уровни в игре'
+
+
+
 class Level(models.Model):
     """Модель уровней пользователей"""
     level = models.PositiveIntegerField(verbose_name='Уровень', unique=True)
-    experience_for_lvl = models.IntegerField(verbose_name='Количество опыта до следующего уровня')
+    experience_for_lvl = models.IntegerField(verbose_name="Опыт", default=0)
     image = models.ImageField(verbose_name='Аватар', upload_to='img/level/', blank=True, null=True)
 
     class Meta:
-        verbose_name = 'Уровни в игре'
-        verbose_name_plural = 'Уровни в игре'
+        verbose_name = 'Уровни в игре (старые)'
+        verbose_name_plural = 'Уровни в игре (старые)'
 
     def __str__(self):
         return f'{self.level}'

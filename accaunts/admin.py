@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, Level, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP
+from .models import CustomUser, Level, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, LevelRange
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
 admin.site.unregister(UserSocialAuth)
@@ -65,6 +65,10 @@ class CustomUserAdmin(UserAdmin):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')
 
     preview.short_description = 'Аватар'
+
+
+
+admin.site.register(LevelRange)
 
 
 @admin.register(Level)
