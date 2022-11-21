@@ -1,8 +1,10 @@
-from django.contrib import admin
+from django import forms
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
 from .models import CustomUser, Level, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, LevelRange
+from psycopg2.extras import NumericRange
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
 admin.site.unregister(UserSocialAuth)
@@ -67,26 +69,41 @@ class CustomUserAdmin(UserAdmin):
     preview.short_description = 'Аватар'
 
 
-
-admin.site.register(LevelRange)
-
-
-@admin.register(Level)
-class LevelAdmin(admin.ModelAdmin):
-    """Класс отображения в админке уровней пользователей(модель Level)"""
-    list_display = 'level', 'experience_for_lvl', 'image', 'preview'
-    list_editable = 'experience_for_lvl', 'image'
+@admin.register(LevelRange)
+class LevelRangeAdmin(admin.ModelAdmin):
+    """Класс отображения в админке уровней пользователей(модель LevelRange)"""
+    # actions = 'add_experience',
+    fields = 'level', 'experience_range', 'image'
+    list_display = 'level', 'experience_range', 'experience_for_lvl', 'image', 'preview'
+    list_editable = 'image',
     list_filter = 'level',
-    search_fields = 'level',
+    ordering = 'level',
     readonly_fields = 'preview',
+    search_fields = 'level', 'experience_range'
+
+    # @admin.action(description='Добавить опыт для получения уровней')
+    # def add_experience(self, request, queryset):
+    #     self.message_user(request, f"{queryset}", messages.SUCCESS)
+
+    def save_model(self, request, obj: LevelRange, form: forms.ModelForm, change):
+        """Saves changes for level and adds experience for all furhter levels"""
+        if change and form.is_valid():
+            levels = LevelRange.objects.filter(experience_range__fully_gt=obj.experience_range).order_by('experience_range')
+            print(levels)
+        super().save_model(request, obj, form, change)
+
+    @admin.display(description='Опыт до следующего уровня')
+    def experience_for_lvl(self, obj):
+        return obj.experience_range.upper - obj.experience_range.lower
 
     def preview(self, obj):
         if obj.image:
             return mark_safe(f'<img src="{obj.image.url}" width="50" height="50">')
         else:
-            return 'Нет аватара'
+            return 'Нет изображения'
 
-    preview.short_description = 'Аватар'
+    preview.short_description = 'Картинка уровня'
+
 
 # admin.site.register(ReferalUser)
 # admin.site.unregister(Group)

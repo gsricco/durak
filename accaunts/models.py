@@ -94,6 +94,7 @@ class LevelRange(models.Model):
                 violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
             ),
         ]
+        ordering = ['level']
         verbose_name = 'Уровень в игре'
         verbose_name_plural = 'Уровни в игре'
 
