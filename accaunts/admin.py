@@ -3,7 +3,8 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, Level, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, LevelRange
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level
+from .forms import LevelForm
 from psycopg2.extras import NumericRange
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
@@ -69,11 +70,11 @@ class CustomUserAdmin(UserAdmin):
     preview.short_description = 'Аватар'
 
 
-@admin.register(LevelRange)
-class LevelRangeAdmin(admin.ModelAdmin):
-    """Класс отображения в админке уровней пользователей(модель LevelRange)"""
+@admin.register(Level)
+class LevelAdmin(admin.ModelAdmin):
+    """Класс отображения в админке уровней пользователей(модель Level)"""
     # actions = 'add_experience',
-    fields = 'level', 'experience_range', 'image'
+    form = LevelForm
     list_display = 'level', 'experience_range', 'experience_for_lvl', 'image', 'preview'
     list_editable = 'image',
     list_filter = 'level',
@@ -84,13 +85,6 @@ class LevelRangeAdmin(admin.ModelAdmin):
     # @admin.action(description='Добавить опыт для получения уровней')
     # def add_experience(self, request, queryset):
     #     self.message_user(request, f"{queryset}", messages.SUCCESS)
-
-    def save_model(self, request, obj: LevelRange, form: forms.ModelForm, change):
-        """Saves changes for level and adds experience for all furhter levels"""
-        if change and form.is_valid():
-            levels = LevelRange.objects.filter(experience_range__fully_gt=obj.experience_range).order_by('experience_range')
-            print(levels)
-        super().save_model(request, obj, form, change)
 
     @admin.display(description='Опыт до следующего уровня')
     def experience_for_lvl(self, obj):

@@ -26,7 +26,7 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self):
             if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
-                level_1 = Level(level=1, experience_for_lvl=600)
+                level_1 = Level(level=1, experience_range=NumericRange(0, 600))
                 level_1.save()
             detail = DetailUser(user=self, level=Level.objects.get(level=1))
             detail.save()
@@ -75,50 +75,35 @@ class UserIP(models.Model):
         return f'{self.user}'
 
 
-class LevelRange(models.Model):
+class Level(models.Model):
     """Модель уровня игрока"""
-    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True, default=1)
-    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', default=NumericRange(lower=0, upper=601))
+    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
+    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня')
     image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
 
     def __str__(self):
         return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
 
     class Meta:
-        constraints = [
-            ExclusionConstraint(
-                name='exclude_overlapped_levels',
-                expressions=[
-                    ('experience_range', RangeOperators.OVERLAPS),
-                ],
-                violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
-            ),
-        ]
-        ordering = ['level']
+        # constraints = [
+        #     ExclusionConstraint(
+        #         name='exclude_overlapped_levels',
+        #         expressions=[
+        #             ('experience_range', RangeOperators.OVERLAPS),
+        #         ],
+        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
+        #     ),
+        # ]
+        ordering = ['-level']
         verbose_name = 'Уровень в игре'
         verbose_name_plural = 'Уровни в игре'
-
-
-
-class Level(models.Model):
-    """Модель уровней пользователей"""
-    level = models.PositiveIntegerField(verbose_name='Уровень', unique=True)
-    experience_for_lvl = models.IntegerField(verbose_name="Опыт", default=0)
-    image = models.ImageField(verbose_name='Аватар', upload_to='img/level/', blank=True, null=True)
-
-    class Meta:
-        verbose_name = 'Уровни в игре (старые)'
-        verbose_name_plural = 'Уровни в игре (старые)'
-
-    def __str__(self):
-        return f'{self.level}'
 
 
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Данные пользователя'
