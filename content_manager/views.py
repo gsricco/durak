@@ -128,10 +128,10 @@ def profil(request):
         # print(user_ip, ' - IP USER')
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=detail_user.level_id)
-        if detail_user.experience >= level_data.experience_for_lvl:
-            detail_user.lvl_up()
-            detail_user = DetailUser.objects.get(user_id=request.user.id)
-            level_data = Level.objects.get(pk=detail_user.level_id)
+        # if detail_user.experience >= level_data.experience_for_lvl:
+        #     detail_user.lvl_up()
+        #     detail_user = DetailUser.objects.get(user_id=request.user.id)
+        #     level_data = Level.objects.get(pk=detail_user.level_id)
         if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
             social_google = True
         else:
