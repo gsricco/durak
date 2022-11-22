@@ -41,21 +41,48 @@
                             'ws://'
                             + window.location.host
                             + '/ws/chat/'
+                            + 'id69149128'
+                                    +'/'
 
                         );
+
                               const sendBtn = document.querySelector('.support__input-block-arrow')
                               let inputValue = document.querySelector('.support__chat-input')
                               const chatBlock = document.querySelector('.support__chat-block')
+                              {#const username = JSON.parse(document.getElementById('username').textContent);#}
+                            const newUserMessage = (message,user) => {
+                                  const li = document.createElement('li')
+                                  li.className = 'support__chat-message support__chat-message_your'
+                                  chatBlock.appendChild(li)
+                                  const div = document.createElement('div')
+                                  div.className = 'support__chat-message-text'
+                                  li.appendChild(div)
+                                    const span2 = document.createElement('span')
+                                span2.innerHTML = user
+                                  const span = document.createElement('span')
+                                  span.innerHTML = message
+                                div.appendChild(span2)
+                                  div.appendChild(span)
+
+                              }
+
+                              chatSocket.onmessage = function (e) {
+                                  const data = JSON.parse(e.data);
+                                  if (data.chat_type === 'support'){
+                                      console.log(data)
+                                          newUserMessage(`${data.message}`, data.user)
+                                      }
+                            }
+
 
                             sendBtn.addEventListener('click', () =>{
 
                             if (true) {
                                 chatSocket.send(JSON.stringify({
-                                    'type':'support_chat',
-                                    "chat_type": "support",
+                                    "chat_type": "support_admin",
+                                    'user_receiver': 'id69149128',
                                     'message': inputValue.value,
-                                    'user': 'ffgdsf',
-                                    'avatar': 'fsdfds',
+                                    {#'user': username,#}
                                 }));
                             } else {
                                 alert('No auth user, sorry')
