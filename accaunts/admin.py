@@ -62,7 +62,8 @@ class CustomUserAdmin(UserAdmin):
         ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email')}),
         (None, {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (None, {'fields': ('last_login', 'date_joined')}),
-        ('Дополнительная информация', {'fields': ('avatar', 'vk_url', 'photo')})
+        ('Дополнительная информация', {'fields': ('avatar', 'vk_url', 'photo')}),
+        ('Игровые данные', {'fields': ('experience',)})
     )
     def preview(self, obj):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')
