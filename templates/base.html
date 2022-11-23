@@ -299,6 +299,12 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
+                            if(data.roll){
+                                startRoll()
+                            }
+                            if(data.back){
+                                returnToStartPosition()
+                            }
                             if (data.roulette){
                                 console.log('hihihi')
                                 timerCounter(data.roulette)
