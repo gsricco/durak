@@ -4603,6 +4603,8 @@ h3 {
 
 .roulette__item-avatar img {
   display: block;
+  width: 1.375rem;
+  height: 1.375rem;
 }
 
 .roulette__item-stoun svg {

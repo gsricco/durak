@@ -15,7 +15,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # a = debug_task.apply_async()
         await self.accept()
 
-
     async def disconnect(self, code):
         await self.channel_layer.group_discard(
             self.room_group_name, self.channel_name
@@ -23,33 +22,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
-        print(text_data_json)
-        # if text_data_json.get('get') == 'message':
-        #     # await self.send_message()
-        #     r = redis.StrictRedis(host='localhost', port=6379, db=1)
-        #     p = r.pubsub()
-        #     p.psubscribe('roulette')
-        #     print('start sending message')
-        #     for message in p.listen():
-        #         if message:
-        #             m_type = message.get('type', '')
-        #             m_pattern = message.get('pattern', '')
-        #             m_channel = message.get('channel', '')
-        #             data = message.get('data', '')
-        #             print(data, 'nasha data')
-        #             await self.channel_layer.group_send(
-        #                 self.room_group_name, {
-        #                     "type": "korney_task",
-        #                     "data": data
-        #                 })
-        #
-        #         break
         if text_data_json.get('online') == "online":
             online = self.channel_layer.receive_count
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "get_online",
                                        "get_online": online
                                        }
+            )
+        elif text_data_json.get('bidCount') is not None:
+            await self.channel_layer.group_send(
+                self.room_group_name, {
+                    "type": "get_bid",
+                    "bid": text_data_json,
+                }
             )
         else:
             message = text_data_json.get("message")
@@ -123,4 +108,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def go_back(self, event):
         await self.send(text_data=json.dumps({
             'back': 'go-back',
+        }))
+
+    async def get_bid(self, event):
+        data = event.get('bid')
+        # amount = event['bidCount']
+        await self.send(text_data=json.dumps({
+            "bid": data,
         }))

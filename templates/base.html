@@ -275,10 +275,8 @@
                     {{ room_name|json_script:"room-name" }}
                     {{ user.is_authenticated|json_script:"auth-user" }}
                     {{ user.username|json_script:"username" }}
-
                     <script>
                         {#import {timerCounter} from "../start_all_template/static/js/roulette";#}
-
 
                         const roomName = JSON.parse(document.getElementById('room-name').textContent);
                         const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
@@ -299,6 +297,9 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
+                            if(data.bid){
+                                createBidItemRow(data.bid)
+                            }
                             if(data.roll){
                                 startRoll()
                             }

@@ -117,7 +117,6 @@
 
                 const seconds = (rafSeconds - (Date.now() - rafStart) / 100) | 0;
                 let timerShow = seconds/10
-                console.log(seconds)
                 if (seconds<1) {
 
                     timerNums.innerHTML = ``;
