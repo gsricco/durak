@@ -11,7 +11,7 @@
             //101 - black2
 
             // window.addEventListener('focus', function() { timerCounter(10); });
-            let responseBack; // определенная карта с бэкенда
+            let responseBack=113; // определенная карта с бэкенда
             let cells;
 
             let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))
@@ -21,7 +21,6 @@
                 cells = (numbersCards % 2 === 0 ) ? numbersCards+1:numbersCards
             }
             console.log(cells)
-            // const cells = 113
 
             const list = document.querySelector('.list');
 
@@ -57,20 +56,14 @@
 
                 }
             }
-            let rafSeconds = 0;
-            const rafStart = Date.now();
-            const tick = () => { const seconds = (Date.now() - rafStart) / 1000 | 0;
-                if (rafSeconds !== seconds) { // секунды изменились! rafSeconds = seconds; //
-                    // TODO: отрисовать новые секунды
-                      } window.requestAnimationFrame(tick);
-                      }
-                      tick();
-            //генерируем при загрузке страницы первоначальную верстку картинок
             generateItems();
 
             // анимацию прокрутки
             function startRoll() {
                 //докрутка от -49.6% до -50.4%
+                wrapperItems.classList.remove("roulette__rull-wrapper_blur");
+                timerWrapper.style.display = "none";
+                rull_line.style.display = "block";
                 function randomInteger(min, max) {
                     // получить случайное число от (min-0.5) до (max+0.5)
                     let rand = min + Math.random() * (max - min + 1);
@@ -89,10 +82,14 @@
                 list.style.left = '0%'
                 list.style.transform = 'translate3d(-380px, 0, 0)'
                 list.style.transition = '1s cubic-bezier(0.21, 0.53, 0.29, 0.99)'
+                wrapperItems.classList.add("roulette__rull-wrapper_blur");
+                timerWrapper.style.display = "flex";
+
+                rull_line.style.display = "inline-block";
             }
 
             //! Таймер рулетка
-
+            let timerText = document.querySelector(".roulette__rull-timer-text")
             let timerWrapper = document.querySelector(".roulette__rull-timer-wrapper");
             let timerNums = document.querySelector(".roulette__rull-timer");
             let wrapperItems = document.querySelector(".roulette__rull-wrapper");
@@ -106,27 +103,49 @@
             }
 
             // логика счетчика таймера
-            let timerCounter = (back_counter) => {
+            let timerCounter = (back_counter)=>{
+                timerText.innerHTML = `<p class="roulette__rull-timer-text">ПРОКРУТКА</p>`
+                const rafStart = Date.now();
 
+            let timerCounter1 = () => {
+{
+               // blurForTimer()
+            }
                 // стартовое значение таймера
+                let rafSeconds = back_counter*10;
                 let num = back_counter
 
+                const seconds = (rafSeconds - (Date.now() - rafStart) / 100) | 0;
+                let timerShow = seconds/10
+                console.log(seconds)
+                if (seconds<1) {
+
+                    timerNums.innerHTML = ``;
+                    timerText.innerHTML = ``;
+
+                } else {
+
+                    timerNums.innerHTML = `${timerShow.toFixed(1)}`
+                    window.requestAnimationFrame(timerCounter1);
+
+                }
+
                 // происходит отсчет и его отрисовка
-                let intervalTimerRull = setInterval(() => {
-                    if (num.toFixed(1) <= 0.1) {
-                        clearInterval(intervalTimerRull);
-                        // удаляем счетчик после отсчета
-                        wrapperItems.classList.remove("roulette__rull-wrapper_blur");
-                        timerWrapper.style.display = "none";
-                        rull_line.style.display = "block";
-                    } else {
-                        num -= 0.1;
-                        timerNums.innerHTML = num.toFixed(1);
-                    }
-                }, 100);
+                // let intervalTimerRull = setInterval(() => {
+                //     if (num.toFixed(1) <= 0.1) {
+                //         clearInterval(intervalTimerRull);
+                //         // удаляем счетчик после отсчета
+                //         wrapperItems.classList.remove("roulette__rull-wrapper_blur");
+                //         timerWrapper.style.display = "none";
+                //         rull_line.style.display = "block";
+                //     } else {
+                //         num -= 0.1;
+                //         timerNums.innerHTML = num.toFixed(1);
+                //     }
+                // }, 100);
 
                 //добавляем стили счетчика для его отображения при новой прокрутке
-                blurForTimer()
+
 
                 // setTimeout(() => {
                 //     // тут стартует анимация прокрута с задержкой в 20 секунд
@@ -137,6 +156,8 @@
                 //     }, 8000);
                 // }, back_counter*1000)
             }
+            // blurForTimer()
+            timerCounter1()}
 
             //дергаем ф-цию что бы все сработало 1 раз при загрузке, дальше по сет интервалу в 29сек
             // timerCounter()
