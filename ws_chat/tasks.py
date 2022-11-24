@@ -55,6 +55,7 @@ def stop(self):
 def save_as_nested(keys_storage_name: str, dict_key: (str|int), dictionary: dict) -> None:
     """
     Creates a nested structure imitation in redis.
+    
     Args:
         keys_storage_name (str): name of the list where dict_key will be stored;
         dict_key (str|int): name of the key to acces dict;
