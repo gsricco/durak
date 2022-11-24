@@ -88,4 +88,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
-        await tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))
+        tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))

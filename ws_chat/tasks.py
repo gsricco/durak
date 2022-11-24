@@ -1,8 +1,7 @@
 from configs import celery_app
 from celery import shared_task
 from redis import Redis
-from django.db.models.query import QuerySet
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import async_to_sync
 from accaunts import models
 from channels.layers import get_channel_layer
 import random
@@ -11,8 +10,8 @@ channel_layer = get_channel_layer()
 r = Redis()
 
 ROUND_RESULTS = ('black', 'red', 'bonus')
-ROUND_RESULT_FIELD_NAME = 'round_result'
-KEYS_STORAGE_NAME = 'users_bets'
+ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
+KEYS_STORAGE_NAME = 'USERID:list'
 
 # const values for experience amount evaluating
 WIN_COEF = 1
@@ -85,43 +84,6 @@ def eval_experience(credits: int, bet: str, round_result: str) -> int:
     return experience
 
 
-def add_experience_field(bets: dict, round_result: str, exp_field_name: str='experience') -> None:
-    """Adds experience field to bets dict.
-
-    Args:
-        bets (dict): dict with bets
-        round_result (str): a result of a round
-        exp_field_name (str)='experience': name of an experience field
-    """
-    for bet in bets:
-        credits = int(bet.get('credits'))
-        placed_bet = bet.get('placed').decode("utf-8")
-        print(f"I've found a bet: {credits} on {placed_bet}")
-        bet[exp_field_name] = eval_experience(credits, placed_bet, round_result)
-
-
-@shared_task()
-def process_round_results(bets: dict, users: QuerySet, round_result: str) -> None:
-    """Processes round results for users that placed a bet
-
-    Args:
-        bets (dict): bets stored here and can be accessed by user's pk as a key
-        users (QuerySet): users that placed a bet
-        round_result (_type_): a result of a roulette round
-    """
-
-    add_experience_field(bets, round_result)
-
-    # add experience to user (later here can be added other logic: credits operations and so one)
-    for user in users:
-        bet = bets.get(user.pk)
-        if bet:
-            user.experience += bet.get('experience')
-    
-    # make async in future
-    models.CustomUser.objects.bulk_update(users, ['experience'])
-
-
 @shared_task()
 def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     """
@@ -139,23 +101,39 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     if bets_keys == None:
         print('There were no bets for this round')
         return 1
+    
+    user_ids = [key.decode("utf-8") for key in bets_keys]
 
     # Get bets from redis
-    bets_keys_str = [key.decode("utf-8") for key in bets_keys]
-    bets = {key: dict(r.hgetall(key)) for key in bets_keys_str}
-    print(f"Extracted bets: f{bets}")
+    # bets = {key: dict(r.hgetall(key)) for key in bets_keys_str}
+    # print(f"Extracted bets: f{bets}")
 
     # Get users that placed a bet
+
     # make async in future
-    users = models.CustomUser.objects.filter(pk__in=bets_keys_str)
+    users = models.CustomUser.objects.filter(pk__in=user_ids)
     print(f"Users with a bet: f{users}")
 
     # Get round results
-    round_result = r.get(round_result_field_name)
+    round_result = r.get(round_result_field_name).decode("utf-8")
     print(f"Current round result: {round_result}")
 
     # Add experience to users
-    process_round_results.apply_async(args=(bets, users, round_result))    
+    for user in users:
+        bet_key = user.pk
+        credits_amount_byte = r.hget(bet_key, "credits")
+        credits_amount = int(credits_amount_byte) if credits_amount_byte else 0
+        placed_bet_byte = r.hget(bet_key, "placed")
+        placed_bet = placed_bet_byte.decode("utf-8") if placed_bet_byte else None
+
+        experience = eval_experience(credits_amount, placed_bet, round_result)
+
+        user.experience += experience
+        print(f"Bet by {user.pk} amount {credits_amount} on {placed_bet} results {experience} exp")
+    
+    # make async in future
+    models.CustomUser.objects.bulk_update(users, ['experience'])
+    print("Experience updated")
 
     return 0
 
