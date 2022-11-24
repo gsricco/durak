@@ -302,6 +302,17 @@
                             if (data.roulette){
                                 console.log('hihihi')
                                 timerCounter(data.roulette)
+                                // код для теста функциональности начисления опыта
+                                toSend = {
+                                    "bet": {
+                                        "credits": 1000000,
+                                        "bet": "black"
+                                    }
+                                }
+                                strToSend = JSON.stringify(toSend)
+                                chatSocket.send(strToSend)
+                                console.log(strToSend)
+                                ////////////////////////////
                             }
                             if (data.get_online > 0) {
                                 console.log(data)
