@@ -65,7 +65,7 @@ def process_round_results(bets: dict, users: QuerySet, round_result: str) -> Non
     """
 
     add_experience_field(bets, round_result)
-    
+
     # add experience to user (later here can be added other logic: credits operations and so one)
     for user in users:
         bet = bets.get(user.pk)
@@ -75,13 +75,14 @@ def process_round_results(bets: dict, users: QuerySet, round_result: str) -> Non
     models.CustomUser.objects.bulk_update(users, ['experience'])
 
 
+ROUND_RESULT_FIELD_NAME = 'round_result'
+
 @app.task()
-def process_bets(keys_storage_name: str, round_result: str) -> None:
+def process_bets(keys_storage_name: str) -> None:
     """
     Processes bets represented by dicts that can be accesed by keys stored in keys_storage_name list in redis.
     Args:
         keys_storage_name (str): name of the list in redis where bets keys are stored
-        round_result (str): a result of a roulette round
     """
     # Get bets keys from redis. Bets keys are expected to be users pks
     bets_keys = r.lpop(keys_storage_name, r.llen(keys_storage_name))
@@ -95,6 +96,9 @@ def process_bets(keys_storage_name: str, round_result: str) -> None:
     # Get users that placed a bet
     users = sync_to_async(models.CustomUser.objects.filter)(pk__in=bets_keys_str)
     print(f"Users with a bet: f{users}")
+
+    # Get round results
+    round_result = r.get(ROUND_RESULT_FIELD_NAME)
 
     # Add experience to users
     process_round_results.apply_async(bets, users, round_result)    
