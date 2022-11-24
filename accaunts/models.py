@@ -15,6 +15,7 @@ class CustomUser(AbstractUser):
                               default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
 
     def save(self, *args, **kwargs):
@@ -23,12 +24,13 @@ class CustomUser(AbstractUser):
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
-        super().save(*args, **kwargs)
-        if not DetailUser.objects.filter(user=self):
-            if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
+        if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
                 level_1 = Level(level=1, experience_range=NumericRange(0, 600))
                 level_1.save()
-            detail = DetailUser(user=self, level=Level.objects.get(level=1))
+                self.level = level_1
+        super().save(*args, **kwargs)
+        if not DetailUser.objects.filter(user=self):
+            detail = DetailUser(user=self)
             detail.save()
 
     class Meta:
@@ -37,6 +39,33 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def give_level(self, save_immediately: bool=False) -> bool:
+        """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
+
+        Args:
+            save_immediately (bool)=False: сохранять изменения в пользователе в этом методе или нет
+
+        Returns:
+            bool: True если уровень выдан, иначе False
+        """
+        lvl_up = False
+        # give available level
+        while self.experience >= self.level.experience_range.upper:
+            new_levels = Level.objects.filter(level__gt=self.level.level).order_by('level')
+            print(f"Available levels {new_levels}")
+            if new_levels:
+                new_level = new_levels.first()
+                print(f"New level {new_level}")
+                self.level = new_level
+                lvl_up = True
+            else:
+                break
+        
+        if lvl_up and save_immediately:
+            self.save()
+
+        return lvl_up
 
     def user_info(self):
         return f'{self.last_name} {self.first_name}'
@@ -103,7 +132,6 @@ class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Данные пользователя'

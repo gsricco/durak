@@ -130,9 +130,19 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
         user.experience += experience
         print(f"Bet by {user.pk} amount {credits_amount} on {placed_bet} results {experience} exp")
+        if user.give_level():
+            channel_name_byte = r.hget(user.pk, "channel_name")
+            if channel_name_byte:
+                channel_name = channel_name_byte.decode("utf-8")
+                message = {
+                    "type": "send_new_level",
+                    "lvlup": {
+                        "new_lvl": user.level.level,
+                    },
+                }
+                async_to_sync(channel_layer.send)(channel_name, message)
     
-    # make async in future
-    models.CustomUser.objects.bulk_update(users, ['experience'])
+    models.CustomUser.objects.bulk_update(users, ['experience', 'level'])
     print("Experience updated")
 
     return 0

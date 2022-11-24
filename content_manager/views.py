@@ -11,7 +11,7 @@ def index(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=detail_user.level_id)
+        level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -31,7 +31,7 @@ def bonus_currency(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=detail_user.level_id)
+        level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -51,7 +51,7 @@ def contact(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=detail_user.level_id)
+        level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -72,7 +72,7 @@ def faq(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=detail_user.level_id)
+        level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -94,7 +94,7 @@ def honesty(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=detail_user.level_id)
+        level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -127,11 +127,7 @@ def profil(request):
         # print(user_agent, ' - USER AGENT')
         # print(user_ip, ' - IP USER')
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=detail_user.level_id)
-        # if detail_user.experience >= level_data.experience_for_lvl:
-        #     detail_user.lvl_up()
-        #     detail_user = DetailUser.objects.get(user_id=request.user.id)
-        #     level_data = Level.objects.get(pk=detail_user.level_id)
+        level_data = Level.objects.get(pk=request.user.level.pk)
         if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
             social_google = True
         else:

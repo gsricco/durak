@@ -88,4 +88,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
+        bet["channel_name"] = self.channel_name
+        print(type(self.channel_name))
+        print(self.channel_name)
         tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))
+
+    async def send_new_level(self, event):
+        message = dict()
+        message["lvlup"] = event["lvlup"]
+        print("send new level")
+        await self.send(json.dumps(message))

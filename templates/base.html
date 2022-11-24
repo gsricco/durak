@@ -314,6 +314,9 @@
                                 console.log(strToSend)
                                 ////////////////////////////
                             }
+                            if (data.lvlup) {
+                                console.log("You have a new level: " + data.lvlup.new_lvl)
+                            }
                             if (data.get_online > 0) {
                                 console.log(data)
                                 online.innerHTML = `${data.get_online}`
