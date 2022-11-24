@@ -55,7 +55,7 @@ def stop(self):
 def save_as_nested(keys_storage_name: str, dict_key: (str|int), dictionary: dict) -> None:
     """
     Creates a nested structure imitation in redis.
-    
+
     Args:
         keys_storage_name (str): name of the list where dict_key will be stored;
         dict_key (str|int): name of the key to acces dict;
@@ -65,6 +65,7 @@ def save_as_nested(keys_storage_name: str, dict_key: (str|int), dictionary: dict
         pipe.rpush(keys_storage_name, dict_key)
         pipe.hmset(dict_key, dictionary)
         pipe.execute()
+    print(f"Hi from save_as_nested. {r.hgetall(dict_key)}")
 
 
 def eval_experience(credits: int, bet: str, round_result: str) -> int:
@@ -93,8 +94,9 @@ def add_experience_field(bets: dict, round_result: str, exp_field_name: str='exp
         exp_field_name (str)='experience': name of an experience field
     """
     for bet in bets:
-        credits = bet.get('credits')
-        placed_bet = bet.get('placed')
+        credits = int(bet.get('credits'))
+        placed_bet = bet.get('placed').decode("utf-8")
+        print(f"I've found a bet: {credits} on {placed_bet}")
         bet[exp_field_name] = eval_experience(credits, placed_bet, round_result)
 
 
@@ -116,7 +118,8 @@ def process_round_results(bets: dict, users: QuerySet, round_result: str) -> Non
         if bet:
             user.experience += bet.get('experience')
     
-    sync_to_async(models.CustomUser.objects.bulk_update)(users, ['experience'])
+    # make async in future
+    models.CustomUser.objects.bulk_update(users, ['experience'])
 
 
 @shared_task()
@@ -138,16 +141,18 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         return 1
 
     # Get bets from redis
-    bets_keys_str = [str(key) for key in bets_keys]
-    bets = {key: r.hgetall(key) for key in bets_keys_str}
+    bets_keys_str = [key.decode("utf-8") for key in bets_keys]
+    bets = {key: dict(r.hgetall(key)) for key in bets_keys_str}
     print(f"Extracted bets: f{bets}")
 
     # Get users that placed a bet
-    users = sync_to_async(models.CustomUser.objects.filter)(pk__in=bets_keys_str)
+    # make async in future
+    users = models.CustomUser.objects.filter(pk__in=bets_keys_str)
     print(f"Users with a bet: f{users}")
 
     # Get round results
     round_result = r.get(round_result_field_name)
+    print(f"Current round result: {round_result}")
 
     # Add experience to users
     process_round_results.apply_async(args=(bets, users, round_result))    

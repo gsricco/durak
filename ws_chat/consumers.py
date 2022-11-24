@@ -31,10 +31,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif text_data_json.get('bet'):
             # expected to have bet like {"bet": {"credits": 1000, "placed": "black"}}
             user = self.scope.get('user')
-            if user and user.isauthenticated():
+            if user and user.is_authenticated:
                 user_pk = user.pk
                 bet = text_data_json.get('bet')
-                self.save_bet(bet, user_pk)
+                print(f"receive method in consumers.py: Receiving bet from user({user_pk}): {bet}")
+                await self.save_bet(bet, user_pk)
         else:
             message = text_data_json["message"]
             user = text_data_json["user"]
@@ -86,4 +87,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
-        tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))
+        print(f"Saving bet in {storage_name}")
+        await tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))
