@@ -31,11 +31,12 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ('message', 'file_message')
+        ordering = [-1]
 class RoomMessageSerializer(serializers.ModelSerializer):
     user_posted = UserSerializer()
     class Meta:
-        model =  Message
-        fields = ('user_posted','message')
+        model =  UserChatRoom
+        fields = ('message')
 
 
 # class RoomAdminMessageSerializer(serializers.ModelSerializer):
@@ -45,9 +46,11 @@ class RoomMessageSerializer(serializers.ModelSerializer):
 
 class RoomSerializer(serializers.ModelSerializer):
 
-    message = RoomMessageSerializer(many=True)
+    message = MessageGetSerializer(many=True)
     class Meta:
         model = UserChatRoom
         fields = ('room_id','message')
 
-    # admin_message = RoomAdminMessageSerializer(many=True)
+class OnlyRoomSerializer(serializers.Serializer):
+    room_id = serializers.CharField()
+

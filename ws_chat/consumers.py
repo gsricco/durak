@@ -1,25 +1,23 @@
 import json
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.layers import get_channel_layer
 import redis
-
 from accaunts.models import CustomUser
 from support_chat.models import Message, UserChatRoom
-from support_chat.serializers import RoomSerializer
+from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 
-r = redis.Redis()
+r = redis.Redis()  # подключаемся к редису
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    user_reciever = ''
+
     @sync_to_async
     def create_or_get_support_chat_room(self, user):  # получает или создает чат рум
-
-            chat_room, created = UserChatRoom.objects.get_or_create(room_id=user)
-            return chat_room
+        chat_room, created = UserChatRoom.objects.get_or_create(room_id=user)
+        return chat_room
 
     @sync_to_async
-    def save_user_message(self, room, user , message):  # сохраняет сообщение в бд
+    def save_user_message(self, room, user, message):  # сохраняет сообщение в бд
         if user:
             user = CustomUser.objects.get(username=user).pk
             user_mess = Message(user_posted_id=user, message=message)
@@ -28,118 +26,142 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return user_mess
 
     @sync_to_async()
-    def send_json(self, channel, room_name):
+    def get_all_room(self):
         try:
-            room_data = UserChatRoom.objects.get(room_id=room_name)
-            serializer = RoomSerializer(room_data)
-            channel_layer = get_channel_layer()
-            for i in serializer.data.get('message'):
-                async_to_sync(channel_layer.send)(channel, {"type": "chat_message",
-                                                            "chat_type": "support",
-                                                            "message": i['message'],
-                                                            "user": i['user_posted']['username'],
-                                                            })
+            print("отработал get_all_room")
+            rooms = UserChatRoom.objects.all()
+            serializer = OnlyRoomSerializer(rooms, many=True)
+            # print(serializer.data)
+            for i in serializer.data:
+                # print(i['room_id'])# отправляем все сообщения поочереди
+                async_to_sync(self.channel_layer.send)(self.channel_name, {"type": "get_rooms",
+                                                                           "room_name": i['room_id']
+                                                                           })
         except:
-            pass
-    async def connect(self):
-        recieve_user = self.scope["url_route"]["kwargs"]["user"]
-        user = str(self.scope['user'])
-        print(f'Польщователь {user} подключился ')
-        r.set(user,self.channel_name)
-        self.room_name = 'go'  # self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = "chat_%s" % self.room_name
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.accept()
-        await self.send_online(0)
-        if recieve_user == 'go':
-            await self.send_json(self.channel_name, user)
-        else:
-            await self.send_json(self.channel_name,recieve_user)
-
+            print('error get_all_room')
 
     async def send_online(self, num):
+        '''функция отправки онлайна. вызывается при коннекте и дисконнекте'''
         online = self.channel_layer.receive_count + num
         await self.channel_layer.group_send(self.room_group_name, {"type": "get_online", "get_online": online})
 
+    @sync_to_async()
+    def send_json(self, channel, room_name):
+        '''отправка истории сообщений'''
+        try:
+            room_data = UserChatRoom.objects.get(room_id=room_name)  # получаем комнату
+            serializer = RoomSerializer(room_data)  # сериализуем ее
+            for i in serializer.data.get('message'):  # отправляем все сообщения поочереди
+                async_to_sync(self.channel_layer.send)(channel, {"type": "chat_message",
+                                                                 "chat_type": "support",
+                                                                 "message": i['message'],
+                                                                 "user": i['user_posted']['username'],
+                                                                 })
+        except:
+            pass
+
+    async def send_support_chat_message(self, channel_name, message, user):
+        '''Отправка сообщения в суппорт чат . Аргументы channel_name,message,user '''
+        await self.channel_layer.send(
+            channel_name, {"type": "chat_message",
+                           "chat_type": "support",
+                           "message": message,
+                           "user": user, })
+
+    async def connect(self):
+        '''Подключение юзеров'''
+        recieve_user = str(self.scope["url_route"]["kwargs"][
+                               "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
+        print(recieve_user, '------->>>connect', 'чью историю подкгружаем в админку')
+        user = str(self.scope['user'])  # получаем имя пользователя который подключился с фронта
+        r.set(user, self.channel_name)  # записываем в редис имя и channel_name подключенного юзера
+        self.room_name = 'go'  # задаем статический румнейм для общего чата
+        self.room_group_name = "chat_%s" % self.room_name  # формируем рум груп нейм
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
+        await self.accept()  # подтверждение
+        await self.send_online(0)  # отправляем количество вебсокет подключений на фронт
+        if recieve_user == 'go':  # проверка подключение из админки или нет .'go' - это не админка
+            await self.send_json(self.channel_name, user)  # выгружает свою историю чата в суппорт чат
+        else:
+            print('это админка')
+            await self.get_all_room()
+            await self.send_json(self.channel_name, recieve_user)  # выгружает выбранную историю в админ чат
+
     async def disconnect(self, code):
-        r.delete(str(self.scope['user']))
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        await self.send_online(-1)
+        '''отключение пользователя'''
+        r.delete(str(self.scope['user']))  # удаляет запись об юзере из редиса при отключении
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # убирает юзера из группы
+        await self.send_online(-1)  # отправляет онлайн
 
     async def receive(self, text_data=None, bytes_data=None):
-        text_data_json = json.loads(text_data)
-        if text_data_json.get('chat_type') == 'support':
-            room = await self.create_or_get_support_chat_room(text_data_json.get('user'))
-            await self.save_user_message(room,str(self.scope['user']), text_data_json["message"])
-            await self.channel_layer.send(
-                self.channel_name, {"type": "chat_message",
-                                       "chat_type": "support",
-                                       "message": text_data_json["message"],
-                                       "user": text_data_json["user"], })
-            byte_user_channel_name = r.get('admin')
-            user_channel_name = bytes.decode(byte_user_channel_name, encoding='utf-8')
 
-            await self.channel_layer.send(
-                user_channel_name, {"type": "chat_message",
-                                       "chat_type": "support",
-                                       "message": text_data_json["message"],
-                                       "user": text_data_json["user"], })
+        '''первичное получение и обработка сообщений'''
+        text_data_json = json.loads(text_data)  # десериализует json
+        print(text_data_json, '------------json support_admin')
+        if text_data_json.get('chat_type') == 'support':  # проверяет пришло ли сообщение из support чата
+            room = await self.create_or_get_support_chat_room(
+                text_data_json.get('user'))  # получает или создает рум в бд
+            await self.save_user_message(room, str(self.scope['user']),
+                                         text_data_json["message"])  # сохранении сообщение в полученой комнате
+            byte_user_channel_name = r.get('admin')  # проверяем есть ли дамин в онлайне(НУЖНО ДОДЕЛАТЬ)
+            user_channel_name = bytes.decode(byte_user_channel_name, encoding='utf-8')  # получаем channel_name админа
+            await self.send_support_chat_message(self.channel_name, text_data_json["message"], text_data_json[
+                "user"])  # отправляем сообщение из супорт чата на сайте себе
+            await self.send_support_chat_message(user_channel_name, text_data_json["message"],
+                                                 text_data_json["user"])  # отправляем сообщение из супорт чата админу
+
         elif text_data_json.get('chat_type') == 'all_chat':
-            message = text_data_json["message"]
-            user = text_data_json["user"]
-            avatar = text_data_json["avatar"]
-            rubin = text_data_json.get("rubin")
-            chat_type = text_data_json.get('chat_type')
+            '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем'''
             await self.channel_layer.group_send(
                 self.room_group_name, {"type": "chat_message",
-                                       "chat_type": chat_type,
-                                       "message": message,
-                                       "user": user,
-                                       "avatar": avatar,
-                                       "rubin": rubin,
+                                       "chat_type": text_data_json.get('chat_type'),
+                                       "message": text_data_json["message"],
+                                       "user": text_data_json["user"],
+                                       "avatar": text_data_json["avatar"],
+                                       "rubin": text_data_json.get("rubin"),
                                        })
+
         elif text_data_json.get('chat_type') == 'support_admin':
-            byte_user_channel_name = r.get(text_data_json.get('user_receiver'))
-            user_channel_name = bytes.decode(byte_user_channel_name,encoding='utf-8')
-            if user_channel_name:
-                user = text_data_json.get('user_receiver')
-                self.user_reciever = user
-                room = await self.create_or_get_support_chat_room(user)
-                await self.save_user_message(room , user, text_data_json['message'])
-                print(self.scope['user'],'наш юзер')
-                await self.channel_layer.send(
-                    user_channel_name, {"type": "chat_message",
-                                        "chat_type": "support",
-                                        "message": text_data_json["message"],
-                                        "user": str(self.scope['user']) })
+            '''Получем сообщение от админа из админки'''
 
-                await self.channel_layer.send(
-                    self.channel_name, {"type": "chat_message",
-                                        "chat_type": "support",
-                                        "message": text_data_json["message"],
-                                        "user": str(self.scope['user'])})
-
+            receive_user = self.scope["url_route"]["kwargs"]["user"]
+            print(receive_user, '-------support_admin', 'получатель')
+            sender_user = str(self.scope['user'])
+            print(sender_user, '-----------support_admin', 'отправитель')
+            byte_user_channel_name = r.get(receive_user)  # получаем channel_name юзера из редиса в виде байт строки
+            user_channel_name = bytes.decode(byte_user_channel_name,
+                                             encoding='utf-8')  # преобразуем байт channel_name в строку
+            print(user_channel_name, '--------support_chat user_channel_name')
+            print(self.channel_name, '--------support_chat self.channel_name')
+            room = await self.create_or_get_support_chat_room(receive_user)  # получаем комнату с сообщениями
+            await self.save_user_message(room, sender_user,
+                                         text_data_json["message"])  # сохранении сообщение админа в бд
+            await self.send_support_chat_message(user_channel_name, text_data_json["message"],
+                                                 sender_user)  # отправка сообщения пользователю из админку
+            await self.send_support_chat_message(self.channel_name, text_data_json["message"],
+                                                 sender_user)  # отправка сообщения самому себе в админку
 
     async def get_online(self, event):
-        # print(event['get_online'])
         online = event['get_online']
         await self.send(text_data=json.dumps({
             "get_online": online
         }))
 
+    async def get_rooms(self, event):
+        room_name = event.get('room_name')
+        await self.send(text_data=json.dumps({
+            "room_name": room_name
+        }))
+
     async def chat_message(self, event):
-        # print(event, 'Это event')
         chat_type = event.get('chat_type')
-        # print(chat_type)
         user = event.get('user')
         message = event.get("message")
         avatar = event.get("avatar")
         rubin = event.get("rubin")
-        # online = event.get("online")
         await self.send(text_data=json.dumps({"message": message,
                                               "chat_type": chat_type,
                                               "user": user,
                                               "avatar": avatar,
                                               "rubin": rubin,
-                                              # "online": online
                                               }))

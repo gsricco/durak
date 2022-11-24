@@ -7,5 +7,5 @@ from .models import Message, UserChatRoom
 
 @admin.register(UserChatRoom)
 class UserChatRoomAdmin(admin.ModelAdmin):
-    change_list_template = 'admin/admin_chat.html'
+    change_list_template = 'admin/admin_main_chat.html'
     # inlines = [MessageInLine]
