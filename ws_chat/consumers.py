@@ -79,12 +79,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event.get("message")
         avatar = event.get("avatar")
         rubin = event.get("rubin")
-        # online = event.get("online")
         await self.send(text_data=json.dumps({"message": message,
                                               "user": user,
                                               "avatar": avatar,
                                               "rubin": rubin,
-                                              # "online": online
                                               }))
 # начинает отсчёт
     async def korney_task(self, event):
