@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
 from django.contrib.postgres.constraints import ExclusionConstraint
 from psycopg2.extras import NumericRange
+from caseapp.models import OwnedCase
 
 
 class CustomUser(AbstractUser):
@@ -47,9 +48,10 @@ class CustomUser(AbstractUser):
             save_immediately (bool)=False: сохранять изменения в пользователе в этом методе или нет
 
         Returns:
-            list: список с выданными за уровень наградами
+            list: список с выданными за уровень наградами (если выданы)
         """
         rewards = []
+        level_changed = False
         # give available level
         while self.experience >= self.level.experience_range.upper:
             new_levels = Level.objects.filter(level__gt=self.level.level).order_by('level')
@@ -60,15 +62,22 @@ class CustomUser(AbstractUser):
                 new_level = new_levels.first()
                 print(f"New level {new_level}")
                 self.level = new_level
+                level_changed = True
 
-                # находит награду за уровень 
-                
+                # выдаёт награду за уровень 
+                # если за уровень выдаётся кейс
+                if self.level.case:
+                    # создаются экземпляры OwnedCase для хранения начисленных кейсов
+                    for _ in range(self.level.amount):
+                        new_reward = OwnedCase(case=self.level.case, owner=self)
+                        rewards.append(new_reward)
             else:
                 break
         
-        if rewards and save_immediately:
+        if level_changed and save_immediately:
             self.save()
-
+            if rewards:
+                OwnedCase.objects.bulk_create(rewards)
         return rewards
 
     def user_info(self):
@@ -115,7 +124,7 @@ class Level(models.Model):
     image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
     
     case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
-    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=1)
+    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
 
     def __str__(self):
         return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
