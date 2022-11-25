@@ -29,6 +29,8 @@ class CustomUser(AbstractUser):
                 level_1 = Level(level=1, experience_range=NumericRange(0, 600))
                 level_1.save()
                 self.level = level_1
+        if self.level is None:
+            self.level = Level.objects.get(experience_range__contains=NumericRange(self.experience, self.experience+1))
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self):
             detail = DetailUser(user=self)
@@ -120,7 +122,7 @@ class UserIP(models.Model):
 class Level(models.Model):
     """Модель уровня игрока"""
     level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
-    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня')
+    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
     image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
     
     case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)

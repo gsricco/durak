@@ -17,7 +17,7 @@ KEYS_STORAGE_NAME = 'USERID:list'
 # const values for experience amount evaluating
 WIN_COEF = 1
 LOSE_COEF = 1
-CREDITS_TO_EXP_COEF = 1000 
+CREDITS_TO_EXP_COEF = 1000
 
 
 @shared_task(bind=True)
@@ -37,16 +37,29 @@ def sender(self):
 @shared_task
 def debug_task():
     sender.apply_async()
+    roll.apply_async(countdown=20)
     stop.apply_async(countdown=20)
+    go_back.apply_async(countdown=28)
     generate_round_result.apply_async(countdown=20, args=(True,))
 
+@shared_task
+def roll():
+    async_to_sync(channel_layer.group_send)('chat_go',
+                                            {
+                                                'type': 'rolling',
+                                            })
+@shared_task
+def go_back():
+    async_to_sync(channel_layer.group_send)('chat_go',
+                                            {
+                                                'type': 'go_back',
+                                            })
 
 @shared_task(bind=True)
 def stop(self):
-    print(self)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
-                                                'type':'stopper',
+                                                'type': 'stopper',
 
                                             })
 
@@ -99,10 +112,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     # Get bets keys from redis. Bets keys are expected to be users pks
     bets_keys = r.lpop(keys_storage_name, r.llen(keys_storage_name))
     print(f"Extracted keys: f{bets_keys}")
-    if bets_keys == None:
+    if bets_keys is None:
         print('There were no bets for this round')
         return 1
-    
     user_ids = [key.decode("utf-8") for key in bets_keys]
 
     # Get bets from redis
@@ -118,8 +130,8 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     # Get round results
     round_result = r.get(round_result_field_name).decode("utf-8")
     print(f"Current round result: {round_result}")
-    
-    # список с наградами пользователей за новые уровни - 
+
+    # список с наградами пользователей за новые уровни -
     # после обработки всех ставок награды сохранятся в БД через bulk_create
     users_rewards = []
     # обработка ставок для каждого пользователя
@@ -141,7 +153,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # запоминает номер предыдущего уровня
         prev_level = user.level.level
 
-        # после получения опыта пробует начислить пользователю уровни 
+        # после получения опыта пробует начислить пользователю уровни
         rewards_for_level = user.give_level()
 
         # если уровень пользоватея изменился
@@ -158,11 +170,11 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                     },
                 }
                 async_to_sync(channel_layer.send)(channel_name, message)
-            
+
             # проверяет награды пользователя за новый уровень
             if rewards_for_level:
                 # добавляет награды в список с наградами других пользователей
-                # для дальнейшего сохранения в БД 
+                # для дальнейшего сохранения в БД
                 users_rewards.extend(rewards_for_level)
                 print(f"Rewards was given: {users_rewards}")
 
@@ -177,7 +189,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                     }
                     async_to_sync(channel_layer.send)(channel_name, message)
 
-    
+
     updated = models.CustomUser.objects.bulk_update(users, ['experience', 'level'])
     print(f"Experience updated for {updated} users")
     if users_rewards:
@@ -203,7 +215,7 @@ def generate_round_result(process_after_generating: bool=False) -> int:
 
     if process_after_generating:
         process_bets.apply_async(args=(KEYS_STORAGE_NAME, ROUND_RESULT_FIELD_NAME,))
-    
+
     return 0
 
 

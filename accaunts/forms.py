@@ -23,7 +23,7 @@ class LevelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(LevelForm, self).__init__(*args, **kwargs)
 
-        if self.initial.get('level') == '':
+        if self.initial.get('level') == '' or self.initial.get('level') is None:
 
             last_level = Level.objects.aggregate(Max('level'))
             init_level = 1
