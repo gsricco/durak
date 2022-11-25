@@ -49,7 +49,7 @@ const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
     let bidCount = document.querySelector('.roulette__table-input').value * 1000;
     if (is_auth && bidCount) {
-
+        // console.log(cells)
         if (balanceUser > Number(bidCount)) {
             chatSocket.send(JSON.stringify({
                 'bidCount': bidCount,
