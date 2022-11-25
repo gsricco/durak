@@ -215,7 +215,12 @@
                               {##}
                               {#    postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})#}
                               {#    inputValue.value = ''#}
-
+                            inputValue.focus();
+                            inputValue.onkeyup = function (e) {
+                            if (e.keyCode === 13) {  // enter, return
+                                sendBtn.click();
+                            }
+                        };
                             sendBtn.addEventListener('click', () =>{
 
                             if (is_auth === true) {

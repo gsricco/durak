@@ -1,8 +1,6 @@
         const media_prefix = JSON.parse(document.getElementById('media_prefix').textContent);
         const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
     const createBidItemRow = (data) => {
-        console.log(media_prefix)
-        console.log(static_prefix)
             console.log(data)
             const bidItemBlock = document.querySelector(`.${data.bidCard}`)
 

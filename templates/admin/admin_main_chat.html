@@ -1,4 +1,6 @@
+{% extends "admin/base_site.html" %}
 {% load static %}
+{% block content %}
 <link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
 <link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}"/>
 <link rel="stylesheet" href="{% static 'css/admin_support_chat.css' %}">
@@ -47,7 +49,6 @@
     const sendBtn = document.querySelector('.support__input-block-arrow')
     let inputValue = document.querySelector('.support__chat-input')
     const chatBlock = document.querySelector('.support__chat-block')
-
     const newUserMessage = (message, user) => {
         const li = document.createElement('li')
         li.className = 'support__chat-message support__chat-message_your'
@@ -63,7 +64,6 @@
         div.appendChild(span)
 
     }
-
     const start_ws = (room_id = 'admin') => {
 
 
@@ -105,7 +105,13 @@
         })
         div.appendChild(room)
 
-    }
+    };
+    inputValue.focus();
+                        inputValue.onkeyup = function (e) {
+                            if (e.keyCode === 13) {  // enter, return
+                                sendBtn.click();
+                            }
+                        };
     sendBtn.addEventListener('click', () => {
         chatS.send(JSON.stringify({
             'chat_type': 'support_admin',
@@ -117,5 +123,5 @@
 
 
 </script>
-
+{% endblock %}
 
