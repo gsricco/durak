@@ -4,6 +4,9 @@ from urllib.request import urlopen
 from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
+from django.contrib.postgres.constraints import ExclusionConstraint
+from psycopg2.extras import NumericRange
 
 
 class CustomUser(AbstractUser):
@@ -12,6 +15,8 @@ class CustomUser(AbstractUser):
                               default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
+    experience = models.IntegerField(verbose_name="Опыт", default=0)
 
     def save(self, *args, **kwargs):
         if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
@@ -19,12 +24,13 @@ class CustomUser(AbstractUser):
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
+        if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
+                level_1 = Level(level=1, experience_range=NumericRange(0, 600))
+                level_1.save()
+                self.level = level_1
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self):
-            if not Level.objects.exists():  # создание первого лвл при регистрации первого пользователя
-                level_1 = Level(level=1, experience_for_lvl=600)
-                level_1.save()
-            detail = DetailUser(user=self, level=Level.objects.get(level=1))
+            detail = DetailUser(user=self)
             detail.save()
 
     class Meta:
@@ -33,6 +39,33 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def give_level(self, save_immediately: bool=False) -> bool:
+        """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
+
+        Args:
+            save_immediately (bool)=False: сохранять изменения в пользователе в этом методе или нет
+
+        Returns:
+            bool: True если уровень выдан, иначе False
+        """
+        lvl_up = False
+        # give available level
+        while self.experience >= self.level.experience_range.upper:
+            new_levels = Level.objects.filter(level__gt=self.level.level).order_by('level')
+            print(f"Available levels {new_levels}")
+            if new_levels:
+                new_level = new_levels.first()
+                print(f"New level {new_level}")
+                self.level = new_level
+                lvl_up = True
+            else:
+                break
+        
+        if lvl_up and save_immediately:
+            self.save()
+
+        return lvl_up
 
     def user_info(self):
         return f'{self.last_name} {self.first_name}'
@@ -72,25 +105,33 @@ class UserIP(models.Model):
 
 
 class Level(models.Model):
-    """Модель уровней пользователей"""
-    level = models.PositiveIntegerField(verbose_name='Уровень', unique=True)
-    experience_for_lvl = models.IntegerField(verbose_name='Количество опыта до следующего уровня')
-    image = models.ImageField(verbose_name='Аватар', upload_to='img/level/', blank=True, null=True)
-
-    class Meta:
-        verbose_name = 'Уровни в игре'
-        verbose_name_plural = 'Уровни в игре'
+    """Модель уровня игрока"""
+    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
+    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня')
+    image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
 
     def __str__(self):
-        return f'{self.level}'
+        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
+
+    class Meta:
+        # constraints = [
+        #     ExclusionConstraint(
+        #         name='exclude_overlapped_levels',
+        #         expressions=[
+        #             ('experience_range', RangeOperators.OVERLAPS),
+        #         ],
+        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
+        #     ),
+        # ]
+        ordering = ['-level']
+        verbose_name = 'Уровень в игре'
+        verbose_name_plural = 'Уровни в игре'
 
 
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
-    experience = models.IntegerField(verbose_name="Опыт", default=0)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Данные пользователя'

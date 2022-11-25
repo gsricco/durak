@@ -8,6 +8,8 @@ from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 
 r = redis.Redis()  # подключаемся к редису
 
+from . import tasks
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
@@ -111,6 +113,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "bid": text_data_json,
                 }
             )
+        if text_data_json.get('bet'):
+            # expected to have bet like {"bet": {"credits": 1000, "placed": "black"}}
+            user = self.scope.get('user')
+            if user and user.is_authenticated:
+                user_pk = user.pk
+                bet = text_data_json.get('bet')
+                print(f"receive method in consumers.py: Receiving bet from user({user_pk}): {bet}")
+                await self.save_bet(bet, user_pk)
         if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
             message = text_data_json.get("message")
             user = text_data_json["user"]
@@ -205,7 +215,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def stopper(self, event):
-        print(event)
         await self.send(text_data=json.dumps({
             "stop": "stopping",
         }))
@@ -221,3 +230,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "bid": data,
         }))
+
+    async def save_bet(self, bet, user_pk):
+        storage_name = tasks.KEYS_STORAGE_NAME
+        print(f"Saving bet in {storage_name}")
+        bet["channel_name"] = self.channel_name
+        print(type(self.channel_name))
+        print(self.channel_name)
+        tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))
+
+    async def send_new_level(self, event):
+        message = dict()
+        message["lvlup"] = event["lvlup"]
+        print("send new level")
+        await self.send(json.dumps(message))
