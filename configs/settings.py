@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'social_django',
-    'rest_framework',
-    'drf_yasg',
 
     'accaunts',
     'start_all_template',

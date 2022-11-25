@@ -7,9 +7,9 @@ class Item(models.Model):
     """
     name = models.CharField(verbose_name='Название', max_length=255)
     image = models.ImageField(verbose_name='Изображение', upload_to='items')
-    selling_price = models.IntegerField(verbose_name='Цена продажи')
-    chance_price = models.IntegerField(verbose_name='Цена для расчёта шансов')
-    is_money = models.BooleanField(verbose_name='Предмет является кредитами')
+    selling_price = models.PositiveIntegerField(verbose_name='Цена продажи', default=0)
+    chance_price = models.PositiveIntegerField(verbose_name='Цена для расчёта шансов', default=0)
+    is_money = models.BooleanField(verbose_name='Предмет является кредитами', default=False)
 
     def __str__(self):
         return self.name
@@ -24,8 +24,8 @@ class Grade(models.Model):
     Model represents grade of a case
     """
     name = models.CharField(verbose_name='Название', max_length=255)
-    image = models.ImageField(verbose_name='Изображение', upload_to='grades', null=True, blank=True)
-    min_lvl = models.IntegerField(verbose_name='Минимальный уровень')
+    image = models.ImageField(verbose_name='Изображение', upload_to='grades/img/', null=True, blank=True)
+    min_lvl = models.PositiveIntegerField(verbose_name='Минимальный уровень')
 
     def __str__(self):
         return self.name
@@ -41,7 +41,7 @@ class Case(models.Model):
     """
     name = models.CharField(verbose_name='Название', max_length=255)
     grade = models.ForeignKey('Grade', verbose_name='Качество', on_delete=models.PROTECT)
-    avg_win = models.IntegerField(verbose_name='Средний выигрыш')
+    avg_win = models.PositiveIntegerField(verbose_name='Средний выигрыш')
 
     def __str__(self):
         return self.name
@@ -72,9 +72,9 @@ class OwnedCase(models.Model):
     """
     Model stores information about users cases
     """
-    case = models.ForeignKey('Case', verbose_name='Кейс', on_delete=models.CASCADE)
+    case = models.ForeignKey('Case', verbose_name='Кейс', on_delete=models.PROTECT)
 
-    owner = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    owner = models.ForeignKey('accaunts.CustomUser', on_delete=models.PROTECT)
 
     date_owned = models.DateTimeField(verbose_name='Дата получения', auto_now_add=True)
     date_opened = models.DateTimeField(verbose_name='Дата открытия', null=True, blank=True)
