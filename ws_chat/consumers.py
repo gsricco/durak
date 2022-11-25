@@ -75,6 +75,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "get_online": online
         }))
     async def chat_message(self, event):
+        print('chat-message')
         user = event.get('user')
         message = event.get("message")
         avatar = event.get("avatar")
