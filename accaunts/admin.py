@@ -95,7 +95,13 @@ class LevelAdmin(admin.ModelAdmin):
 
     @admin.display(description='Опыт до следующего уровня')
     def experience_for_lvl(self, obj):
-        return obj.experience_range.upper - obj.experience_range.lower
+        # проверка на непустые значения диапазона опыта
+        upper = obj.experience_range.upper if obj.experience_range.upper else 0
+        lower = obj.experience_range.lower if obj.experience_range.lower else 0
+        
+        difference = upper - lower
+
+        return difference
 
     def preview(self, obj):
         if obj.image:
