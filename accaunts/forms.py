@@ -94,6 +94,6 @@ class LevelForm(forms.ModelForm):
 
     class Meta:
         model = Level
-        fields = ['level', 'experience_range', 'experience_to_add', 'image']
+        fields = ['level', 'experience_range', 'experience_to_add', 'case', 'amount', 'image',]
 
     

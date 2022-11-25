@@ -40,32 +40,36 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def give_level(self, save_immediately: bool=False) -> bool:
+    def give_level(self, save_immediately: bool=False) -> list:
         """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
 
         Args:
             save_immediately (bool)=False: сохранять изменения в пользователе в этом методе или нет
 
         Returns:
-            bool: True если уровень выдан, иначе False
+            list: список с выданными за уровень наградами
         """
-        lvl_up = False
+        rewards = []
         # give available level
         while self.experience >= self.level.experience_range.upper:
             new_levels = Level.objects.filter(level__gt=self.level.level).order_by('level')
             print(f"Available levels {new_levels}")
+            # если есть доступные уровни
             if new_levels:
+                # связывает новый уровень с пользователем (не сохраняет в БД)
                 new_level = new_levels.first()
                 print(f"New level {new_level}")
                 self.level = new_level
-                lvl_up = True
+
+                # находит награду за уровень 
+                
             else:
                 break
         
-        if lvl_up and save_immediately:
+        if rewards and save_immediately:
             self.save()
 
-        return lvl_up
+        return rewards
 
     def user_info(self):
         return f'{self.last_name} {self.first_name}'
@@ -109,6 +113,9 @@ class Level(models.Model):
     level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
     experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня')
     image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
+    
+    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=1)
 
     def __str__(self):
         return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
