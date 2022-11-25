@@ -240,7 +240,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         tasks.save_as_nested.apply_async(args=(storage_name, user_pk, bet))
 
     async def send_new_level(self, event):
+        """Отправляет по каналу сообщение о новом уровне"""
         message = dict()
-        message["lvlup"] = event["lvlup"]
+        message["lvlup"] = event.get("lvlup")
         print("send new level")
+        await self.send(json.dumps(message))
+
+    async def send_rewards(self, event):
+        """Отправляет по каналу сообщение о начисленных наградах"""
+        message = dict()
+        message["rewards"] = event.get("rewards")
+        print("send reward")
         await self.send(json.dumps(message))

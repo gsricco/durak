@@ -3,6 +3,7 @@ from celery import shared_task
 from redis import Redis
 from asgiref.sync import async_to_sync
 from accaunts import models
+from caseapp.models import OwnedCase
 from channels.layers import get_channel_layer
 import random
 
@@ -117,20 +118,35 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     # Get round results
     round_result = r.get(round_result_field_name).decode("utf-8")
     print(f"Current round result: {round_result}")
-
-    # Add experience to users
+    
+    # список с наградами пользователей за новые уровни - 
+    # после обработки всех ставок награды сохранятся в БД через bulk_create
+    users_rewards = []
+    # обработка ставок для каждого пользователя
     for user in users:
+        # получение информации о ставке пользователя
         bet_key = user.pk
         credits_amount_byte = r.hget(bet_key, "credits")
         credits_amount = int(credits_amount_byte) if credits_amount_byte else 0
         placed_bet_byte = r.hget(bet_key, "placed")
         placed_bet = placed_bet_byte.decode("utf-8") if placed_bet_byte else None
 
+        # расчёт количества начисляемого опыта
         experience = eval_experience(credits_amount, placed_bet, round_result)
 
+        # добавление опыта пользователю (без сохранения в БД)
         user.experience += experience
         print(f"Bet by {user.pk} amount {credits_amount} on {placed_bet} results {experience} exp")
-        if user.give_level():
+
+        # запоминает номер предыдущего уровня
+        prev_level = user.level.level
+
+        # после получения опыта пробует начислить пользователю уровни 
+        rewards_for_level = user.give_level()
+
+        # если уровень пользоватея изменился
+        if prev_level != user.level.level:
+            # находим канал с пользователем и отправляем ему сообщение о новом уровне
             channel_name_byte = r.hget(user.pk, "channel_name")
             if channel_name_byte:
                 channel_name = channel_name_byte.decode("utf-8")
@@ -138,12 +154,35 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                     "type": "send_new_level",
                     "lvlup": {
                         "new_lvl": user.level.level,
+                        "levels": user.level.level - prev_level,
                     },
                 }
                 async_to_sync(channel_layer.send)(channel_name, message)
+            
+            # проверяет награды пользователя за новый уровень
+            if rewards_for_level:
+                # добавляет награды в список с наградами других пользователей
+                # для дальнейшего сохранения в БД 
+                users_rewards.extend(rewards_for_level)
+                print(f"Rewards was given: {users_rewards}")
+
+                # отправляем пользователю сообщение о доступных наградах
+                if channel_name_byte:
+                    channel_name = channel_name_byte.decode("utf-8")
+                    message = {
+                        "type": "send_rewards",
+                        "rewards": {
+                            "cases": {"amount": len(users_rewards)},
+                        },
+                    }
+                    async_to_sync(channel_layer.send)(channel_name, message)
+
     
-    models.CustomUser.objects.bulk_update(users, ['experience', 'level'])
-    print("Experience updated")
+    updated = models.CustomUser.objects.bulk_update(users, ['experience', 'level'])
+    print(f"Experience updated for {updated} users")
+    if users_rewards:
+        granted = OwnedCase.objects.bulk_create(users_rewards)
+        print(f"Rewards granted:{granted}")
 
     return 0
 

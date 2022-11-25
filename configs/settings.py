@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'django_celery_results',
     'ckeditor',
     'ckeditor_uploader',
-
     'social_django',
 
     'accaunts',
@@ -56,6 +55,7 @@ INSTALLED_APPS = [
     'content_manager',
     'support_chat',
     'api_router',
+    'caseapp',
 ]
 
 MIDDLEWARE = [

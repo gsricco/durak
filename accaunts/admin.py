@@ -68,6 +68,12 @@ class CustomUserAdmin(UserAdmin):
     def preview(self, obj):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')
 
+    # переопределение сохранения модели для выдачи новых уровней и наград при 
+    # изменении опыта пользователя через админку
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        obj.give_level(save_immediately=True)
+
     preview.short_description = 'Аватар'
 
 
@@ -89,7 +95,13 @@ class LevelAdmin(admin.ModelAdmin):
 
     @admin.display(description='Опыт до следующего уровня')
     def experience_for_lvl(self, obj):
-        return obj.experience_range.upper - obj.experience_range.lower
+        # проверка на непустые значения диапазона опыта
+        upper = obj.experience_range.upper if obj.experience_range.upper else 0
+        lower = obj.experience_range.lower if obj.experience_range.lower else 0
+        
+        difference = upper - lower
+
+        return difference
 
     def preview(self, obj):
         if obj.image:

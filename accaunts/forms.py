@@ -23,7 +23,7 @@ class LevelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(LevelForm, self).__init__(*args, **kwargs)
 
-        if not self.initial.get('level'):
+        if self.initial.get('level') == '':
 
             last_level = Level.objects.aggregate(Max('level'))
             init_level = 1
@@ -34,21 +34,33 @@ class LevelForm(forms.ModelForm):
                 last_range = Level.objects.get(level=last_level_val)
 
                 init_level = last_level_val + 1
+                upper = last_range.experience_range.upper if last_range.experience_range.upper else 0
                 init_range = NumericRange(
-                    last_range.experience_range.upper, 
-                    last_range.experience_range.upper + 1000
+                    upper, 
+                    upper + 1000
                 )
 
             self.initial['level'] = init_level
             self.initial['experience_range'] = init_range
+        elif self.initial.get('level') == 0:
+            if not self.initial['experience_range']:
+                init_range = NumericRange(
+                    0, 
+                    0
+                )
+                self.initial['experience_range'] = init_range
+            
+
 
     def save(self, commit=True):
         super().save(commit)
         experience_to_add = self.cleaned_data.get('experience_to_add', 0)
         if experience_to_add != 0:
+            lower = self.instance.experience_range.lower if self.instance.experience_range.lower else 0
+            upper = self.instance.experience_range.upper if self.instance.experience_range.upper else 0
             new_experience_range = NumericRange(
-                self.instance.experience_range.lower, 
-                self.instance.experience_range.upper + experience_to_add
+                lower, 
+                upper + experience_to_add
             )
 
             if new_experience_range.lower >= new_experience_range.upper:
@@ -94,6 +106,6 @@ class LevelForm(forms.ModelForm):
 
     class Meta:
         model = Level
-        fields = ['level', 'experience_range', 'experience_to_add', 'image']
+        fields = ['level', 'experience_range', 'experience_to_add', 'case', 'amount', 'image',]
 
     
