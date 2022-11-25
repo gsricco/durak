@@ -13,7 +13,7 @@
                 <div class="roulette__rull-timer-wrapper">
                     <div class="roulette__rull-timer-block">
                         <p class="roulette__rull-timer-text">ПРОКРУТКА</p>
-                        <span class="roulette__rull-timer">18.5с</span>
+                        <span class="roulette__rull-timer">20с</span>
                     </div>
 
                 </div>
@@ -272,5 +272,5 @@
     {{ media_prefix|json_script:'media_prefix' }}
     {{ static_prefix|json_script:'static_prefix' }}
     <script type="text/javascript" src="{% static 'js/roulette_bids.js'%}"></script>
-
+<script src="{% static 'js/roulette.js' %}"></script>
 {% endblock %}

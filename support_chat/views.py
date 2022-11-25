@@ -4,8 +4,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from accaunts.models import CustomUser
-from .models import Message
-from .serializers import MessageGetSerializer, MessageCreateSerializer
+from .models import Message, UserChatRoom
+from .serializers import MessageGetSerializer, MessageCreateSerializer, RoomSerializer
 
 
 class MessageViewSet(viewsets.ViewSet):
@@ -13,7 +13,7 @@ class MessageViewSet(viewsets.ViewSet):
     def list(self, request):
         """Список всех сообщений авторизованного пользователя"""
         user = request.user
-        queryset = Message.objects.filter(Q(user_posted=user) | Q(user_received=user))
+        queryset = Message.objects.filter(user_posted=user)
         serializer = MessageGetSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -21,7 +21,7 @@ class MessageViewSet(viewsets.ViewSet):
         """Выборка всех сообщений по конкретному пользователю"""
         user = CustomUser.objects.all()
         user = get_object_or_404(user, username=pk)
-        data = Message.objects.filter(Q(user_posted=user.id) | Q(user_received=user.id))
+        data = Message.objects.filter(user_posted=user.id)
         serializer = MessageGetSerializer(data, many=True)
         return Response(serializer.data)
 
@@ -41,3 +41,8 @@ class MessageViewSet(viewsets.ViewSet):
         serializer.save()
         return Response(status=200)
 
+class RoomViewSet(viewsets.ViewSet):
+    def retrieve(self,request,pk=None):
+        room = get_object_or_404(UserChatRoom, room_id=pk)
+        serializer = RoomSerializer(room)
+        return Response(serializer.data)

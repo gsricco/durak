@@ -167,53 +167,75 @@
                             </div>
 
                             <script>
+
                               const sendBtn = document.querySelector('.support__input-block-arrow')
                               let inputValue = document.querySelector('.support__chat-input')
                               const chatBlock = document.querySelector('.support__chat-block')
-                              const blockMessage = (messageArray) => {
-                                  chatBlock.innerHTML = ''
-                                  messageArray = messageArray.reverse()
-                                  messageArray.map(el => {
-                                      newUserMessage(el)
-                                  })
-                                  console.log(messageArray)
-                              }
-                              const newUserMessage = (message, avatar, file) => {
-                                  const li = document.createElement('li')
-                                  li.className = 'support__chat-message support__chat-message_your'
-                                  chatBlock.appendChild(li)
-                                  const div = document.createElement('div')
-                                  div.className = 'support__chat-message-text'
-                                  li.appendChild(div)
-                                  const span = document.createElement('span')
-                                  span.innerHTML = message
-                                  div.appendChild(span)
-                              }
-                              const getResponse = () => {
-                                  fetch('http://127.0.0.1:8000/api/v1/message/')
-                                      .then((response) => {
-                                          return response.json();
-                                      })
-                                      .then((data) => {
-                                          blockMessage(data.map(el => el.message))
-                                          chatBlock.scrollTop = chatBlock.scrollHeight
-                                      });
-                              }
-                              getResponse()
-                              sendBtn.addEventListener('click', () => {
-                                  async function postData(url, data) {
-                                      const response = await fetch(url, {
-                                          method: 'POST',
-                                          headers: {
-                                              'Content-Type': 'application/json',
-                                              "X-CSRFToken": '{{csrf_token}}',
-                                          },
-                                          body: JSON.stringify(data)
-                                      }).then(() => getResponse());
-                                  }
+                              {#const blockMessage = (messageArray) => {#}
+                              {#    chatBlock.innerHTML = ''#}
+                              {#    messageArray = messageArray.reverse()#}
+                              {#    messageArray.map(el => {#}
+                              {#        newUserMessage(el)#}
+                              {#    })#}
+                              {#    console.log(messageArray)#}
 
-                                  postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})
-                                  inputValue.value = ''
+                              {#const newUserMessage = (message, avatar, file) => {#}
+                              {#    const li = document.createElement('li')#}
+                              {#    li.className = 'support__chat-message support__chat-message_your'#}
+                              {#    chatBlock.appendChild(li)#}
+                              {#    const div = document.createElement('div')#}
+                              {#    div.className = 'support__chat-message-text'#}
+                              {#    li.appendChild(div)#}
+                              {#    const span = document.createElement('span')#}
+                              {#    span.innerHTML = message#}
+                              {#    div.appendChild(span)#}
+
+                              {#const getResponse = () => {#}
+                              {#    fetch('http://127.0.0.1:8000/api/v1/message/')#}
+                              {#        .then((response) => {#}
+                              {#            return response.json();#}
+                              {#        })#}
+                              {#        .then((data) => {#}
+                              {#            blockMessage(data.map(el => el.message))#}
+                              {#            chatBlock.scrollTop = chatBlock.scrollHeight#}
+                              {#        });#}
+
+                              {#getResponse()#}
+                              {#sendBtn.addEventListener('click', () => {#}
+                              {#    async function postData(url, data) {#}
+                              {#        const response = await fetch(url, {#}
+                              {#            method: 'POST',#}
+                              {#            headers: {#}
+                              {#                'Content-Type': 'application/json',#}
+                              {#                "X-CSRFToken": '{{csrf_token}}',#}
+                              {#            },#}
+                              {#            body: JSON.stringify(data)#}
+                              {#        }).then(() => getResponse());#}
+                              {#    }#}
+                              {##}
+                              {#    postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})#}
+                              {#    inputValue.value = ''#}
+                            inputValue.focus();
+                            inputValue.onkeyup = function (e) {
+                            if (e.keyCode === 13) {  // enter, return
+                                sendBtn.click();
+                            }
+                        };
+                            sendBtn.addEventListener('click', () =>{
+
+                            if (is_auth === true) {
+                                chatSocket.send(JSON.stringify({
+                                    'type':'support_chat',
+                                    "chat_type": "support",
+                                    'message': inputValue.value,
+                                    'user': username,
+                                    'avatar': ava,
+                                }));
+                            } else {
+                                alert('No auth user, sorry')
+                            }
+                            inputValue.value = '';
+
                               })
 
                             </script>
