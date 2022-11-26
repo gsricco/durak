@@ -7,9 +7,13 @@ const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 
 
 // let balanceUser - из бэка
-let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
+// let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
+let balanceUser = Number(document.querySelector('#balanceUser').textContent)
+// let balanceUser = `{{ detail_user.balance }}`
 
 console.log(balanceUser)
+
+
 const createBidItemRow = (data) => {
     console.log(media_prefix)
     console.log(static_prefix)
@@ -83,6 +87,51 @@ const itemsClick = (bidCard) => {
             /////////////////////////////////////////////////
         } else {
             //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ
+
+            document.querySelector('.profil-main__content').innerHtml = `
+            <div className="popup" id="authorization">
+                <div className="popup__body">
+                    <div className="popup__content modal modal_popup modal_authorization">
+                        <a href="#" className="popup__close close-popup close-popup_close">
+                            <svg className="close-popup__icon ">
+                                <use xlink:href="img/icons/sprite.svg#close"></use>
+                            </svg>
+                        </a>
+                        <div className="modal-enter">
+                            <h3 className="modal__title modal-enter__title">
+                                Авторизуйтесь для продолжения
+                            </h3>
+                            <div className="modal-enter__body">
+                                <div className="modal-enter__row">
+                                    <div className="modal-enter__item">
+                                        <div className="modal-enter__img">
+                                            <svg className="yt">
+                                                <use xlink:href="img/icons/sprite.svg#youtube"></use>
+                                            </svg>
+                                        </div>
+                                        <a href="##" className="btn btns_yt modal-enter__btn">Войти через Google</a>
+                                    </div>
+                                    <div className="modal-enter__item">
+                                        <div className="modal-enter__img">
+                                            <svg className="vk">
+                                                <use xlink:href="img/icons/sprite.svg#vk"></use>
+                                            </svg>
+                                        </div>
+                                        <a href="##" className="btn btns_vk modal-enter__btn">Войти через Вконтакте</a>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            `
+
+
             alert('No money')
         }
         document.querySelector('.roulette__table-input').value = ''

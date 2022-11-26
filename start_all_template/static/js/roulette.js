@@ -9,7 +9,7 @@
 //101 - black2
 
 // window.addEventListener('focus', function() { timerCounter(10); });
-let responseBack; // определенная карта с бэкенда
+let responseBack = 103 // определенная карта с бэкенда
 let cells;
 
 let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))

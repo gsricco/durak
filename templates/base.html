@@ -59,7 +59,7 @@
                     <!-- If logged-in and has balance -->
                     {% if user.is_authenticated %}
                     <a href="{% url 'profil' %}" class="header__balance">
-                        <span>{{ detail_user.balance }}</span>
+                        <span>{{ detail_user.balance|json_script:"balanceUser"  }}</span>
                     </a>
                     {% endif %}
                 </div>
