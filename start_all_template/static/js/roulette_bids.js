@@ -1,8 +1,14 @@
 const media_prefix = JSON.parse(document.getElementById('media_prefix').textContent);
 const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
+const items = document.querySelectorAll('.roulette__radio-item > label')
 
-let balanceUser = 20000;
 
+
+
+// let balanceUser - из бэка
+let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
+
+console.log(balanceUser)
 const createBidItemRow = (data) => {
     console.log(media_prefix)
     console.log(static_prefix)
@@ -13,44 +19,43 @@ const createBidItemRow = (data) => {
 
     const bidItemBlock = document.querySelector(`.${data.bidCard}`)
 
-            const bidItem = document.createElement('div')
-            bidItem.className = 'roulette__item-row'
-            bidItemBlock.appendChild(bidItem)
+    const bidItem = document.createElement('div')
+    bidItem.className = 'roulette__item-row'
+    bidItemBlock.appendChild(bidItem)
 
-            const bidItemLeftBlock = document.createElement('div')
-            bidItemLeftBlock.className = 'roulette__item-left'
-            bidItem.appendChild(bidItemLeftBlock)
+    const bidItemLeftBlock = document.createElement('div')
+    bidItemLeftBlock.className = 'roulette__item-left'
+    bidItem.appendChild(bidItemLeftBlock)
 
-            const itemMoney = document.createElement('div')
-            itemMoney.className = 'roulette__item-money'
-            itemMoney.innerHTML = `${data.bidCount}`
-            bidItem.appendChild(itemMoney)
+    const itemMoney = document.createElement('div')
+    itemMoney.className = 'roulette__item-money'
+    itemMoney.innerHTML = `${data.bidCount}`
+    bidItem.appendChild(itemMoney)
 
-            const itemAvatar = document.createElement('div')
-            itemAvatar.className = 'roulette__item-avatar'
-            itemAvatar.innerHTML = `<img src="${media_prefix}${data.avatar}" alt="">`
-            bidItemLeftBlock.appendChild(itemAvatar)
+    const itemAvatar = document.createElement('div')
+    itemAvatar.className = 'roulette__item-avatar'
+    itemAvatar.innerHTML = `<img src="${media_prefix}${data.avatar}" alt="">`
+    bidItemLeftBlock.appendChild(itemAvatar)
 
-            const itemStone = document.createElement('div')
-            itemStone.className = 'roulette__item-stoun'
-            const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.userStone}"></use>`
-            itemStone.appendChild(stone)
-            bidItemLeftBlock.appendChild(itemStone)
+    const itemStone = document.createElement('div')
+    itemStone.className = 'roulette__item-stoun'
+    const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+    stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.userStone}"></use>`
+    itemStone.appendChild(stone)
+    bidItemLeftBlock.appendChild(itemStone)
 
-            const itemUserName = document.createElement('div')
-            itemUserName.className = 'roulette__item-username'
-            itemUserName.innerHTML = `${data.userName}`
-            bidItemLeftBlock.appendChild(itemUserName)
-        }
+    const itemUserName = document.createElement('div')
+    itemUserName.className = 'roulette__item-username'
+    itemUserName.innerHTML = `${data.userName}`
+    bidItemLeftBlock.appendChild(itemUserName)
+}
 
-const items = document.querySelectorAll('.roulette__radio-item > label')
-
+// const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
     let bidCount = document.querySelector('.roulette__table-input').value * 1000;
     if (is_auth && bidCount) {
         // console.log(cells)
-        if (balanceUser > Number(bidCount)) {
+        if (balanceUser + 1 > Number(bidCount)) {
             chatSocket.send(JSON.stringify({
                 'bidCount': bidCount,
                 'userName': username,
@@ -59,8 +64,21 @@ const itemsClick = (bidCard) => {
                 userStone: 'rubin_blue',
                 bidCard: bidCard
             }));
+            if (bidCard === 'hearts') {
+                items[2].style.pointerEvents = 'none';
+            } else if(bidCard ==='spades') {
+                items[0].style.pointerEvents = 'none';
+            }
+
+
+
             ///////////////////////////////////////////////
             //логика БЭК отнимания ставки от баланса/////////
+            /////пока на фронте//////////////////////////////
+            balanceUser = balanceUser - Number(bidCount)
+            document.querySelector('.header__profile-sum>span').innerHTML = `${balanceUser}`
+            // items[0].style.pointerEvents = 'none';
+
             /////////////////////////////////////////////////
         } else {
             //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ

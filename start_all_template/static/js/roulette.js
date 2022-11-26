@@ -21,6 +21,8 @@ if (responseBack) {
 console.log(cells)
 
 const list = document.querySelector('.list');
+// const items = document.querySelectorAll('.roulette__radio-item > label')
+console.log(items[0])
 
 function generateItems() {
     let h = 8;
@@ -58,11 +60,21 @@ function generateItems() {
 generateItems();
 
 // анимацию прокрутки
-function startRoll() {
+function startRoll(winnerCard) {
+    console.log('none')
+    items[0].style.pointerEvents = 'none';
+    items[1].style.pointerEvents = 'none';
+    items[2].style.pointerEvents = 'none';
+    document.querySelector('.roulette__radio-wrapper').style.opacity = '0.3'
+    document.querySelector('.roulette__items').style.opacity = '0.3'
+
+
     //докрутка от -49.6% до -50.4%
     wrapperItems.classList.remove("roulette__rull-wrapper_blur");
     timerWrapper.style.display = "none";
     rull_line.style.display = "block";
+
+
 
     function randomInteger(min, max) {
         // получить случайное число от (min-0.5) до (max+0.5)
@@ -105,6 +117,16 @@ let blurForTimer = () => {
 
 // логика счетчика таймера
 let timerCounter = (back_counter) => {
+    items[0].style.pointerEvents = '';
+    items[1].style.pointerEvents = '';
+    items[2].style.pointerEvents = '';
+
+    document.querySelector('.hearts').innerHTML = ''
+    document.querySelector('.coin').innerHTML = ''
+    document.querySelector('.spades').innerHTML = ''
+    document.querySelector('.roulette__radio-wrapper').style.opacity = '1'
+    document.querySelector('.roulette__items').style.opacity = '1'
+
     timerText.innerHTML = `<p class="roulette__rull-timer-text">ПРОКРУТКА</p>`
     const rafStart = Date.now();
 
