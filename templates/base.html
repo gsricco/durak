@@ -286,7 +286,7 @@
                         const buttonSend = document.querySelector('.online-chat__icon-arrow')
                         const messageInput = document.querySelector('.online-chat__input');
                         const scrollBlock = document.querySelector('.online-chat__body')
-
+                        const UserBalance = document.querySelector('.header__profile-sum>span')
                         const chatSocket = new WebSocket(
                             'ws://'
                             + window.location.host
@@ -310,7 +310,13 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
+                            if (data.current_balance){
+                                console.log(data.current_balance, 'CURRENT BALANCE')
+                                UserBalance.innerHTML = `${data.current_balance}`
+                            }
+
                             if (data.bid) {
+                                console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
                                 createBidItemRow(data.bid)
                             }
                             if (data.roll) {
@@ -319,7 +325,7 @@
                             if (data.stop) {
 
                                 //winnerCard from backend
-                                let winnerCard = 'hearts'
+                                let winnerCard = `${data.winner}`
                                 let bidsNumber = document.querySelectorAll('.roulette__item-money')
                                 const bidsButtons = document.querySelectorAll('.roulette__radio-item')
                                 bidsNumber.forEach(el => {
@@ -359,15 +365,15 @@
                                 console.log('hihihi')
                                 timerCounter(data.roulette)
                                 // код для теста функциональности начисления опыта
-                                toSend = {
-                                    "bet": {
-                                        "credits": 1000000,
-                                        "placed": "black"
-                                    }
-                                }
-                                strToSend = JSON.stringify(toSend)
-                                chatSocket.send(strToSend)
-                                console.log(strToSend)
+                                {#toSend = {#}
+                                {#    "bet": {#}
+                                {#        "credits": 1000000,#}
+                                {#        "placed": "black"#}
+                                {#    }#}
+                                {##}
+                                {#strToSend = JSON.stringify(toSend)#}
+                                {#chatSocket.send(strToSend)#}
+                                {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
                                 ////////////////////////////
                             }
                             if (data.lvlup) {
