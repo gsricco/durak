@@ -22,7 +22,7 @@ class Message(models.Model):
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
-        ordering = ('-date',)
+        ordering = ('date',)
 
     def status_is_read(self):
         """Метод для установки статуса 'Прочитанно' у поля конкретного сообщения"""
