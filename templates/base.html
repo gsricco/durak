@@ -23,175 +23,175 @@
     <header class="header">
         <div class="container">
             {% block header %}
-                <div class="header__row">
+            <div class="header__row">
 
-                    <div class="header__logo-wrapper">
-                        <div class="burger-menu">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
+                <div class="header__logo-wrapper">
+                    <div class="burger-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
 
-                        <div class="header__logo">
-                            <a href="{% url 'index' %}">
-                                <svg>
-                                    <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logo"></use>
+                    <div class="header__logo">
+                        <a href="{% url 'index' %}">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logo"></use>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- If not logged-in -->
+                    {% if user.is_authenticated == False %}
+                    <div class="header__login" style="display: none;">
+                        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
+                            </svg>
+                        </a>
+                        <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
+                            </svg>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- If logged-in and has balance -->
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'profil' %}" class="header__balance">
+                        <span>{{ detail_user.balance|json_script:"balanceUser"  }}</span>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="header__wrapper">
+                    <nav class="header__nav">
+                        <ul class="header__list">
+                            <li class="header__li">
+                                <a href="{% url 'honesty' %}" class="header__link">ЧЕСТНОСТЬ</a>
+                            </li>
+                            <li class="header__li">
+                                <a href="{% url 'faq' %}" class="header__link">ПОМОЩЬ</a>
+                            </li>
+
+                            <li class="header__li">
+                                <a href="{% url 'contact' %}" class="header__link">КОНТАКТЫ</a>
+                            </li>
+
+                            <li class="header__li">
+                                <a href="{% url 'bonus-currency' %}" class="header__link header__link_red">FREE</a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div class="header__profile">
+                        <a href="{% url 'profil' %}" class="header__avatar">
+                            {% if user.is_authenticated == False %}
+                            <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                            {% else %}
+                            <img src="{{ user.avatar.url }}" alt="Аватар">
+                            {% endif %}
+                        </a>
+
+                        <div class="header__profile-info">
+                            <a href="{% url 'profil' %}" class="header__profile-name">
+                                {% if user.is_authenticated == False %}
+                                <span>Anonymous</span>
+                                {% else %}
+                                <span>{{ request.user.username }}</span>
+                                {% endif %}
+                                <svg class="header__profile-settings">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                 </svg>
                             </a>
-                        </div>
 
-                        <!-- If not logged-in -->
-                        {% if user.is_authenticated == False %}
-                            <div class="header__login" style="display: none;">
-                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
+                            <div class="header__profile-row">
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'profil' %}" class="header__profile-sum">
+                                    <div class="header__profile-sum-img">
+                                        <svg>
+                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                        </svg>
+                                    </div>
+                                    <span>{{ detail_user.balance }}</span>
+                                </a>
+                                <a href="#modalPayment" class="header__profile-link popup-link">
+                                    Пополнить
+                                </a>
+                                <a href="#selectAmountInput" class="header__profile-link popup-link">
+                                    Вывести
+                                </a>
+                                <a href="/logout" class="header__profile-link logout-btn">Выйти</a>
+                                {% endif %}
+
+                                <!-- If not logged-in -->
+                                {% if user.is_authenticated == False %}
+                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login"
+                                   style="display: block!important;">
                                     <svg>
                                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
                                     </svg>
                                 </a>
-                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-link">
+                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login"
+                                   style="display: block!important;">
                                     <svg>
                                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                                     </svg>
                                 </a>
-                            </div>
-                        {% endif %}
 
-                        <!-- If logged-in and has balance -->
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'profil' %}" class="header__balance">
-                                <span>{{ detail_user.balance }}</span>
-                            </a>
-                        {% endif %}
-                    </div>
-
-                    <div class="header__wrapper">
-                        <nav class="header__nav">
-                            <ul class="header__list">
-                                <li class="header__li">
-                                    <a href="{% url 'honesty' %}" class="header__link">ЧЕСТНОСТЬ</a>
-                                </li>
-                                <li class="header__li">
-                                    <a href="{% url 'faq' %}" class="header__link">ПОМОЩЬ</a>
-                                </li>
-
-                                <li class="header__li">
-                                    <a href="{% url 'contact' %}" class="header__link">КОНТАКТЫ</a>
-                                </li>
-
-                                <li class="header__li">
-                                    <a href="{% url 'bonus-currency' %}" class="header__link header__link_red">FREE</a>
-                                </li>
-                            </ul>
-                        </nav>
-
-                        <div class="header__profile">
-                            <a href="{% url 'profil' %}" class="header__avatar">
-                                {% if user.is_authenticated == False %}
-                                    <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
-                                {% else %}
-                                    <img src="{{ user.avatar.url }}" alt="Аватар">
-                                {% endif %}
-                            </a>
-
-                            <div class="header__profile-info">
-                                <a href="{% url 'profil' %}" class="header__profile-name">
-                                    {% if user.is_authenticated == False %}
-                                        <span>Anonymous</span>
-                                    {% else %}
-                                        <span>{{ request.user.username }}</span>
-                                    {% endif %}
-                                    <svg class="header__profile-settings">
-                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
+                                <!-- Login btn mobile shown if not logged-in-->
+                                <a href="#" class="header__login-btn" style="display: none;">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
                                     </svg>
                                 </a>
-
-                                <div class="header__profile-row">
-                                    {% if user.is_authenticated %}
-                                        <a href="{% url 'profil' %}" class="header__profile-sum">
-                                            <div class="header__profile-sum-img">
-                                                <svg>
-                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
-                                                </svg>
-                                            </div>
-                                            <span>{{ detail_user.balance }}</span>
-                                        </a>
-                                        <a href="#modalPayment" class="header__profile-link popup-link">
-                                            Пополнить
-                                        </a>
-                                        <a href="#selectAmountInput" class="header__profile-link popup-link">
-                                            Вывести
-                                        </a>
-                                        <a href="/logout" class="header__profile-link logout-btn">Выйти</a>
-                                    {% endif %}
-
-                                    <!-- If not logged-in -->
-                                    {% if user.is_authenticated == False %}
-                                        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__profile-login"
-                                           style="display: block!important;">
-                                            <svg>
-                                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
-                                            </svg>
-                                        </a>
-                                        <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__profile-login"
-                                           style="display: block!important;">
-                                            <svg>
-                                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
-                                            </svg>
-                                        </a>
-
-                                        <!-- Login btn mobile shown if not logged-in-->
-                                        <a href="#" class="header__login-btn" style="display: none;">
-                                            <svg>
-                                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
-                                            </svg>
-                                        </a>
-                                    {% endif %}
-                                </div>
-
-                                <!-- If user logged-in -->
-                                <!-- На этом участке не войдя в систему видимо отрабатывает js в месте, где должен быть profile-line, и выдаёт постоянные null -->
-                                {% if user.is_authenticated %}
-                                    <a href="{% url 'profil' %}" class="header__profile-progressbar">
-                                        <div class="header__profile-lvl header__profile-lvl_back">
-                                            <span>{{ level_data.level }} ур.</span>
-                                        </div>
-                                        <div class="header__profile-line">
-                                            <span></span>
-                                        </div>
-                                        <div class="header__profile-lvl header__profile-lvl_next">
-                                            <span>{{ level_data.level|add:"1" }} ур.</span>
-                                        </div>
-                                    </a>
-                                {% else %}
-                                    <a href="{% url 'profil' %}" class="header__profile-progressbar">
-                                        <div class="header__profile-lvl header__profile-lvl_back">
-                                            <span>1 ур.</span>
-                                        </div>
-                                        <div class="header__profile-line">
-                                            <span></span>
-                                        </div>
-                                        <div class="header__profile-lvl header__profile-lvl_next">
-                                            <span>2 ур.</span>
-                                        </div>
-                                    </a>
                                 {% endif %}
-
-                                <div class="header__btns">
-                                    <a href="#modalPayment" class="header__profile-btn popup-link">
-                                        Пополнить
-                                    </a>
-
-                                    <a href="#selectAmountInput" class="header__profile-btn popup-link">
-                                        Вывести
-                                    </a>
-                                </div>
-
                             </div>
-                        </div>
 
+                            <!-- If user logged-in -->
+                            <!-- На этом участке не войдя в систему видимо отрабатывает js в месте, где должен быть profile-line, и выдаёт постоянные null -->
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'profil' %}" class="header__profile-progressbar">
+                                <div class="header__profile-lvl header__profile-lvl_back">
+                                    <span>{{ level_data.level }} ур.</span>
+                                </div>
+                                <div class="header__profile-line">
+                                    <span></span>
+                                </div>
+                                <div class="header__profile-lvl header__profile-lvl_next">
+                                    <span>{{ level_data.level|add:"1" }} ур.</span>
+                                </div>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'profil' %}" class="header__profile-progressbar">
+                                <div class="header__profile-lvl header__profile-lvl_back">
+                                    <span>1 ур.</span>
+                                </div>
+                                <div class="header__profile-line">
+                                    <span></span>
+                                </div>
+                                <div class="header__profile-lvl header__profile-lvl_next">
+                                    <span>2 ур.</span>
+                                </div>
+                            </a>
+                            {% endif %}
+
+                            <div class="header__btns">
+                                <a href="#modalPayment" class="header__profile-btn popup-link">
+                                    Пополнить
+                                </a>
+
+                                <a href="#selectAmountInput" class="header__profile-btn popup-link">
+                                    Вывести
+                                </a>
+                            </div>
+
+                        </div>
                     </div>
 
                 </div>
+
+            </div>
             {% endblock %}
         </div>
     </header>
@@ -247,7 +247,7 @@
                                         </div>
                                         <ol class="rules__list">
                                             {% for i in sitecontent %}
-                                                {{ i.chat_rule|safe }}
+                                            {{ i.chat_rule|safe }}
                                             {% endfor %}
                                         </ol>
                                     </div>
@@ -310,16 +310,52 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
-                            if(data.bid){
+                            if (data.bid) {
                                 createBidItemRow(data.bid)
                             }
-                            if(data.roll){
-                                startRoll()
+                            if (data.roll) {
+                                startRoll('hearts')
                             }
-                            if(data.back){
+                            if (data.stop) {
+
+                                //winnerCard from backend
+                                let winnerCard = 'hearts'
+                                let bidsNumber = document.querySelectorAll('.roulette__item-money')
+                                const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+                                bidsNumber.forEach(el => {
+                                    el.style.color = 'red'
+                                })
+                                if (winnerCard === 'hearts') {
+                                    let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
+                                    bidsNumber.forEach(el => {
+                                        el.style.color = 'green'
+                                        document.querySelector('.hearts').style.opacity = '1'
+                                        bidsButtons[0].style.opacity = '1'
+                                    })
+                                } else if (winnerCard === 'coin') {
+                                    let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
+                                    bidsNumber.forEach(el => {
+                                        el.style.color = 'green'
+                                        document.querySelector('.coin').style.opacity = '1'
+                                        bidsButtons[1].style.opacity = '1'
+                                    })
+                                } else if (winnerCard === 'spades') {
+                                    let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
+                                    bidsNumber.forEach(el => {
+                                        el.style.color = 'green'
+                                        document.querySelector('.spades').style.opacity = '1'
+                                        bidsButtons[2].style.opacity = '1'
+                                    })
+                                }
+
+
+                            }
+                            if (data.back) {
+                                //winnerCard from backend
                                 returnToStartPosition()
                             }
-                            if (data.roulette){
+
+                            if (data.roulette) {
                                 console.log('hihihi')
                                 timerCounter(data.roulette)
                                 // код для теста функциональности начисления опыта
@@ -343,10 +379,9 @@
                             }
 
 
-                            if (data.chat_type === 'support'){
-                              newUserMessage(`${data.message}`,data.user)
+                            if (data.chat_type === 'support') {
+                                newUserMessage(`${data.message}`, data.user)
                             }
-
 
 
                             if (data.message && data.chat_type === 'all_chat') {
@@ -434,37 +469,37 @@
     <footer class="footer">
         <div class="container">
             {% block footer %}
-                <div class="footer__row">
-                    <div class="footer__info">
-                        <a href="/" class="footer__logo">
-                            <svg>
-                                <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logofooter"></use>
-                            </svg>
-                        </a>
+            <div class="footer__row">
+                <div class="footer__info">
+                    <a href="/" class="footer__logo">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#logofooter"></use>
+                        </svg>
+                    </a>
 
-                        {% for i in sitecontent %}
-                            <a href="{{ i.url_vk }}" target="_blank"
-                               class="footer__soc-item footer__soc-item footer__soc-item_vk">
-                                <img src="{% static 'img/gallery/vk.png' %}" alt="">
-                            </a>
-                            <a href="{{ i.url_youtube }}" target="_blank"
-                               class="footer__soc-item footer__soc-item_yt">
-                                <svg>
-                                    <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
-                                </svg>
-                            </a>
-                            </div>
-                            <div class="footer__text-block">
-                                <div class="footer__text-achievements">
-                                    {{ i.description|safe }}
-
-                                </div>
-                                <div class="footer__rights">
-                                    Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.
-                                </div>
-                            </div>
-                        {% endfor %}
+                    {% for i in sitecontent %}
+                    <a href="{{ i.url_vk }}" target="_blank"
+                       class="footer__soc-item footer__soc-item footer__soc-item_vk">
+                        <img src="{% static 'img/gallery/vk.png' %}" alt="">
+                    </a>
+                    <a href="{{ i.url_youtube }}" target="_blank"
+                       class="footer__soc-item footer__soc-item_yt">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
+                        </svg>
+                    </a>
                 </div>
+                <div class="footer__text-block">
+                    <div class="footer__text-achievements">
+                        {{ i.description|safe }}
+
+                    </div>
+                    <div class="footer__rights">
+                        Все права защищены. 2022. <br> Вся существующая информация на сайте конфиденциальна.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
             {% endblock %}
         </div>
     </footer>
@@ -1047,6 +1082,5 @@
 
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
-
 </body>
 </html>
