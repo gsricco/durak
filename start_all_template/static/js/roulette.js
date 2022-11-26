@@ -59,15 +59,19 @@ function generateItems() {
 
 generateItems();
 
-// анимацию прокрутки
+// анимация прокрутки
 function startRoll(winnerCard) {
     console.log('none')
     items[0].style.pointerEvents = 'none';
     items[1].style.pointerEvents = 'none';
     items[2].style.pointerEvents = 'none';
-    document.querySelector('.roulette__radio-wrapper').style.opacity = '0.3'
-    document.querySelector('.roulette__items').style.opacity = '0.3'
 
+    bidsButtons.forEach(el=>{
+        el.style.opacity = '0.3'
+    })
+    bidsBlock.forEach(el=>{
+        el.style.opacity = '0.3'
+    })
 
     //докрутка от -49.6% до -50.4%
     wrapperItems.classList.remove("roulette__rull-wrapper_blur");
@@ -120,6 +124,13 @@ let timerCounter = (back_counter) => {
     items[0].style.pointerEvents = '';
     items[1].style.pointerEvents = '';
     items[2].style.pointerEvents = '';
+
+    bidsButtons.forEach(el=>{
+        el.style.opacity = '1'
+    })
+    bidsBlock.forEach(el=>{
+        el.style.opacity = '1'
+    })
 
     document.querySelector('.hearts').innerHTML = ''
     document.querySelector('.coin').innerHTML = ''

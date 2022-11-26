@@ -1,7 +1,8 @@
 const media_prefix = JSON.parse(document.getElementById('media_prefix').textContent);
 const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
 const items = document.querySelectorAll('.roulette__radio-item > label')
-
+const bidsBlock = document.querySelectorAll('.roulette__item-body')
+const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 
 
 
