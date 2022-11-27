@@ -16,6 +16,11 @@ source venv/bin/activate(for MacOs/Linux)
 
 pip install -r requirements.txt
 
+pip install channels-redis=3.4.1
+
+pip install channels==4.0.0
+
+pip install daphne==4.0.0
 
 python manage.py makemigrations
 
