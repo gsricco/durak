@@ -6,6 +6,26 @@
 {% endblock %}
 
 {% block maincontent %}
+
+<div class="popup" id="modalMoney">
+    <div class="popup__body">
+        <div class="popup__content modal modal_popup modal_authorization">
+            <a href="#" class="popup__close close-popup">
+                <svg class="close-popup__icon ">
+                    <use xlink:href="static/img/icons/sprite.svg#close"></use>
+                </svg>
+            </a>
+            <div class="modal-enter">
+                <h3 class="modal__title">
+                    Не достаточно средств
+                </h3>
+                <h3 class="modal__balance">
+                </h3>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="profil-main__content">
         <section class="roulette">
             <div class="roulette__rull">

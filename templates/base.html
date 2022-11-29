@@ -310,6 +310,11 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
+                            //winnerCard from backend
+                            // let winnerCard = `${data.winner}`
+                            let winnerCard = `hearts`
+                            console.log(winnerCard +' WinnerCard')
+
                             if (data.current_balance){
                                 console.log(data.current_balance, 'CURRENT BALANCE')
                                 UserBalance.innerHTML = `${data.current_balance}`
@@ -320,12 +325,11 @@
                                 createBidItemRow(data.bid)
                             }
                             if (data.roll) {
-                                startRoll('hearts')
+                                list.innerHTML = ''
+                                generateItems(winnerCard)
+                                startRoll(winnerCard)
                             }
                             if (data.stop) {
-
-                                //winnerCard from backend
-                                let winnerCard = `${data.winner}`
                                 let bidsNumber = document.querySelectorAll('.roulette__item-money')
                                 const bidsButtons = document.querySelectorAll('.roulette__radio-item')
                                 bidsNumber.forEach(el => {
@@ -334,6 +338,10 @@
                                 if (winnerCard === 'hearts') {
                                     let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
                                     bidsNumber.forEach(el => {
+                                        /////////Логика подсчета баланса при ставках и выйгрыше/пройгрыше/////
+                                        let winnerSum = Number(document.querySelector('.header__profile-sum>span').textContent) + Number(el.textContent) * 2
+                                        document.querySelector('.header__profile-sum>span').innerHTML = `${winnerSum}`
+
                                         el.style.color = 'green'
                                         document.querySelector('.hearts').style.opacity = '1'
                                         bidsButtons[0].style.opacity = '1'
@@ -341,6 +349,11 @@
                                 } else if (winnerCard === 'coin') {
                                     let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
                                     bidsNumber.forEach(el => {
+                                        /////////Логика подсчета баланса при ставках и выйгрыше/пройгрыше/////
+                                        let winnerSum = Number(document.querySelector('.header__profile-sum>span').textContent) + Number(el.textContent) * 14
+                                        document.querySelector('.header__profile-sum>span').innerHTML = `${winnerSum}`
+
+
                                         el.style.color = 'green'
                                         document.querySelector('.coin').style.opacity = '1'
                                         bidsButtons[1].style.opacity = '1'
@@ -348,6 +361,10 @@
                                 } else if (winnerCard === 'spades') {
                                     let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
                                     bidsNumber.forEach(el => {
+                                        /////////Логика подсчета баланса при ставках и выйгрыше/пройгрыше/////
+                                        let winnerSum = Number(document.querySelector('.header__profile-sum>span').textContent) + Number(el.textContent) * 2
+                                        document.querySelector('.header__profile-sum>span').innerHTML = `${winnerSum}`
+
                                         el.style.color = 'green'
                                         document.querySelector('.spades').style.opacity = '1'
                                         bidsButtons[2].style.opacity = '1'
@@ -362,7 +379,7 @@
                             }
 
                             if (data.roulette) {
-                                console.log('hihihi')
+                                console.log('start timer')
                                 timerCounter(data.roulette)
                                 // код для теста функциональности начисления опыта
                                 {#toSend = {#}
@@ -1083,6 +1100,7 @@
 
         </div>
     </div>
+
 
 </div>
 

@@ -8,23 +8,36 @@
 //103 - red3
 //101 - black2
 
-// window.addEventListener('focus', function() { timerCounter(10); });
-let responseBack = 103 // определенная карта с бэкенда
-let cells;
-
-let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))
-if (responseBack) {
-    cells = responseBack
-} else {
-    cells = (numbersCards % 2 === 0) ? numbersCards + 1 : numbersCards
-}
-console.log(cells)
 
 const list = document.querySelector('.list');
-// const items = document.querySelectorAll('.roulette__radio-item > label')
-console.log(items[0])
 
-function generateItems() {
+function generateItems(winnerCard) {
+
+    let cells;
+    const heartsArray = [103, 107, 111, 115]
+    const spadesArray = [101, 105, 109, 117]
+
+
+    switch (winnerCard) {
+        case'hearts':
+            winnerCard = heartsArray[Math.round(Math.random() * (2 + 1))]
+            break
+        case'spades':
+            winnerCard = spadesArray[Math.round(Math.random() * (2 + 1))]
+            break
+        case'coin':
+            winnerCard = 113
+            break
+    }
+
+    let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))
+    if (winnerCard) {
+        cells = winnerCard
+    } else {
+        cells = (numbersCards % 2 === 0) ? numbersCards + 1 : numbersCards
+    }
+    console.log(cells)
+
     let h = 8;
     // четные элементы красные, нечетные черные, каждая 8 карта coin
     for (let i = 0; i < cells; i++) {
@@ -60,7 +73,7 @@ function generateItems() {
 generateItems();
 
 // анимация прокрутки
-function startRoll(winnerCard) {
+function startRoll() {
     console.log('none')
     items[0].style.pointerEvents = 'none';
     items[1].style.pointerEvents = 'none';
@@ -216,4 +229,5 @@ if (document.querySelector(".scrollbar-overflow")) {
         });
     });
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

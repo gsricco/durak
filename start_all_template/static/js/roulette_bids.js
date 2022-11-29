@@ -5,17 +5,15 @@ const bidsBlock = document.querySelectorAll('.roulette__item-body')
 const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 
 
-
 // let balanceUser - из бэка
 // let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
 // let balanceUser = Number(document.querySelector('#balanceUser').textContent)
-let balanceUser = document.querySelector('.header__profile-sum>span')
-// let balanceUser = `{{ detail_user.balance }}`
-
+let balanceUser = document.querySelector('.header__profile-sum>span').textContent
+// let balanceUser1 = `{{ detail_user.balance }}`
+// console.log(balanceUser1 + "   Balance back")
 
 const createBidItemRow = (data) => {
     //balanceUser - текущий баланс user
-
 
     const bidItemBlock = document.querySelector(`.${data.bet.bidCard}`)
     const bidItem = document.createElement('div')
@@ -52,27 +50,27 @@ const createBidItemRow = (data) => {
 // const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
     let bidCount = document.querySelector('.roulette__table-input').value * 1000;
-    let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+    let balanceUser = Number(document.querySelector('.header__profile-sum>span').innerText);
     console.log(balanceUser, "ETO BALANCE USERA")
+
     if (is_auth && bidCount) {
         // console.log(cells)
-        if (balanceUser > Number(bidCount)) {
+        if (balanceUser+1 > Number(bidCount)) {
             chatSocket.send(JSON.stringify({
-                'bet':{
-                'bidCount': bidCount,
-                'userName': username,
-                'avatar': ava,
-                'rubin': 'rubin_blue',
-                userStone: 'rubin_blue',
-                'bidCard': bidCard
-            }
+                'bet': {
+                    'bidCount': bidCount,
+                    'userName': username,
+                    'avatar': ava,
+                    'rubin': 'rubin_blue',
+                    userStone: 'rubin_blue',
+                    'bidCard': bidCard
+                }
             }));
             if (bidCard === 'hearts') {
                 items[2].style.pointerEvents = 'none';
-            } else if(bidCard ==='spades') {
+            } else if (bidCard === 'spades') {
                 items[0].style.pointerEvents = 'none';
             }
-
 
 
             ///////////////////////////////////////////////
@@ -84,53 +82,15 @@ const itemsClick = (bidCard) => {
 
             /////////////////////////////////////////////////
         } else {
-            //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ
-
-            document.querySelector('.profil-main__content').innerHtml = `
-            <div className="popup" id="authorization">
-                <div className="popup__body">
-                    <div className="popup__content modal modal_popup modal_authorization">
-                        <a href="#" className="popup__close close-popup close-popup_close">
-                            <svg className="close-popup__icon ">
-                                <use xlink:href="img/icons/sprite.svg#close"></use>
-                            </svg>
-                        </a>
-                        <div className="modal-enter">
-                            <h3 className="modal__title modal-enter__title">
-                                Авторизуйтесь для продолжения
-                            </h3>
-                            <div className="modal-enter__body">
-                                <div className="modal-enter__row">
-                                    <div className="modal-enter__item">
-                                        <div className="modal-enter__img">
-                                            <svg className="yt">
-                                                <use xlink:href="img/icons/sprite.svg#youtube"></use>
-                                            </svg>
-                                        </div>
-                                        <a href="##" className="btn btns_yt modal-enter__btn">Войти через Google</a>
-                                    </div>
-                                    <div className="modal-enter__item">
-                                        <div className="modal-enter__img">
-                                            <svg className="vk">
-                                                <use xlink:href="img/icons/sprite.svg#vk"></use>
-                                            </svg>
-                                        </div>
-                                        <a href="##" className="btn btns_vk modal-enter__btn">Войти через Вконтакте</a>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-            `
-
-
-            alert('No money')
+            //вывод модалки НЕДОСТАТОЧНО СРЕДСТВ
+            let modalMoney = document.querySelector('#modalMoney')
+            modalMoney.classList.add("open");
+            document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+            modalMoney.addEventListener("click", function (e) {
+                if (!e.target.closest(".popup__content")) {
+                    document.querySelector('.popup.open').classList.remove("open");
+                }
+            });
         }
         document.querySelector('.roulette__table-input').value = ''
         document.querySelector('.roulette__current-block').innerHTML = '';
