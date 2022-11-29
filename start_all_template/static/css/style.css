@@ -2385,6 +2385,7 @@ h3 {
 }
 
 .online-chat {
+  height: 73vh;
   background: #212121;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2727,7 +2728,6 @@ h3 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: 70vh;
 }
 
 .profil-main__content {
@@ -4405,12 +4405,23 @@ h3 {
 }
 
 .roulette__item {
+  height: 34vh;
   -webkit-box-flex: 0;
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
   max-width: 100%;
   overflow: hidden;
   position: relative;
+}
+
+.roulette__item::after {
+  content: '';
+  display: block;
+  height: 15px;
+  width: 100%;
+  background: linear-gradient(0deg, #1e1e1e 20.24%, rgba(28, 31, 36, 0) 113.1%);
+  position: absolute;
+  bottom: 0;
 }
 
 .roulette__item.lost {
