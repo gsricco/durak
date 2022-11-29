@@ -305,8 +305,7 @@
                             const span = document.createElement('span')
                             span.innerHTML = message
                             div.appendChild(span2)
-                            div.appendChild(span)
-                        }
+                            div.appendChild(span)}
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
@@ -385,9 +384,9 @@
                             }
 
 
-                            if (data.chat_type === 'support') {
-                                newUserMessage(`${data.message}`, data.user)
-                            }
+                            if (data.chat_type === 'support' && document.title==='Помощь') {
+                                newUserMessage(`${data.message}`, data.user)}
+
 
 
                             if (data.message && data.chat_type === 'all_chat') {

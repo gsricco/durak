@@ -67,26 +67,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
                            "message": message,
                            "user": user, })
 
+    @sync_to_async()
+    def get_user_status(self, username):
+        user = CustomUser.objects.get(username=username)
+        if user.is_staff or user.is_superuser:
+            return True
+
     async def connect(self):
         '''Подключение юзеров'''
-        recieve_user = str(self.scope["url_route"]["kwargs"][
-                               "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
+        connect_chat_room = str(self.scope["url_route"]["kwargs"]["user"])  # имя комнаты
         user = str(self.scope['user'])  # получаем имя пользователя который подключился с фронта
-        r.set(user, self.channel_name)  # записываем в редис имя и channel_name подключенного юзера
+        admin_status = await self.get_user_status(user)
+        if admin_status:
+            await self.channel_layer.group_add('admin_group', self.channel_name)
+        await self.channel_layer.group_add(f'{user}_room', self.channel_name)  # добавляем в группу юзеров
         self.room_name = 'go'  # задаем статический румнейм для общего чата
         self.room_group_name = "chat_%s" % self.room_name  # формируем рум груп нейм
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
         await self.accept()  # подтверждение
         await self.send_online(0)  # отправляем количество вебсокет подключений на фронт
-        if recieve_user == 'go':  # проверка подключение из админки или нет .'go' - это не админка
+        if connect_chat_room == 'go':  # проверка подключение из админки или нет .'go' - это не админка
             await self.send_json(self.channel_name, user)  # выгружает свою историю чата в суппорт чат
         else:
             await self.get_all_room()
-            await self.send_json(self.channel_name, recieve_user)  # выгружает выбранную историю в админ чат
+
 
     async def disconnect(self, code):
         """Отключение пользователя"""
         r.delete(str(self.scope['user']))  # удаляет запись об юзере из редиса при отключении
+        await self.channel_layer.group_discard('admin_group', self.channel_name)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # убирает юзера из группы
         await self.send_online(-1)  # отправляет онлайн
 
@@ -130,19 +139,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # online = self.channel_layer.receive_count
 
         '''первичное получение и обработка сообщений'''
-        # text_data_json = json.loads(text_data)  # десериализует json
-        if text_data_json.get('chat_type') == 'support':  # проверяет пришло ли сообщение из support чата
-            room = await self.create_or_get_support_chat_room(
-                text_data_json.get('user'))  # получает или создает рум в бд
-            await self.save_user_message(room, str(self.scope['user']),
-                                         text_data_json["message"])  # сохранении сообщение в полученой комнате
-            byte_user_channel_name = r.get('admin')  # проверяем есть ли дамин в онлайне(НУЖНО ДОДЕЛАТЬ)
-            if byte_user_channel_name:
-                user_channel_name = bytes.decode(byte_user_channel_name, encoding='utf-8')  # получаем channel_name админа
-                await self.send_support_chat_message(user_channel_name, text_data_json["message"],
-                                                 text_data_json["user"])  # отправляем сообщение из супорт чата админу
-            await self.send_support_chat_message(self.channel_name, text_data_json["message"], text_data_json[
-                "user"])  # отправляем сообщение из супорт чата на сайте себе
+        if text_data_json.get('chat_type') == 'support':  #сообщение из support чата
+            user = str(self.scope.get('user'))
+            room = await self.create_or_get_support_chat_room(text_data_json.get('user'))  # получает рум из бд
+            await self.save_user_message(room, user,text_data_json["message"])  # сохранение сообщения
+            admin_status = await self.get_user_status(user)
+            if not admin_status:
+                await self.send_support_chat_message(self.channel_name,
+                                                     text_data_json["message"],
+                                                     text_data_json["user"])  # из супорт чата на сайте себе
+            await self.channel_layer.group_send('admin_group', {"type": "chat_message",
+                                                                "chat_type": "support",
+                                                                "message": text_data_json["message"],
+                                                                "user": user, })  # отправка сообщения пользователя админам
+
+
+
         elif text_data_json.get('chat_type') == 'all_chat':
             '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем'''
             await self.channel_layer.group_send(
@@ -156,20 +168,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         elif text_data_json.get('chat_type') == 'support_admin':
             '''Получем сообщение от админа из админки'''
-
-            receive_user = self.scope["url_route"]["kwargs"]["user"]
-            sender_user = str(self.scope['user'])
-            byte_user_channel_name = r.get(receive_user)  # получаем channel_name юзера из редиса в виде байт строки
-            if byte_user_channel_name:
-                user_channel_name = bytes.decode(byte_user_channel_name,
-                                                 encoding='utf-8')  # преобразуем байт channel_name в строку
-                await self.send_support_chat_message(user_channel_name, text_data_json["message"],
-                                                     sender_user)  # отправка сообщения пользователю из админку
-            room = await self.create_or_get_support_chat_room(receive_user)  # получаем комнату с сообщениями
-            await self.save_user_message(room, sender_user,
-                                         text_data_json["message"])  # сохранении сообщение админа в бд
-            await self.send_support_chat_message(self.channel_name, text_data_json["message"],
-                                                 sender_user)  # отправка сообщения самому себе в админку
+            if text_data_json.get('receiver_user_room'):
+                receive_user = text_data_json.get('receiver_user_room')
+                await self.get_all_room()
+                await self.send_json(self.channel_name, receive_user)
+            else:
+                sender_user = str(self.scope['user'])
+                receive = text_data_json.get('receive')
+                room = await self.create_or_get_support_chat_room(receive)  # получаем комнату с сообщениями
+                await self.save_user_message(room, sender_user,
+                                             text_data_json["message"])  # сохранении сообщение админа в бд
+                await self.send_support_chat_message(self.channel_name, text_data_json["message"],
+                                                     sender_user)  # отправка сообщения самому себе в админку
+                await self.channel_layer.group_send(f'{receive}_room', {"type": "chat_message",
+                                                                        "chat_type": "support",
+                                                                        "message": text_data_json["message"],
+                                                                        "user": sender_user, })  # отправка сообщения пользователю в рум
 
     async def get_online(self, event):
         online = event['get_online']
@@ -197,14 +211,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                               "rubin": rubin,
                                               # "online": online
                                               }))
-# начинает отсчёт
+
+    # начинает отсчёт
     async def korney_task(self, event):
         data = event.get('data')
         await self.send(text_data=json.dumps({
             "roulette": 20,
             "data": data
         }))
-# начинает крутиться рулетка
+
+    # начинает крутиться рулетка
     async def rolling(self, event):
         await self.send(text_data=json.dumps({
             "roll": 'rolling',
@@ -256,8 +272,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print(f"Saving bet in {storage_name}")
         bet["channel_name"] = self.channel_name
         await tasks.save_as_nested(storage_name, user_pk, bet)
-
-
 
     async def send_new_level(self, event):
         """Отправляет по каналу сообщение о новом уровне"""

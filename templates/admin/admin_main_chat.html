@@ -1,127 +1,138 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
-<link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}"/>
-<link rel="stylesheet" href="{% static 'css/admin_support_chat.css' %}">
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'custom-css/one.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/swiper@8_swiper-bundle.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/admin_support_chat.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-<div class="chat_wrapper">
-    <div class="admin_support_chat_wrapper"></div>
-    <div class="support_chat_all_wrapper">
-        <div class="support__chat-wrapper">
-            <div class="support__top-plank">
-                <div class="support__top-plank-wrapper">
-                    <span>Чат поддержки</span>
+    <div class="chat_wrapper">
+        <div class="admin_support_chat_wrapper"></div>
+        <div class="support_chat_all_wrapper">
+            <div class="support__chat-wrapper">
+                <div class="support__top-plank">
+                    <div class="support__top-plank-wrapper">
+                        <span>Чат поддержки</span>
+                    </div>
                 </div>
+
+                <ul class="support__chat-block scrollbar-overflow">
+                    <div class="messageContainer"></div>
+
+                    <div class="support__chat-answer">
+                    </div>
+                </ul>
+
             </div>
+            <div class="support__input-block">
+                <div class="support__input-block-wrapper">
+                    <input type="file" name="file" id="file-add">
+                    <label for="file-add" class="support__input-block-attach">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#attach"></use>
+                        </svg>
+                    </label>
 
-            <ul class="support__chat-block scrollbar-overflow">
-                <div class="messageContainer"></div>
-
-                <div class="support__chat-answer">
-                </div>
-            </ul>
-
-        </div>
-        <div class="support__input-block">
-            <div class="support__input-block-wrapper">
-                <input type="file" name="file" id="file-add">
-                <label for="file-add" class="support__input-block-attach">
-                    <svg>
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#attach"></use>
-                    </svg>
-                </label>
-
-                <input placeholder="Написать сообщение..." name="chat-message" type="text"
-                       class="support__chat-input" autocomplete="off">
-                <span class="support__input-block-arrow">
+                    <input placeholder="Написать сообщение..." name="chat-message" type="text"
+                           class="support__chat-input" autocomplete="off">
+                    <span class="support__input-block-arrow">
                                 <svg>
                                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#chatarrow"></use>
                                 </svg>
                               </span>
-            </div>
+                </div>
 
+            </div>
         </div>
     </div>
-</div>
-<script>
-    const sendBtn = document.querySelector('.support__input-block-arrow')
-    let inputValue = document.querySelector('.support__chat-input')
-    const chatBlock = document.querySelector('.support__chat-block')
-    const newUserMessage = (message, user) => {
-        const li = document.createElement('li')
-        li.className = 'support__chat-message support__chat-message_your'
-        chatBlock.appendChild(li)
-        const div = document.createElement('div')
-        div.className = 'support__chat-message-text'
-        li.appendChild(div)
-        const span2 = document.createElement('span')
-        span2.innerHTML = user
-        const span = document.createElement('span')
-        span.innerHTML = message
-        div.appendChild(span2)
-        div.appendChild(span)
+    {{ user.username|json_script:'username' }}
+    <script>
+        const sendBtn = document.querySelector('.support__input-block-arrow')
+        let inputValue = document.querySelector('.support__chat-input')
+        const chatBlock = document.querySelector('.support__chat-block')
+        const username = JSON.parse(document.getElementById('username').textContent)
+        let room_id = ''
 
-    }
-    const start_ws = (room_id = 'admin') => {
+        const newUserMessage = (message, user) => {
+            const li = document.createElement('li')
+            li.className = 'support__chat-message support__chat-message_your'
+            chatBlock.appendChild(li)
+            const div = document.createElement('div')
+            div.className = 'support__chat-message-text'
+            li.appendChild(div)
+            const span2 = document.createElement('span')
+            span2.innerHTML = user
+            const span = document.createElement('span')
+            span.innerHTML = message
+            div.appendChild(span2)
+            div.appendChild(span)
 
+        }
 
-        const chats = new WebSocket(
+        const newRoom = (room_name) => {
+
+                if (room_name !== username) {
+                    const div = document.querySelector('.admin_support_chat_wrapper')
+                    const room = document.createElement('p')
+                    room.className = 'support__chat__room'
+                    room.innerHTML = room_name
+                    room.addEventListener('click', () => {
+                        let room_value = room.innerText
+                        room_id = room_value
+                        const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
+                        clear_chat_block.forEach(item => item.remove())
+                        const clear_room = document.querySelectorAll('.support__chat__room')
+                        clear_room.forEach(item => item.remove())
+                        chatS.send(JSON.stringify({
+                            'chat_type': 'support_admin',
+                            'receiver_user_room': room_value
+                        }))
+                    })
+                    div.appendChild(room)
+                }
+            };
+
+        const chatS = new WebSocket(
             'ws://'
             + window.location.host
             + '/ws/chat/'
-            + `${room_id}`
+            + 'admin_chat'
             + '/'
         )
 
-        chats.onmessage = function (e) {
+        chatS.onmessage = function (e) {
+
+
             const data = JSON.parse(e.data);
-            console.log(data)
             if (data.room_name) {
                 newRoom(data.room_name)
             }
             if (data.chat_type === 'support') {
-                newUserMessage(`${data.message}`, data.user)
+                if (data.user === username || data.user === room_id) {
+                    newUserMessage(`${data.message}`, data.user)
+                }
             }
+
         }
-        return chats
-    }
-    let chatS = start_ws()
-    const newRoom = (room_name) => {
-        console.log(room_name)
-        const div = document.querySelector('.admin_support_chat_wrapper')
-        const room = document.createElement('p')
-        room.className = 'support__chat__room'
-        room.innerHTML = room_name
-        room.addEventListener('click', () => {
-            let room_value = room.innerText
-            chatS.close()
-            chatS = start_ws(room_value)
-            const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
-            clear_chat_block.forEach(item => item.remove())
-            const clear_room = document.querySelectorAll('.support__chat__room')
-            clear_room.forEach(item => item.remove())
+
+
+        inputValue.focus();
+        inputValue.onkeyup = function (e) {
+            if (e.keyCode === 13) {  // enter, return
+                sendBtn.click();
+            }
+        };
+        sendBtn.addEventListener('click', () => {
+            chatS.send(JSON.stringify({
+                'chat_type': 'support_admin',
+                'message': inputValue.value,
+                'receive':room_id
+            }));
+
+            inputValue.value = '';
         })
-        div.appendChild(room)
-
-    };
-    inputValue.focus();
-                        inputValue.onkeyup = function (e) {
-                            if (e.keyCode === 13) {  // enter, return
-                                sendBtn.click();
-                            }
-                        };
-    sendBtn.addEventListener('click', () => {
-        chatS.send(JSON.stringify({
-            'chat_type': 'support_admin',
-            'message': inputValue.value,
-        }));
-
-        inputValue.value = '';
-    })
 
 
-</script>
+    </script>
 {% endblock %}
 
