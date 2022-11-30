@@ -2385,7 +2385,7 @@ h3 {
 }
 
 .online-chat {
-  height: 73vh;
+  height: 692px;
   background: #212121;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2837,7 +2837,7 @@ h3 {
   font-weight: 500;
   color: #fff;
   text-align: center;
-  min-width: 206px;
+  min-width: 229px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-transition: 0.3s;
@@ -2870,7 +2870,7 @@ h3 {
 }
 
 .profil__btn:last-child {
-  margin-left: 10px;
+  margin-top: 10px;
 }
 
 .profil__btn:hover {
@@ -3479,6 +3479,8 @@ h3 {
 }
 
 .support__chat {
+  height: 645px;
+  max-height: calc(100vh - 252px);
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -3486,8 +3488,6 @@ h3 {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  height: 88%;
-  min-height: 65vh;
   background: #212121;
   border-radius: 15px;
   -webkit-box-pack: justify;
@@ -3731,6 +3731,7 @@ h3 {
 }
 
 .support__chat-input {
+  min-width: 130px;
   -webkit-box-flex: 1;
   -ms-flex: 1 1;
   flex: 1 1;

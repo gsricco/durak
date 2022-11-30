@@ -331,7 +331,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 chatBlock.style.height = windowHeigth - windowChat.offsetTop + "px";
             } else if (document.documentElement.clientWidth > 540){
                 let chatBlock = document.querySelector(".support__chat");
-                chatBlock.style.height = '68vh'
+                chatBlock.style.height = '645px'
             }
 
         }
