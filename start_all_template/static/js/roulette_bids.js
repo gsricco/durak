@@ -6,14 +6,17 @@ const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 
 
 // let balanceUser - из бэка
-// let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
 // let balanceUser = Number(document.querySelector('#balanceUser').textContent)
-let balanceUser = document.querySelector('.header__profile-sum>span').textContent
-// let balanceUser1 = `{{ detail_user.balance }}`
-// console.log(balanceUser1 + "   Balance back")
+// let balanceUser = document.querySelector('.header__profile-sum>span')
+// let balanceUser = `{{ detail_user.balance }}`
+
+
+// let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+
 
 const createBidItemRow = (data) => {
     //balanceUser - текущий баланс user
+
 
     const bidItemBlock = document.querySelector(`.${data.bet.bidCard}`)
     const bidItem = document.createElement('div')
@@ -49,13 +52,31 @@ const createBidItemRow = (data) => {
 
 // const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
-    let bidCount = document.querySelector('.roulette__table-input').value * 1000;
-    let balanceUser = Number(document.querySelector('.header__profile-sum>span').innerText);
-    console.log(balanceUser, "ETO BALANCE USERA")
+    console.log('itemClick')
 
-    if (is_auth && bidCount) {
+    // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+
+    // console.log(balanceUser, "ETO BALANCE USERA")
+    let bidCount = document.querySelector('.roulette__table-input').value * 1000;
+
+    if (!is_auth) {
+
+        ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
+        let modalAuth = document.querySelector('#authorization')
+        modalAuth.classList.add("open");
+        // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+        modalAuth.addEventListener("click", function (e) {
+            if (!e.target.closest(".popup__content")) {
+                document.querySelector('.popup.open').classList.remove("open");
+            }
+        });
+///////////////////////////////////////////////////////////////////////////////////
+    } else if (bidCount) {
+
+        let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
+
         // console.log(cells)
-        if (balanceUser+1 > Number(bidCount)) {
+        if (balanceUser > Number(bidCount)) {
             chatSocket.send(JSON.stringify({
                 'bet': {
                     'bidCount': bidCount,
@@ -79,26 +100,17 @@ const itemsClick = (bidCard) => {
             balanceUser = balanceUser - Number(bidCount)
             document.querySelector('.header__profile-sum>span').innerHTML = `${balanceUser}`
             // items[0].style.pointerEvents = 'none';
-
             /////////////////////////////////////////////////
         } else {
-            //вывод модалки НЕДОСТАТОЧНО СРЕДСТВ
-            let modalMoney = document.querySelector('#modalMoney')
-            modalMoney.classList.add("open");
-            document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
-            modalMoney.addEventListener("click", function (e) {
-                if (!e.target.closest(".popup__content")) {
-                    document.querySelector('.popup.open').classList.remove("open");
-                }
-            });
+            //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ
+            alert('No money')
         }
         document.querySelector('.roulette__table-input').value = ''
         document.querySelector('.roulette__current-block').innerHTML = '';
     }
+
 }
 
 items[0].addEventListener('click', () => itemsClick('hearts'))
 items[1].addEventListener('click', () => itemsClick('coin'))
 items[2].addEventListener('click', () => itemsClick('spades'))
-
-

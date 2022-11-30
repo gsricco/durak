@@ -56,11 +56,11 @@
                                     <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
                                         аккаунт VK</a>
                                     {% elif not social_vk %}
-                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
+                                    <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_vk">Подключить
                                         аккаунт VK</a>
                                     {% elif not social_google %}
-                                    <a href="{% url 'social:begin' 'google-oauth2' %}"
-                                       class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+<!--                                    <a href="{% url 'social:begin' 'google-oauth2' %}"-->
+                                    <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
                                     {% endif %}
                                     <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
                                     {% else %}
@@ -518,7 +518,7 @@
             </h3>
             <div class="profile-settings">
 
-
+<!--                    avatarModal = {{ request.user.avatar }}-->
                 <form class="profile-settings__row" method="POST">
                     {% csrf_token %}
                     <div class="profile-settings__item-avatar">

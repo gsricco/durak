@@ -310,12 +310,7 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
-                            //winnerCard from backend
-                            // let winnerCard = `${data.winner}`
-                            let winnerCard = `hearts`
-                            console.log(winnerCard +' WinnerCard')
-
-                            if (data.current_balance){
+                            if (data.current_balance) {
                                 console.log(data.current_balance, 'CURRENT BALANCE')
                                 UserBalance.innerHTML = `${data.current_balance}`
                             }
@@ -325,11 +320,12 @@
                                 createBidItemRow(data.bid)
                             }
                             if (data.roll) {
-                                list.innerHTML = ''
-                                generateItems(winnerCard)
-                                startRoll(winnerCard)
+                                startRoll('hearts')
                             }
                             if (data.stop) {
+
+                                //winnerCard from backend
+                                let winnerCard = `${data.winner}`
                                 let bidsNumber = document.querySelectorAll('.roulette__item-money')
                                 const bidsButtons = document.querySelectorAll('.roulette__radio-item')
                                 bidsNumber.forEach(el => {
@@ -338,10 +334,6 @@
                                 if (winnerCard === 'hearts') {
                                     let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
                                     bidsNumber.forEach(el => {
-                                        /////////Логика подсчета баланса при ставках и выйгрыше/пройгрыше/////
-                                        let winnerSum = Number(document.querySelector('.header__profile-sum>span').textContent) + Number(el.textContent) * 2
-                                        document.querySelector('.header__profile-sum>span').innerHTML = `${winnerSum}`
-
                                         el.style.color = 'green'
                                         document.querySelector('.hearts').style.opacity = '1'
                                         bidsButtons[0].style.opacity = '1'
@@ -349,11 +341,6 @@
                                 } else if (winnerCard === 'coin') {
                                     let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
                                     bidsNumber.forEach(el => {
-                                        /////////Логика подсчета баланса при ставках и выйгрыше/пройгрыше/////
-                                        let winnerSum = Number(document.querySelector('.header__profile-sum>span').textContent) + Number(el.textContent) * 14
-                                        document.querySelector('.header__profile-sum>span').innerHTML = `${winnerSum}`
-
-
                                         el.style.color = 'green'
                                         document.querySelector('.coin').style.opacity = '1'
                                         bidsButtons[1].style.opacity = '1'
@@ -361,10 +348,6 @@
                                 } else if (winnerCard === 'spades') {
                                     let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
                                     bidsNumber.forEach(el => {
-                                        /////////Логика подсчета баланса при ставках и выйгрыше/пройгрыше/////
-                                        let winnerSum = Number(document.querySelector('.header__profile-sum>span').textContent) + Number(el.textContent) * 2
-                                        document.querySelector('.header__profile-sum>span').innerHTML = `${winnerSum}`
-
                                         el.style.color = 'green'
                                         document.querySelector('.spades').style.opacity = '1'
                                         bidsButtons[2].style.opacity = '1'
@@ -379,18 +362,18 @@
                             }
 
                             if (data.roulette) {
-                                console.log('start timer')
+                                console.log('hihihi')
                                 timerCounter(data.roulette)
                                 // код для теста функциональности начисления опыта
-                                {#toSend = {#}
-                                {#    "bet": {#}
-                                {#        "credits": 1000000,#}
-                                {#        "placed": "black"#}
-                                {#    }#}
-                                {##}
-                                {#strToSend = JSON.stringify(toSend)#}
-                                {#chatSocket.send(strToSend)#}
-                                {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
+                                // {#toSend = {#}
+                                // {#    "bet": {#}
+                                // {#        "credits": 1000000,#}
+                                // {#        "placed": "black"#}
+                                // {#    }#}
+                                // {##}
+                                // {#strToSend = JSON.stringify(toSend)#}
+                                // {#chatSocket.send(strToSend)#}
+                                // {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
                                 ////////////////////////////
                             }
                             if (data.lvlup) {
@@ -469,7 +452,16 @@
                                     'rubin': rubin
                                 }));
                             } else {
-                                alert('No auth user, sorry')
+                                ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
+                                let modalAuth = document.querySelector('#authorization')
+                                modalAuth.classList.add("open");
+                                // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+                                modalAuth.addEventListener("click", function (e) {
+                                    if (!e.target.closest(".popup__content")) {
+                                        document.querySelector('.popup.open').classList.remove("open");
+                                    }
+                                });
+///////////////////////////////////////////////////////////////////////////////////
                             }
                             messageInput.value = '';
 
@@ -1100,7 +1092,65 @@
 
         </div>
     </div>
+    <div class="popup" id="authorization">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal_authorization">
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <div class="modal-enter">
+                    <h3 class="modal__title modal-enter__title">
+                        Авторизуйтесь для продолжения
+                    </h3>
+                    <div class="modal-enter__body">
+                        <div class="modal-enter__row">
+                            <div class="modal-enter__item">
+                                <div class="modal-enter__img">
+                                    <svg class="yt">
+                                        <use xlink:href="img/icons/sprite.svg#youtube"></use>
+                                    </svg>
+                                </div>
+                                <a href="/login/google-oauth2/" class="btn btns_yt modal-enter__btn">Войти через
+                                    Google</a>
+                            </div>
+                            <div class="modal-enter__item">
+                                <div class="modal-enter__img">
+                                    <svg class="vk">
+                                        <use xlink:href="img/icons/sprite.svg#vk"></use>
+                                    </svg>
+                                </div>
+                                <a href="/login/vk-oauth2/" class="btn btns_vk modal-enter__btn">Войти через
+                                    Вконтакте</a>
+                            </div>
 
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup" id="modalAccountSocial">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal_authorization">
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <div class="modal-enter">
+                    <div class="closedBlock">
+                        <img class="closedImg" src="{% static 'img/icons/closedIcon.svg' %}" alt="Krest">
+                        <h3 class="modal__title modal-enter__title">
+                            Вы уже привязали этот аккаунт <span class="googleSp">Google</span>/<span class="vkSp">Вконтакте</span> к другому аккануту <span class="vkSp">Вконтакте</span>/<span class="googleSp">Google</span>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

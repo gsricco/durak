@@ -652,9 +652,18 @@ window.addEventListener("DOMContentLoaded", () => {
         const avaBtnShow = document.getElementById("avaBtnShow");
         const profileImage = document.getElementById("profileImage");
 
+
         function getImage() {
-            let randomNum = Math.floor(Math.random() * 8);
-            profileImage.setAttribute("src", `img/avatar/${randomNum}.svg`);
+
+            fetch(' http://127.0.0.1:8000/api/v1/avatar_default/')
+                .then(response => response.json())
+                .then((data) => {
+                    console.log('sizeArray ' + data.length)
+                    let randomNum = Math.floor(Math.random() * (data.length));
+                    const avatarka = data[randomNum]['avatar_default']
+                    console.log('RANDOM_ICON '+randomNum + ' LINK- '+avatarka);
+                    profileImage.setAttribute("src", `${avatarka}`);
+                });
         }
 
         avaBtnHide.addEventListener("click", () => {
@@ -664,7 +673,18 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         avaBtnShow.addEventListener("click", () => {
-            profileImage.setAttribute("src", `img/avatar/user/avatar.png`);
+            fetch('http://127.0.0.1:8000/api/v1/avatar/')
+                .then(response => response.json())
+                .then((data) => {
+                    console.log('USER_NAME '+username)
+
+                    let userNow = data.filter(el => el['username'] === username)
+                    console.log('userAvatar     ' + userNow[0]['avatar']);
+
+                    const avatarSocial = userNow[0]['avatar']
+                    profileImage.setAttribute("src", `${avatarSocial}`);
+                    // profileImage.setAttribute("src", `/media/img/avatar/user/image_1`);
+                });
             avaBtnShow.style.display = "none";
             avaBtnHide.style.display = "block";
         });
@@ -1368,6 +1388,18 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+/////////Аккаунт уже привязан////////////////
+    const vkBtn = document.querySelector('#qqq');
+    vkBtn.addEventListener('click', ()=>{
+        let modalAuth = document.querySelector('#modalAccountSocial')
+        modalAuth.classList.add("open");
+        // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+        modalAuth.addEventListener("click", function (e) {
+            if (!e.target.closest(".popup__content")) {
+                document.querySelector('.popup.open').classList.remove("open");
+            }
+        });
+    })
 
 
 
