@@ -455,7 +455,6 @@
                                 ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
                                 let modalAuth = document.querySelector('#authorization')
                                 modalAuth.classList.add("open");
-                                // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
                                 modalAuth.addEventListener("click", function (e) {
                                     if (!e.target.closest(".popup__content")) {
                                         document.querySelector('.popup.open').classList.remove("open");

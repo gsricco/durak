@@ -103,7 +103,15 @@ const itemsClick = (bidCard) => {
             /////////////////////////////////////////////////
         } else {
             //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ
-            alert('No money')
+            let modalMoney = document.querySelector('#modalMoney')
+            modalMoney.classList.add("open");
+            document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+            modalMoney.addEventListener("click", function (e) {
+                if (!e.target.closest(".popup__content")) {
+                    document.querySelector('.popup.open').classList.remove("open");
+                }
+            });
+///////////////////////////////////////////////////////////////////////////////////
         }
         document.querySelector('.roulette__table-input').value = ''
         document.querySelector('.roulette__current-block').innerHTML = '';
