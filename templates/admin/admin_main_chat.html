@@ -53,6 +53,16 @@
         const username = JSON.parse(document.getElementById('username').textContent)
         let room_id = ''
 
+        const chat_cleaner = () => {
+            const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
+            clear_chat_block.forEach(item => item.remove())
+        }
+
+        const room_cleaner = () => {
+            const clear_room = document.querySelectorAll('.support__chat__room')
+            clear_room.forEach(item => item.remove())
+        }
+
         const newUserMessage = (message, user) => {
             const li = document.createElement('li')
             li.className = 'support__chat-message support__chat-message_your'
@@ -70,27 +80,29 @@
         }
 
         const newRoom = (room_name) => {
-
-                if (room_name !== username) {
-                    const div = document.querySelector('.admin_support_chat_wrapper')
-                    const room = document.createElement('p')
-                    room.className = 'support__chat__room'
-                    room.innerHTML = room_name
-                    room.addEventListener('click', () => {
-                        let room_value = room.innerText
-                        room_id = room_value
-                        const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
-                        clear_chat_block.forEach(item => item.remove())
-                        const clear_room = document.querySelectorAll('.support__chat__room')
-                        clear_room.forEach(item => item.remove())
-                        chatS.send(JSON.stringify({
-                            'chat_type': 'support_admin',
-                            'receiver_user_room': room_value
-                        }))
-                    })
-                    div.appendChild(room)
-                }
-            };
+            if (room_name !== username) {
+                const div = document.querySelector('.admin_support_chat_wrapper')
+                const room = document.createElement('p')
+                room.className = 'support__chat__room'
+                room.innerHTML = room_name
+                room.addEventListener('click', () => {
+                    let room_value = room.innerText
+                    room_id = room_value
+                    chat_cleaner()
+                    room_cleaner()
+                    {#chat_cleaner()#}
+                    {#const clear_chat_block = document.querySelectorAll('.support__chat-message_your')#}
+                    {#clear_chat_block.forEach(item => item.remove())#}
+                    {#const clear_room = document.querySelectorAll('.support__chat__room')#}
+                    {#clear_room.forEach(item => item.remove())#}
+                    chatS.send(JSON.stringify({
+                        'chat_type': 'support_admin',
+                        'receiver_user_room': room_value
+                    }))
+                })
+                div.appendChild(room)
+            }
+        };
 
         const chatS = new WebSocket(
             'ws://'
@@ -105,7 +117,9 @@
 
             const data = JSON.parse(e.data);
             if (data.room_name) {
-                newRoom(data.room_name)
+                room_cleaner()
+                data.room_name.forEach(e => newRoom(e))
+
             }
             if (data.chat_type === 'support') {
                 if (data.user === username || data.user === room_id) {
@@ -126,7 +140,7 @@
             chatS.send(JSON.stringify({
                 'chat_type': 'support_admin',
                 'message': inputValue.value,
-                'receive':room_id
+                'receive': room_id
             }));
 
             inputValue.value = '';

@@ -4,6 +4,7 @@ from .models import Message, UserChatRoom
 
 # class MessageInLine(admin.TabularInline):
 #     model = Message
+admin.site.register(Message)
 
 @admin.register(UserChatRoom)
 class UserChatRoomAdmin(admin.ModelAdmin):

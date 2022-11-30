@@ -25,17 +25,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user_mess = Message(user_posted_id=user, message=message)
             user_mess.save()
             room.message.add(user_mess, bulk=False)
+            room.save()
+            async_to_sync(self.get_all_room)()
+            print(f'Сохранил сообщение {room}')
             return user_mess
 
     @sync_to_async()
     def get_all_room(self):
+        print('Отправились комнаты')
         try:
             rooms = UserChatRoom.objects.all()
             serializer = OnlyRoomSerializer(rooms, many=True)
+            room_list = []
             for i in serializer.data:
-                async_to_sync(self.channel_layer.send)(self.channel_name, {"type": "get_rooms",
-                                                                           "room_name": i['room_id']
-                                                                           })
+                room_list.append(i['room_id'])
+            print(room_list)
+            async_to_sync(self.channel_layer.group_send)('admin_group', {'type': 'get_rooms', 'room_name': room_list})
+            # for i in serializer.data:
+            #     async_to_sync(self.channel_layer.group_send)('admin_group', {"type": "get_rooms",
+            #                                                                "room_name": i['room_id']
+            #                                                                })
         except:
             print('error get_all_room')
 
@@ -91,10 +100,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             await self.get_all_room()
 
-
     async def disconnect(self, code):
         """Отключение пользователя"""
-        r.delete(str(self.scope['user']))  # удаляет запись об юзере из редиса при отключении
+        await self.channel_layer.group_discard(f'{str(self.scope["user"])}_room', self.channel_name)
         await self.channel_layer.group_discard('admin_group', self.channel_name)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # убирает юзера из группы
         await self.send_online(-1)  # отправляет онлайн
@@ -139,10 +147,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # online = self.channel_layer.receive_count
 
         '''первичное получение и обработка сообщений'''
-        if text_data_json.get('chat_type') == 'support':  #сообщение из support чата
+        if text_data_json.get('chat_type') == 'support':  # сообщение из support чата
             user = str(self.scope.get('user'))
             room = await self.create_or_get_support_chat_room(text_data_json.get('user'))  # получает рум из бд
-            await self.save_user_message(room, user,text_data_json["message"])  # сохранение сообщения
+            await self.save_user_message(room, user, text_data_json["message"])  # сохранение сообщения
             admin_status = await self.get_user_status(user)
             if not admin_status:
                 await self.send_support_chat_message(self.channel_name,
