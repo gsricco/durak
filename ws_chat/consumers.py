@@ -1,3 +1,4 @@
+import datetime
 import json
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -5,6 +6,7 @@ import redis
 from accaunts.models import CustomUser
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
+from .tasks import ROUND_RESULT_FIELD_NAME
 
 r = redis.Redis()  # подключаемся к редису
 
@@ -40,13 +42,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print('error get_all_room')
 
     async def send_online(self, num):
-        '''функция отправки онлайна. вызывается при коннекте и дисконнекте'''
+        """Отправка онлайна при коннекте и дисконнекте пользователя"""
         online = self.channel_layer.receive_count + num
         await self.channel_layer.group_send(self.room_group_name, {"type": "get_online", "get_online": online})
 
     @sync_to_async()
     def send_json(self, channel, room_name):
-        '''отправка истории сообщений'''
+        """Отправка истории сообщений в чат поддержки"""
         try:
             room_data = UserChatRoom.objects.get(room_id=room_name)  # получаем комнату
             serializer = RoomSerializer(room_data)  # сериализуем ее
@@ -60,7 +62,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             pass
 
     async def send_support_chat_message(self, channel_name, message, user):
-        '''Отправка сообщения в суппорт чат . Аргументы channel_name,message,user '''
+        """Отправка сообщения в суппорт чат . Аргументы channel_name,message,user """
         await self.channel_layer.send(
             channel_name, {"type": "chat_message",
                            "chat_type": "support",
@@ -68,7 +70,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                            "user": user, })
 
     async def connect(self):
-        '''Подключение юзеров'''
+        """Подключение юзеров"""
+        print(self.scope)
         recieve_user = str(self.scope["url_route"]["kwargs"][
                                "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = str(self.scope['user'])  # получаем имя пользователя который подключился с фронта
@@ -76,7 +79,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_name = 'go'  # задаем статический румнейм для общего чата
         self.room_group_name = "chat_%s" % self.room_name  # формируем рум груп нейм
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
-        await self.accept()  # подтверждение
+        await self.accept()
+        await self.channel_layer.send(self.channel_name, {
+            "type": 'roulette_countdown_state',
+        })
+        # подтверждение
         await self.send_online(0)  # отправляем количество вебсокет подключений на фронт
         if recieve_user == 'go':  # проверка подключение из админки или нет .'go' - это не админка
             await self.send_json(self.channel_name, user)  # выгружает свою историю чата в суппорт чат
@@ -114,14 +121,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "bid": text_data_json,
                 }
             )
-        # if text_data_json.get('bet'):
-        #     # expected to have bet like {"bet": {"credits": 1000, "placed": "black"}}
-        #     user = self.scope.get('user')
-        #     if user and user.is_authenticated:
-        #         user_pk = user.pk
-        #         bet = text_data_json.get('bet')
-        #         print(f"receive method in consumers.py: Receiving bet from user({user_pk}): {bet}")
-        #         await self.save_bet(bet, user_pk)
         if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
             message = text_data_json.get("message")
             user = text_data_json["user"]
@@ -138,9 +137,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                          text_data_json["message"])  # сохранении сообщение в полученой комнате
             byte_user_channel_name = r.get('admin')  # проверяем есть ли дамин в онлайне(НУЖНО ДОДЕЛАТЬ)
             if byte_user_channel_name:
-                user_channel_name = bytes.decode(byte_user_channel_name, encoding='utf-8')  # получаем channel_name админа
+                user_channel_name = bytes.decode(byte_user_channel_name,
+                                                 encoding='utf-8')  # получаем channel_name админа
                 await self.send_support_chat_message(user_channel_name, text_data_json["message"],
-                                                 text_data_json["user"])  # отправляем сообщение из супорт чата админу
+                                                     text_data_json[
+                                                         "user"])  # отправляем сообщение из супорт чата админу
             await self.send_support_chat_message(self.channel_name, text_data_json["message"], text_data_json[
                 "user"])  # отправляем сообщение из супорт чата на сайте себе
         elif text_data_json.get('chat_type') == 'all_chat':
@@ -172,9 +173,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                  sender_user)  # отправка сообщения самому себе в админку
 
     async def get_online(self, event):
+        """Получение онлайна для нового юзера"""
         online = event['get_online']
+        t = datetime.datetime.now()
         await self.send(text_data=json.dumps({
-            "get_online": online
+            "get_online": online,
+            "time": str(int(t.timestamp() * 1000))
         }))
 
     async def get_rooms(self, event):
@@ -184,6 +188,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def chat_message(self, event):
+        """Общий чат - обмен сообщениями"""
         chat_type = event.get('chat_type')
         user = event.get('user')
         message = event.get("message")
@@ -197,20 +202,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                               "rubin": rubin,
                                               # "online": online
                                               }))
-# начинает отсчёт
+
+    # начинает отсчёт
     async def korney_task(self, event):
+        """Начинает отсчёт рулетки"""
         data = event.get('data')
+        curr_round = event.get('round')
         await self.send(text_data=json.dumps({
             "roulette": 20,
-            "data": data
+            "data": data,
+            "round": curr_round,
         }))
-# начинает крутиться рулетка
+
+    # начинает крутиться рулетка
     async def rolling(self, event):
+        """Начинает прокрутку рулетки"""
         await self.send(text_data=json.dumps({
             "roll": 'rolling',
         }))
 
     async def stopper(self, event):
+        """Сигнализирует об остановке прокрутки рулетки"""
         message = event.get('winner')
         await self.send(text_data=json.dumps({
             "stop": "stopping",
@@ -218,46 +230,45 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def go_back(self, event):
+        """Откатывает рулетку на первоначальное состояние"""
         await self.send(text_data=json.dumps({
             'back': 'go-back',
         }))
 
     async def get_bid(self, event):
+        """Обрабатывает ставки пользователей"""
         data = event.get('bid')
-        # amount = event['bidCount']
-        print(data, 'ETO DATA V GET_BID')
         await self.send(text_data=json.dumps({
             "bid": data,
         }))
 
     async def get_balance(self, event):
+        """Отправляет изменения баланса пользователя"""
         print('send new balance to user')
         message = event.get('balance_update')
         print(message)
         await self.send(text_data=json.dumps(message))
 
-    async def save_as_nested(keys_storage_name: str, dict_key: (str | int), dictionary: dict) -> None:
-        """
-        Creates a nested structure imitation in redis.
-
-        Args:
-            keys_storage_name (str): name of the list where dict_key will be stored;
-            dict_key (str|int): name of the key to acces dict;
-            dictionary (dict): dict to store.
-        """
-        async with r.pipeline() as pipe:
-            pipe.rpush(keys_storage_name, dict_key)
-            pipe.hmset(dict_key, dictionary)
-            pipe.execute()
-        print(f"Hi from save_as_nested. {r.hgetall(dict_key)}")
+    # async def save_as_nested(keys_storage_name: str, dict_key: (str | int), dictionary: dict) -> None:
+    #     """
+    #     Creates a nested structure imitation in redis.
+    #
+    #     Args:
+    #         keys_storage_name (str): name of the list where dict_key will be stored;
+    #         dict_key (str|int): name of the key to acces dict;
+    #         dictionary (dict): dict to store.
+    #     """
+    #     async with r.pipeline() as pipe:
+    #         pipe.rpush(keys_storage_name, dict_key)
+    #         pipe.hmset(dict_key, dictionary)
+    #         pipe.execute()
+    #     print(f"Hi from save_as_nested. {r.hgetall(dict_key)}")
 
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
         bet["channel_name"] = self.channel_name
         await tasks.save_as_nested(storage_name, user_pk, bet)
-
-
 
     async def send_new_level(self, event):
         """Отправляет по каналу сообщение о новом уровне"""
@@ -271,4 +282,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = dict()
         message["rewards"] = event.get("rewards")
         print("send reward")
+        await self.send(json.dumps(message))
+
+    async def roulette_countdown_state(self, event):
+        """Отправляет новому клиенту состояние рулетки при уже начавшемся отсчёте"""
+        state = r.get('state')
+
+        t = r.get('start:time')
+        # print(str(t.decode('utf-8')), state.decode('utf-8'))
+        message = {'init': {"state": state.decode('utf-8'),
+                            "t": str(t.decode('utf-8'))}
+                   }
+        if state.decode('utf-8') == 'rolling':
+            round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
+            message['init']['winner'] = round_result
+        print(message)
         await self.send(json.dumps(message))

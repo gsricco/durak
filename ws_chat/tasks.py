@@ -1,3 +1,4 @@
+import datetime
 from configs import celery_app
 from celery import shared_task
 from redis import Redis
@@ -8,9 +9,9 @@ from channels.layers import get_channel_layer
 import random
 
 channel_layer = get_channel_layer()
-r = Redis(db=1)
-# ROUND_RESULTS = ('hearts',)
-ROUND_RESULTS = ('spades', 'hearts', 'coin')
+r = Redis()
+ROUND_RESULTS = ('coin',)
+# ROUND_RESULTS = ('spades', 'hearts', 'coin')
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 KEYS_STORAGE_NAME = 'USERID:list'
 
@@ -20,20 +21,21 @@ LOSE_COEF = 1
 CREDITS_TO_EXP_COEF = 1000
 
 
-@shared_task(bind=True)
-def sender(self):
-    print(self)
+@shared_task
+def sender():
+    t = datetime.datetime.now()
+    r.incr('round', 1)
+    r.set('state', 'countdown', ex=30)
+    r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'korney_task',
-                                                'do': 'do_something'
+                                                'do': 'do_something',
+                                                'round': r.get('round').decode('utf-8')
                                             }
                                             )
-    print('sender func done')
-    return {"my_name": "Korney"}
+    r.json().delete('round_bets')
 
-
-# @app.task
 @shared_task
 def debug_task():
     sender.apply_async()
@@ -45,12 +47,20 @@ def debug_task():
 
 @shared_task
 def roll():
+    t = datetime.datetime.now()
+    r.set('state', 'rolling', ex=30)
+    r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
                                             })
+
+
 @shared_task
 def go_back():
+    t = datetime.datetime.now()
+    r.set('state', 'go_back', ex=30)
+    r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'go_back',
@@ -58,6 +68,9 @@ def go_back():
 
 @shared_task
 def stop():
+    t = datetime.datetime.now()
+    r.set('state', 'stop', ex=30)
+    r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
@@ -67,48 +80,67 @@ def stop():
 
 
 # @shared_task()
-async def save_as_nested(keys_storage_name: str, dict_key: (str|int), dictionary: dict) -> None:
+async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info: dict) -> None:
     """
-    Creates a nested structure imitation in redis.
+    Записывает ставку пользователя в redis.json()
 
     Args:
         keys_storage_name (str): name of the list where dict_key will be stored;
-        dict_key (str|int): name of the key to access dict;
-        dictionary (dict): dict to store.
+        dict_key (str|int): ключ в словаре - user-id для записи/доступа;
+        bet_info (dict): информация о конкретной ставке пользователя в текущем раунде;
     """
-    with r.pipeline() as pipe:
-        pipe.rpush(keys_storage_name, dict_key)
-        pipe.hmset(dict_key, dictionary)
-        pipe.execute()
-    print(f"Hi from save_as_nested. {r.hgetall(dict_key)}")
+    current_round = r.get('round')
+    bet_to_redis_json = bet_info
+    bet_to_redis_json['amount'] = {bet_info['bidCard']: bet_info['bidCount']}
+    to_save = {dict_key: bet_to_redis_json}
+    if previous_bet := r.json().get('round_bets', dict_key):
+        print('if previous bet WORK >>>>>>>>>>>>>>>>>>>>')
+        if bet_info['bidCard'] in previous_bet['amount']:
+            print(f'Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+            r.json().numincrby('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
+        else:
+            print(f'Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+            r.json().set('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
+    else:
+        r.json().set('round_bets', ".", to_save)
 
 
-def eval_experience(credits: int, bet: str, round_result: str) -> int:
-    """Evaluates experience amount for bet.
+def eval_experience(user_bet: dict, round_result:str) -> int:
+    """Рассчитывает опыт в зависимости от ставки пользователя
 
     Args:
-        credits (int): amount of credits placed on the bet
-        bet (str): bet placed
-        round_result (str): a round result - the winning bet
+        user_bet (dict): полная информация о ставке пользователя
+        round_result (str): победная карта текущего раунда
 
     Returns:
         int: evaluated amount of experience
     """
-    experience = credits // CREDITS_TO_EXP_COEF
-    experience *= WIN_COEF if bet == round_result else LOSE_COEF
+    xp = 0
+    for bet in user_bet:
+        xp += int(user_bet[bet]) // CREDITS_TO_EXP_COEF
+    return xp
 
-    return experience
 
+def eval_balance(user_bet: dict, round_result: str) -> int:
+    """Рассчитывает изменение баланса юзера в зависимости от его ставок
 
-def eval_balance(credits: int, bet: str, round_result: str) -> int:
-    if bet == round_result:
-        if bet == 'spades' or 'hearts':
-            return credits
+    Args:
+          user_bet -> dict: информация о ставках пользователя
+          round_result -> str: победная карта текущего раунда
+    """
+    credits = 0
+    for bet_card in user_bet:
+        if bet_card == round_result:
+            if bet_card == ('spades' or 'hearts'):
+                credits += int(user_bet[bet_card])
+            else:
+                credits += int(user_bet[bet_card]) * 13
+        # Возможно списание средств надо оставить на момент самой ставки
+        # и убрать отсюда
         else:
-            return credits*13
-    else:
-        return -credits
-
+            credits += - int(user_bet[bet_card])
+    print(f'Кол-во кредитов к начислению : {credits}')
+    return credits
 
 @shared_task()
 def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
@@ -121,22 +153,17 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     Returns:
         int: return code
     """
-    # Get bets keys from redis. Bets keys are expected to be users pks
-    bets_keys = r.lpop(keys_storage_name, r.llen(keys_storage_name))
-    print(f"Extracted keys: {bets_keys}")
-    if bets_keys is None:
+    # получение всех ключей - id юзеров, который делали ставки в этом раунде
+    bets_keys = r.json().objkeys('round_bets')
+    # получаем информацию о всех ставках на текущий раунд
+    bets_info = r.json().get('round_bets')
+
+    print(f"Extracted keys: {bets_keys}", type(bets_keys))
+    if not bets_keys:
         print('There were no bets for this round')
         return 1
-    user_ids = [key.decode("utf-8") for key in bets_keys]
-
-    # Get bets from redis
-    # bets = {key: dict(r.hgetall(key)) for key in bets_keys_str}
-    # print(f"Extracted bets: f{bets}")
-
-    # Get users that placed a bet
-
     # make async in future
-    users = models.CustomUser.objects.filter(pk__in=user_ids)
+    users = models.CustomUser.objects.filter(pk__in=list(map(lambda x: int(x), bets_keys)))
     print(f"Users with a bet: f{users}")
 
     # Get round results
@@ -150,25 +177,17 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     for user in users:
         # получение информации о ставке пользователя
         bet_key = user.pk
-        credits_amount_byte = r.hget(bet_key, "bidCount")
-        print(credits_amount_byte, type(credits_amount_byte), '----'*50)
-        credits_amount = int(credits_amount_byte) if credits_amount_byte else 0
-        print(credits_amount, 'AMOUNT OF BID')
-        placed_bet_byte = r.hget(bet_key, "bidCard")
-        placed_bet = placed_bet_byte.decode("utf-8") if placed_bet_byte else None
-
+        # получаем словарь со всеми ставками юзера
+        user_bets = bets_info[str(bet_key)]
         # расчёт количества начисляемого опыта
-        experience = eval_experience(credits_amount, placed_bet, round_result)
-        user.detailuser.balance += eval_balance(credits_amount, placed_bet, round_result)
-        # добавление опыта пользователю (без сохранения в БД)
-        user.experience += experience
-        print(f"Bet by {user.username}:pk{user.pk} amount {credits_amount} on {placed_bet} results {experience} exp")
-
+        xp = eval_experience(user_bets['amount'], round_result)
+        # расчёт и начисление баланса без сохранения в БД
+        user.detailuser.balance += eval_balance(user_bets['amount'], round_result)
+        # добавление опыта пользователю без сохранения в БД
+        user.experience += xp
         # запоминает номер предыдущего уровня
         prev_level = user.level.level
-        channel_name_byte = r.hget(user.pk, "channel_name")
-        if channel_name_byte:
-            channel_name = channel_name_byte.decode("utf-8")
+        if channel_name := bets_info[str(bet_key)]['channel_name']:
             message = {
                 'type': 'get_balance',
                 'balance_update': {
@@ -179,12 +198,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # после получения опыта пробует начислить пользователю уровни
         rewards_for_level = user.give_level()
 
-        # если уровень пользоватея изменился
+        # если уровень пользователя изменился
         if prev_level != user.level.level:
-            # находим канал с пользователем и отправляем ему сообщение о новом уровне
-            channel_name_byte = r.hget(user.pk, "channel_name")
-            if channel_name_byte:
-                channel_name = channel_name_byte.decode("utf-8")
+            if channel_name := bets_info[str(bet_key)]['channel_name']:
                 message = {
                     "type": "send_new_level",
                     "lvlup": {
@@ -202,8 +218,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                 print(f"Rewards was given: {users_rewards}")
 
                 # отправляем пользователю сообщение о доступных наградах
-                if channel_name_byte:
-                    channel_name = channel_name_byte.decode("utf-8")
+                if channel_name:
                     message = {
                         "type": "send_rewards",
                         "rewards": {
@@ -223,7 +238,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
 
 @shared_task()
-def generate_round_result(process_after_generating: bool=False) -> int:
+def generate_round_result(process_after_generating: bool = False) -> int:
     """Generates round result and stores it in redis
 
     Args:
@@ -234,10 +249,8 @@ def generate_round_result(process_after_generating: bool=False) -> int:
     """
     result = random.choice(ROUND_RESULTS)
     r.set(ROUND_RESULT_FIELD_NAME, result)
-    print(r.get(ROUND_RESULT_FIELD_NAME), 'generate_round_result'*50)
 
     if process_after_generating:
-        print('IF STATEMENT'*100)
         process_bets.apply_async(args=(KEYS_STORAGE_NAME, ROUND_RESULT_FIELD_NAME,))
 
     return 0

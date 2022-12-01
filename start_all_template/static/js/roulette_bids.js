@@ -33,7 +33,7 @@ const createBidItemRow = (data) => {
 
     const itemAvatar = document.createElement('div')
     itemAvatar.className = 'roulette__item-avatar'
-    itemAvatar.innerHTML = `<img src="${media_prefix}${data.bet.avatar}" alt="">`
+    itemAvatar.innerHTML = `<img src="${data.bet.avatar}" alt="">`
     bidItemLeftBlock.appendChild(itemAvatar)
 
     const itemStone = document.createElement('div')
@@ -56,7 +56,7 @@ const itemsClick = (bidCard) => {
     console.log(balanceUser, "ETO BALANCE USERA")
     if (is_auth && bidCount) {
         // console.log(cells)
-        if (balanceUser > Number(bidCount)) {
+        if (balanceUser >= Number(bidCount)) {
             chatSocket.send(JSON.stringify({
                 'bet':{
                 'bidCount': bidCount,
