@@ -314,7 +314,7 @@ chatSocket.onmessage = function (e) {
 
     if (data.bid) {
         console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
-        // createBidItemRow(data.bid)
+        createBidItemRow(data.bid)
     }
     if (data.roll) {
         generateItems(data.winner)
