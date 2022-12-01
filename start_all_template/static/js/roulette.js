@@ -79,10 +79,10 @@ function startRoll(winnerCard) {
     items[1].style.pointerEvents = 'none';
     items[2].style.pointerEvents = 'none';
 
-    bidsButtons.forEach(el=>{
+    bidsButtons.forEach(el => {
         el.style.opacity = '0.3'
     })
-    bidsBlock.forEach(el=>{
+    bidsBlock.forEach(el => {
         el.style.opacity = '0.3'
     })
 
@@ -90,7 +90,6 @@ function startRoll(winnerCard) {
     wrapperItems.classList.remove("roulette__rull-wrapper_blur");
     timerWrapper.style.display = "none";
     rull_line.style.display = "block";
-
 
 
     function randomInteger(min, max) {
@@ -138,10 +137,10 @@ let timerCounter = (back_counter) => {
     items[1].style.pointerEvents = '';
     items[2].style.pointerEvents = '';
 
-    bidsButtons.forEach(el=>{
+    bidsButtons.forEach(el => {
         el.style.opacity = '1'
     })
-    bidsBlock.forEach(el=>{
+    bidsBlock.forEach(el => {
         el.style.opacity = '1'
     })
 
@@ -231,210 +230,258 @@ if (document.querySelector(".scrollbar-overflow")) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        const roomName = JSON.parse(document.getElementById('room-name').textContent);
-                        const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
-                        const username = JSON.parse(document.getElementById('username').textContent);
-                        const messageBlock = document.querySelector('.online-chat__list')
-                        const buttonSend = document.querySelector('.online-chat__icon-arrow')
-                        const messageInput = document.querySelector('.online-chat__input');
-                        const scrollBlock = document.querySelector('.online-chat__body')
-                        const UserBalance = document.querySelector('.header__profile-sum>span')
-                        const chatSocket = new WebSocket(
-                            'ws://'
-                            + window.location.host
-                            + '/ws/chat/go/'
-                        );
-                        const online = document.querySelector('.online-chat__current')
-                        const newUserMessage = (message, user) => {
-                            const li = document.createElement('li')
-                            li.className = 'support__chat-message support__chat-message_your'
-                            chatBlock.appendChild(li)
-                            const div = document.createElement('div')
-                            div.className = 'support__chat-message-text'
-                            li.appendChild(div)
-                            const span2 = document.createElement('span')
-                            span2.innerHTML = user
-                            const span = document.createElement('span')
-                            span.innerHTML = message
-                            div.appendChild(span2)
-                            div.appendChild(span)
-                        }
+const roomName = JSON.parse(document.getElementById('room-name').textContent);
+const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
+const username = JSON.parse(document.getElementById('username').textContent);
+const messageBlock = document.querySelector('.online-chat__list')
+const buttonSend = document.querySelector('.online-chat__icon-arrow')
+const messageInput = document.querySelector('.online-chat__input');
+const scrollBlock = document.querySelector('.online-chat__body')
+const UserBalance = document.querySelector('.header__profile-sum>span')
+const chatSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/chat/go/'
+);
+const online = document.querySelector('.online-chat__current')
+const newUserMessage = (message, user, file_path) => {
 
-                        chatSocket.onmessage = function (e) {
-                            const data = JSON.parse(e.data);
-                            if(data.init){
-                                if (data.init.state === 'countdown'){
-                                    let timeNow = Date.now()
-                                    let remainTime = (20*1000 - (timeNow - data.init.t))/1000
-                                    timerCounter(remainTime)
-                                }
-                                if (data.init.state === 'rolling'){
-                                    console.log(data)
-                                    startRoll(data.init.winner)
+    const li = document.createElement('li')
+    li.className = 'support__chat-message support__chat-message_your'
+    const div = document.createElement('div')
+    div.className = 'support__chat-message-text'
+    const spanUser = document.createElement('span')
+    const span = document.createElement('span')
+    const fullDiv = document.createElement('div')
+    fullDiv.style.display = 'flex'
+    fullDiv.style.flexDirection = 'column'
+    spanUser.style.textAlign = 'right'
+    if (user !== username) {
+        li.style.justifyContent = 'flex-start'
+        li.style.paddingLeft = '0%'
+        li.style.paddingRight = '16%'
+        div.style.background = 'orange'
+        div.style.borderRadius = '15px 15px 15px 0px'
+        spanUser.style.textAlign = 'left'
+    }
+    chatBlock.appendChild(li)
+    li.appendChild(div)
 
-                                }
-                            }
-                            if (data.current_balance){
-                                console.log(data.current_balance, 'CURRENT BALANCE')
-                                UserBalance.innerHTML = `${data.current_balance}`
-                            }
-
-                            if (data.bid) {
-                                console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
-                                createBidItemRow(data.bid)
-                            }
-                            if (data.roll) {
-                                generateItems('hearts')
-                                startRoll()
-                            }
-                            if (data.stop) {
-
-                                //winnerCard from backend
-                                let winnerCard = `${data.winner}`
-                                let bidsNumber = document.querySelectorAll('.roulette__item-money')
-                                const bidsButtons = document.querySelectorAll('.roulette__radio-item')
-                                bidsNumber.forEach(el => {
-                                    el.style.color = 'red'
-                                })
-                                if (winnerCard === 'hearts') {
-                                    let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
-                                    bidsNumber.forEach(el => {
-                                        el.style.color = 'green'
-                                        document.querySelector('.hearts').style.opacity = '1'
-                                        bidsButtons[0].style.opacity = '1'
-                                    })
-                                } else if (winnerCard === 'coin') {
-                                    let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
-                                    bidsNumber.forEach(el => {
-                                        el.style.color = 'green'
-                                        document.querySelector('.coin').style.opacity = '1'
-                                        bidsButtons[1].style.opacity = '1'
-                                    })
-                                } else if (winnerCard === 'spades') {
-                                    let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
-                                    bidsNumber.forEach(el => {
-                                        el.style.color = 'green'
-                                        document.querySelector('.spades').style.opacity = '1'
-                                        bidsButtons[2].style.opacity = '1'
-                                    })
-                                }
+    spanUser.innerHTML = user
+    span.innerHTML = message
+    div.appendChild(span)
+    fullDiv.appendChild(spanUser)
+    fullDiv.appendChild(div)
+    if (file_path) {
+        const file_url = document.createElement('div')
+        file_url.innerHTML = 'Файл'
+        file_url.className = 'file_name'
+        file_url.addEventListener('click', () => {
+            window.open(`http://127.0.0.1:8000${file_path}`)
+        })
+        if (user !== username) {
+            li.appendChild(fullDiv)
+            li.appendChild(file_url)
+        } else {
+            li.appendChild(file_url)
+            li.appendChild(fullDiv)
+        }
+    } else {
+        li.appendChild(fullDiv)
+    }
 
 
-                            }
-                            if (data.back) {
-                                //winnerCard from backend
-                                returnToStartPosition()
-                            }
+}
 
-                            if (data.roulette) {
-                                timerCounter(data.roulette)
-                                // код для теста функциональности начисления опыта
-                                // {#toSend = {#}
-                                // {#    "bet": {#}
-                                // {#        "credits": 1000000,#}
-                                // {#        "placed": "black"#}
-                                // {#    }#}
-                                // {##}
-                                // {#strToSend = JSON.stringify(toSend)#}
-                                // {#chatSocket.send(strToSend)#}
-                                // {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
-                                ////////////////////////////
-                            }
-                            if (data.lvlup) {
-                                console.log("You have a new level: " + data.lvlup.new_lvl)
-                            }
-                            if (data.get_online > 0) {
-                                online.innerHTML = `${data.get_online}`
-                            }
+chatSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    if (data.init) {
+        if (data.init.state === 'countdown') {
+            let timeNow = Date.now()
+            let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
+            timerCounter(remainTime)
+        }
+        if (data.init.state === 'rolling') {
+            console.log(data)
+            startRoll(data.init.winner)
+
+        }
+    }
+    if (data.current_balance) {
+        console.log(data.current_balance, 'CURRENT BALANCE')
+        UserBalance.innerHTML = `${data.current_balance}`
+    }
+
+    if (data.bid) {
+        console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
+        // createBidItemRow(data.bid)
+    }
+    if (data.roll) {
+        generateItems('hearts')
+        startRoll()
+    }
+    if (data.stop) {
+
+        //winnerCard from backend
+        let winnerCard = `${data.winner}`
+        let bidsNumber = document.querySelectorAll('.roulette__item-money')
+        const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+        bidsNumber.forEach(el => {
+            el.style.color = 'red'
+        })
+        if (winnerCard === 'hearts') {
+            let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
+            bidsNumber.forEach(el => {
+                el.style.color = 'green'
+                document.querySelector('.hearts').style.opacity = '1'
+                bidsButtons[0].style.opacity = '1'
+            })
+        } else if (winnerCard === 'coin') {
+            let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
+            bidsNumber.forEach(el => {
+                el.style.color = 'green'
+                document.querySelector('.coin').style.opacity = '1'
+                bidsButtons[1].style.opacity = '1'
+            })
+        } else if (winnerCard === 'spades') {
+            let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
+            bidsNumber.forEach(el => {
+                el.style.color = 'green'
+                document.querySelector('.spades').style.opacity = '1'
+                bidsButtons[2].style.opacity = '1'
+            })
+        }
 
 
-                            if (data.chat_type === 'support') {
-                                newUserMessage(`${data.message}`, data.user)
-                            }
+    }
+    if (data.back) {
+        //winnerCard from backend
+        returnToStartPosition()
+    }
+
+    if (data.roulette) {
+        timerCounter(data.roulette)
+        // код для теста функциональности начисления опыта
+        // {#toSend = {#}
+        // {#    "bet": {#}
+        // {#        "credits": 1000000,#}
+        // {#        "placed": "black"#}
+        // {#    }#}
+        // {##}
+        // {#strToSend = JSON.stringify(toSend)#}
+        // {#chatSocket.send(strToSend)#}
+        // {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
+        ////////////////////////////
+    }
+    if (data.lvlup) {
+        console.log("You have a new level: " + data.lvlup.new_lvl)
+    }
+    if (data.get_online > 0) {
+        online.innerHTML = `${data.get_online}`
+    }
 
 
-                            if (data.message && data.chat_type === 'all_chat') {
-                                const li = document.createElement('li')
-                                li.className = 'online-chat__li'
-                                messageBlock.appendChild(li)
+    if (data.chat_type === 'support' && document.title === 'Помощь') {
+        if (data.list_message) {
+            data.list_message.forEach((mess) => {
+                if (mess.file_message) {
+                    newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
+                } else {
+                    newUserMessage(mess.message, mess.user_posted.username)
+                }
+            })
+        } else {
+            if (data.file_path !== '/') {
+                newUserMessage(`${data.message}`, data.user, data.file_path)
+            } else {
+                newUserMessage(`${data.message}`, data.user)
+            }
+        }
+    }
 
-                                const divWrap = document.createElement('div')
-                                divWrap.className = 'online-chat__li-wrapper'
-                                li.appendChild(divWrap)
 
-                                const divRub = document.createElement('div')
-                                divRub.className = 'online-chat__li-rubin'
-                                divWrap.appendChild(divRub)
+    if (data.message && data.chat_type === 'all_chat') {
+        const li = document.createElement('li')
+        li.className = 'online-chat__li'
+        messageBlock.appendChild(li)
 
-                                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                                svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}#rubin_red"></use>`
-                                   // stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
+        const divWrap = document.createElement('div')
+        divWrap.className = 'online-chat__li-wrapper'
+        li.appendChild(divWrap)
 
-                                divRub.appendChild(svg)
-                                console.log(data.rubin)
-                                const divAva = document.createElement('div')
-                                divAva.className = 'online-chat__li-avatar'
-                                divAva.innerHTML = `<img src="${data.avatar}" alt="">`
-                                divWrap.appendChild(divAva)
+        const divRub = document.createElement('div')
+        divRub.className = 'online-chat__li-rubin'
+        divWrap.appendChild(divRub)
 
-                                const p = document.createElement('p')
-                                p.className = 'online-chat__li-text'
-                                li.appendChild(p)
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}#rubin_red"></use>`
+        // stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
 
-                                const spanName = document.createElement('span')
-                                spanName.className = 'online-chat__li-name'
-                                spanName.innerHTML = `${data.user} </br>`
-                                p.appendChild(spanName)
+        divRub.appendChild(svg)
+        console.log(data.rubin)
+        const divAva = document.createElement('div')
+        divAva.className = 'online-chat__li-avatar'
+        divAva.innerHTML = `<img src="${data.avatar}" alt="">`
+        divWrap.appendChild(divAva)
 
-                                const spanMessage = document.createElement('span')
-                                spanMessage.className = 'online-chat__li-sms'
-                                spanMessage.innerHTML = `${data.message}`
+        const p = document.createElement('p')
+        p.className = 'online-chat__li-text'
+        li.appendChild(p)
 
-                                p.appendChild(spanMessage)
-                            }
-                            scrollBlock.scrollTop = scrollBlock.scrollHeight
+        const spanName = document.createElement('span')
+        spanName.className = 'online-chat__li-name'
+        spanName.innerHTML = `${data.user} </br>`
+        p.appendChild(spanName)
 
-                        };
+        const spanMessage = document.createElement('span')
+        spanMessage.className = 'online-chat__li-sms'
+        spanMessage.innerHTML = `${data.message}`
 
-                        //    chatSocket.onclose = function(e) {
-                        //        console.error('Chat socket closed unexpectedly');
-                        //    };
+        p.appendChild(spanMessage)
+    }
+    scrollBlock.scrollTop = scrollBlock.scrollHeight
 
-                        messageInput.focus();
-                        messageInput.onkeyup = function (e) {
-                            if (e.keyCode === 13) {  // enter, return
-                                buttonSend.click();
-                            }
-                        };
+};
 
-                        buttonSend.onclick = function (e) {
-                            const message = messageInput.value;
-                            if (is_auth === true) {
-                                chatSocket.send(JSON.stringify({
-                                    "chat_type": "all_chat",
-                                    'message': message,
-                                    'user': username,
-                                    'avatar': ava,
-                                    'rubin': rubin
-                                }));
-                            } else {
-                                ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
-                                let modalAuth = document.querySelector('#authorization')
-                                modalAuth.classList.add("open");
-                                // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
-                                modalAuth.addEventListener("click", function (e) {
-                                    if (!e.target.closest(".popup__content")) {
-                                        document.querySelector('.popup.open').classList.remove("open");
-                                    }
-                                });
+//    chatSocket.onclose = function(e) {
+//        console.error('Chat socket closed unexpectedly');
+//    };
+
+messageInput.focus();
+messageInput.onkeyup = function (e) {
+    if (e.keyCode === 13) {  // enter, return
+        buttonSend.click();
+    }
+};
+
+buttonSend.onclick = function (e) {
+    const message = messageInput.value;
+    if (is_auth === true) {
+        chatSocket.send(JSON.stringify({
+            "chat_type": "all_chat",
+            'message': message,
+            'user': username,
+            'avatar': ava,
+            'rubin': rubin
+        }));
+    } else {
+        ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
+        let modalAuth = document.querySelector('#authorization')
+        modalAuth.classList.add("open");
+        // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+        modalAuth.addEventListener("click", function (e) {
+            if (!e.target.closest(".popup__content")) {
+                document.querySelector('.popup.open').classList.remove("open");
+            }
+        });
 ///////////////////////////////////////////////////////////////////////////////////
-                            }
-                            messageInput.value = '';
+    }
+    messageInput.value = '';
 
-                        }
-                        chatSocket.onopen = function (e) {
-                            chatSocket.send(JSON.stringify({
-                                'online': 'online'
-                            }));
+}
+chatSocket.onopen = function (e) {
+    chatSocket.send(JSON.stringify({
+        'online': 'online'
+    }));
 
-                        };
+};

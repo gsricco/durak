@@ -114,9 +114,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         recieve_user = str(self.scope["url_route"]["kwargs"][
                                "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = str(self.scope['user'])  # получаем имя пользователя который подключился с фронта
-        admin_status = await self.get_user_status(user)
-        if admin_status:
-            await self.channel_layer.group_add('admin_group', self.channel_name)
+        if user != 'AnonymousUser':
+            admin_status = await self.get_user_status(user)
+            if admin_status:
+                await self.channel_layer.group_add('admin_group', self.channel_name)
         await self.channel_layer.group_add(f'{user}_room', self.channel_name)  # добавляем в группу юзеров
         self.room_name = 'go'  # задаем статический румнейм для общего чата
         self.room_group_name = "chat_%s" % self.room_name  # формируем рум груп нейм
