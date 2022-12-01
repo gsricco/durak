@@ -15,15 +15,18 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 import ws_chat.routing
+import bot_payment.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'configs.settings')
 django_asgi_app = get_asgi_application()
+
+websocket_urlpatterns = ws_chat.routing.websocket_urlpatterns + bot_payment.routing.websocket_urlpatterns
 
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(ws_chat.routing.websocket_urlpatterns))
+            AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
         ),
     }
 )
