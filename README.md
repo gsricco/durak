@@ -44,6 +44,10 @@ Run server:
 
 python manage.py runserver
 
+To run Redis-Stack:
+
+docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
+
 To run Celery tasks:
 
 celery -A configs flower beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
