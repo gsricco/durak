@@ -32,10 +32,12 @@ class Message(models.Model):
 
 class UserChatRoom(models.Model):
     room_id = models.CharField(max_length=255, unique=True)
+    updated = models.DateTimeField(auto_now=True,null=True,blank=True)
 
     def __str__(self):
         return self.room_id
 
     class Meta:
-        verbose_name = 'Room'
-        verbose_name_plural = "Rooms"
+        verbose_name = 'Админ чат'
+        verbose_name_plural = "Админ чат"
+        ordering = ('-updated',)

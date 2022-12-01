@@ -141,97 +141,129 @@
                                         человек</div>
                                     </li>-->
 
-                                    <div class="support__chat-answer">
-                                        Ответ придёт спустя 12сек - 12ч, спам увеличивает время ответа.
-                                    </div>
-                                </ul>
+                                        <div class="support__chat-answer">
+                                            Ответ придёт спустя 12сек - 12ч, спам увеличивает время ответа.
+                                        </div>
+                                    </ul>
 
-                            </div>
-                            <div class="support__input-block">
-                                <div class="support__input-block-wrapper">
-                                    <input type="file" name="file" id="file-add">
-                                    <label for="file-add" class="support__input-block-attach">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#attach"></use>
-                                        </svg>
-                                    </label>
+                                </div>
+                                <div class="support__input-block">
+                                    <div class="support__input-block-wrapper">
+                                        <input type="file" name="file" id="file-add" onchange="checkFileSize(this)">
 
-                                    <input placeholder="Написать сообщение..." name="chat-message" type="text"
-                                           class="support__chat-input" autocomplete="off">
-                                    <span class="support__input-block-arrow">
+                                        <label for="file-add" class="support__input-block-attach">
+                                            <svg>
+                                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#attach"></use>
+                                            </svg>
+                                        </label>
+
+                                        <input placeholder="Написать сообщение..." name="chat-message" type="text"
+                                               class="support__chat-input" autocomplete="off">
+                                        <span class="support__input-block-arrow">
                                 <svg>
                                   <use xlink:href="{% static 'img/icons/sprite.svg' %}#chatarrow"></use>
                                 </svg>
                               </span>
+                                        <div id="showFile"></div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <script>
+                                <script>
 
-                              const sendBtn = document.querySelector('.support__input-block-arrow')
-                              let inputValue = document.querySelector('.support__chat-input')
-                              const chatBlock = document.querySelector('.support__chat-block')
-                              // {#const blockMessage = (messageArray) => {#}
-                              // {#    chatBlock.innerHTML = ''#}
-                              // {#    messageArray = messageArray.reverse()#}
-                              // {#    messageArray.map(el => {#}
-                              // {#        newUserMessage(el)#}
-                              // {#    })#}
-                              // {#    console.log(messageArray)#}
-                              //
-                              // {#const newUserMessage = (message, avatar, file) => {#}
-                              // {#    const li = document.createElement('li')#}
-                              // {#    li.className = 'support__chat-message support__chat-message_your'#}
-                              // {#    chatBlock.appendChild(li)#}
-                              // {#    const div = document.createElement('div')#}
-                              // {#    div.className = 'support__chat-message-text'#}
-                              // {#    li.appendChild(div)#}
-                              // {#    const span = document.createElement('span')#}
-                              // {#    span.innerHTML = message#}
-                              // {#    div.appendChild(span)#}
-                              //
-                              // {#const getResponse = () => {#}
-                              // {#    fetch('http://127.0.0.1:8000/api/v1/message/')#}
-                              // {#        .then((response) => {#}
-                              // {#            return response.json();#}
-                              // {#        })#}
-                              // {#        .then((data) => {#}
-                              // {#            blockMessage(data.map(el => el.message))#}
-                              // {#            chatBlock.scrollTop = chatBlock.scrollHeight#}
-                              // {#        });#}
-                              //
-                              // {#getResponse()#}
-                              // {#sendBtn.addEventListener('click', () => {#}
-                              // {#    async function postData(url, data) {#}
-                              // {#        const response = await fetch(url, {#}
-                              // {#            method: 'POST',#}
-                              // {#            headers: {#}
-                              // {#                'Content-Type': 'application/json',#}
-                              // {#                "X-CSRFToken": '{{csrf_token}}',#}
-                              // {#            },#}
-                              // {#            body: JSON.stringify(data)#}
-                              // {#        }).then(() => getResponse());#}
-                              // {#    }#}
-                              // {##}
-                              // {#    postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})#}
-                              // {#    inputValue.value = ''#}
-                            inputValue.focus();
-                            inputValue.onkeyup = function (e) {
-                            if (e.keyCode === 13) {  // enter, return
-                                sendBtn.click();
-                            }
-                        };
-                            sendBtn.addEventListener('click', () =>{
+                                    const sendBtn = document.querySelector('.support__input-block-arrow')
+                                    let inputValue = document.querySelector('.support__chat-input')
+                                    const chatBlock = document.querySelector('.support__chat-block')
+                                    const showFile = document.querySelector('#showFile')
 
-                            if (is_auth === true) {
-                                chatSocket.send(JSON.stringify({
-                                    'type':'support_chat',
-                                    "chat_type": "support",
-                                    'message': inputValue.value,
-                                    'user': username,
-                                    'avatar': ava,
-                                }));
-                            } else {
+                                    let byteFile
+
+
+                                    function checkFileSize(elem) {
+                                        const maxSize = 10000000;
+                                        const fileSize = elem.files[0].size;
+                                        if (fileSize > maxSize) {
+                                            showFile.innerHTML = "<span>Файл слишком большой  </span>"
+                                            setInterval(() => showFile.innerHTML = '', 2000)
+                                        } else {
+                                            var reader = new FileReader();
+                                            reader.readAsDataURL(elem.files[0]);
+                                            reader.onload = function () {
+                                                byteFile = reader.result
+                                            };
+                                            reader.onerror = function (error) {
+                                                console.log('Error: ', error);
+                                            };
+                                            showFile.innerHTML = "<span>Загрузка</span>"
+                                            setInterval(() => showFile.innerHTML = '', 2000)
+                                        }
+
+
+                                    }
+
+
+                                    {#const blockMessage = (messageArray) => {#}
+                                    {#    chatBlock.innerHTML = ''#}
+                                    {#    messageArray = messageArray.reverse()#}
+                                    {#    messageArray.map(el => {#}
+                                    {#        newUserMessage(el)#}
+                                    {#    })#}
+                                    {#    console.log(messageArray)#}
+
+                                    {#const newUserMessage = (message, avatar, file) => {#}
+                                    {#    const li = document.createElement('li')#}
+                                    {#    li.className = 'support__chat-message support__chat-message_your'#}
+                                    {#    chatBlock.appendChild(li)#}
+                                    {#    const div = document.createElement('div')#}
+                                    {#    div.className = 'support__chat-message-text'#}
+                                    {#    li.appendChild(div)#}
+                                    {#    const span = document.createElement('span')#}
+                                    {#    span.innerHTML = message#}
+                                    {#    div.appendChild(span)#}
+
+                                    {#const getResponse = () => {#}
+                                    {#    fetch('http://127.0.0.1:8000/api/v1/message/')#}
+                                    {#        .then((response) => {#}
+                                    {#            return response.json();#}
+                                    {#        })#}
+                                    {#        .then((data) => {#}
+                                    {#            blockMessage(data.map(el => el.message))#}
+                                    {#            chatBlock.scrollTop = chatBlock.scrollHeight#}
+                                    {#        });#}
+
+                                    {#getResponse()#}
+                                    {#sendBtn.addEventListener('click', () => {#}
+                                    {#    async function postData(url, data) {#}
+                                    {#        const response = await fetch(url, {#}
+                                    {#            method: 'POST',#}
+                                    {#            headers: {#}
+                                    {#                'Content-Type': 'application/json',#}
+                                    {#                "X-CSRFToken": '{{csrf_token}}',#}
+                                    {#            },#}
+                                    {#            body: JSON.stringify(data)#}
+                                    {#        }).then(() => getResponse());#}
+                                    {#    }#}
+                                    {##}
+                                    {#    postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})#}
+                                    {#    inputValue.value = ''#}
+
+                                    inputValue.focus();
+                                    inputValue.onkeyup = function (e) {
+                                        if (e.keyCode === 13) {  // enter, return
+                                            sendBtn.click();
+                                        }
+                                    };
+
+                                    sendBtn.addEventListener('click', () => {
+                                        if (is_auth === true) {
+                                            chatSocket.send(JSON.stringify({
+                                                'file':byteFile,
+                                                {#'type': 'support_chat',#}
+                                                "chat_type": "support",
+                                                'message': inputValue.value,
+                                                {#'user': username,#}
+                                                {#'avatar': ava,#}
+                                            }));
+                                        } else {
                                 ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
                                 let modalAuth = document.querySelector('#authorization')
                                 modalAuth.classList.add("open");
@@ -240,33 +272,31 @@
                                         document.querySelector('.popup.open').classList.remove("open");
                                     }
                                 });
-///////////////////////////////////////////////////////////////////////////////////
                             }
-                            inputValue.value = '';
-
+                                        inputValue.value = '';
+                                        byteFile = ''
                               })
 
                             </script>
 
-                        </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+
+                <div class="tabs__pane" id="content-2">
+                    <section class="agreement">
+                        <h1 class="agreement__title">Пользовательское соглашение:</h1>
+                        {% for i in sitecontent %}
+                            <div class="agreement__text">
+                                {{ i.agreement|safe }}
+                            </div>
+                        {% endfor %}
+
                     </section>
                 </div>
             </div>
-
-
-            <div class="tabs__pane" id="content-2">
-                <section class="agreement">
-                    <h1 class="agreement__title">Пользовательское соглашение:</h1>
-                    {% for i in sitecontent %}
-                    <div class="agreement__text">
-                        {{ i.agreement|safe }}
-                    </div>
-                    {% endfor %}
-
-                </section>
-            </div>
         </div>
     </div>
-</div>
-
 {% endblock %}

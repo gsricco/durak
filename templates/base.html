@@ -293,21 +293,55 @@
 {#                            + window.location.host#}
 {#                            + '/ws/chat/go/'#}
 {#                        );#}
-{#                        const online = document.querySelector('.online-chat__current')#}
-{#                        const newUserMessage = (message, user) => {#}
-{#                            const li = document.createElement('li')#}
-{#                            li.className = 'support__chat-message support__chat-message_your'#}
-{#                            chatBlock.appendChild(li)#}
-{#                            const div = document.createElement('div')#}
-{#                            div.className = 'support__chat-message-text'#}
-{#                            li.appendChild(div)#}
-{#                            const span2 = document.createElement('span')#}
-{#                            span2.innerHTML = user#}
-{#                            const span = document.createElement('span')#}
-{#                            span.innerHTML = message#}
-{#                            div.appendChild(span2)#}
-{#                            div.appendChild(span)#}
-{#                        }#}
+{# const online = document.querySelector('.online-chat__current')
+                    {# const newUserMessage = (message, user, file_path) => {
+                    {#
+                    {# const li = document.createElement('li')
+                    {# li.className = 'support__chat-message support__chat-message_your'
+                    {# const div = document.createElement('div')
+                    {# div.className = 'support__chat-message-text'
+                    {# const spanUser = document.createElement('span')
+                    {# const span = document.createElement('span')
+                    {# const fullDiv = document.createElement('div')
+                    {# fullDiv.style.display = 'flex'
+                    {# fullDiv.style.flexDirection = 'column'
+                    {# spanUser.style.textAlign = 'right'
+                    {# if (user !== username) {
+                    {# li.style.justifyContent = 'flex-start'
+                    {# li.style.paddingLeft = '0%'
+                    {# li.style.paddingRight = '16%'
+                    {# div.style.background = 'orange'
+                    {# div.style.borderRadius = '15px 15px 15px 0px'
+                    {# spanUser.style.textAlign = 'left'
+                    {# }
+                    {# chatBlock.appendChild(li)
+                    {# li.appendChild(div)
+                    {#
+                    {# spanUser.innerHTML = user
+                    {# span.innerHTML = message
+                    {# div.appendChild(span)
+                    {# fullDiv.appendChild(spanUser)
+                    {# fullDiv.appendChild(div)
+                    {# if (file_path) {
+                    {# const file_url = document.createElement('div')
+                    {# file_url.innerHTML = 'Файл'
+                    {# file_url.className = 'file_name'
+                    {# file_url.addEventListener('click', () => {
+                    {# window.open(`http://127.0.0.1:8000${file_path}`)
+                    {# })
+                    {# if (user !== username) {
+                    {# li.appendChild(fullDiv)
+                    {# li.appendChild(file_url)
+                    {# } else {
+                    {# li.appendChild(file_url)
+                    {# li.appendChild(fullDiv)
+                    {# }
+                    {# } else {
+                    {# li.appendChild(fullDiv)
+                    {# }
+                    {#
+                    {#
+                    {# }
 {##}
 {#                        chatSocket.onmessage = function (e) {#}
 {#                            const data = JSON.parse(e.data);#}
@@ -398,9 +432,23 @@
 {#                            }#}
 {##}
 {##}
-{#                            if (data.chat_type === 'support') {#}
-{#                                newUserMessage(`${data.message}`, data.user)#}
-{#                            }#}
+                    {# if (data.chat_type === 'support' && document.title === 'Помощь') {
+                    {# if (data.list_message) {
+                    {# data.list_message.forEach((mess) => {
+                    {# if (mess.file_message) {
+                    {# newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
+                    {# } else {
+                    {# newUserMessage(mess.message, mess.user_posted.username)
+                    {# }
+                    {# })
+                    {# } else {
+                    {# if (data.file_path !== '/') {
+                    {# newUserMessage(`${data.message}`, data.user, data.file_path)
+                    {# } else {
+                    {# newUserMessage(`${data.message}`, data.user)
+                    {# }
+                    {# }
+                    {# }
 {##}
 {##}
 {#                            if (data.message && data.chat_type === 'all_chat') {#}
