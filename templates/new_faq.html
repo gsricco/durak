@@ -174,16 +174,32 @@
                                     let inputValue = document.querySelector('.support__chat-input')
                                     const chatBlock = document.querySelector('.support__chat-block')
                                     const showFile = document.querySelector('#showFile')
+
+                                    let byteFile
+
+
                                     function checkFileSize(elem) {
                                         const maxSize = 10000000;
                                         const fileSize = elem.files[0].size;
-                                        if (fileSize > maxSize ) {
+                                        if (fileSize > maxSize) {
                                             showFile.innerHTML = "<span>Файл слишком большой  </span>"
-                                            setInterval(()=>showFile.innerHTML = '',2000)
-                                        } else {showFile.innerHTML = "<span>Загрузка</span>"
-                                            setInterval(()=>showFile.innerHTML = '',2000)
+                                            setInterval(() => showFile.innerHTML = '', 2000)
+                                        } else {
+                                            var reader = new FileReader();
+                                            reader.readAsDataURL(elem.files[0]);
+                                            reader.onload = function () {
+                                                byteFile = reader.result
+                                            };
+                                            reader.onerror = function (error) {
+                                                console.log('Error: ', error);
+                                            };
+                                            showFile.innerHTML = "<span>Загрузка</span>"
+                                            setInterval(() => showFile.innerHTML = '', 2000)
                                         }
+
+
                                     }
+
 
                                     {#const blockMessage = (messageArray) => {#}
                                     {#    chatBlock.innerHTML = ''#}
@@ -230,28 +246,28 @@
                                     {#    postData('http://127.0.0.1:8000/api/v1/message/', {message: inputValue.value})#}
                                     {#    inputValue.value = ''#}
 
-
-
                                     inputValue.focus();
                                     inputValue.onkeyup = function (e) {
                                         if (e.keyCode === 13) {  // enter, return
                                             sendBtn.click();
                                         }
                                     };
-                                    sendBtn.addEventListener('click', () => {
 
+                                    sendBtn.addEventListener('click', () => {
                                         if (is_auth === true) {
                                             chatSocket.send(JSON.stringify({
-                                                'type': 'support_chat',
+                                                'file':byteFile,
+                                                {#'type': 'support_chat',#}
                                                 "chat_type": "support",
                                                 'message': inputValue.value,
-                                                'user': username,
-                                                'avatar': ava,
+                                                {#'user': username,#}
+                                                {#'avatar': ava,#}
                                             }));
                                         } else {
                                             alert('No auth user, sorry')
                                         }
                                         inputValue.value = '';
+                                        byteFile = ''
 
                                     })
 
