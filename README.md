@@ -16,7 +16,7 @@ source venv/bin/activate(for MacOs/Linux)
 
 pip install -r requirements.txt
 
-pip install channels-redis=3.4.1
+pip install channels-redis==3.4.1
 
 pip install channels==4.0.0
 
@@ -43,6 +43,10 @@ Confirm password: admin
 Run server:
 
 python manage.py runserver
+
+To run Redis-Stack:
+
+docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 
 To run Celery tasks:
 

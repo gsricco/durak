@@ -275,6 +275,7 @@
                     {{ room_name|json_script:"room-name" }}
                     {{ user.is_authenticated|json_script:"auth-user" }}
                     {{ user.username|json_script:"username" }}
+                    {{ user.rubin|json_script:"rubin" }}
 
                     <script>
                         const roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -310,6 +311,18 @@
 
                         chatSocket.onmessage = function (e) {
                             const data = JSON.parse(e.data);
+                            if(data.init){
+                                if (data.init.state === 'countdown'){
+                                    let timeNow = Date.now()
+                                    let remainTime = (20*1000 - (timeNow - data.init.t))/1000
+                                    timerCounter(remainTime)
+                                }
+                                if (data.init.state === 'rolling'){
+                                    console.log(data)
+                                    startRoll(data.init.winner)
+
+                                }
+                            }
                             if (data.current_balance) {
                                 console.log(data.current_balance, 'CURRENT BALANCE')
                                 UserBalance.innerHTML = `${data.current_balance}`
