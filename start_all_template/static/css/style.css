@@ -1,3 +1,9 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
 @font-face {
   font-family: 'Inter';
   font-display: swap;
@@ -490,10 +496,8 @@ html {
 
 main {
   padding: 114px 0px 0px 0px;
-  -webkit-box-flex: 1;
-  -ms-flex: 1 1;
-  flex: 1 1;
   position: relative;
+  min-height: 100vh;
 }
 
 .section-nomargin {
@@ -891,12 +895,6 @@ h3 {
   background: #242424;
   padding: 16px 0px;
   z-index: 1000;
-}
-
-.footer_fix {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
 }
 
 .footer__row {
@@ -2719,6 +2717,7 @@ h3 {
 }
 
 .profil-main {
+  height: 97vh;
   width: 100%;
   padding-top: 20px;
 }
@@ -5920,9 +5919,6 @@ margin-top: 36px;
 }
 
 @media (min-width: 1200px) {
-  .footer_dofix {
-    position: relative;
-  }
 
   .invite__steps {
     padding-top: 23px;
@@ -6052,7 +6048,7 @@ margin-top: 36px;
     -ms-flex: 0 0 24%;
     flex: 0 0 24%;
     max-width: 24%;
-    min-width: 320px;
+    min-width: 260px;
   }
 
   .profil-main__content {
@@ -7503,6 +7499,7 @@ margin-top: 36px;
   }
 
   .roulette__item {
+    display: none;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;

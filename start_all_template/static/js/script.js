@@ -329,7 +329,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 let windowHeigth = window.innerHeight;
                 let chatBlock = document.querySelector(".support__chat");
                 chatBlock.style.height = windowHeigth - windowChat.offsetTop + "px";
-            } else if (document.documentElement.clientWidth > 540){
+            } else if (document.documentElement.clientWidth > 540) {
                 let chatBlock = document.querySelector(".support__chat");
                 chatBlock.style.height = '645px'
             }
@@ -360,9 +360,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     //! Активные аккардионы
     if (document.querySelector(".roulette__accardion")) {
-        window.addEventListener("resize", activeAccardin);
+        window.addEventListener("resize", activeAccardion);
 
-        function activeAccardin() {
+        function activeAccardion() {
             let accardionArr = document.querySelectorAll(".roulette__accardion");
 
             accardionArr.forEach(function (item) {
@@ -373,9 +373,18 @@ window.addEventListener("DOMContentLoaded", () => {
                     panel.style.maxHeight = panel.scrollHeight + "px";
                 }
             });
+
+            activeAccardion();
         }
 
-        activeAccardin();
+        const btnBids = document.querySelectorAll(".roulette__accardion")
+        const rouIt = document.querySelectorAll(".roulette__item")
+        btnBids.forEach((el, index) => {
+            el.addEventListener('click', () => {
+                rouIt[index].style.display = rouIt[index].style.display === 'block' ? 'none' : 'block'
+            })
+        })
+
     }
 
     // //! Таймер рулетка
@@ -1372,8 +1381,9 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
-
-
+    if (document.documentElement.clientWidth < 1000 | document.documentElement.clientWidth > 1000) {
+        const h = document.querySelector('body').scrollHeight;
+        document.querySelector('main').style.height = `${h}px`
+    }
 
 });
