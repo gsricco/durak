@@ -284,8 +284,8 @@ if (document.querySelector(".scrollbar-overflow")) {
                                 createBidItemRow(data.bid)
                             }
                             if (data.roll) {
-
-                                startRoll('hearts')
+                                generateItems('hearts')
+                                startRoll()
                             }
                             if (data.stop) {
 
@@ -367,7 +367,7 @@ if (document.querySelector(".scrollbar-overflow")) {
                                 divWrap.appendChild(divRub)
 
                                 const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                                svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
+                                svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}#rubin_red"></use>`
                                    // stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
 
                                 divRub.appendChild(svg)
@@ -418,7 +418,16 @@ if (document.querySelector(".scrollbar-overflow")) {
                                     'rubin': rubin
                                 }));
                             } else {
-                                alert('No auth user, sorry')
+                                ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
+                                let modalAuth = document.querySelector('#authorization')
+                                modalAuth.classList.add("open");
+                                // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+                                modalAuth.addEventListener("click", function (e) {
+                                    if (!e.target.closest(".popup__content")) {
+                                        document.querySelector('.popup.open').classList.remove("open");
+                                    }
+                                });
+///////////////////////////////////////////////////////////////////////////////////
                             }
                             messageInput.value = '';
 
