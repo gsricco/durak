@@ -77,13 +77,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             room_data = UserChatRoom.objects.get(room_id=room_name)  # получаем комнату
             serializer = RoomSerializer(room_data)  # сериализуем ее
-            for i in serializer.data.get('message'):  # отправляем все сообщения поочереди
-                async_to_sync(self.channel_layer.send)(channel, {"type": "support_chat_message",
+            async_to_sync(self.channel_layer.send)(channel, {"type": "support_chat_message",
                                                                  "chat_type": "support",
-                                                                 "message": i['message'],
-                                                                 "user": i['user_posted']['username'],
-                                                                 "file_path": i['file_message']
-                                                                 })
+                                                                 "list_message": serializer.data.get('message')})
+
+            # for i in serializer.data.get('message'):  # отправляем все сообщения поочереди
+            #     async_to_sync(self.channel_layer.send)(channel, {"type": "support_chat_message",
+            #                                                      "chat_type": "support",
+            #                                                      "message": i['message'],
+            #                                                      "user": i['user_posted']['username'],
+            #                                                      "file_path": i['file_message']
+            #                                                      })
         except:
             pass
 
@@ -252,11 +256,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                               }))
 
     async def support_chat_message(self, event):
+        list_message = event.get('list_message')
+        print(list_message,'0000000000000000000000000')
         user = event.get('user')
         message = event.get("message")
         file_path = event.get('file_path')
         chat_type = event.get('chat_type')
         await self.send(text_data=json.dumps({"message": message,
+                                              "list_message":list_message,
                                               "chat_type": chat_type,
                                               "user": user,
                                               "file_path": file_path,

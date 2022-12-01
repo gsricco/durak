@@ -419,14 +419,30 @@
                             }
 
 
-                            if (data.chat_type === 'support' && document.title === 'Помощь') {
-                                if (data.file_path !== '/') {
-                                    newUserMessage(`${data.message}`, data.user, data.file_path)
-                                } else {
-                                    newUserMessage(`${data.message}`, data.user)
-                                }
-                            }
+                            {#if (data.chat_type === 'support' && document.title === 'Помощь') {#}
+                            {#    if (data.file_path !== '/') {#}
+                            {#        newUserMessage(`${data.message}`, data.user, data.file_path)#}
+                            {#    } else {#}
+                            {#        newUserMessage(`${data.message}`, data.user)#}
+                            {#    }#}
 
+                                if (data.chat_type === 'support' && document.title === 'Помощь') {
+                                    if (data.list_message) {
+                                        data.list_message.forEach((mess) => {
+                                            if (mess.file_message) {
+                                                newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
+                                            } else {
+                                                newUserMessage(mess.message, mess.user_posted.username)
+                                            }
+                                        })
+                                    } else {
+                                        if (data.file_path !== '/') {
+                                            newUserMessage(`${data.message}`, data.user, data.file_path)
+                                        } else {
+                                            newUserMessage(`${data.message}`, data.user)
+                                        }
+                                    }
+                                }
 
                             if (data.message && data.chat_type === 'all_chat') {
                                 const li = document.createElement('li')
@@ -466,7 +482,8 @@
                             }
                             scrollBlock.scrollTop = scrollBlock.scrollHeight
 
-                        };
+                        }
+                        ;
 
                         //    chatSocket.onclose = function(e) {
                         //        console.error('Chat socket closed unexpectedly');
