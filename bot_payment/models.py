@@ -28,6 +28,7 @@ class RefillRequest(models.Model):
     date_closed = models.DateTimeField(verbose_name='Дата закрытия заявки', null=True, blank=True)
 
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
+    close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
     user_id = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
@@ -67,6 +68,7 @@ class WithdrawalRequest(models.Model):
     date_closed = models.DateTimeField(verbose_name='Дата закрытия заявки', null=True, blank=True)
 
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
+    close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
     user_id = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре')

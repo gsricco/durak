@@ -114,9 +114,9 @@ class RefillConsumer(AsyncWebsocketConsumer):
             # получаем имя бота
             url_get_bot_info = f"{HOST_URL}refill/get_bot_info?bot_id={bot_id}"
             try:
-                req = requests.get(url_get_bot_info)
+                req = await sync_to_async(requests.get)(url_get_bot_info)
             except requests.exceptions.ConnectionError:
-                message = {"status": "error", "detail": "bot were taken"}
+                message = {"status": "error", "detail": "Connection error"}
                 await self.send(json.dumps(message))
                 return
             
@@ -132,16 +132,102 @@ class RefillConsumer(AsyncWebsocketConsumer):
             message = {"status": "get_name","detail": bot_name}
             await self.send(json.dumps(message))
 
-            # todo: создание заявки
+            # создаёт заявку и сохраняет её в бд
+            refill_request = await sync_to_async(serializer.save)()
 
+            # создаёт заявку на сервере ботов
+            url_refill_create = f"{HOST_URL}refill/create?id={refill_request.pk}&bot_id={bot_id}&site_id={user.pk}&bet={refill_request.amount}"
+            if not refill_request.game_id is None:
+                url_refill_create += f"&game_id={refill_request.game_id}"
+            
+            try:
+                req = await sync_to_async(requests.get)(url_refill_create)
+            except requests.exceptions.ConnectionError:
+                message = {"status": "error", "detail": "bot were taken"}
+                await self.send(json.dumps(message))
+                return
+            
+            if req.status_code != 200:
+                message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
+                await self.send(json.dumps(message))
+                return
 
-            # создаёт заявку
-            refill_request = await sync_to_async(serializer.save)()  
+            # проверяет, создалась ли заявка на сервере
+            bot_response = req.json()
+            if bot_response.get('ok') == False:
+                message = {"status": "error","detail": f"Error while creating a request: {bot_response.get('message')})"}
+                await self.send(json.dumps(message))
+                return
+            
+            # если заявка на сервере создалась (см. выше), то отправляем заявку на клиент
             response_serializer = serializers.RefillRequestModelSerializer(refill_request)
-            await self.send(json.dumps(response_serializer.data))
+            serializer_data = await sync_to_async(getattr)(response_serializer, 'data')
+            await self.send(json.dumps(serializer_data))
             r.delete(f"bot:{bot_id}")
+
+            await self.send_request_status(refill_request.pk, 3)
+
             return
         
         message = {"status": "error","detail": "bad data"}
         await self.send(json.dumps(message))
-        
+
+    async def send_request_status(self, request_id, delay):
+        """Получает от сервера ботов и посылает клиенту статус заявки на пополнение"""
+        # создаёт url для получения статуса заявки
+        url_get_status = f"{HOST_URL}refill/get?id={request_id}"
+        # считает количество повторений цикла для избежания зацикливания
+        retries = 0
+        max_retries = 150
+        # в цикле с интервалом delay получаем статус заявки и отсылаем его на клиент
+        while retries < max_retries:
+            retries += 1
+            try:
+                req = await sync_to_async(requests.get)(url_get_status, timeout=2)
+            except requests.ConnectionError:
+                message = {"status": "error", "detail": "Connection error"}
+                await asyncio.sleep(delay)
+                await self.send(json.dumps(message))
+                continue
+            except requests.Timeout:
+                await asyncio.sleep(delay)
+                continue
+
+            
+            if req.status_code != 200:
+                message = {"status": "error", "detail": f"Get status code from server: {req.status_code}"}
+                await self.send(json.dumps(message))
+                await asyncio.sleep(delay)
+                continue
+
+            await self.send(req.text)
+
+            info = req.json()
+            if info.get('closed'):
+                # fail_close_reasons = (
+                #     'NoMessage',
+                #     'ClientScoreLessThanMinimum',
+                #     'ClientBanned',
+                #     'Timeout',
+                #     'Error',
+                # )
+                refill_request = await models.RefillRequest.objects.aget(pk=request_id)
+                refill_request.close_reason = info.get('close_reason')
+                refill_request.note = info.get('note')
+                refill_request.amount = info.get('refiil')
+                if info.get('close_reason') == 'Success':
+                    refill_request.status = 'succ'
+                else:
+                    refill_request.status = 'fail'
+                await sync_to_async(refill_request.save)()
+                
+                serializer = serializers.RefillRequestModelSerializer(refill_request)
+                serializer_data = await sync_to_async(getattr)(serializer, 'data')
+                await self.send(json.dumps(serializer_data))
+
+                return
+
+            await asyncio.sleep(delay)
+
+        message = {"status": "error", "detail": "Too many requests"}
+        await self.send(json.dumps(message))
