@@ -6058,6 +6058,11 @@ margin-top: 36px;
     max-width: 71%;
   }
 
+  .profil__btn:first-child {
+    margin-left: 0px;
+    margin-bottom: 10px;
+  }
+
   .profil__btn:last-child {
     margin-left: 0px;
     margin-top: 10px;
