@@ -19,12 +19,12 @@ Welcome to Refill<br>
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
-            + '/ws/refill_payment/'
+            + '/ws/refill_payment/create/'
         );
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (`${data.user} ${data.message}` + '\n');
+            document.querySelector('#chat-log').value += (`${JSON.stringify(data)}` + '\n');
         };
 
     //    chatSocket.onclose = function(e) {
@@ -43,7 +43,7 @@ Welcome to Refill<br>
             const message = messageInputDom.value;
             if(is_auth === true) {
                 chatSocket.send(JSON.stringify({
-                    'message': message,
+                    'create': message,
                     'user': username,
                 }));
             }
