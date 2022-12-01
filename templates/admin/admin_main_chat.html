@@ -12,7 +12,7 @@
             <div class="support__chat-wrapper">
                 <div class="support__top-plank">
                     <div class="support__top-plank-wrapper">
-                        <span>Чат поддержки</span>
+                        <span class="support_chat_top_block">Чат поддержки</span>
                     </div>
                 </div>
 
@@ -54,6 +54,8 @@
         const username = JSON.parse(document.getElementById('username').textContent)
         let room_id = ''
         let byteFile
+        let topBlock = document.querySelector('.support_chat_top_block')
+
 
 
         function checkFileSize(elem) {
@@ -145,6 +147,7 @@
                 room.addEventListener('click', () => {
                     let room_value = room.innerText
                     room_id = room_value
+                    topBlock.innerHTML = `Чат поддержки с ${room_id}`
                     chat_cleaner()
                     room_cleaner()
                     chatS.send(JSON.stringify({
