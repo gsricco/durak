@@ -317,7 +317,7 @@ chatSocket.onmessage = function (e) {
         // createBidItemRow(data.bid)
     }
     if (data.roll) {
-        generateItems('hearts')
+        generateItems(data.winner)
         startRoll()
     }
     if (data.stop) {

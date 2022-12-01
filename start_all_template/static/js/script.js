@@ -1401,18 +1401,19 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
 /////////Аккаунт уже привязан////////////////
-    const vkBtn = document.querySelector('#qqq');
-    vkBtn.addEventListener('click', ()=>{
-        let modalAuth = document.querySelector('#modalAccountSocial')
-        modalAuth.classList.add("open");
-        // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
-        modalAuth.addEventListener("click", function (e) {
-            if (!e.target.closest(".popup__content")) {
-                document.querySelector('.popup.open').classList.remove("open");
-            }
-        });
-    })
-
+    if (document.querySelector('#qqq')) {
+        const vkBtn = document.querySelector('#qqq');
+        vkBtn.addEventListener('click', () => {
+            let modalAuth = document.querySelector('#modalAccountSocial')
+            modalAuth.classList.add("open");
+            // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+            modalAuth.addEventListener("click", function (e) {
+                if (!e.target.closest(".popup__content")) {
+                    document.querySelector('.popup.open').classList.remove("open");
+                }
+            });
+        })
+    }
 
 
     if (document.documentElement.clientWidth < 1000 | document.documentElement.clientWidth > 1000) {

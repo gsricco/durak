@@ -30,7 +30,6 @@ def sender():
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'korney_task',
-                                                'do': 'do_something',
                                                 'round': r.get('round').decode('utf-8')
                                             }
                                             )
@@ -50,9 +49,11 @@ def roll():
     t = datetime.datetime.now()
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
+    round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
+                                                "winner": round_result,
                                             })
 
 
@@ -71,11 +72,9 @@ def stop():
     t = datetime.datetime.now()
     r.set('state', 'stop', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
-    round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'stopper',
-                                                "winner": round_result,
                                             })
 
 

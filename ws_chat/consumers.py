@@ -274,27 +274,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # начинает отсчёт
     async def korney_task(self, event):
         """Начинает отсчёт рулетки"""
-        data = event.get('data')
         curr_round = event.get('round')
         await self.send(text_data=json.dumps({
             "roulette": 20,
-            "data": data,
             "round": curr_round,
         }))
 
     # начинает крутиться рулетка
     async def rolling(self, event):
         """Начинает прокрутку рулетки"""
+        winner = event.get('winner')
+        print(winner)
         await self.send(text_data=json.dumps({
             "roll": 'rolling',
+            "winner": winner,
         }))
 
     async def stopper(self, event):
         """Сигнализирует об остановке прокрутки рулетки"""
-        message = event.get('winner')
         await self.send(text_data=json.dumps({
             "stop": "stopping",
-            "winner": message,
         }))
 
     async def go_back(self, event):
