@@ -1,5 +1,6 @@
 import json
-import requests
+# import requests
+import aiohttp
 import asyncio
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -111,26 +112,34 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     return
 
                 # запрос на сервер для поиска свободного бота
-                try:
-                    req = await sync_to_async(requests.get)(url_get_free_bot, timeout=2)
-                except requests.exceptions.ConnectionError:
-                    message = {"status": "process","detail": "Connection error"}
-                    await self.send(json.dumps(message))
-                    return
-                except requests.exceptions.Timeout:
-                    message = {"status": "process","detail": "Timeout"}
-                    await self.send(json.dumps(message))
-                    await asyncio.sleep(self.connection_delay)
-                    continue
+                # try:
+                #     req = await sync_to_async(requests.get)(url_get_free_bot, timeout=2)
+                # except requests.exceptions.ConnectionError:
+                #     message = {"status": "process","detail": "Connection error"}
+                #     await self.send(json.dumps(message))
+                #     return
+                # except requests.exceptions.Timeout:
+                #     message = {"status": "process","detail": "Timeout"}
+                #     await self.send(json.dumps(message))
+                #     await asyncio.sleep(self.connection_delay)
+                #     continue
 
-                # если был получен ответ с ошибкой
-                if req.status_code != 200:
-                    message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
-                    await self.send(json.dumps(message))
-                    return
+                # # если был получен ответ с ошибкой
+                # if req.status_code != 200:
+                #     message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
+                #     await self.send(json.dumps(message))
+                #     return
 
-                # получение id свободного бота
-                bot_response = req.json()
+                # # получение id свободного бота
+                # bot_response = req.json()
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url_get_free_bot) as resp:
+                        if not resp.ok:
+                            await self.send(json.dumps({"status": "error", "detail": resp.reason}))
+                            return
+                        bot_response = await resp.json()
+
                 if 'bot_id' not in bot_response:
                     message = {"status": "error", "detail": "missing bot_id"}
                     await self.send(json.dumps(message))
@@ -165,25 +174,32 @@ class RequestConsumer(AsyncWebsocketConsumer):
             
             # получает имя бота по его id 
             url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
-            try:
-                req = await sync_to_async(requests.get)(url_get_bot_info, timeout=3)
-            except requests.exceptions.ConnectionError:
-                message = {"status": "error", "detail": "Connection error"}
-                await self.send(json.dumps(message))
-                return
-            except requests.exceptions.Timeout:
-                message = {"status": "error", "detail": "Timeout"}
-                await self.send(json.dumps(message))
-                return
+            # try:
+            #     req = await sync_to_async(requests.get)(url_get_bot_info, timeout=3)
+            # except requests.exceptions.ConnectionError:
+            #     message = {"status": "error", "detail": "Connection error"}
+            #     await self.send(json.dumps(message))
+            #     return
+            # except requests.exceptions.Timeout:
+            #     message = {"status": "error", "detail": "Timeout"}
+            #     await self.send(json.dumps(message))
+            #     return
             
-            # если код ответа не успешный, то прерывает создание заявки
-            if req.status_code != 200:
-                message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
-                await self.send(json.dumps(message))
-                return
+            # # если код ответа не успешный, то прерывает создание заявки
+            # if req.status_code != 200:
+            #     message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
+            #     await self.send(json.dumps(message))
+            #     return
             
-            # получает список ботов из ответа сервера
-            bot_list = req.json()
+            # # получает список ботов из ответа сервера
+            # bot_list = req.json()
+
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url_get_bot_info) as resp:
+                    if not resp.ok:
+                        await self.send(json.dumps({"status": "error", "detail": resp.reason}))
+                        return
+                    bot_list = await resp.json()
 
             # получает имя бота, с которым нужно будет взаимодействовать пользователю
             bot_name = await self.get_bot_name(bot_list)
@@ -202,25 +218,32 @@ class RequestConsumer(AsyncWebsocketConsumer):
             if not new_request.game_id is None:
                 url_request_create += f"&game_id={new_request.game_id}"
             
-            try:
-                req = await sync_to_async(requests.get)(url_request_create, timeout=2)
-            except requests.exceptions.ConnectionError:
-                message = {"status": "error", "detail": "Connection error"}
-                await self.send(json.dumps(message))
-                return
-            except requests.exceptions.Timeout:
-                message = {"status": "error", "detail": "Timeout"}
-                await self.send(json.dumps(message))
-                return
+            # try:
+            #     req = await sync_to_async(requests.get)(url_request_create, timeout=2)
+            # except requests.exceptions.ConnectionError:
+            #     message = {"status": "error", "detail": "Connection error"}
+            #     await self.send(json.dumps(message))
+            #     return
+            # except requests.exceptions.Timeout:
+            #     message = {"status": "error", "detail": "Timeout"}
+            #     await self.send(json.dumps(message))
+            #     return
             
-            # если статус ответа не был успешен, то заканчивает создание заявки
-            if req.status_code != 200:
-                message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
-                await self.send(json.dumps(message))
-                return
+            # # если статус ответа не был успешен, то заканчивает создание заявки
+            # if req.status_code != 200:
+            #     message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
+            #     await self.send(json.dumps(message))
+            #     return
+
+            # bot_response = req.json()
+
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url_request_create) as resp:
+                    if not resp.ok:
+                        await self.send(json.dumps({"status": "error", "detail": resp.reason}))
+                    bot_response = await resp.json()
 
             # проверяет, создалась ли заявка на сервере
-            bot_response = req.json()
             if bot_response.get('ok') == False:
                 message = {"status": "error","detail": f"Error while creating a request: {bot_response.get('message')})"}
                 await self.send(json.dumps(message))
@@ -253,69 +276,79 @@ class RequestConsumer(AsyncWebsocketConsumer):
         retries = 0
         max_retries = 250
         # в цикле с интервалом delay получает статус заявки и отсылает его на клиент
-        while retries < max_retries:
-            retries += 1
-            # получает статус заявки от сервера
-            try:
-                req = await sync_to_async(requests.get)(url_get_status, timeout=3)
-            except requests.ConnectionError:
-                message = {"status": "process", "detail": "Connection error"}
-                await asyncio.sleep(delay)
-                await self.send(json.dumps(message))
-                continue
-            except requests.Timeout:
-                await asyncio.sleep(delay)
-                continue
+        async with aiohttp.ClientSession() as session:
+            while retries < max_retries:
+                retries += 1
+                # получает статус заявки от сервера
+                # try:
+                #     req = await sync_to_async(requests.get)(url_get_status, timeout=3)
+                # except requests.ConnectionError:
+                #     message = {"status": "process", "detail": "Connection error"}
+                #     await asyncio.sleep(delay)
+                #     await self.send(json.dumps(message))
+                #     continue
+                # except requests.Timeout:
+                #     await asyncio.sleep(delay)
+                #     continue
 
-            # если статус ответа сервера не успешный, то, после задержки, опрашивает сервер ещё раз
-            if req.status_code != 200:
-                message = {"status": "process", "detail": f"Get status code from server: {req.status_code}"}
-                await self.send(json.dumps(message))
-                await asyncio.sleep(delay)
-                continue
-            
-            # пересылает ответ сервера на фронт для обработки
-            await self.send(req.text)
+                # # если статус ответа сервера не успешный, то, после задержки, опрашивает сервер ещё раз
+                # if req.status_code != 200:
+                #     message = {"status": "process", "detail": f"Get status code from server: {req.status_code}"}
+                #     await self.send(json.dumps(message))
+                #     await asyncio.sleep(delay)
+                #     continue
+                # req_txt = req.text
+                # info = req.json()
 
-            # проверяет статус заявки
-            info = req.json()
-            if info.get('done'):
-                # достаёт заявку из бд
-                user_request = await self.model.objects.aget(pk=request_pk)
-                # проверяет, не была ли заявка закрыта ранее
-                if user_request.status != 'open' or r.getex(f'close_{request_pk}:{self.operation}:bool', ex=10*60):
+                async with session.get(url_get_status) as resp:
+                    if not resp.ok:
+                        await self.send(json.dumps({"status": "process", "detail": resp.reason}))
+                        await asyncio.sleep(delay)
+                        continue
+                    req_txt = await resp.text()
+                    info = await resp.json()
+
+                # пересылает ответ сервера на фронт для обработки
+                await self.send(req_txt)
+
+                # проверяет статус заявки
+                if info.get('done'):
+                    # достаёт заявку из бд
+                    user_request = await self.model.objects.aget(pk=request_pk)
+                    # проверяет, не была ли заявка закрыта ранее
+                    if user_request.status != 'open' or r.getex(f'close_{request_pk}:{self.operation}:bool', ex=10*60):
+                        serializer = self.model_serializer(user_request)
+                        serializer_data = await sync_to_async(getattr)(serializer, 'data')
+                        await self.send(json.dumps(serializer_data))
+                        await self.send(json.dumps({"status": "error", "detail": "second page prevented"}))
+                        return
+                    # закрывает заявку в БД
+                    # отмечает заявку как закрытую
+                    r.set(f'close_{request_pk}:{self.operation}:bool', "closed", ex=10*60)
+                    # изменяет статус заявки
+                    user_request.close_reason = info.get('close_reason')
+                    user_request.note = info.get('note')                
+                    user_request.date_closed = timezone.now()
+                    if info.get('close_reason') == 'Success':
+                        user_request.status = 'succ'
+                    else:
+                        user_request.status = 'fail'
+                    # производит операции с балансом пользователя
+                    await self.process_balance(user_request, info)
+                    await sync_to_async(user_request.save)()
+                    # банит пользователя, если его забанил сервер
+                    if info.get('ban'):
+                        ban = await Ban.objects.aget(user=user_request.user)
+                        ban.ban = True
+                        await sync_to_async(ban.save)()
+                    # посылает закрытую заявку на клиент
                     serializer = self.model_serializer(user_request)
                     serializer_data = await sync_to_async(getattr)(serializer, 'data')
                     await self.send(json.dumps(serializer_data))
-                    await self.send(json.dumps({"status": "error", "detail": "second page prevented"}))
-                    return
-                # закрывает заявку в БД
-                # отмечает заявку как закрытую
-                r.set(f'close_{request_pk}:{self.operation}:bool', "closed", ex=10*60)
-                # изменяет статус заявки
-                user_request.close_reason = info.get('close_reason')
-                user_request.note = info.get('note')                
-                user_request.date_closed = timezone.now()
-                if info.get('close_reason') == 'Success':
-                    user_request.status = 'succ'
-                else:
-                    user_request.status = 'fail'
-                # производит операции с балансом пользователя
-                await self.process_balance(user_request, info)
-                await sync_to_async(user_request.save)()
-                # банит пользователя, если его забанил сервер
-                if info.get('ban'):
-                    ban = await Ban.objects.aget(user=user_request.user)
-                    ban.ban = True
-                    await sync_to_async(ban.save)()
-                # посылает закрытую заявку на клиент
-                serializer = self.model_serializer(user_request)
-                serializer_data = await sync_to_async(getattr)(serializer, 'data')
-                await self.send(json.dumps(serializer_data))
 
-                return
-            # задержка перед следующим опросом сервера
-            await asyncio.sleep(delay)
+                    return
+                # задержка перед следующим опросом сервера
+                await asyncio.sleep(delay)
 
         # отрабатывает если цикл выше закончился по причине большого количества повторений
         message = {"status": "error", "detail": "Too many requests"}
