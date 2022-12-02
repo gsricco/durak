@@ -12,44 +12,75 @@ r = redis.Redis()  # подключаемся к редису
 
 # url сервера с ботами
 HOST_URL = "http://195.3.220.151:8888/"
+ID_SHIFT = 0
 
-class RefillConsumer(AsyncWebsocketConsumer):
+class RequestConsumer(AsyncWebsocketConsumer):
+    """Базовый класс для создания заявок"""
+    # поля ниже заполнены как для RefillConsumer - создание заявки на пополнение счёта
+    # название операции заявки
+    operation = 'refill'
+    # модель для хранения заявки в БД
+    model = models.RefillRequest
+    # сериализатор для заявки
+    model_serializer = serializers.RefillRequestModelSerializer
+    # задержка между повторными запросами
+    connection_delay = 3
+    # задержка между обновлениями статуса
+    status_delay = 3
 
     async def connect(self):
-        '''Подключение юзеров'''
+        """Подключение юзеров"""
         user_pk = str(self.scope['user'].pk)  # получаем pk пользователя который подключился с фронта
-        r.set(f"refill:{user_pk}", self.channel_name, ex=10*60)  # записываем в редис channel_name подключенного юзера
+        r.set(f"{self.operation}:{user_pk}", self.channel_name, ex=10*60)  # записываем в редис channel_name подключенного юзера
         await self.accept()  # подтверждение
 
         # продолжение обработки заявки при разрыве соединения
-        if r.get(f"user_refill:{user_pk}"):
-            refill_pk = int(r.getex(f"user_refill:{user_pk}", ex=10*60))
-            await self.send(json.dumps({"status": "continue", "detail": refill_pk}))
-            await self.send_request_status(refill_pk, 3)
-            r.delete(f"user_refill:{user_pk}")
+        if r.get(f"user_{self.operation}:{user_pk}"):
+            request_pk = int(r.getex(f"user_{self.operation}:{user_pk}", ex=10*60))
+            await self.send(json.dumps({"status": "continue", "detail": request_pk}))
+            await self.send_request_status(request_pk, self.status_delay)
+            r.delete(f"user_{self.operation}:{user_pk}")
 
     async def disconnect(self, code):
         """Отключение пользователя"""
-        r.delete(f"refill:{self.scope['user'].pk}")  # удаляет запись об юзере из редиса при отключении
+        r.delete(f"{self.operation}:{self.scope['user'].pk}")  # удаляет запись об юзере из редиса при отключении
 
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
 
         text_data_json = json.loads(text_data)
-        # если в полученном json есть ключ create, под которым должен храниться json для создания RefillRequest
+        # если в полученном json есть ключ create, под которым должен храниться json для создания запроса
         if text_data_json.get('create'):
-            await self.create_refill_request(json.loads(text_data_json['create']))
+            if r.getex(f"user_{self.operation}:{self.scope['user'].pk}", ex=10*60):
+                await self.send(json.dumps({'status': 'error', 'detail': 'you already have a request.'}))
+            else:
+                await self.create_request(json.loads(text_data_json['create']))
         else:
             await self.send(json.dumps({'status': 'error', 'detail': 'missing "create" in json'}))
 
-    async def create_refill_request(self, text_data_json):
-        """Создаёт новую заявку на пополнение"""
+    async def check_conditions(self, text_data_json):
+        """Проверяет условия создания заявки. OK - заявку можно продолжать создавать"""
+        return "OK"
+
+    async def get_bot_name(self, response):
+        """Получает имя бота из запроса"""
+        return response[0].get('name')
+
+    async def create_request(self, text_data_json):
+        """Создаёт новую заявку"""
         # проверяет правильность полученных данных
-        serializer = serializers.RefillRequestModelSerializer(data=text_data_json)
+        serializer = self.model_serializer(data=text_data_json)
         if serializer.is_valid():
             user = self.scope['user']
+            # проверяет условия, специфичные для типа операции
+            check_result = await self.check_conditions(text_data_json)
+            if check_result != "OK":
+                message = {"status": "error","detail": check_result}
+                await self.send(json.dumps(message))
+                return
+            
             # проверяет, создаётся ли заявка для текущего юзера
-            if user.pk != serializer.validated_data['user_id']['id']:
+            if user.pk != serializer.validated_data['user']['id']:
                 message = {"status": "error","detail": "can't create request for other user"}
                 await self.send(json.dumps(message))
                 return
@@ -64,7 +95,7 @@ class RefillConsumer(AsyncWebsocketConsumer):
 
             # поиск свободного бота
             amount = serializer.validated_data.get('amount')
-            url_get_free_bot = f"{HOST_URL}refill/get_free?bet={amount}"
+            url_get_free_bot = f"{HOST_URL}{self.operation}/get_free?bet={amount}"
 
             # -1 - нет свободных ботов
             bot_id = -1
@@ -89,7 +120,7 @@ class RefillConsumer(AsyncWebsocketConsumer):
                 except requests.exceptions.Timeout:
                     message = {"status": "process","detail": "Timeout"}
                     await self.send(json.dumps(message))
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(self.connection_delay)
                     continue
 
                 # если был получен ответ с ошибкой
@@ -104,7 +135,6 @@ class RefillConsumer(AsyncWebsocketConsumer):
                     message = {"status": "error", "detail": "missing bot_id"}
                     await self.send(json.dumps(message))
                     return
-
                 bot_id = bot_response['bot_id']
 
                 # -1 в id бота - на сервере нет свободных ботов
@@ -112,13 +142,13 @@ class RefillConsumer(AsyncWebsocketConsumer):
                     # отсылаем на фронт ответ о том, что поиск ещё идёт
                     message = {"status": "process","detail": "finding free bots"}
                     await self.send(json.dumps(message))
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(self.connection_delay)
                 else:
-                    # записываем в redis пользователя, который будет использовать бота
+                    # записывает в redis пользователя, который будет использовать бота
                     r.set(f'bot:{bot_id}', user.pk, ex=60)
                     break
 
-            # проверяем, не успел ли кто-то занять бота
+            # проверяет, не успел ли кто-то занять бота
             bot_owner = r.getex(f"bot:{bot_id}", ex=60)
 
             # если бота кто-то использовал, то прерывает создание заявки
@@ -134,7 +164,7 @@ class RefillConsumer(AsyncWebsocketConsumer):
                 return
             
             # получает имя бота по его id 
-            url_get_bot_info = f"{HOST_URL}refill/get_bot_info?bot_id={bot_id}"
+            url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
             try:
                 req = await sync_to_async(requests.get)(url_get_bot_info, timeout=3)
             except requests.exceptions.ConnectionError:
@@ -155,24 +185,25 @@ class RefillConsumer(AsyncWebsocketConsumer):
             # получает список ботов из ответа сервера
             bot_list = req.json()
 
-            # todo: проверка bot_list на наличие значений.
             # получает имя бота, с которым нужно будет взаимодействовать пользователю
-            bot_name = bot_list[0].get('name')
+            bot_name = await self.get_bot_name(bot_list)
 
             # посылаем имя бота на фронт для отображения пользователю
             message = {"status": "get_name","detail": bot_name}
             await self.send(json.dumps(message))
 
             # создаёт заявку и сохраняет её в бд
-            refill_request = await sync_to_async(serializer.save)()
+            new_request = await sync_to_async(serializer.save)()
 
             # создаёт заявку на сервере ботов
-            url_refill_create = f"{HOST_URL}refill/create?id={refill_request.pk}&bot_id={bot_id}&site_id={user.pk}&bet={refill_request.amount}"
-            if not refill_request.game_id is None:
-                url_refill_create += f"&game_id={refill_request.game_id}"
+            new_request.request_id = new_request.pk + ID_SHIFT
+            await sync_to_async(new_request.save)()
+            url_request_create = f"{HOST_URL}{self.operation}/create?id={new_request.request_id}&bot_id={bot_id}&site_id={user.pk}&bet={new_request.amount}"
+            if not new_request.game_id is None:
+                url_request_create += f"&game_id={new_request.game_id}"
             
             try:
-                req = await sync_to_async(requests.get)(url_refill_create, timeout=2)
+                req = await sync_to_async(requests.get)(url_request_create, timeout=2)
             except requests.exceptions.ConnectionError:
                 message = {"status": "error", "detail": "Connection error"}
                 await self.send(json.dumps(message))
@@ -196,17 +227,17 @@ class RefillConsumer(AsyncWebsocketConsumer):
                 return
             
             # запоминает в редис заявку пользователя для её обработки в случае перезагрузки страницы
-            r.set(f"user_refill:{user.pk}", refill_request.pk, ex=10*60)
+            r.set(f"user_{self.operation}:{user.pk}", new_request.pk, ex=10*60)
             # если заявка на сервере создалась, то отправляет заявку на клиент
-            response_serializer = serializers.RefillRequestModelSerializer(refill_request)
+            response_serializer = self.model_serializer(new_request)
             serializer_data = await sync_to_async(getattr)(response_serializer, 'data')
             await self.send(json.dumps(serializer_data))
             # удаляет из redis запись о занятии пользователем бота
             r.delete(f"bot:{bot_id}")
 
             # запускает процесс мониторинга состояния заявки
-            await self.send_request_status(refill_request.pk, 3)
-            r.delete(f"user_refill:{user.pk}")
+            await self.send_request_status(new_request.pk, self.status_delay)
+            r.delete(f"user_{self.operation}:{user.pk}")
 
             return
         
@@ -214,14 +245,14 @@ class RefillConsumer(AsyncWebsocketConsumer):
         message = {"status": "error","detail": "bad data"}
         await self.send(json.dumps(message))
 
-    async def send_request_status(self, request_id, delay):
-        """Получает от сервера ботов и посылает клиенту статус заявки на пополнение"""
+    async def send_request_status(self, request_pk, delay):
+        """Получает от сервера ботов и посылает клиенту статус заявки"""
         # создаёт url для получения статуса заявки
-        url_get_status = f"{HOST_URL}refill/get?id={request_id}"
+        url_get_status = f"{HOST_URL}{self.operation}/get?id={request_pk + ID_SHIFT}"
         # считает количество повторений цикла для избежания зацикливания
         retries = 0
-        max_retries = 150
-        # в цикле с интервалом delay получаем статус заявки и отсылает его на клиент
+        max_retries = 250
+        # в цикле с интервалом delay получает статус заявки и отсылает его на клиент
         while retries < max_retries:
             retries += 1
             # получает статус заявки от сервера
@@ -236,7 +267,7 @@ class RefillConsumer(AsyncWebsocketConsumer):
                 await asyncio.sleep(delay)
                 continue
 
-            # если статус ответа не успешный, то, после задержки, опрашивает сервер ещё раз
+            # если статус ответа сервера не успешный, то, после задержки, опрашивает сервер ещё раз
             if req.status_code != 200:
                 message = {"status": "process", "detail": f"Get status code from server: {req.status_code}"}
                 await self.send(json.dumps(message))
@@ -248,37 +279,37 @@ class RefillConsumer(AsyncWebsocketConsumer):
 
             # проверяет статус заявки
             info = req.json()
-            if info.get('closed'):
-                # fail_close_reasons = (
-                #     'NoMessage',
-                #     'ClientScoreLessThanMinimum',
-                #     'ClientBanned',
-                #     'Timeout',
-                #     'Error',
-                # )
-                # заявка закрыта - изменяем статус заявки в БД
-                refill_request = await models.RefillRequest.objects.aget(pk=request_id)
-                refill_request.close_reason = info.get('close_reason')
-                refill_request.note = info.get('note')
-                refill_request.amount = info.get('refiil')
-                refill_request.date_closed = timezone.now()
+            if info.get('done'):
+                # достаёт заявку из бд
+                user_request = await self.model.objects.aget(pk=request_pk)
+                # проверяет, не была ли заявка закрыта ранее
+                if user_request.status != 'open' or r.getex(f'close_{request_pk}:{self.operation}:bool', ex=10*60):
+                    serializer = self.model_serializer(user_request)
+                    serializer_data = await sync_to_async(getattr)(serializer, 'data')
+                    await self.send(json.dumps(serializer_data))
+                    await self.send(json.dumps({"status": "error", "detail": "second page prevented"}))
+                    return
+                # закрывает заявку в БД
+                # отмечает заявку как закрытую
+                r.set(f'close_{request_pk}:{self.operation}:bool', "closed", ex=10*60)
+                # изменяет статус заявки
+                user_request.close_reason = info.get('close_reason')
+                user_request.note = info.get('note')                
+                user_request.date_closed = timezone.now()
                 if info.get('close_reason') == 'Success':
-                    refill_request.status = 'succ'
+                    user_request.status = 'succ'
                 else:
-                    refill_request.status = 'fail'
-                await sync_to_async(refill_request.save)()
+                    user_request.status = 'fail'
+                # производит операции с балансом пользователя
+                await self.process_balance(user_request, info)
+                await sync_to_async(user_request.save)()
                 # банит пользователя, если его забанил сервер
                 if info.get('ban'):
-                    ban = await Ban.objects.aget(user=refill_request.user_id)
+                    ban = await Ban.objects.aget(user=user_request.user)
                     ban.ban = True
                     await sync_to_async(ban.save)()
-                # начисление на баланс пользователя полученных кредитов
-                if refill_request.amount > 0:
-                    detail_user = await DetailUser.objects.aget(user=refill_request.user_id)
-                    detail_user.balance += refill_request.amount
-                    await sync_to_async(detail_user.save)()
                 # посылает закрытую заявку на клиент
-                serializer = serializers.RefillRequestModelSerializer(refill_request)
+                serializer = self.model_serializer(user_request)
                 serializer_data = await sync_to_async(getattr)(serializer, 'data')
                 await self.send(json.dumps(serializer_data))
 
@@ -289,3 +320,56 @@ class RefillConsumer(AsyncWebsocketConsumer):
         # отрабатывает если цикл выше закончился по причине большого количества повторений
         message = {"status": "error", "detail": "Too many requests"}
         await self.send(json.dumps(message))
+
+    async def process_balance(self, user_request, response):
+        """Производит операции с балансом пользователя"""
+        # начисление на баланс пользователя полученных кредитов
+        user_request.amount = response.get('refiil')
+        if user_request.amount > 0:
+            detail_user = await DetailUser.objects.aget(user=user_request.user)
+            detail_user.balance += user_request.amount
+            await sync_to_async(detail_user.save)()
+
+
+class RefillConsumer(RequestConsumer):
+    """Consumer для создания заявок на пополнение счёта"""
+    # название операции заявки
+    operation = 'refill'
+    # модель для хранения заявки в БД
+    model = models.RefillRequest
+    # сериализатор для заявки
+    model_serializer = serializers.RefillRequestModelSerializer
+    # задержка между повторными запросами
+    connection_delay = 3
+
+
+class WithdrawConsumer(RequestConsumer):
+    """Consumer для создание заявок на вывод кредитов"""
+    # название операции заявки
+    operation = 'withdraw'
+    # модель для хранения заявки в БД
+    model = models.WithdrawalRequest
+    # сериализатор для заявки
+    model_serializer = serializers.WithdrawRequestModelSerializer
+    # задержка между повторными запросами
+    connection_delay = 10
+
+    async def check_conditions(self, text_data_json):
+        user = self.scope['user']
+        detail_user = await DetailUser.objects.aget(user=user)
+        if detail_user.balance < text_data_json.get('amount', 0):
+            return "Not enough credits."
+        return "OK"
+
+    async def process_balance(self, user_request, response):
+            """Производит операции с балансом пользователя"""
+            # начисление на баланс пользователя полученных кредитов
+            user_request.amount = response.get('withdraw')
+            if user_request.amount > 0:
+                detail_user = await DetailUser.objects.aget(user=user_request.user)
+                detail_user.balance -= user_request.amount
+                await sync_to_async(detail_user.save)()
+
+    async def get_bot_name(self, response):
+        """Получает имя бота из запроса"""
+        return response.get('name')

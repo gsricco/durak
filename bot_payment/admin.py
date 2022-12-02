@@ -34,13 +34,13 @@ class WithdrawStatusListFilter(StatusListFilter):
 
 @admin.register(models.RefillRequest)
 class RefillRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'amount', 'note', 'status')
+    list_display = ('id', 'request_id', 'user', 'amount', 'note', 'status')
     list_editable = ('note', 'status')
     list_filter = (RefillStatusListFilter,)
 
 
 @admin.register(models.WithdrawalRequest)
 class WithdrawalRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'amount', 'balance', 'note', 'status')
+    list_display = ('id', 'request_id', 'user', 'amount', 'balance', 'note', 'status')
     list_editable = ('note', 'status')
     list_filter = (WithdrawStatusListFilter,)

@@ -18,7 +18,8 @@ class RefillRequest(models.Model):
     ]
     
     # переопределяет первичный ключ для задания verbose_name
-    id = models.BigAutoField(verbose_name='Номер заявки', primary_key=True)
+    id = models.BigAutoField(verbose_name='ID заявки', primary_key=True)
+    request_id = models.BigIntegerField(verbose_name='Номер заявки', default=0)
 
     status = models.CharField(verbose_name='Статус заявки', max_length=4, choices=STATUS_CHOICE_LIST, default=OPEN)
     amount = models.PositiveBigIntegerField(verbose_name='Сумма пополнения', default=0)
@@ -30,11 +31,11 @@ class RefillRequest(models.Model):
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
     close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
-    user_id = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
+    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
 
     def __str__(self):
-        return f"Заявка {self.pk} <статус:{self.status}> сумма: {self.amount}"
+        return f"Заявка {self.request_id} <статус:{self.status}> сумма: {self.amount}"
     
     class Meta:
         verbose_name = "Заявка на пополнение"
@@ -58,7 +59,8 @@ class WithdrawalRequest(models.Model):
     ]
 
     # переопределяет первичный ключ для задания verbose_name
-    id = models.BigAutoField(verbose_name='Номер заявки', primary_key=True)
+    id = models.BigAutoField(verbose_name='ID заявки', primary_key=True)
+    request_id = models.BigIntegerField(verbose_name='Номер заявки', default=0)
 
     status = models.CharField(verbose_name='Статус заявки', max_length=4, choices=STATUS_CHOICE_LIST, default=OPEN)
     amount = models.PositiveBigIntegerField(verbose_name='Сумма вывода', default=0)
@@ -70,11 +72,11 @@ class WithdrawalRequest(models.Model):
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
     close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
-    user_id = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
-    game_id = models.BigIntegerField(verbose_name='id пользователя в игре')
+    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
+    game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
 
     def __str__(self):
-        return f"Заявка {self.pk} <статус:{self.status}> сумма: {self.amount}"
+        return f"Заявка {self.request_id} <статус:{self.status}> сумма: {self.amount}"
 
     class Meta:
         verbose_name = "Заявка на вывод"
