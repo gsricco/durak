@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from accaunts.models import CustomUser
 
@@ -28,6 +29,16 @@ class Message(models.Model):
         """Метод для установки статуса 'Прочитанно' у поля конкретного сообщения"""
         self.is_read = True
         return {"status": "Ok"}
+
+    def clean(self):
+        if not len(self.message) < 500:
+            raise ValidationError(
+                {'message': "message support_chat more 500"},
+            )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
 
 class UserChatRoom(models.Model):

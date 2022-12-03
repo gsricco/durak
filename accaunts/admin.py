@@ -82,8 +82,8 @@ class LevelAdmin(admin.ModelAdmin):
     """Класс отображения в админке уровней пользователей(модель Level)"""
     # actions = 'add_experience',
     form = LevelForm
-    list_display = 'level', 'experience_range', 'experience_for_lvl', 'image', 'preview'
-    list_editable = 'image',
+    list_display = 'level', 'experience_range', 'experience_for_lvl', 'preview', 'img_name'
+    list_editable = 'img_name',
     list_filter = 'level',
     ordering = 'level',
     readonly_fields = 'preview',
@@ -106,8 +106,8 @@ class LevelAdmin(admin.ModelAdmin):
         return None
 
     def preview(self, obj):
-        if obj.image:
-            return mark_safe(f'<img src="{obj.image.url}" width="50" height="50">')
+        if obj.img_name:
+            return mark_safe(f'<svg style="width: 50px; height: 50px;"><use xlink:href="/static/img/icons/sprite.svg#{obj.img_name}"></use></svg>')
         else:
             return 'Нет изображения'
 

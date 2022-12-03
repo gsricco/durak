@@ -2,7 +2,7 @@ import base64
 import datetime
 import json
 import os
-
+from django.core.exceptions import ValidationError
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
@@ -22,6 +22,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def create_or_get_support_chat_room(self, user):  # получает или создает чат рум
         chat_room, created = UserChatRoom.objects.get_or_create(room_id=user)
         return chat_room
+
+    async def save_user_message_all_chat(self, all_chat_message):
+        """Cохраняет последние 1-50 сообщений из общего чата в Редис"""
+        if r.llen("all_chat_50") == 50:
+            r.lpop("all_chat_50")
+        r.rpush("all_chat_50", json.dumps(all_chat_message))
 
     @sync_to_async()
     def base64_to_image(self, file):
@@ -45,14 +51,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def save_user_message(self, room, user, message, file_path=''):  # сохраняет сообщение в бд
+        """Cохраняет сообщений из чата поддержки в БД"""
         if user:
-            user = CustomUser.objects.get(username=user).pk
-            user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
-            user_mess.save()
-            room.message.add(user_mess, bulk=False)
-            room.save()
-            async_to_sync(self.get_all_room)()
-            return user_mess
+            try:
+                user = CustomUser.objects.get(username=user).pk
+                user_mess = Message(user_posted_id=user, message=message)
+                user_mess.full_clean()
+                user_mess.save()
+                room.message.add(user_mess, bulk=False)
+                return user_mess
+            except ValidationError:
+                print("Message support_chat more 500")
 
     @sync_to_async()
     def get_all_room(self):
@@ -71,6 +80,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Отправка онлайна при коннекте и дисконнекте пользователя"""
         online = self.channel_layer.receive_count + num
         await self.channel_layer.group_send(self.room_group_name, {"type": "get_online", "get_online": online})
+
+    async def send_json_all_chat(self, channel):
+        """Отправляет историю сообщений(до 50шт) общего чата, выгружая её из Редиса"""
+        message_with_list = []
+        print(channel)
+        for message in r.lrange("all_chat_50", 0, 49):
+            message_with_list.append(json.loads(message))
+        await self.channel_layer.send(channel, {"type": "chat_message",
+                                                "chat_type": "all_chat_list",
+                                                "message": "list",
+                                                "list": message_with_list,
+                                                })
 
     @sync_to_async()
     def send_json(self, channel, room_name):
@@ -129,7 +150,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # подтверждение
         await self.send_online(0)  # отправляем количество вебсокет подключений на фронт
         if recieve_user == 'go':  # проверка подключение из админки или нет .'go' - это не админка
+            print(user, recieve_user, '*'*100)
             await self.send_json(self.channel_name, user)  # выгружает свою историю чата в суппорт чат
+            await self.send_json_all_chat(self.channel_name)
         else:
             await self.get_all_room()
 
@@ -163,6 +186,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "bid": text_data_json,
                 }
             )
+        print(text_data_json, 'eto text data json', '*'*50)
         if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
             message = text_data_json.get("message")
             user = text_data_json["user"]
@@ -172,25 +196,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         '''первичное получение и обработка сообщений'''
         if text_data_json.get('chat_type') == 'support':  # сообщение из support чата
-            file_path = ''
-            if text_data_json.get('file'):
-                filed = text_data_json.get('file')
-                file_path = await self.base64_to_image(filed)
-            user = str(self.scope.get('user'))
-            room = await self.create_or_get_support_chat_room(user)  # получает рум из бд
-            # сохранение сообщения
-            await self.save_user_message(room, user, text_data_json["message"], file_path)
-            admin_status = await self.get_user_status(user)
-            if not admin_status:
-                await self.send_support_chat_message(self.channel_name,
-                                                     text_data_json["message"],
-                                                     user, file_path)  # из супорт чата на сайте себе
-            await self.channel_layer.group_send('admin_group', {"type": "support_chat_message",
-                                                                "chat_type": "support",
-                                                                "message": text_data_json["message"],
-                                                                "user": user,
-                                                                "file_path": f'/{file_path}'
-                                                                })  # отправка сообщения пользователя админам
+            if len(text_data_json.get("message")) > 500:
+                print("message all_chat more 500")
+            else:
+                file_path = ''
+                if text_data_json.get('file'):
+                    filed = text_data_json.get('file')
+                    file_path = await self.base64_to_image(filed)
+                user = str(self.scope.get('user'))
+                room = await self.create_or_get_support_chat_room(user)  # получает рум из бд
+                # сохранение сообщения
+                await self.save_user_message(room, user, text_data_json["message"], file_path)
+                admin_status = await self.get_user_status(user)
+                if not admin_status:
+                    await self.send_support_chat_message(self.channel_name,
+                                                         text_data_json["message"],
+                                                         user, file_path)  # из супорт чата на сайте себе
+                await self.channel_layer.group_send('admin_group', {"type": "support_chat_message",
+                                                                    "chat_type": "support",
+                                                                    "message": text_data_json["message"],
+                                                                    "user": user,
+                                                                    "file_path": f'/{file_path}'
+                                                                    })  # отправка сообщения пользователя админам
 
         elif text_data_json.get('chat_type') == 'support_admin':
             '''Получем сообщение от админа из админки'''
@@ -218,14 +245,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                         "user": sender_user, })  # отправка сообщения пользователю в рум
         elif text_data_json.get('chat_type') == 'all_chat':
             '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем'''
-            await self.channel_layer.group_send(
-                self.room_group_name, {"type": "chat_message",
-                                       "chat_type": text_data_json.get('chat_type'),
-                                       "message": text_data_json["message"],
-                                       "user": text_data_json["user"],
-                                       "avatar": text_data_json["avatar"],
-                                       "rubin": text_data_json.get("rubin"),
-                                       })
+            all_chat_message = {"type": "chat_message",
+                                "chat_type": text_data_json.get('chat_type'),
+                                "message": text_data_json["message"],
+                                "user": text_data_json["user"],
+                                "avatar": text_data_json["avatar"],
+                                "rubin": text_data_json.get("rubin"),
+                                }
+            if len(all_chat_message["message"]) > 250:
+                print("message all_chat more 250")
+            else:
+                await self.channel_layer.group_send(self.room_group_name, all_chat_message)
+                await self.save_user_message_all_chat(all_chat_message)
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
@@ -249,12 +280,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event.get("message")
         avatar = event.get("avatar")
         rubin = event.get("rubin")
+        list = event.get('list')
         await self.send(text_data=json.dumps({"message": message,
                                               "chat_type": chat_type,
                                               "user": user,
                                               "avatar": avatar,
                                               "rubin": rubin,
-                                              # "online": online
+                                              "list": list
                                               }))
 
     async def support_chat_message(self, event):

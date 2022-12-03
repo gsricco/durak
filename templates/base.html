@@ -256,7 +256,7 @@
 
                             <div class="online-chat__input-block">
                                 <input placeholder="Написать сообщение..." name="chat-message" type="text"
-                                       class="online-chat__input" autocomplete="off">
+                                       class="online-chat__input" autocomplete="off" maxlength="250">
                                 <div class="online-chat__icon-doc">
                                     <svg>
                                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#document"></use>
@@ -275,8 +275,7 @@
                     {{ room_name|json_script:"room-name" }}
                     {{ user.is_authenticated|json_script:"auth-user" }}
                     {{ user.username|json_script:"username" }}
-                    {{ user.rubin|json_script:"rubin" }}
-
+                    {{ user.level.img_name|json_script:"kamen" }}
 {#                    <script>#}
 {#                        const roomName = JSON.parse(document.getElementById('room-name').textContent);#}
 {#                        const is_auth = JSON.parse(document.getElementById('auth-user').textContent);#}

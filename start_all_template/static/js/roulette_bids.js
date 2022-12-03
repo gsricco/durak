@@ -93,8 +93,8 @@ const itemsClick = (bidCard) => {
                     'bidCount': bidCount,
                     'userName': username,
                     'avatar': ava,
-                    'rubin': 'rubin_blue',
-                    userStone: 'rubin_blue',
+                    'rubin': rubin,
+                    userStone: rubin,
                     'bidCard': bidCard
                 }
             }));

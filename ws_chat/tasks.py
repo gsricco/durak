@@ -49,13 +49,13 @@ def roll():
     t = datetime.datetime.now()
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
-    round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
+    result = random.choice(ROUND_RESULTS)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
-                                                "winner": round_result,
+                                                "winner": result,
                                             })
-
+    r.set(ROUND_RESULT_FIELD_NAME, result)
 
 @shared_task
 def go_back():
@@ -248,8 +248,8 @@ def generate_round_result(process_after_generating: bool = False) -> int:
     Returns:
         int: return code
     """
-    result = random.choice(ROUND_RESULTS)
-    r.set(ROUND_RESULT_FIELD_NAME, result)
+    # result = random.choice(ROUND_RESULTS)
+    # r.set(ROUND_RESULT_FIELD_NAME, result)
 
     if process_after_generating:
         process_bets.apply_async(args=(KEYS_STORAGE_NAME, ROUND_RESULT_FIELD_NAME,))

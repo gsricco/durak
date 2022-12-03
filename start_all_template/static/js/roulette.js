@@ -9,9 +9,9 @@
 //101 - black2
 
 const ava = document.getElementById('ava').getAttribute('src');
-const rubin = JSON.parse(document.querySelector('.rubin'));
 const list = document.querySelector('.list');
-
+const rubin = JSON.parse(document.getElementById('kamen').textContent);
+console.log(rubin, 'ETO SUKA RUBIN NOVIY')
 function generateItems(winnerCard) {
     const list = document.querySelector('.list');
 
@@ -76,7 +76,7 @@ function generateItems(winnerCard) {
 
 // анимация прокрутки
 function startRoll(winnerCard) {
-    list.innerHTML ='';
+    list.innerHTML = '';
     generateItems(winnerCard);
 
     items[0].style.pointerEvents = 'none';
@@ -431,11 +431,10 @@ chatSocket.onmessage = function (e) {
         divWrap.appendChild(divRub)
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-        svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}#rubin_red"></use>`
+        svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
         // stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
 
         divRub.appendChild(svg)
-        console.log(data.rubin)
         const divAva = document.createElement('div')
         divAva.className = 'online-chat__li-avatar'
         divAva.innerHTML = `<img src="${data.avatar}" alt="">`
@@ -456,6 +455,49 @@ chatSocket.onmessage = function (e) {
 
         p.appendChild(spanMessage)
     }
+    if (data.chat_type === 'all_chat_list') {
+        const set = new Set(data.list);
+        console.log("list_50")
+        for (let count of set) {
+            const data = count
+
+            const li = document.createElement('li')
+            li.className = 'online-chat__li'
+            messageBlock.appendChild(li)
+
+            const divWrap = document.createElement('div')
+            divWrap.className = 'online-chat__li-wrapper'
+            li.appendChild(divWrap)
+
+            const divRub = document.createElement('div')
+            divRub.className = 'online-chat__li-rubin'
+            divWrap.appendChild(divRub)
+            console.log(data.rubin, 'ETO RUBIN')
+            console.log(data.avatar, 'ETO AVATAR')
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
+            divRub.appendChild(svg)
+            const divAva = document.createElement('div')
+            divAva.className = 'online-chat__li-avatar'
+            divAva.innerHTML = `<img src="${data.avatar}" alt="">`
+            divWrap.appendChild(divAva)
+
+            const p = document.createElement('p')
+            p.className = 'online-chat__li-text'
+            li.appendChild(p)
+
+            const spanName = document.createElement('span')
+            spanName.className = 'online-chat__li-name'
+            spanName.innerHTML = `${data.user} </br>`
+            p.appendChild(spanName)
+
+            const spanMessage = document.createElement('span')
+            spanMessage.className = 'online-chat__li-sms'
+            spanMessage.innerHTML = `${data.message}`
+
+            p.appendChild(spanMessage)
+        }
+    }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
@@ -473,6 +515,7 @@ messageInput.onkeyup = function (e) {
 
 buttonSend.onclick = function (e) {
     const message = messageInput.value;
+    console.log(rubin, "ETO RUBIN KOTORIY SHLEM")
     if (is_auth === true) {
         chatSocket.send(JSON.stringify({
             "chat_type": "all_chat",

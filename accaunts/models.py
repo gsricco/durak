@@ -122,10 +122,18 @@ class UserIP(models.Model):
 
 class Level(models.Model):
     """Модель уровня игрока"""
+    RUBIN_CHOICES = (
+        ('amber_case', 'Amber'),
+        ('pearl_case', 'Pearl'),
+        ('rubin_blue', 'Sapphire'),
+        ('rubin_green', 'Emerald'),
+        ('rubin_purple', 'Amethist'),
+        ('rubin_red', 'Rubin'),
+        ('rubin_turquoise', 'Diamond'),
+    )
     level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
     experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
-    image = models.ImageField(verbose_name='Картинка уровня', upload_to='img/level/', blank=True, null=True)
-    
+    img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
     case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
     amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
 
