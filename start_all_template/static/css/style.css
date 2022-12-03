@@ -2346,6 +2346,10 @@ h3 {
 
 .modal-enter__img .yt {
   fill: #ff5b5b;
+  width: 25px;
+  height: 23px;
+  margin-left: -5px;
+  margin-top: 6px;
 }
 
 .modal-enter__img .vk {

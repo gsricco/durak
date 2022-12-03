@@ -10,8 +10,8 @@ import random
 
 channel_layer = get_channel_layer()
 r = Redis()
-ROUND_RESULTS = ('coin',)
-# ROUND_RESULTS = ('spades', 'hearts', 'coin')
+# ROUND_RESULTS = ('coin',)
+ROUND_RESULTS = ('spades', 'hearts', 'coin')
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 KEYS_STORAGE_NAME = 'USERID:list'
 
@@ -72,9 +72,11 @@ def stop():
     t = datetime.datetime.now()
     r.set('state', 'stop', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
+    winner = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'stopper',
+                                                'winner': winner
                                             })
 
 

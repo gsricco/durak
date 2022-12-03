@@ -325,10 +325,10 @@ chatSocket.onmessage = function (e) {
         startRoll(data.winner)
     }
     if (data.stop) {
-
+        let winnerCard = data.w
         //winnerCard from backend
-        let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-        console.log(winnerCard)
+        // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
+        // console.log(winnerCard)
         let bidsNumber = document.querySelectorAll('.roulette__item-money')
         const bidsButtons = document.querySelectorAll('.roulette__radio-item')
         bidsNumber.forEach(el => {

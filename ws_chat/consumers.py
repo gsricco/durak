@@ -292,8 +292,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def stopper(self, event):
         """Сигнализирует об остановке прокрутки рулетки"""
+        winner = event.get('winner')
         await self.send(text_data=json.dumps({
             "stop": "stopping",
+            "w": winner,
         }))
 
     async def go_back(self, event):
