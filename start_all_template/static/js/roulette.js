@@ -13,6 +13,7 @@ const rubin = JSON.parse(document.querySelector('.rubin'));
 const list = document.querySelector('.list');
 
 function generateItems(winnerCard) {
+    const list = document.querySelector('.list');
 
     let cells;
     const heartsArray = [103, 107, 111, 115]
@@ -71,10 +72,13 @@ function generateItems(winnerCard) {
     }
 }
 
-generateItems();
+// generateItems();
 
 // анимация прокрутки
 function startRoll(winnerCard) {
+    list.innerHTML ='';
+    generateItems(winnerCard);
+
     items[0].style.pointerEvents = 'none';
     items[1].style.pointerEvents = 'none';
     items[2].style.pointerEvents = 'none';
@@ -303,6 +307,7 @@ chatSocket.onmessage = function (e) {
         }
         if (data.init.state === 'rolling') {
             console.log(data)
+
             startRoll(data.init.winner)
 
         }
@@ -317,13 +322,13 @@ chatSocket.onmessage = function (e) {
         createBidItemRow(data.bid)
     }
     if (data.roll) {
-        generateItems(data.winner)
-        startRoll()
+        startRoll(data.winner)
     }
     if (data.stop) {
 
         //winnerCard from backend
-        let winnerCard = `${data.winner}`
+        let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
+        console.log(winnerCard)
         let bidsNumber = document.querySelectorAll('.roulette__item-money')
         const bidsButtons = document.querySelectorAll('.roulette__radio-item')
         bidsNumber.forEach(el => {
@@ -332,6 +337,10 @@ chatSocket.onmessage = function (e) {
         if (winnerCard === 'hearts') {
             let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
             bidsNumber.forEach(el => {
+                //обновление баланса user////
+                let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                console.log(balanceUser)
+                // /////////////////////
                 el.style.color = 'green'
                 document.querySelector('.hearts').style.opacity = '1'
                 bidsButtons[0].style.opacity = '1'
@@ -339,6 +348,10 @@ chatSocket.onmessage = function (e) {
         } else if (winnerCard === 'coin') {
             let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
             bidsNumber.forEach(el => {
+                //обновление баланса user////
+                let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                console.log(balanceUser)
+                // /////////////////////
                 el.style.color = 'green'
                 document.querySelector('.coin').style.opacity = '1'
                 bidsButtons[1].style.opacity = '1'
@@ -346,6 +359,10 @@ chatSocket.onmessage = function (e) {
         } else if (winnerCard === 'spades') {
             let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
             bidsNumber.forEach(el => {
+                //обновление баланса user////
+                let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                console.log(balanceUser)
+                // /////////////////////
                 el.style.color = 'green'
                 document.querySelector('.spades').style.opacity = '1'
                 bidsButtons[2].style.opacity = '1'

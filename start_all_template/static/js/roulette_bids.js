@@ -16,38 +16,47 @@ const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 
 const createBidItemRow = (data) => {
     //balanceUser - текущий баланс user
-
+    // console.log(data.bet.bidCard)
 
     const bidItemBlock = document.querySelector(`.${data.bet.bidCard}`)
-    const bidItem = document.createElement('div')
-    bidItem.className = 'roulette__item-row'
-    bidItemBlock.appendChild(bidItem)
 
-    const bidItemLeftBlock = document.createElement('div')
-    bidItemLeftBlock.className = 'roulette__item-left'
-    bidItem.appendChild(bidItemLeftBlock)
+    if (bidItemBlock.innerHTML != ``) {
+        let itemMoney = document.querySelector(`div.${data.bet.bidCard} div.roulette__item-money`)
+        let bidOld = Number(itemMoney.textContent) + Number(`${data.bet.bidCount}`)
+        console.log(bidOld)
+        itemMoney.innerHTML = bidOld;
+    } else {
 
-    const itemMoney = document.createElement('div')
-    itemMoney.className = 'roulette__item-money'
-    itemMoney.innerHTML = `${data.bet.bidCount}`
-    bidItem.appendChild(itemMoney)
+        const bidItem = document.createElement('div')
+        bidItem.className = 'roulette__item-row'
+        bidItemBlock.appendChild(bidItem)
 
-    const itemAvatar = document.createElement('div')
-    itemAvatar.className = 'roulette__item-avatar'
-    itemAvatar.innerHTML = `<img src="${data.bet.avatar}" alt="">`
-    bidItemLeftBlock.appendChild(itemAvatar)
+        const bidItemLeftBlock = document.createElement('div')
+        bidItemLeftBlock.className = 'roulette__item-left'
+        bidItem.appendChild(bidItemLeftBlock)
 
-    const itemStone = document.createElement('div')
-    itemStone.className = 'roulette__item-stoun'
-    const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-    stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
-    itemStone.appendChild(stone)
-    bidItemLeftBlock.appendChild(itemStone)
+        const itemMoney = document.createElement('div')
+        itemMoney.className = 'roulette__item-money'
+        itemMoney.innerHTML = `${data.bet.bidCount}`
+        bidItem.appendChild(itemMoney)
 
-    const itemUserName = document.createElement('div')
-    itemUserName.className = 'roulette__item-username'
-    itemUserName.innerHTML = `${data.bet.userName}`
-    bidItemLeftBlock.appendChild(itemUserName)
+        const itemAvatar = document.createElement('div')
+        itemAvatar.className = 'roulette__item-avatar'
+        itemAvatar.innerHTML = `<img src="${data.bet.avatar}" alt="">`
+        bidItemLeftBlock.appendChild(itemAvatar)
+
+        const itemStone = document.createElement('div')
+        itemStone.className = 'roulette__item-stoun'
+        const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
+        itemStone.appendChild(stone)
+        bidItemLeftBlock.appendChild(itemStone)
+
+        const itemUserName = document.createElement('div')
+        itemUserName.className = 'roulette__item-username'
+        itemUserName.innerHTML = `${data.bet.userName}`
+        bidItemLeftBlock.appendChild(itemUserName)
+    }
 }
 
 // const items = document.querySelectorAll('.roulette__radio-item > label')
@@ -76,7 +85,9 @@ const itemsClick = (bidCard) => {
         let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
 
         // console.log(cells)
-        if (balanceUser >= Number(bidCount)) {
+        if (balanceUser + 1 >= Number(bidCount)) {
+
+
             chatSocket.send(JSON.stringify({
                 'bet': {
                     'bidCount': bidCount,
@@ -92,7 +103,6 @@ const itemsClick = (bidCard) => {
             } else if (bidCard === 'spades') {
                 items[0].style.pointerEvents = 'none';
             }
-
 
             ///////////////////////////////////////////////
             //логика БЭК отнимания ставки от баланса/////////
@@ -116,7 +126,6 @@ const itemsClick = (bidCard) => {
         document.querySelector('.roulette__table-input').value = ''
         document.querySelector('.roulette__current-block').innerHTML = '';
     }
-
 }
 
 items[0].addEventListener('click', () => itemsClick('hearts'))
