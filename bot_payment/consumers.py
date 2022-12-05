@@ -1,5 +1,4 @@
 import json
-# import requests
 import aiohttp
 import asyncio
 from asgiref.sync import sync_to_async, async_to_sync
@@ -8,6 +7,7 @@ import redis
 from accaunts.models import CustomUser, Ban, DetailUser
 from . import models, serializers
 from django.utils import timezone
+from django.db.utils import Error
 
 r = redis.Redis()  # подключаемся к редису
 
@@ -65,7 +65,11 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
     async def get_bot_name(self, response):
         """Получает имя бота из запроса"""
-        return response[0].get('name')
+        if type(response) == dict:
+            return response.get('name')
+        elif type(response) == list and len(response) > 0 and type(response[0]) == dict:
+            return response[0].get('name')
+        return "Can't find name in server response."
 
     async def create_request(self, text_data_json):
         """Создаёт новую заявку"""
@@ -87,7 +91,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 return
 
             # проверяет, находится ли юзер в бане
-            ban_tuple = await Ban.objects.aget_or_create(user=user)
+            try:
+                ban_tuple = await Ban.objects.aget_or_create(user=user)
+            except Error as err:
+                await self.send(json.dumps({"status": "error", "detail": "Error while trying to access database."}))
+                print(f"Error while trying to access database, {type(err)}: {err}")
+                return
             ban = await sync_to_async(ban_tuple.__getitem__)(0)
             if ban.ban:
                 message = {"status": "error","detail": "user banned"}
@@ -102,146 +111,111 @@ class RequestConsumer(AsyncWebsocketConsumer):
             bot_id = -1
             retries = 0
             MAX_RETRIES = 100
+            timeout = aiohttp.ClientTimeout(total=2)
+            async with aiohttp.ClientSession(timeout=timeout, raise_for_status=True) as session:
             # пока не нашли свободного бота
-            while bot_id == -1:
-                retries += 1
-                # если слишком много запрсов, то перестаём искать
-                if retries > MAX_RETRIES:
-                    message = {"status": "error","detail": "Can't find a free bot"}
-                    await self.send(json.dumps(message))
-                    return
-
-                # запрос на сервер для поиска свободного бота
-                # try:
-                #     req = await sync_to_async(requests.get)(url_get_free_bot, timeout=2)
-                # except requests.exceptions.ConnectionError:
-                #     message = {"status": "process","detail": "Connection error"}
-                #     await self.send(json.dumps(message))
-                #     return
-                # except requests.exceptions.Timeout:
-                #     message = {"status": "process","detail": "Timeout"}
-                #     await self.send(json.dumps(message))
-                #     await asyncio.sleep(self.connection_delay)
-                #     continue
-
-                # # если был получен ответ с ошибкой
-                # if req.status_code != 200:
-                #     message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
-                #     await self.send(json.dumps(message))
-                #     return
-
-                # # получение id свободного бота
-                # bot_response = req.json()
-
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url_get_free_bot) as resp:
-                        if not resp.ok:
-                            await self.send(json.dumps({"status": "error", "detail": resp.reason}))
-                            return
-                        bot_response = await resp.json()
-
-                if 'bot_id' not in bot_response:
-                    message = {"status": "error", "detail": "missing bot_id"}
-                    await self.send(json.dumps(message))
-                    return
-                bot_id = bot_response['bot_id']
-
-                # -1 в id бота - на сервере нет свободных ботов
-                if bot_id == -1:
-                    # отсылаем на фронт ответ о том, что поиск ещё идёт
-                    message = {"status": "process","detail": "finding free bots"}
-                    await self.send(json.dumps(message))
-                    await asyncio.sleep(self.connection_delay)
-                else:
-                    # записывает в redis пользователя, который будет использовать бота
-                    r.set(f'bot:{bot_id}', user.pk, ex=60)
-                    break
-
-            # проверяет, не успел ли кто-то занять бота
-            bot_owner = r.getex(f"bot:{bot_id}", ex=60)
-
-            # если бота кто-то использовал, то прерывает создание заявки
-            if bot_owner is None:
-                message = {"status": "error","detail": "None get when trying to get a bot_owner"}
-                await self.send(json.dumps(message))
-                return
-
-            # если бота занял другой пользователь, то прерывает создание заявки
-            if int(bot_owner) != user.pk:
-                message = {"status": "error","detail": "bot were taken"}
-                await self.send(json.dumps(message))
-                return
-            
-            # получает имя бота по его id 
-            url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
-            # try:
-            #     req = await sync_to_async(requests.get)(url_get_bot_info, timeout=3)
-            # except requests.exceptions.ConnectionError:
-            #     message = {"status": "error", "detail": "Connection error"}
-            #     await self.send(json.dumps(message))
-            #     return
-            # except requests.exceptions.Timeout:
-            #     message = {"status": "error", "detail": "Timeout"}
-            #     await self.send(json.dumps(message))
-            #     return
-            
-            # # если код ответа не успешный, то прерывает создание заявки
-            # if req.status_code != 200:
-            #     message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
-            #     await self.send(json.dumps(message))
-            #     return
-            
-            # # получает список ботов из ответа сервера
-            # bot_list = req.json()
-
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url_get_bot_info) as resp:
-                    if not resp.ok:
-                        await self.send(json.dumps({"status": "error", "detail": resp.reason}))
+                while bot_id == -1:
+                    retries += 1
+                    # если слишком много запрсов, то перестаём искать
+                    if retries > MAX_RETRIES:
+                        message = {"status": "error","detail": "Can't find a free bot"}
+                        await self.send(json.dumps(message))
                         return
+                    # пытается получить от сервера ответ
+                    try:
+                        resp = await session.get(url_get_free_bot)
+                        bot_response = await resp.json()
+                    except (aiohttp.ClientConnectionError, aiohttp.ServerTimeoutError, asyncio.exceptions.TimeoutError) as err:
+                        # при этих ошибках можно попробовать продолжить посылать запросы серверу
+                        await self.send(json.dumps({"status": "process", "detail": f"Error while trying to connect to the bot server{type(err)}"}))
+                        await asyncio.sleep(self.connection_delay)
+                        continue
+                    except aiohttp.ClientError as err:
+                        await self.send(json.dumps({"status": "error", "detail": f"Can't connect to the bot server ({type(err)})"}))
+                        print(f"{type(err)}: {err}")
+                        return
+                    finally:
+                        resp.close()
+
+                    if 'bot_id' not in bot_response:
+                        message = {"status": "error", "detail": "missing bot_id"}
+                        await self.send(json.dumps(message))
+                        return
+                    bot_id = bot_response['bot_id']
+
+                    # -1 в id бота - на сервере нет свободных ботов
+                    if bot_id == -1:
+                        # отсылаем на фронт ответ о том, что поиск ещё идёт
+                        message = {"status": "process","detail": "finding free bots"}
+                        await self.send(json.dumps(message))
+                        await asyncio.sleep(self.connection_delay)
+                    else:
+                        # записывает в redis пользователя, который будет использовать бота
+                        r.set(f'bot:{bot_id}', user.pk, ex=60)
+                        break
+
+                # проверяет, не успел ли кто-то занять бота
+                bot_owner = r.getex(f"bot:{bot_id}", ex=60)
+
+                # если бота кто-то использовал, то прерывает создание заявки
+                if bot_owner is None:
+                    message = {"status": "error","detail": "None get when trying to get a bot_owner"}
+                    await self.send(json.dumps(message))
+                    return
+                # если бота занял другой пользователь, то прерывает создание заявки
+                if int(bot_owner) != user.pk:
+                    message = {"status": "error","detail": "bot were taken"}
+                    await self.send(json.dumps(message))
+                    return 
+                # получает имя бота по его id 
+                url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
+                # получает список ботов из ответа сервера
+                try:
+                    resp = await session.get(url_get_bot_info)
                     bot_list = await resp.json()
+                except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
+                    await self.send(json.dumps({"status": "error", "detail": f"Error while trying to get a bot name ({type(err)})"}))
+                    print(f"{type(err)}: {err}")
+                    return
+                finally:
+                    resp.close()
+                # получает имя бота, с которым нужно будет взаимодействовать пользователю
+                bot_name = await self.get_bot_name(bot_list)
+                # посылаем имя бота на фронт для отображения пользователю
+                message = {"status": "get_name","detail": bot_name}
+                await self.send(json.dumps(message))
 
-            # получает имя бота, с которым нужно будет взаимодействовать пользователю
-            bot_name = await self.get_bot_name(bot_list)
+                # создаёт заявку и сохраняет её в бд
+                try:
+                    new_request = await sync_to_async(serializer.save)()
+                except Error as err:
+                    await self.send(json.dumps({"status": "error", "detail": "Can't save request to DB"}))
+                    print(f"{(type(err))}: {err}")
+                    return
 
-            # посылаем имя бота на фронт для отображения пользователю
-            message = {"status": "get_name","detail": bot_name}
-            await self.send(json.dumps(message))
+                # создаёт заявку на сервере ботов
+                # ID_SHIFT используется для сдвига значений id запросов на сервере ботов, т.к. первые id уже могут быть заняты
+                new_request.request_id = new_request.pk + ID_SHIFT
+                try:
+                    await sync_to_async(new_request.save)()
+                except Error as err:
+                    await self.send(json.dumps({"status": "process", "detail": f"Loosing request ID: {new_request.request_id}"}))
+                    print(f"{(type(err))}: {err}")
+                    print(f"request id may be lost for {new_request}, request_id = {new_request.request_id}")
 
-            # создаёт заявку и сохраняет её в бд
-            new_request = await sync_to_async(serializer.save)()
-
-            # создаёт заявку на сервере ботов
-            new_request.request_id = new_request.pk + ID_SHIFT
-            await sync_to_async(new_request.save)()
-            url_request_create = f"{HOST_URL}{self.operation}/create?id={new_request.request_id}&bot_id={bot_id}&site_id={user.pk}&bet={new_request.amount}"
-            if not new_request.game_id is None:
-                url_request_create += f"&game_id={new_request.game_id}"
-            
-            # try:
-            #     req = await sync_to_async(requests.get)(url_request_create, timeout=2)
-            # except requests.exceptions.ConnectionError:
-            #     message = {"status": "error", "detail": "Connection error"}
-            #     await self.send(json.dumps(message))
-            #     return
-            # except requests.exceptions.Timeout:
-            #     message = {"status": "error", "detail": "Timeout"}
-            #     await self.send(json.dumps(message))
-            #     return
-            
-            # # если статус ответа не был успешен, то заканчивает создание заявки
-            # if req.status_code != 200:
-            #     message = {"status": "error","detail": f"bot server unavailable (status code: {req.status_code})"}
-            #     await self.send(json.dumps(message))
-            #     return
-
-            # bot_response = req.json()
-
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url_request_create) as resp:
-                    if not resp.ok:
-                        await self.send(json.dumps({"status": "error", "detail": resp.reason}))
+                url_request_create = f"{HOST_URL}{self.operation}/create?id={new_request.request_id}&bot_id={bot_id}&site_id={user.pk}&bet={new_request.amount}"
+                if not new_request.game_id is None:
+                    url_request_create += f"&game_id={new_request.game_id}"
+                
+                try:
+                    resp = await session.get(url_request_create)
                     bot_response = await resp.json()
+                except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
+                    await self.send(json.dumps({"status": "error", "detail": "Can't create request on the bot server"}))
+                    print(f"Can't create request on the bot server. {type(err)}: {err}")
+                    return
+                finally:
+                    resp.close()
 
             # проверяет, создалась ли заявка на сервере
             if bot_response.get('ok') == False:
@@ -255,13 +229,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
             response_serializer = self.model_serializer(new_request)
             serializer_data = await sync_to_async(getattr)(response_serializer, 'data')
             await self.send(json.dumps(serializer_data))
+
             # удаляет из redis запись о занятии пользователем бота
             r.delete(f"bot:{bot_id}")
-
             # запускает процесс мониторинга состояния заявки
             await self.send_request_status(new_request.pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user.pk}")
-
             return
         
         # отрабатывает если данные для создания заявки, полученные от клиента, были неправильными
@@ -276,45 +249,40 @@ class RequestConsumer(AsyncWebsocketConsumer):
         retries = 0
         max_retries = 250
         # в цикле с интервалом delay получает статус заявки и отсылает его на клиент
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=2)
+        async with aiohttp.ClientSession(timeout=timeout, raise_for_status=True) as session:
             while retries < max_retries:
                 retries += 1
-                # получает статус заявки от сервера
-                # try:
-                #     req = await sync_to_async(requests.get)(url_get_status, timeout=3)
-                # except requests.ConnectionError:
-                #     message = {"status": "process", "detail": "Connection error"}
-                #     await asyncio.sleep(delay)
-                #     await self.send(json.dumps(message))
-                #     continue
-                # except requests.Timeout:
-                #     await asyncio.sleep(delay)
-                #     continue
-
-                # # если статус ответа сервера не успешный, то, после задержки, опрашивает сервер ещё раз
-                # if req.status_code != 200:
-                #     message = {"status": "process", "detail": f"Get status code from server: {req.status_code}"}
-                #     await self.send(json.dumps(message))
-                #     await asyncio.sleep(delay)
-                #     continue
-                # req_txt = req.text
-                # info = req.json()
-
-                async with session.get(url_get_status) as resp:
-                    if not resp.ok:
-                        await self.send(json.dumps({"status": "process", "detail": resp.reason}))
-                        await asyncio.sleep(delay)
-                        continue
+                
+                try:
+                    resp = await session.get(url_get_status)
                     req_txt = await resp.text()
                     info = await resp.json()
-
+                except (aiohttp.ClientConnectionError, aiohttp.ServerTimeoutError, asyncio.exceptions.TimeoutError) as err:
+                    await self.send(json.dumps({"status": "process", "detail": f"{type(err)}"}))
+                    await asyncio.sleep(delay)
+                    continue
+                except aiohttp.ClientError as err:
+                    await self.send(json.dumps({"status": "process", "detail": f"Error while fetching request status from bot server. {type(err)}"}))
+                    print(f"Error while fetching request status from bot server. {type(err)}: {err}")
+                finally:
+                    resp.close()
                 # пересылает ответ сервера на фронт для обработки
                 await self.send(req_txt)
 
                 # проверяет статус заявки
                 if info.get('done'):
                     # достаёт заявку из бд
-                    user_request = await self.model.objects.aget(pk=request_pk)
+                    try:
+                        user_request = await self.model.objects.aget(pk=request_pk)
+                    except self.model.DoesNotExist as err:
+                        user_request = self.model(request_id=request_pk+ID_SHIFT)
+                        user_request.user = self.scope.get('user')
+                        await self.send(json.dumps({"status": "process", "detail": "Can't find user request. New one is created"}))
+                    except Error as err:
+                        await self.send(json.dumps({"status": "error", "detail": f"Database error. {type(err)}"}))
+                        print(f"Database error. {type(err)}: {err}.")
+                        return
                     # проверяет, не была ли заявка закрыта ранее
                     if user_request.status != 'open' or r.getex(f'close_{request_pk}:{self.operation}:bool', ex=10*60):
                         serializer = self.model_serializer(user_request)
@@ -334,13 +302,23 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     else:
                         user_request.status = 'fail'
                     # производит операции с балансом пользователя
-                    await self.process_balance(user_request, info)
-                    await sync_to_async(user_request.save)()
+                    try:
+                        await self.process_balance(user_request, info)
+                        await sync_to_async(user_request.save)()
+                    except Error as err:
+                        await self.send(json.dumps({"status": "error", "detail": f"Database error. Request is not saved. {type(err)}"}))
+                        print(f"Database error. {type(err)}: {err}.")
+                        return
                     # банит пользователя, если его забанил сервер
                     if info.get('ban'):
-                        ban = await Ban.objects.aget(user=user_request.user)
-                        ban.ban = True
-                        await sync_to_async(ban.save)()
+                        try:
+                            ban = await Ban.objects.aget(user=user_request.user)
+                            ban.ban = True
+                            await sync_to_async(ban.save)()
+                        except Error as err:
+                            await self.send(json.dumps({"status": "error", "detail": f"Database error. User was banned by bot server but bat wasn't saved. {type(err)}"}))
+                            print(f"Database error. {type(err)}: {err}.")
+                            return
                     # посылает закрытую заявку на клиент
                     serializer = self.model_serializer(user_request)
                     serializer_data = await sync_to_async(getattr)(serializer, 'data')
@@ -402,7 +380,3 @@ class WithdrawConsumer(RequestConsumer):
                 detail_user = await DetailUser.objects.aget(user=user_request.user)
                 detail_user.balance -= user_request.amount
                 await sync_to_async(detail_user.save)()
-
-    async def get_bot_name(self, response):
-        """Получает имя бота из запроса"""
-        return response.get('name')
