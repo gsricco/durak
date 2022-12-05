@@ -532,6 +532,7 @@
 {##}
 {#                        };#}
 {#                    </script>#}
+
                     {% block maincontent %}
                     {% endblock %}
                 </div>
@@ -1219,5 +1220,8 @@
 {{ static_prefix|json_script:'static_prefix' }}
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/base.js' %}"></script>
+<script src="{% static 'js/chat.js' %}"></script>
+
 </body>
 </html>

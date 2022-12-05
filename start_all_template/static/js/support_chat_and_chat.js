@@ -1,92 +1,103 @@
-import newUserMessage from './admin_chat.js'
-const ava = document.getElementById('ava').getAttribute('src');
-const list = document.querySelector('.list');
-const rubin = JSON.parse(document.getElementById('kamen').textContent);
-const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
-const username = JSON.parse(document.getElementById('username').textContent);
-const messageBlock = document.querySelector('.online-chat__list')
-const buttonSend = document.querySelector('.online-chat__icon-arrow')
-const messageInput = document.querySelector('.online-chat__input');
-const scrollBlock = document.querySelector('.online-chat__body')
-const UserBalance = document.querySelector('.header__profile-sum>span')
-const online = document.querySelector('.online-chat__current')
+const sendBtn = document.querySelector('.support__input-block-arrow')
+let inputValue = document.querySelector('.support__chat-input')
+const chatBlock = document.querySelector('.support__chat-block')
+const showFile = document.querySelector('#showFile')
+let byteFile
 
-// WS Connection
-// const chatSocket = new WebSocket(
-//     'ws://'
-//     + window.location.host
-//     + '/ws/chat/go/'
-// );
-if (document.querySelector(".scrollbar-overflow")) {
-    let blockArrow = document.querySelectorAll(".scrollbar-overflow");
+//проверка на размер файла, если всё ОК преобразуем файл в base64 и записываем его в переменную byteFile
+function checkFileSize(elem) {
+    const maxSize = 10000000;
+    const fileSize = elem.files[0].size;
+    if (fileSize > maxSize) {
+        showFile.innerHTML = "<span>Файл слишком большой  </span>"
+        setInterval(() => showFile.innerHTML = '', 2000)
+    } else {
+        var reader = new FileReader();
+        reader.readAsDataURL(elem.files[0]);
+        reader.onload = function () {
+            byteFile = reader.result
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+        showFile.innerHTML = "<span>Загрузка</span>"
+        setInterval(() => showFile.innerHTML = '', 2000)
+    }
 
-    blockArrow.forEach(function (item) {
-        item.addEventListener("touchmove", function () {
-            item.classList.add("scrollbar-overflow_active");
-        });
 
-        item.addEventListener("touchend", function () {
-            setTimeout(function () {
-                item.classList.remove("scrollbar-overflow_active");
-            }, 1000);
-        });
-    });
 }
-chatSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    if (data.chat_type === 'support' && document.title === 'Помощь') {
-        if (data.list_message) {
-            data.list_message.forEach((mess) => {
-                if (mess.file_message) {
-                    newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
-                } else {
-                    newUserMessage(mess.message, mess.user_posted.username)
-                }
-            })
-        } else {
-            if (data.file_path !== '/') {
-                newUserMessage(`${data.message}`, data.user, data.file_path)
-            } else {
-                newUserMessage(`${data.message}`, data.user)
-            }
-        }
-    }
-    scrollBlock.scrollTop = scrollBlock.scrollHeight
-};
-messageInput.focus();
-messageInput.onkeyup = function (e) {
-    if (e.keyCode === 13) {  // enter, return
-        buttonSend.click();
-    }
-};
-buttonSend.onclick = function (e) {
-    const message = messageInput.value;
+
+//слушаем событие клик на стрелочке отправить , при нажатии отправляем json
+//после отпрввки обнуляем byteFile и строку инпута
+sendBtn.addEventListener('click', () => {
     if (is_auth === true) {
         chatSocket.send(JSON.stringify({
-            "chat_type": "all_chat",
-            'message': message,
-            'user': username,
-            'avatar': ava,
-            'rubin': rubin
+            'file': byteFile,
+            "chat_type": "support",
+            'message': inputValue.value,
         }));
     } else {
-        ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
-        let modalAuth = document.querySelector('#authorization')
-        modalAuth.classList.add("open");
-        // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
-        modalAuth.addEventListener("click", function (e) {
-            if (!e.target.closest(".popup__content")) {
-                document.querySelector('.popup.open').classList.remove("open");
-            }
-        });
-///////////////////////////////////////////////////////////////////////////////////
+        alert('No auth user, sorry')
     }
-    messageInput.value = '';
+    inputValue.value = '';
+    byteFile = ''
+
+})
+
+//отправка сообщения при нажатии на enter
+inputValue.focus();
+inputValue.onkeyup = function (e) {
+    if (e.keyCode === 13) {
+        sendBtn.click()
+    }
+};
+
+//функция отображения сообщений
+const newUserMessage = (message, user, file_path) => {
+
+    const li = document.createElement('li')
+    li.className = 'support__chat-message support__chat-message_your'
+    const div = document.createElement('div')
+    div.className = 'support__chat-message-text'
+    const spanUser = document.createElement('span')
+    const span = document.createElement('span')
+    const fullDiv = document.createElement('div')
+    fullDiv.style.display = 'flex'
+    fullDiv.style.flexDirection = 'column'
+    spanUser.style.textAlign = 'right'
+    if (user !== username) {
+        li.style.justifyContent = 'flex-start'
+        li.style.paddingLeft = '0%'
+        li.style.paddingRight = '16%'
+        div.style.background = 'orange'
+        div.style.borderRadius = '15px 15px 15px 0px'
+        spanUser.style.textAlign = 'left'
+    }
+    chatBlock.appendChild(li)
+    li.appendChild(div)
+
+    spanUser.innerHTML = user
+    span.innerHTML = message
+    div.appendChild(span)
+    fullDiv.appendChild(spanUser)
+    fullDiv.appendChild(div)
+    if (file_path) {
+        const file_url = document.createElement('div')
+        file_url.innerHTML = 'Файл'
+        file_url.className = 'file_name'
+        file_url.addEventListener('click', () => {
+            window.open(`http://127.0.0.1:8000${file_path}`)
+        })
+        if (user !== username) {
+            li.appendChild(fullDiv)
+            li.appendChild(file_url)
+        } else {
+            li.appendChild(file_url)
+            li.appendChild(fullDiv)
+        }
+    } else {
+        li.appendChild(fullDiv)
+    }
+
 
 }
-chatSocket.onopen = function (e) {
-    chatSocket.send(JSON.stringify({
-        'online': 'online'
-    }));
-
-};

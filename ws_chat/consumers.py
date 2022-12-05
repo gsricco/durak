@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
-from accaunts.models import CustomUser
+from accaunts.models import CustomUser, Level
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 # хранит победную карту текущего раунда
@@ -54,15 +54,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_user_message(self, room, user, message, file_path=''):  # сохраняет сообщение в бд
         """Cохраняет сообщения из чата поддержки в БД"""
         if user:
-            try:
-                user = CustomUser.objects.get(username=user).pk
-                user_mess = Message(user_posted_id=user, message=message)
-                user_mess.full_clean()
-                user_mess.save()
-                room.message.add(user_mess, bulk=False)
-                return user_mess
-            except ValidationError:
-                print("Message support_chat more 500")
+            user = CustomUser.objects.get(username=user).pk
+            user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
+            # user_mess.full_clean()
+            user_mess.save()
+            room.message.add(user_mess, bulk=False)
+            room.save()
+            async_to_sync(self.get_all_room)()
+            return user_mess
 
     @sync_to_async()
     def get_all_room(self):
@@ -128,15 +127,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Отправляет информацию об уровне пользователя.
         Рассчитывает в процентах сколько опыта у пользователя для данного уровня
         """
+        lev = Level.objects.last()
+        max_level = lev.level
+        max_level_exp = lev.experience_range.upper
+        current_level = user.level.level
+        next_level = current_level + 1
         max_exp = user.level.experience_range.upper
         min_exp = user.level.experience_range.lower
         delta_exp = max_exp - min_exp
         exp = user.experience
         percent_exp_line = (exp - min_exp) / (delta_exp / 100)
+        if current_level == max_level:
+            next_level = 'max'
+        if exp == max_level_exp:
+            percent_exp_line = 100
         message = {
             "lvlup": {
-                "new_lvl": user.level.level + 1,
-                "levels": user.level.level},
+                "new_lvl": next_level,
+                "levels": current_level},
             "expr": {
                         "start": min_exp,
                         "end": max_exp,
@@ -159,7 +167,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = str(self.scope['user'])  # TODO получаем имя пользователя который подключился с фронта
         if self.scope['user'].is_authenticated:
-            if self.scope['user'].is_staff:
+            if self.scope['user'].is_staff or self.scope['user'].is_superuser:
                 await self.channel_layer.group_add('admin_group', self.channel_name)
             else:
                 await self.channel_layer.group_add(f'{user}_room', self.channel_name)  # TODO добавляем в группу юзеров
@@ -222,14 +230,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         '''первичное получение и обработка сообщений'''
         if text_data_json.get('chat_type') == 'support':  # сообщение из support чата
             if len(text_data_json.get("message")) > 500:
-                print("message all_chat more 500")
+                print(len(text_data_json.get("message")))
             else:
                 file_path = ''
                 if text_data_json.get('file'):
                     filed = text_data_json.get('file')
                     file_path = await self.base64_to_image(filed)
                 user = str(self.scope.get('user'))
-                room = await self.create_or_get_support_chat_room(user)  # получает рум из бд
+                room = await self.create_or_get_support_chat_room(user)
                 # сохранение сообщения
                 await self.save_user_message(room, user, text_data_json["message"], file_path)
                 if not self.scope.get('user').is_staff:

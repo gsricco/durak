@@ -30,15 +30,15 @@ class Message(models.Model):
         self.is_read = True
         return {"status": "Ok"}
 
-    def clean(self):
-        if not len(self.message) < 500:
-            raise ValidationError(
-                {'message': "message support_chat more 500"},
-            )
+    # def clean(self):
+    #     if not len(self.message) < 15:
+    #         raise ValidationError(
+    #             {'message': "message support_chat more 500"},
+    #         )
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     self.clean()
+    #     return super().save(*args, **kwargs)
 
 
 class UserChatRoom(models.Model):

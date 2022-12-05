@@ -11,7 +11,7 @@ const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 // let balanceUser = `{{ detail_user.balance }}`
 
 
-// let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
 
 
 const createBidItemRow = (data) => {
@@ -82,7 +82,7 @@ const itemsClick = (bidCard) => {
 ///////////////////////////////////////////////////////////////////////////////////
     } else if (bidCount) {
 
-        let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
+        // let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
 
         // console.log(cells)
         if (balanceUser + 1 >= Number(bidCount)) {
@@ -108,7 +108,7 @@ const itemsClick = (bidCard) => {
             //логика БЭК отнимания ставки от баланса/////////
             /////пока на фронте//////////////////////////////
             balanceUser = balanceUser - Number(bidCount)
-            document.querySelector('.header__profile-sum>span').innerHTML = `${balanceUser}`
+            document.querySelector('.header__profile-sum').innerHTML = `${balanceUser}`
             // items[0].style.pointerEvents = 'none';
             /////////////////////////////////////////////////
         } else {

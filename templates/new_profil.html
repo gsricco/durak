@@ -82,8 +82,8 @@
                                 <p class="profil__progressbar-lvl-num">{{ level_data.level }} LVL</p>
                                 <span class="profil__progressbar-lvl-progress">{{ user.experience }} / {{ level_data.experience_range.upper }} XP</span>
                                 {% else %}
-                                <p class="profil__progressbar-lvl-num">1 LVL</p>
-                                <span class="profil__progressbar-lvl-progress">0 / {{ level_data.experience_range.upper }} XP</span>
+{#                                <p class="profil__progressbar-lvl-num">1 LVL</p>#}
+{#                                <span class="profil__progressbar-lvl-progress">0 / {{ level_data.experience_range.upper }} XP</span>#}
                                 {% endif %}
                             </div>
                             <div class="profil__progressbar-row">
@@ -95,7 +95,7 @@
                                 </div>
 
                                 <div class="profil__progressbar-line">
-                                    <span></span>
+                                    <span class="profil_profil__progressbar-line"></span>
                                 </div>
 
                                 <div class="profil__progressbar-current">
