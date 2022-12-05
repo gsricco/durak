@@ -29,7 +29,7 @@ def sender():
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
-                                                'type': 'korney_task',
+                                                'type': 'roulette_countdown_starter',
                                                 'round': r.get('round').decode('utf-8')
                                             }
                                             )
@@ -205,8 +205,8 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                 message = {
                     "type": "send_new_level",
                     "lvlup": {
-                        "new_lvl": user.level.level,
-                        "levels": user.level.level - prev_level,
+                        "new_lvl": user.level.level + 1,
+                        "levels": user.level.level ,
                     },
                 }
                 async_to_sync(channel_layer.send)(channel_name, message)
@@ -227,6 +227,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                         },
                     }
                     async_to_sync(channel_layer.send)(channel_name, message)
+        send_exp(user, bets_info[str(bet_key)]['channel_name'])
     detail_users = [user.detailuser for user in users]
     update_balance = models.DetailUser.objects.bulk_update(detail_users, ['balance'])
     updated = models.CustomUser.objects.bulk_update(users, ['experience', 'level'])
@@ -236,6 +237,27 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         print(f"Rewards granted:{granted}")
 
     return 0
+
+
+def send_exp(user, channel_name):
+    print('отправился опыт')
+    max_exp = user.level.experience_range.upper
+    min_exp = user.level.experience_range.lower
+    delta_exp = max_exp - min_exp
+    exp = user.experience
+    percent_exp_line = (exp - min_exp) / (delta_exp / 100)
+    if percent_exp_line >= 100:
+        percent_exp_line -= 100
+    message = {
+        "type": "send_new_level",
+        "expr": {
+            "min_exp": min_exp,
+            "max_exp": max_exp,
+            "expr":exp,
+            "percent":percent_exp_line,
+        },
+    }
+    async_to_sync(channel_layer.send)(channel_name, message)
 
 
 @shared_task()

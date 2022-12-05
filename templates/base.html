@@ -153,13 +153,13 @@
                             {% if user.is_authenticated %}
                             <a href="{% url 'profil' %}" class="header__profile-progressbar">
                                 <div class="header__profile-lvl header__profile-lvl_back">
-                                    <span>{{ level_data.level }} ур.</span>
+                                    <span class="level_data_back"></span>
                                 </div>
                                 <div class="header__profile-line">
-                                    <span></span>
+                                    <span class="header__profile-line_span"></span>
                                 </div>
                                 <div class="header__profile-lvl header__profile-lvl_next">
-                                    <span>{{ level_data.level|add:"1" }} ур.</span>
+                                    <span class="level_data_next"></span>
                                 </div>
                             </a>
                             {% else %}
@@ -1213,7 +1213,10 @@
     </div>
 
 </div>
-
+{% get_media_prefix as media_prefix %}
+{% get_static_prefix as static_prefix %}
+{{ media_prefix|json_script:'media_prefix' }}
+{{ static_prefix|json_script:'static_prefix' }}
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 </body>

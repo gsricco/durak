@@ -170,11 +170,10 @@
 
                                 <script>
 
-                                    const sendBtn = document.querySelector('.support__input-block-arrow')
+                                    let sendBtn = document.querySelector('.support__input-block-arrow')#}
                                     let inputValue = document.querySelector('.support__chat-input')
                                     const chatBlock = document.querySelector('.support__chat-block')
                                     const showFile = document.querySelector('#showFile')
-
                                     let byteFile
 
 
@@ -299,5 +298,6 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'js/roulette.js' %}"></script>
+    <script src="{% static 'js/chat.js' %}"></script>
+{#    <script src="{% static 'js/admin_chat.js' %}"></script>#}
 {% endblock %}

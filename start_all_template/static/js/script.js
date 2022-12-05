@@ -527,7 +527,6 @@ window.addEventListener("DOMContentLoaded", () => {
                     if (repeateTwo < 1) {
                         timerSecond("#timerTwo", function () {
                             let btnTimerCase = document.querySelector(".modal-case__btn");
-                            console.log(12312312);
                             btnTimerCase.classList.remove("btn_white");
                             btnTimerCase.style.background = "#c4364e";
                         });
@@ -616,7 +615,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 }
                 if (currentCredint <= 2 && currentCredint >= 1) {
                     inputForm.value = `${(currentCredint * 69).toFixed(1)}`;
-                    console.log(currentCredint);
                 }
 
                 if (currentCredint <= 5 && currentCredint >= 2) {
@@ -675,10 +673,8 @@ window.addEventListener("DOMContentLoaded", () => {
             fetch(' http://127.0.0.1:8000/api/v1/avatar_default/')
                 .then(response => response.json())
                 .then((data) => {
-                    console.log('sizeArray ' + data.length)
                     let randomNum = Math.floor(Math.random() * (data.length));
                     avatarka = data[randomNum]['avatar_default']
-                    console.log('RANDOM_ICON ' + randomNum + ' LINK- ' + avatarka);
                     profileImage.setAttribute("src", `${avatarka}`);
                 });
         }
@@ -696,11 +692,7 @@ window.addEventListener("DOMContentLoaded", () => {
             fetch('http://127.0.0.1:8000/api/v1/avatar/')
                 .then(response => response.json())
                 .then((data) => {
-                    console.log('USER_NAME ' + username)
-
                     let userNow = data.filter(el => el['username'] === username)
-                    console.log('userAvatar     ' + userNow[0]['avatar']);
-
                     avatarSocial = userNow[0]['avatar']
                     profileImage.setAttribute("src", `${avatarSocial}`);
                     // profileImage.setAttribute("src", `/media/img/avatar/user/image_1`);
@@ -793,12 +785,6 @@ window.addEventListener("DOMContentLoaded", () => {
             let containerHeight =
                 document.querySelector("main .container").offsetHeight;
 
-            // console.log(containerHeight)
-            console.log(
-                "Высота шапки хедера и футера " +
-                (containerHeight + headerHeight + footerHeight + 50),
-            );
-            console.log("Высота окна " + winHeight);
 
             if (document.documentElement.clientWidth > 991) {
                 if (containerHeight + headerHeight + footerHeight + 30 > winHeight) {
@@ -1036,7 +1022,6 @@ window.addEventListener("DOMContentLoaded", () => {
                         .join("")
                         .split(/(?=(?:...)*$)/)
                         .join(" ");
-                    console.log(inputTable.value);
                 } else {
                     currentValue.innerText = (inputTable.value + "000")
                         .split(".")
@@ -1096,7 +1081,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                 if (event.target.textContent == "1/2") {
                     inputTable.value = (Number(inputTable.value) / 2).toFixed(3);
-                    console.log(inputTable.value);
+
                     currentValue.innerText = String(
                         Math.round(Number(inputTable.value * 1000)),
                     )
@@ -1154,7 +1139,6 @@ window.addEventListener("DOMContentLoaded", () => {
             let windowHeigth = window.innerHeight;
             let windowWight = window.innerWidth;
             let bodyContent = document.body;
-            console.log(123123);
 
             if (windowWight <= 575) {
                 if (windowHeigth >= 640 && windowHeigth <= 799) {
@@ -1418,7 +1402,6 @@ window.addEventListener("DOMContentLoaded", () => {
                         // всё прошло удачно
                     } else {
                         // Ошибка запроса
-                        console.error(r.statusText);
                     }
 
                 }
@@ -1449,3 +1432,5 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+const media_prefix = JSON.parse(document.getElementById('media_prefix').textContent);
+const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);

@@ -371,10 +371,7 @@
         </div>
     </section>
 </div>
-{% get_media_prefix as media_prefix %}
-{% get_static_prefix as static_prefix %}
-{{ media_prefix|json_script:'media_prefix' }}
-{{ static_prefix|json_script:'static_prefix' }}
+
 <script type="text/javascript" src="{% static 'js/roulette_bids.js'%}"></script>
 <script src="{% static 'js/roulette.js' %}"></script>
 {% endblock %}
