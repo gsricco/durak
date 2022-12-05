@@ -94,14 +94,19 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
     bet_to_redis_json = bet_info
     bet_to_redis_json['amount'] = {bet_info['bidCard']: bet_info['bidCount']}
     to_save = {dict_key: bet_to_redis_json}
-    if previous_bet := r.json().get('round_bets', dict_key):
-        print('if previous bet WORK >>>>>>>>>>>>>>>>>>>>')
-        if bet_info['bidCard'] in previous_bet['amount']:
-            print(f'Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
-            r.json().numincrby('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
+    print(dict_key, 'DICT KEY')
+    if round_bets := r.json().objkeys('round_bets'):
+        if str(dict_key) in round_bets:
+            previous_bet = r.json().get('round_bets', dict_key)
+            print(previous_bet, 'ETO BET')
+            if bet_info['bidCard'] in previous_bet['amount']:
+                print(f'Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+                r.json().numincrby('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
+            else:
+                print(f'Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+                r.json().set('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
         else:
-            print(f'Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
-            r.json().set('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
+            r.json().set('round_bets', f".{dict_key}", bet_to_redis_json)
     else:
         r.json().set('round_bets', ".", to_save)
 
