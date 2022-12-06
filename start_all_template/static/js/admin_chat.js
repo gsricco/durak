@@ -56,7 +56,7 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
                     li.style.justifyContent = 'flex-start'
                     li.style.paddingLeft = '0%'
                     li.style.paddingRight = '16%'
-                    div.style.background = 'orange'
+                    div.style.background = '#2f2f2f'
                     div.style.borderRadius = '15px 15px 15px 0px'
                     spanUser.style.textAlign = 'left'
                 }
