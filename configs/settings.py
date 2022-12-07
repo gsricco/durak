@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'support_chat',
     'api_router',
     'caseapp',
+    'bot_payment',
 ]
 
 MIDDLEWARE = [
