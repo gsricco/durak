@@ -23,6 +23,7 @@ CREDITS_TO_EXP_COEF = 1000
 
 @shared_task
 def sender():
+
     t = datetime.datetime.now()
     r.incr('round', 1)
     r.set('state', 'countdown', ex=30)
@@ -34,6 +35,7 @@ def sender():
                                             }
                                             )
     r.json().delete('round_bets')
+
 
 @shared_task
 def debug_task():
