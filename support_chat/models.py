@@ -36,9 +36,9 @@ class Message(models.Model):
                 {'message': "message support_chat more 500"},
             )
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+        # self.full_clean()
+    #     return super().save(*args, **kwargs)
 
 
 class UserChatRoom(models.Model):

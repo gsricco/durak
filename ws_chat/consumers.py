@@ -8,6 +8,7 @@ from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from accaunts.models import CustomUser
+from configs.settings import BASE_DIR
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 # хранит победную карту текущего раунда
@@ -32,22 +33,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async()
     def base64_to_image(self, file):
-        '''преобразование байт строки в файл и сохранение его'''
+        """Преобразование байт строки в файл и сохранение его"""
         file_type = file.split(';')[0].split('/')[1]
         string_file = file.split(';')[1][7:]
         save_date = datetime.datetime.now()
         byte_file = string_file.encode(encoding='ascii')
         new_file = base64.decodebytes(byte_file)
-        user = str(self.scope['user'])
-        save_name = f'media/support_chat/{user}/{save_date}.{file_type}'
-        try:
-            os.mkdir(f'media/support_chat/{user}')
+        user = self.scope['user']
+        save_name = f'media/support_chat/{user.pk}/{save_date}.{file_type}'
+        if os.path.isdir(f'{BASE_DIR}/media/support_chat'):
+            print('in if$1')
+            if os.path.isdir(f'{BASE_DIR}/media/support_chat/{user.pk}'):
+                print('in if$2')
+                with open(save_name, 'wb') as f:
+                    f.write(new_file)
+            else:
+                print('in else$2')
+                os.mkdir(f'media/support_chat/{user.pk}')
+                with open(save_name, 'wb') as f:
+                    f.write(new_file)
+        else:
+            print('in else$1')
+            os.mkdir('media/support_chat')
+            os.mkdir(f'media/support_chat/{user.pk}')
             with open(save_name, 'wb') as f:
                 f.write(new_file)
-        except:
-            with open(save_name, 'wb') as f:
-                f.write(new_file)
-
         return save_name
 
     @sync_to_async
@@ -55,11 +65,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Cохраняет сообщения из чата поддержки в БД"""
         if user:
             try:
+                # if user:
+                #     user = CustomUser.objects.get(username=user).pk
+                #     user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
+                #     # user_mess.full_clean()
+                #     user_mess.save()
+                #     room.message.add(user_mess, bulk=False)
+                #     room.save()
+
+                #     return user_mess
                 user = CustomUser.objects.get(username=user).pk
-                user_mess = Message(user_posted_id=user, message=message)
-                user_mess.full_clean()
+                print(user)
+                user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
+                print(user_mess, 'user mesage')
+                # user_mess.full_clean()
                 user_mess.save()
                 room.message.add(user_mess, bulk=False)
+                async_to_sync(self.get_all_room)()
                 return user_mess
             except ValidationError:
                 print("Message support_chat more 500")

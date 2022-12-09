@@ -91,8 +91,6 @@ if (data.message && data.chat_type === 'all_chat') {
             const divRub = document.createElement('div')
             divRub.className = 'online-chat__li-rubin'
             divWrap.appendChild(divRub)
-            console.log(data.rubin, 'ETO RUBIN')
-            console.log(data.avatar, 'ETO AVATAR')
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
             svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
             divRub.appendChild(svg)
@@ -116,6 +114,17 @@ if (data.message && data.chat_type === 'all_chat') {
 
             p.appendChild(spanMessage)
         }
+    }
+    if (data.lvlup) {
+            console.log("You have a new level: " + data.lvlup.new_lvl)
+            level_data_next = document.querySelector('.level_data_next')
+            level_data_back = document.querySelector('.level_data_back')
+            level_data_back.innerHTML = data.lvlup.levels + 'ур.'
+            level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
+            }
+    if (data.expr){
+        level_line = document.querySelector('.header__profile-line_span')
+        level_line.style.width = data.expr.percent + '%'
     }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
