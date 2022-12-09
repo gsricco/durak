@@ -383,6 +383,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = event.get('bid')
         await self.send(text_data=json.dumps({
             "bid": data,
+            "from_json": r.json().get('round_bets')
         }))
 
     async def get_balance(self, event):

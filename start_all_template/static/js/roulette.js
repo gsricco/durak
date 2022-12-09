@@ -1,6 +1,6 @@
 function generateItems(winnerCard) {
     const list = document.querySelector('.list');
-
+    // let cells = 111
     let cells;
     const heartsArray = [103, 107, 111, 115]
     const spadesArray = [101, 105, 109, 117]
@@ -209,64 +209,192 @@ function super_new(f){
         UserBalance.innerHTML = `${data.current_balance}`
     }
 
-    if (data.bid) {
-        console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
-        createBidItemRow(data.bid)
+    if (data.from_json) {
+        console.log(data.from_json, 'eto FROM_JSON bid!!!!!!!!!!!!!!!')
+        createBidItems(data.from_json)
     }
     if (data.roll) {
         startRoll(data.winner)
     }
-    if (data.stop) {
+    // if (data.stop) {
+    //     let winnerCard = data.w
+    //     //winnerCard from backend
+    //     // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
+    //     // console.log(winnerCard)
+    //     let bidsNumber = document.querySelectorAll('.roulette__item-money')
+    //     const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+    //     bidsNumber.forEach(el => {
+    //         el.style.color = 'red'
+    //     })}
+        if (data.stop) {
         let winnerCard = data.w
         //winnerCard from backend
         // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-        // console.log(winnerCard)
+        console.log(winnerCard)
         let bidsNumber = document.querySelectorAll('.roulette__item-money')
         const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+        let signWinnerhearts = document.querySelectorAll('.signWinnerhearts');
+        let signWinnercoin = document.querySelectorAll('.signWinnercoin');
+        let signWinnerspades = document.querySelectorAll('.signWinnerspades');
+
         bidsNumber.forEach(el => {
             el.style.color = 'red'
+            document.querySelector('#spanCardHearts').style.color = 'red';
+            document.querySelector('#spanCardCoin').style.color = 'red';
+            document.querySelector('#spanCardSpades').style.color = 'red';
+             if(signWinnerhearts){
+                 signWinnerhearts.forEach(s=>{
+                     s.innerHTML=`-`;
+                 })
+             }
+            if(signWinnercoin){
+                signWinnercoin.forEach(s=>{
+                    s.innerHTML=`-`;
+                })
+            }
+            if(signWinnerspades){
+                signWinnerspades.forEach(s=>{
+                    s.innerHTML=`-`;
+                })
+            }
+
+            if (document.querySelector('.signWinnerHearts')) document.querySelector('.signWinnerHearts').innerHTML = ':-';
+            if(document.querySelector('.signWinnerCoin'))document.querySelector('.signWinnerCoin').innerHTML = ':-';
+            if(document.querySelector('.signWinnerSpades'))document.querySelector('.signWinnerSpades').innerHTML = ':-';
         })
-        if (winnerCard === 'hearts') {
+    //     if (winnerCard === 'hearts') {
+    //         let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
+    //         bidsNumber.forEach(el => {
+    //             //обновление баланса user////
+    //             let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+    //             console.log(balanceUser)
+    //             // /////////////////////
+    //             el.style.color = 'green'
+    //             document.querySelector('.hearts').style.opacity = '1'
+    //             bidsButtons[0].style.opacity = '1'
+    //         })
+    //     } else if (winnerCard === 'coin') {
+    //         let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
+    //         bidsNumber.forEach(el => {
+    //             //обновление баланса user////
+    //             let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+    //             console.log(balanceUser)
+    //             // /////////////////////
+    //             el.style.color = 'green'
+    //             document.querySelector('.coin').style.opacity = '1'
+    //             bidsButtons[1].style.opacity = '1'
+    //         })
+    //     } else if (winnerCard === 'spades') {
+    //         let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
+    //         bidsNumber.forEach(el => {
+    //             //обновление баланса user////
+    //             let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+    //             console.log(balanceUser)
+    //             // /////////////////////
+    //             el.style.color = 'green'
+    //             document.querySelector('.spades').style.opacity = '1'
+    //             bidsButtons[2].style.opacity = '1'
+    //         })
+    //     }
+    // }
+            if (winnerCard === 'hearts') {
             let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
             bidsNumber.forEach(el => {
-                //обновление баланса user////
-                let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
-                // /////////////////////
+                // //обновление баланса user////
+                // let balanceUser = `+ document.querySelector('.header__profile-sum>span').innerText`;
+                // console.log(balanceUser)
+                // // /////////////////////
                 el.style.color = 'green'
+
+                if(signWinnerhearts){
+                    signWinnerhearts.forEach(s=>{
+                        s.innerHTML=`+`;
+                    })
+                }
+
+
+                document.querySelector('#spanCardHearts').style.color = 'green';
+                document.querySelector('#roulHearts').style.border = '1px solid green';
+                document.querySelector('#titleHearts').innerHTML = `ПОБЕДА`;
+                document.querySelector('.signWinnerHearts').innerHTML = ':+';
                 document.querySelector('.hearts').style.opacity = '1'
                 bidsButtons[0].style.opacity = '1'
             })
         } else if (winnerCard === 'coin') {
             let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
             bidsNumber.forEach(el => {
-                //обновление баланса user////
-                let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
-                // /////////////////////
+                // //обновление баланса user////
+                // let balanceUser = `+document.querySelector('.header__profile-sum>span').innerText`;
+                // console.log(balanceUser)
+                // // /////////////////////
                 el.style.color = 'green'
+                if(signWinnercoin){
+                    signWinnercoin.forEach(s=>{
+                        s.innerHTML=`+`;
+                    })
+                }
+
+                document.querySelector('#spanCardCoin').style.color = 'green';
+                document.querySelector('#roulCoin').style.border = '1px solid green';
+                document.querySelector('#titleCoin').innerHTML = `ПОБЕДА`;
+                document.querySelector('.signWinnerCoin').innerHTML = ':+';
                 document.querySelector('.coin').style.opacity = '1'
                 bidsButtons[1].style.opacity = '1'
             })
         } else if (winnerCard === 'spades') {
             let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
             bidsNumber.forEach(el => {
-                //обновление баланса user////
-                let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
-                // /////////////////////
+                // //обновление баланса user////
+                // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                // console.log(balanceUser)
+                // // /////////////////////
                 el.style.color = 'green'
+                if(signWinnerspades){
+                    signWinnerspades.forEach(s=>{
+                        s.innerHTML=`+`;
+                    })
+                }
+                document.querySelector('#spanCardSpades').style.color = 'green';
+                document.querySelector('#titleSpades').innerHTML = `ПОБЕДА`;
+                document.querySelector('#roulSpades').style.border = '1px solid green';
+                document.querySelector('.signWinnerSpades').innerHTML = ':+';
                 document.querySelector('.spades').style.opacity = '1'
                 bidsButtons[2].style.opacity = '1'
             })
-        }
-    }
+        }}
+
     if (data.back) {
+        console.log(data.back, 'ETO BACK DATA')
         //winnerCard from backend
+        let rollCards = ['hearts', 'spades', 'hearts','hearts','hearts', 'hearts','hearts', 'spades'] //-message back roll
+        let rollWinnerOld = document.querySelector('.roulette__previous-items');
+        rollWinnerOld.innerHTML = ``
+        rollCards.map(roll=>{
+            rollWinnerOld.innerHTML += `
+            <div class="roulette__previous-item">
+                <svg>
+                    <use xlink:href="${static_prefix}/img/icons/sprite.svg#${roll}_stroke_grey"></use>
+                </svg>
+            </div>
+            `
+        })
         returnToStartPosition()
     }
     if (data.roulette) {
+        document.querySelector('#spanCardHearts').innerHTML = ``
+        document.querySelector('#spanCardCoin').innerHTML = ``
+        document.querySelector('#spanCardSpades').innerHTML = ``
+        document.querySelector('#spanCardHearts').style.color = '#fff';
+        document.querySelector('#spanCardCoin').style.color = '#fff';
+        document.querySelector('#spanCardSpades').style.color = '#fff';
+        document.querySelector('#titleHearts').innerHTML = `Черви`
+        document.querySelector('#titleCoin').innerHTML = `Монета`
+        document.querySelector('#titleSpades').innerHTML = `Пики`
+        document.querySelector('#roulSpades').style.border = 'none';
+        document.querySelector('#roulCoin').style.border = 'none';
+        document.querySelector('#roulHearts').style.border = 'none';
+
         timerCounter(data.roulette)
     }
-    }
-}
+
+}}

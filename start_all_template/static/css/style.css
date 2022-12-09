@@ -4,6 +4,13 @@
   margin: 0;
 }
 
+.p {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
 @font-face {
   font-family: 'Inter';
   font-display: swap;
@@ -1209,6 +1216,43 @@ h3 {
 .header__profile-sum-img svg {
   width: 16px;
   height: 18px;
+}
+
+.online-chat__li:hover .online-chat-buttons{
+  opacity: 1;
+
+}
+.online-chat-buttons{
+  margin-left: 5px;
+  width: 50px;
+  display: flex;
+  flex-direction: row-reverse;
+  opacity: 0;
+}
+.online-chat-buttons:hover{
+  opacity: 1;
+}
+
+.online__chat-img {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: end;
+  -ms-flex-align: end;
+  align-items: flex-end;
+  margin-right: 4px;
+
+}
+
+.online__chat-img svg {
+  /*display: none;*/
+  width: 16px;
+  height: 18px;
+}
+.online__chat-img svg:hover{
+  /*display: block;*/
+  width: 22px;
+  height: 20px;
 }
 
 .header__profile-btn {
@@ -2605,7 +2649,11 @@ h3 {
 .online-chat__li-text {
   direction: initial;
   margin-left: 4px;
-  text-align: left;
+  /*text-align: left;*/
+  width: 260px;
+  word-wrap: break-word;
+  white-space:break-spaces;
+  text-align: justify;
 }
 
 .online-chat__li-sms {
