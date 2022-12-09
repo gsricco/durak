@@ -1,4 +1,5 @@
 import datetime
+from hashlib import sha256
 from configs import celery_app
 from celery import shared_task
 from redis import Redis
@@ -14,6 +15,8 @@ r = Redis()
 ROUND_RESULTS = ('spades', 'hearts', 'coin')
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 KEYS_STORAGE_NAME = 'USERID:list'
+SERVER_SEED = 'server_seed:str'
+PUBLIC_SEED = 'public_seed:str'
 
 # const values for experience amount evaluating
 WIN_COEF = 1
@@ -49,7 +52,7 @@ def roll():
     t = datetime.datetime.now()
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
-    result = random.choice(ROUND_RESULTS)
+    result = roll_fair(ROUND_RESULTS, weights=(7, 7, 1))
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
@@ -261,6 +264,58 @@ def send_exp(user, channel_name):
         },
     }
     async_to_sync(channel_layer.send)(channel_name, message)
+
+
+def roll_fair(round_results: list, weights: tuple=None) -> str:
+    """Генерирует результат раунда через хеш (как на csgoempire.com)
+
+    Args:
+        round_results (list): массив с возможными результатами раунда (результат - str)
+        weights (tuple, optional): вес соответствующего результата. Defaults to None.
+
+    Returns:
+        str: результат раунда
+    """
+    # генерация весов по умолчание, если они не были переданы
+    if weights is None:
+        weights = (1 for _ in range(len(round_results)))
+    # получаем server_seed из redis
+    server_seed_byte = r.get(SERVER_SEED)
+    server_seed = ''
+    if server_seed_byte is None:
+        server_seed = '1234567890'
+    else:
+        server_seed = server_seed_byte.decode("utf-8")
+    # получаем public_seed из redis
+    public_seed_byte = r.get(PUBLIC_SEED)
+    public_seed = ''
+    if public_seed_byte is None:
+        public_seed = '1234567890'
+    else:
+        public_seed = public_seed_byte.decode("utf-8")
+    # получаем номер раунда из redis
+    round_number_byte = r.get('round')
+    round_number = 1
+    if not round_number_byte is None:
+        round_number = round_number_byte.decode("utf-8")
+    # генерация хеша раунда
+    unhashed_round = f"{server_seed}-{public_seed}-{round_number}"
+    print(unhashed_round)
+    round_hash = sha256(unhashed_round.encode())
+    # получение результата раунда по хешу
+    # в acc_sum хранятся пороговые значения для результатов раундов при их выборе
+    acc_sum = [weights[0] - 1]
+    for i in range(1, len(weights)):
+        acc_sum.append(acc_sum[-1] + weights[i])
+    print(acc_sum)
+    roll = int(round_hash.hexdigest()[:8], 16) % sum(weights)
+    print(roll)
+    for i, border in enumerate(acc_sum):
+        print(border)
+        if roll <= border:
+            print(round_results[i])
+            return round_results[i]
+    return random.choice(round_results)
 
 
 @shared_task()
