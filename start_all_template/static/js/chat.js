@@ -37,6 +37,7 @@ chatSocket.onmessage = function (e) {
     }
 
 if (data.message && data.chat_type === 'all_chat') {
+        console.log("all_chat")
         const li = document.createElement('li')
         li.className = 'online-chat__li'
         messageBlock.appendChild(li)
@@ -144,7 +145,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnDelete = document.createElement('button')
             btnDelete.type = 'submit'
-            btnDelete.onclick = ()=>onClickDeleteHandler()
+            btnDelete.onclick = () => onClickDeleteHandler()
             btnDelete.className = 'online__chat-img'
             divButtons.appendChild(btnDelete)
 
@@ -154,7 +155,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnBan = document.createElement('button')
             btnBan.type = 'submit'
-            btnBan.onclick = ()=>onClickBanHandler()
+            btnBan.onclick = () => onClickBanHandler()
             btnBan.className = 'online__chat-img'
             divButtons.appendChild(btnBan)
 
@@ -162,6 +163,72 @@ if (data.message && data.chat_type === 'all_chat') {
             svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
             btnBan.appendChild(svgBan)
         }
+    }
+
+        if (data.message && data.chat_type === 'ban_all_chat' && data.user === username) {
+        console.log("ban_all_chat");
+
+        const li = document.createElement('li')
+        li.className = 'online-chat__li'
+        messageBlock.appendChild(li)
+
+        const divWrap = document.createElement('div')
+        divWrap.className = 'online-chat__li-wrapper'
+        li.appendChild(divWrap)
+
+        const divRub = document.createElement('div')
+        divRub.className = 'online-chat__li-rubin'
+        divWrap.appendChild(divRub)
+
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
+        // stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
+
+        divRub.appendChild(svg)
+        const divAva = document.createElement('div')
+        divAva.className = 'online-chat__li-avatar'
+        divAva.innerHTML = `<img src="${data.avatar}" alt="">`
+        divWrap.appendChild(divAva)
+
+        const p = document.createElement('p')
+        p.className = 'online-chat__li-text'
+        li.appendChild(p)
+
+        const spanName = document.createElement('span')
+        spanName.className = 'online-chat__li-name'
+        spanName.innerHTML = `${data.user} `
+        p.appendChild(spanName)
+
+        const spanMessage = document.createElement('span')
+        spanMessage.className = 'online-chat__li-sms'
+        spanMessage.innerHTML = `${data.message}`
+
+        p.appendChild(spanMessage)
+
+        const divButtons = document.createElement('div')
+        divButtons.className = 'online-chat-buttons'
+        li.appendChild(divButtons)
+
+        const btnDelete = document.createElement('button')
+        btnDelete.type = 'submit'
+        btnDelete.onclick = ()=>onClickDeleteHandler()
+        btnDelete.className = 'online__chat-img'
+        divButtons.appendChild(btnDelete)
+
+        const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
+        btnDelete.appendChild(svgDel)
+
+        const btnBan = document.createElement('button')
+        btnBan.type = 'submit'
+        btnBan.onclick = ()=>onClickBanHandler()
+        btnBan.className = 'online__chat-img'
+        divButtons.appendChild(btnBan)
+
+        const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
+        btnBan.appendChild(svgBan)
+
     }
     if (data.lvlup) {
             console.log("You have a new level: " + data.lvlup.new_lvl)
