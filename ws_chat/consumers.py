@@ -2,17 +2,23 @@ import base64
 import datetime
 import json
 import os
+from random import choices
+
+from caseapp.serializers import OwnedCaseTimeSerializer, ItemSerializer, ItemForUserSerializer, OwnedCaseSerializer, \
+    ItemForCaseSerializer
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
-from accaunts.models import CustomUser, Level
+from accaunts.models import CustomUser, Level, ItemForUser
+from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
+
 # подключаемся к редису
 r = redis.Redis()
 
@@ -76,7 +82,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                          {
                                                              'type': 'get_rooms',
                                                              'room_name': room_list
-                                                          })
+                                                         })
         except:
             print('error get_all_room')
 
@@ -106,8 +112,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             room_data = UserChatRoom.objects.get(room_id=room_name)  # получаем комнату
             serializer = RoomSerializer(room_data)  # сериализуем ее
             async_to_sync(self.channel_layer.send)(channel, {"type": "support_chat_message",
-                                                                 "chat_type": "support",
-                                                                 "list_message": serializer.data.get('message')})
+                                                             "chat_type": "support",
+                                                             "list_message": serializer.data.get('message')})
         except:
             pass
 
@@ -137,19 +143,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         delta_exp = max_exp - min_exp
         exp = user.experience
         percent_exp_line = (exp - min_exp) / (delta_exp / 100)
-        if current_level == max_level:
+        if current_level >= max_level:
             next_level = 'max'
-        if exp == max_level_exp:
+        if exp >= max_level_exp:
             percent_exp_line = 100
+
+        # инфа о кристалах
+        next_lvl = Level.objects.filter(level__gt=current_level).first()
+
         message = {
             "lvlup": {
                 "new_lvl": next_level,
                 "levels": current_level},
             "expr": {
-                        "start": min_exp,
-                        "end": max_exp,
-                        "percent": percent_exp_line,
-                    }}
+                "start": min_exp,
+                "end": max_exp,
+                "percent": percent_exp_line,
+            }}
+        if next_lvl:
+            message['lvl_info'] = {
+                'cur_lvl_img': user.level.img_name,
+                'cur_lvl_case_count': user.level.amount,
+                'next_lvl_img': next_lvl.img_name,
+                'next_lvl_case_count': next_lvl.amount,
+
+            }
         return message
 
     async def send_lvl_and_exp(self, event):
@@ -160,6 +178,205 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             message = await self.eval_xp_and_lvl(user)
             await self.send(text_data=json.dumps(message))
+
+    @sync_to_async()
+    def get_cases_info(self):
+        '''функция отправки информации о кейсах'''
+        # поулчаем все выданные и не открытые кейсы
+        users = self.scope['user']
+        owned_cases_for_user = OwnedCase.objects.filter(owner=users.pk)
+        not_owned_case = owned_cases_for_user.filter(date_opened=None)
+        # получаем все имена кейсов из бд и делаем из них дикт
+        all_case_name = Case.objects.all()
+        case_count_for_name = {}
+        for case_name in all_case_name:
+            case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
+            case_count_for_name[case_name.name] = {'count': 0,
+                                                   'open_lvl': case_name.user_lvl_for_open,
+                                                   'case_info': case_item_series.data
+                                                   }
+
+        # подсчитываем сколько каких кейсов есть у юзера
+        for case in not_owned_case:
+            case_count_for_name[str(case.case)]['count'] += 1
+        last_open_owned_case = owned_cases_for_user.exclude(date_opened=None).order_by("-date_opened").first()
+        case_time = {'date_opened': '', 'seconds_since_prev_open': 3600, 'can_be_opened': True}
+        if last_open_owned_case:
+            serializer = OwnedCaseTimeSerializer(last_open_owned_case)
+            case_time = serializer.data
+        message = {'cases': {'open_time': case_time, 'user_cases': case_count_for_name}}
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "send_cases_info",
+                                   "cases": message
+                                   })
+
+    @sync_to_async()
+    def get_user_items(self):
+        '''Send user item functions'''
+        user = self.scope['user']
+        user_items = ItemForUser.objects.filter(user=user)
+        serializer = ItemForUserSerializer(user_items, many=True)
+        message = {
+            'type': 'send_user_item',
+            'user_items': serializer.data
+        }
+        async_to_sync(self.channel_layer.send)(self.channel_name, message)
+
+    @sync_to_async()
+    def open_case(self, case):
+        '''Open case function'''
+        user = self.scope['user']
+        case_id = Case.objects.filter(name=case).first()
+        if case_id:
+            owned_case = OwnedCase.objects.filter(owner=user.pk) \
+                .filter(date_opened=None) \
+                .filter(case=case_id) \
+                .last()
+            if owned_case:
+                if owned_case.owner.pk != user.pk:
+                    print({"details": "Access forbidden"})
+
+                if owned_case.item is not None:
+                    print({"details": "Case is already opened"})
+
+                last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
+                    .exclude(date_opened=None) \
+                    .order_by("-date_opened") \
+                    .first()
+
+                if last_user_case is not None:
+                    delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
+                    if delta_time < datetime.timedelta(hours=1):
+                        print({"details": "Wait before you can open next case"})
+
+                case = owned_case.case
+                case_items = ItemForCase.objects.filter(case=case)
+                weights = [float(item['chance']) for item in case_items.values('chance')]
+                print(weights, 'веса итема')
+                chosen_item_in_case = choices(case_items, weights=weights, k=1)[0]
+                print(chosen_item_in_case)
+                chosen_item = Item.objects.get(pk=chosen_item_in_case.item.pk)
+                owned_case.item = chosen_item
+                # сохраняет время открытия кейса
+                # owned_case.date_opened = datetime.datetime.now()
+                # время открытия для тестов - 1ч
+                # owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(minutes=59)
+                owned_case.save()
+                # отправляет результат рандома открытия кейса
+                async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
+                                                                           'case_roll_result': chosen_item.name
+                                                                           })
+                # отправляет пользователю всё предметы
+                # async_to_sync(self.get_user_items)()
+                # проверка является ли выпавший предмет деньгами
+                # если да пополняет баланс , если нет добавляет предмет в инвентарь
+                if chosen_item.is_money:
+                    print()
+                    user.detailuser.balance += chosen_item.selling_price
+                    user.detailuser.save()
+                else:
+                    ItemForUser.objects.create(user=user, user_item=chosen_item)
+            else:
+                print('Нет выданного кейса')
+        else:
+            print('Нет такого кейса')
+
+    # @sync_to_async()
+    # def get_cases_info(self, user):
+    #     '''функция отправки информации о кейсах'''
+    #     # поулчаем все выданные и не открытые кейсы
+    #     owned_cases_for_user = OwnedCase.objects.filter(owner=user)
+    #     not_owned_case = owned_cases_for_user.filter(date_opened=None)
+    #     # получаем все имена кейсов из бд и делаем из них дикт
+    #     all_case_name = Case.objects.all()
+    #     case_count_for_name = {}
+    #     for case_name in all_case_name:
+    #         case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
+    #         case_count_for_name[case_name.name] = {'count': 0,
+    #                                                'open_lvl': case_name.user_lvl_for_open,
+    #                                                'case_info': case_item_series.data
+    #                                                }
+    #
+    #     # подсчитываем сколько каких кейсов есть у юзера
+    #     for case in not_owned_case:
+    #         case_count_for_name[str(case.case)]['count'] += 1
+    #     last_open_owned_case = owned_cases_for_user.exclude(date_opened=None).order_by("-date_opened").first()
+    #     case_time = {'date_opened': '', 'seconds_since_prev_open': 3600, 'can_be_opened': True}
+    #     if last_open_owned_case:
+    #         serializer = OwnedCaseTimeSerializer(last_open_owned_case)
+    #         case_time = serializer.data
+    #     return {'cases': {'open_time': case_time, 'user_cases': case_count_for_name}}
+    #
+    # @sync_to_async()
+    # def get_user_items(self):
+    #     '''Send user item functions'''
+    #     user = self.scope['user']
+    #     user_items = ItemForUser.objects.filter(user=user)
+    #     serializer = ItemForUserSerializer(user_items, many=True)
+    #     message = {
+    #         'type': 'send_user_item',
+    #         'user_items': serializer.data
+    #     }
+    #     async_to_sync(self.channel_layer.send)(self.channel_name, message)
+    #
+    # @sync_to_async()
+    # def open_case(self, case):
+    #     '''Open case function'''
+    #     user = self.scope['user']
+    #     case_id = Case.objects.filter(name=case).first()
+    #     if case_id:
+    #         owned_case = OwnedCase.objects.filter(owner=user.pk) \
+    #             .filter(date_opened=None) \
+    #             .filter(case=case_id) \
+    #             .last()
+    #         if owned_case:
+    #             if owned_case.owner.pk != user.pk:
+    #                 print({"details": "Access forbidden"})
+    #
+    #             if owned_case.item is not None:
+    #                 print({"details": "Case is already opened"})
+    #
+    #             last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
+    #                 .exclude(date_opened=None) \
+    #                 .order_by("-date_opened") \
+    #                 .first()
+    #
+    #             if last_user_case is not None:
+    #                 delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
+    #                 if delta_time < datetime.timedelta(hours=1):
+    #                     print({"details": "Wait before you can open next case"})
+    #
+    #             case = owned_case.case
+    #             case_items = ItemForCase.objects.filter(case=case)
+    #             weights = [float(item['chance']) for item in case_items.values('chance')]
+    #             print(weights, 'веса итема')
+    #             chosen_item_in_case = choices(case_items, weights=weights, k=1)[0]
+    #             print(chosen_item_in_case)
+    #             chosen_item = Item.objects.get(pk=chosen_item_in_case.item.pk)
+    #             owned_case.item = chosen_item
+    #             # сохраняет время открытия кейса
+    #             # owned_case.date_opened = datetime.datetime.now()
+    #             # время открытия для тестов - 1ч
+    #             owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(minutes=59)
+    #             owned_case.save()
+    #             # отправляет результат рандома открытия кейса
+    #             async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
+    #                                                                        'case_roll_result': chosen_item.name
+    #                                                                        })
+    #             # отправляет пользователю всё предметы
+    #             # async_to_sync(self.get_user_items)()
+    #             # проверка является ли выпавший предмет деньгами
+    #             # если да пополняет баланс , если нет добавляет предмет в инвентарь
+    #             if chosen_item.is_money:
+    #                 print()
+    #                 user.detailuser.balance += chosen_item.selling_price
+    #                 user.detailuser.save()
+    #             else:
+    #                 ItemForUser.objects.create(user=user, user_item=chosen_item)
+    #         else:
+    #             print('Нет выданного кейса')
+    #     else:
+    #         print('Нет такого кейса')
 
     async def connect(self):
         """Подключение пользователя"""
@@ -182,7 +399,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send_online(0)  # TODO:отправляем количество вебсокет подключений на фронт
         if recieve_user == 'go':  # проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
-            await self.init_support_chat(self.channel_name, user)  # TODO: должен выгружать только на странице чата поддержки, в суппорт чат
+            await self.init_support_chat(self.channel_name,
+                                         user)  # TODO: должен выгружать только на странице чата поддержки, в суппорт чат
             await self.init_users_chat(self.channel_name)
         else:
             await self.get_all_room()
@@ -200,6 +418,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
+        # получение предметов в инвентарь
+        if text_data_json.get('item'):
+            await self.get_user_items()
+        # кнопка открытия кейса
+        if text_data_json.get('open_case'):
+            this_case = text_data_json.get('open_case')
+            await self.open_case(this_case)
+            await self.get_user_items()
+            await self.get_cases_info()
+        # информация о кейсах
+        if text_data_json.get('cases'):
+            await self.get_cases_info()
+            # await self.channel_layer.group_send(
+            #     self.room_group_name, {"type": "send_cases_info",
+            #                            "cases": cases
+            #                            })
+
         if text_data_json.get('online') == "online":
             online = self.channel_layer.receive_count
             await self.channel_layer.group_send(
@@ -250,7 +485,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                     "user": user,
                                                                     "file_path": f'/{file_path}'
                                                                     })  # отправка сообщения пользователя админам
-
         elif text_data_json.get('chat_type') == 'support_admin':
             '''Получем сообщение от админа из админки'''
             file_path = ''
@@ -326,7 +560,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         file_path = event.get('file_path')
         chat_type = event.get('chat_type')
         await self.send(text_data=json.dumps({"message": message,
-                                              "list_message":list_message,
+                                              "list_message": list_message,
                                               "chat_type": chat_type,
                                               "user": user,
                                               "file_path": file_path,
@@ -390,17 +624,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     #         pipe.hmset(dict_key, dictionary)
     #         pipe.execute()
 
-
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
         bet["channel_name"] = self.channel_name
         await tasks.save_as_nested(storage_name, user_pk, bet)
 
-    async def init_xp_and_lvl(self, event):
-        message = event
-        print(message)
-        await self.send(json.dumps(message))
 
     async def send_new_level(self, event):
         """Отправляет по каналу сообщение о новом уровне"""
@@ -426,4 +655,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if state.decode('utf-8') == 'rolling':
             round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
             message['init']['winner'] = round_result
+        await self.send(json.dumps(message))
+
+    async def send_cases_info(self, event):
+        """Отправляет по каналу сообщение о кейсах"""
+        message = dict()
+        message["cases"] = event.get("cases").get('cases')
+        # print(event)
+        await self.send(json.dumps(message))
+
+    async def send_user_item(self, event):
+        """Отправляет по каналу сообщение о кейсах"""
+        message = dict()
+        message["user_items"] = event.get("user_items")
+        print(event)
+        await self.send(json.dumps(message))
+
+    async def case_roll(self, event):
+        """Отправляет результат выпадения кейса"""
+        message = dict()
+        message["case_roll_result"] = event.get("case_roll_result")
         await self.send(json.dumps(message))

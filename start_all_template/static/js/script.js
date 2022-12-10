@@ -426,9 +426,9 @@ window.addEventListener("DOMContentLoaded", () => {
     // }
 
     //!Таймер
-    let target_date = new Date().getTime() + /*(1000 * 60 * 5)*/ 1000 * 30; // установить дату обратного отсчета
-    let days, hours, minutes, seconds; // переменные для единиц времени
-    let countdown = document.getElementById("timer"); // получить элемент тега
+    // let target_date = new Date().getTime() + /*(1000 * 60 * 5)*/ 1000 * 30; // установить дату обратного отсчета
+    // let days, hours, minutes, seconds; // переменные для единиц времени
+    // let countdown = document.getElementById("timer"); // получить элемент тега
 
     // getCountdown();
 
@@ -465,76 +465,76 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // }
     //! Таймер
-    if (document.querySelector(".timer")) {
-        function timerSecond(timerSpan, functionTimer) {
-            let timerBlock = document.querySelector(timerSpan);
-            let valueTimer = timerBlock.textContent.split(":");
-            [minuteTime, secTime] = valueTimer;
-
-            let timer = setInterval(function () {
-                if (secTime < 60) {
-                    secTime -= 1;
-                }
-
-                if (secTime < 0) {
-                    minuteTime -= 1;
-                    secTime = 59;
-                }
-
-                if (minuteTime < 1 && secTime < 1) {
-                    clearInterval(timer);
-                    setTimeout(functionTimer, 0);
-                }
-
-                if (secTime >= 10) {
-                    timerBlock.innerHTML = `${minuteTime}:${secTime}`;
-                }
-
-                if (secTime < 10 && secTime >= 0) {
-                    timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
-                }
-            }, 1000);
-        }
-
-        if (document.querySelector(".instruction")) {
-            let repeateOne = 0;
-            document
-                .querySelector(".instruction")
-                .addEventListener("click", function () {
-                    if (repeateOne < 1) {
-                        timerSecond("#timerOne", function () {
-                            let btnTimerInstructin =
-                                document.querySelector(".modal-manual__btn");
-                            btnTimerInstructin.classList.remove("btn_white");
-                            btnTimerInstructin.innerHTML = "Начать";
-                            btnTimerInstructin.addEventListener("click", function (event) {
-                                if (event.target.textContent == "Начать") {
-                                    event.target.innerHTML = "<span>Ожидайте..</span>";
-                                    event.target.classList.add("btn_white");
-                                }
-                            });
-                        });
-                        repeateOne++;
-                    }
-                });
-        }
-
-        if (document.querySelector('a[href="#cases"]')) {
-            let repeateTwo = 0;
-            document
-                .querySelector('a[href="#cases"]')
-                .addEventListener("click", function () {
-                    if (repeateTwo < 1) {
-                        timerSecond("#timerTwo", function () {
-                            let btnTimerCase = document.querySelector(".modal-case__btn");
-                            btnTimerCase.classList.remove("btn_white");
-                            btnTimerCase.style.background = "#c4364e";
-                        });
-                        repeateTwo++;
-                    }
-                });
-        }
-    }
+    // if (document.querySelector(".timer")) {
+    //     function timerSecond(timerSpan, functionTimer) {
+    //         let timerBlock = document.querySelector(timerSpan);
+    //         let valueTimer = timerBlock.textContent.split(":");
+    //         [minuteTime, secTime] = valueTimer;
+    //
+    //         let timer = setInterval(function () {
+    //             if (secTime < 60) {
+    //                 secTime -= 1;
+    //             }
+    //
+    //             if (secTime < 0) {
+    //                 minuteTime -= 1;
+    //                 secTime = 59;
+    //             }
+    //
+    //             if (minuteTime < 1 && secTime < 1) {
+    //                 clearInterval(timer);
+    //                 setTimeout(functionTimer, 0);
+    //             }
+    //
+    //             if (secTime >= 10) {
+    //                 timerBlock.innerHTML = `${minuteTime}:${secTime}`;
+    //             }
+    //
+    //             if (secTime < 10 && secTime >= 0) {
+    //                 timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
+    //             }
+    //         }, 1000);
+    //     }
+    //
+    //     if (document.querySelector(".instruction")) {
+    //         let repeateOne = 0;
+    //         document
+    //             .querySelector(".instruction")
+    //             .addEventListener("click", function () {
+    //                 if (repeateOne < 1) {
+    //                     timerSecond("#timerOne", function () {
+    //                         let btnTimerInstructin =
+    //                             document.querySelector(".modal-manual__btn");
+    //                         btnTimerInstructin.classList.remove("btn_white");
+    //                         btnTimerInstructin.innerHTML = "Начать";
+    //                         btnTimerInstructin.addEventListener("click", function (event) {
+    //                             if (event.target.textContent == "Начать") {
+    //                                 event.target.innerHTML = "<span>Ожидайте..</span>";
+    //                                 event.target.classList.add("btn_white");
+    //                             }
+    //                         });
+    //                     });
+    //                     repeateOne++;
+    //                 }
+    //             });
+    //     }
+    //
+    //     if (document.querySelector('a[href="#cases"]')) {
+    //         let repeateTwo = 0;
+    //         document
+    //             .querySelector('a[href="#cases"]')
+    //             .addEventListener("click", function () {
+    //                 if (repeateTwo < 1) {
+    //                     timerSecond("#timerTwo", function () {
+    //                         let btnTimerCase = document.querySelector(".modal-case__btn");
+    //                         btnTimerCase.classList.remove("btn_white");
+    //                         btnTimerCase.style.background = "#c4364e";
+    //                     });
+    //                     repeateTwo++;
+    //                 }
+    //             });
+    //     }
+    // }
 
     //! Формула перевода рублей в валюту и обратно
     if (document.querySelector(".amount-selection__form")) {

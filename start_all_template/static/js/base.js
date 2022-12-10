@@ -18,7 +18,7 @@ chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
 
     // 1) отображение онлайна , все страницы +
-    if (data.get_online > 0) {
+    if (data.get_online >= 0) {
         online.innerHTML = `${data.get_online}`
     }
 
@@ -58,116 +58,131 @@ chatSocket.onmessage = function (e) {
 
     // 5) отображение уровней на всех страницах
     if (data.lvlup) {
-            level_data_next = document.querySelector('.level_data_next')
-            level_data_back = document.querySelector('.level_data_back')
-            level_data_back.innerHTML = data.lvlup.levels + 'ур.'
-            level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
-            }
+        level_data_next = document.querySelector('.level_data_next')
+        level_data_back = document.querySelector('.level_data_back')
+        level_data_back.innerHTML = data.lvlup.levels + ' ур.'
+        level_data_next.innerHTML = data.lvlup.new_lvl + ' ур.'
+    }
 
     // 6) отображение процентов уровня на всех странцах
-    if (data.expr){
+    if (data.expr) {
         level_line = document.querySelector('.header__profile-line_span')
         level_line.style.width = data.expr.percent + '%'
-        if(document.title === 'Профиль'){
+        if (document.title === 'Профиль') {
             profilLine.style.width = data.expr.percent + '%'
         }
     }
 
     // 7) ЛОГИКА РУЛЕТКА ВСЯ
-    if(document.title === 'Рулетка'){
+    if (document.title === 'Рулетка') {
         if (data.init) {
-        if (data.init.state === 'countdown') {
-            let timeNow = Date.now()
-            let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
-            timerCounter(remainTime)
+            if (data.init.state === 'countdown') {
+                let timeNow = Date.now()
+                let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
+                timerCounter(remainTime)
+            }
+            if (data.init.state === 'rolling') {
+                console.log(data)
+
+                startRoll(data.init.winner)
+
+            }
         }
-        if (data.init.state === 'rolling') {
-            console.log(data)
-
-            startRoll(data.init.winner)
-
-        }
-    }
-    if (data.current_balance) {
-        console.log(data.current_balance, 'CURRENT BALANCE')
-        UserBalance.innerHTML = `${data.current_balance}`
-    }
-
-    if (data.bid) {
-        console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
-        createBidItemRow(data.bid)
-    }
-    if (data.roll) {
-        startRoll(data.winner)
-    }
-    if (data.stop) {
-        let winnerCard = data.w
-        //winnerCard from backend
-        // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-        // console.log(winnerCard)
-        let bidsNumber = document.querySelectorAll('.roulette__item-money')
-        const bidsButtons = document.querySelectorAll('.roulette__radio-item')
-        bidsNumber.forEach(el => {
-            el.style.color = 'red'
-        })
-        if (winnerCard === 'hearts') {
-            let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
-            bidsNumber.forEach(el => {
-                //обновление баланса user////
-                // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
-                // /////////////////////
-                el.style.color = 'green'
-                document.querySelector('.hearts').style.opacity = '1'
-                bidsButtons[0].style.opacity = '1'
-            })
-        } else if (winnerCard === 'coin') {
-            let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
-            bidsNumber.forEach(el => {
-                //обновление баланса user////
-                // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
-                // /////////////////////
-                el.style.color = 'green'
-                document.querySelector('.coin').style.opacity = '1'
-                bidsButtons[1].style.opacity = '1'
-            })
-        } else if (winnerCard === 'spades') {
-            let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
-            bidsNumber.forEach(el => {
-                //обновление баланса user////
-                // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
-                // /////////////////////
-                el.style.color = 'green'
-                document.querySelector('.spades').style.opacity = '1'
-                bidsButtons[2].style.opacity = '1'
-            })
+        if (data.current_balance) {
+            console.log(data.current_balance, 'CURRENT BALANCE')
+            UserBalance.innerHTML = `${data.current_balance}`
         }
 
+        if (data.bid) {
+            console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
+            createBidItemRow(data.bid)
+        }
+        if (data.roll) {
+            startRoll(data.winner)
+        }
+        if (data.stop) {
+            let winnerCard = data.w
+            //winnerCard from backend
+            // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
+            // console.log(winnerCard)
+            let bidsNumber = document.querySelectorAll('.roulette__item-money')
+            const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+            bidsNumber.forEach(el => {
+                el.style.color = 'red'
+            })
+            if (winnerCard === 'hearts') {
+                let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
+                bidsNumber.forEach(el => {
+                    //обновление баланса user////
+                    // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                    console.log(balanceUser)
+                    // /////////////////////
+                    el.style.color = 'green'
+                    document.querySelector('.hearts').style.opacity = '1'
+                    bidsButtons[0].style.opacity = '1'
+                })
+            } else if (winnerCard === 'coin') {
+                let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
+                bidsNumber.forEach(el => {
+                    //обновление баланса user////
+                    // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                    console.log(balanceUser)
+                    // /////////////////////
+                    el.style.color = 'green'
+                    document.querySelector('.coin').style.opacity = '1'
+                    bidsButtons[1].style.opacity = '1'
+                })
+            } else if (winnerCard === 'spades') {
+                let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
+                bidsNumber.forEach(el => {
+                    //обновление баланса user////
+                    // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                    console.log(balanceUser)
+                    // /////////////////////
+                    el.style.color = 'green'
+                    document.querySelector('.spades').style.opacity = '1'
+                    bidsButtons[2].style.opacity = '1'
+                })
+            }
 
-    }
-    if (data.back) {
-        //winnerCard from backend
-        returnToStartPosition()
+
+        }
+        if (data.back) {
+            //winnerCard from backend
+            returnToStartPosition()
+        }
+
+        if (data.roulette) {
+            timerCounter(data.roulette)
+            // код для теста функциональности начисления опыта
+            // {#toSend = {#}
+            // {#    "bet": {#}
+            // {#        "credits": 1000000,#}
+            // {#        "placed": "black"#}
+            // {#    }#}
+            // {##}
+            // {#strToSend = JSON.stringify(toSend)#}
+            // {#chatSocket.send(strToSend)#}
+            // {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
+            ////////////////////////////
+        }
     }
 
-    if (data.roulette) {
-        timerCounter(data.roulette)
-        // код для теста функциональности начисления опыта
-        // {#toSend = {#}
-        // {#    "bet": {#}
-        // {#        "credits": 1000000,#}
-        // {#        "placed": "black"#}
-        // {#    }#}
-        // {##}
-        // {#strToSend = JSON.stringify(toSend)#}
-        // {#chatSocket.send(strToSend)#}
-        // {#console.log(strToSend, 'TOSEND IN 370 stroka')#}
-        ////////////////////////////
+    // 8) КЕЙСЫ
+
+    if (data.cases) {
+        console.log('прилетели кейсы')
+        setModalConst(data.cases)
     }
+    if (data.lvl_info && document.title ==='Профиль'){
+        set_lvl_info(data.lvl_info)
+    }
+    if (data.user_items){
+        newUserItem(data.user_items)
+        newModalUserItem(data.user_items)
     }
 }
+
 //--------------------------onmessage end------------------------------
 //-----------------------------------------------------------------------
 
@@ -206,3 +221,13 @@ messageInput.onkeyup = function (e) {
         buttonSend.click();
     }
 };
+
+if (document.title === 'Профиль') {
+    chatSocket.onopen = function (e) {
+        chatSocket.send(JSON.stringify({
+                    'item': 'get_item'
+                }
+            )
+        )
+    }
+}
