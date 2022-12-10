@@ -213,11 +213,14 @@ class GameID(models.Model):
 class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
-    ban = models.BooleanField(verbose_name='Бан', default=False)  # расписать виды банов
+    ban_site = models.BooleanField(verbose_name='Бан на сайте', default=False)
+    ban_chat = models.BooleanField(verbose_name='Бан в чате', default=False)
+    ban_ip = models.BooleanField(verbose_name='Бан по ip', default=False)
 
     class Meta:
-        verbose_name = 'Баны'
+        verbose_name = 'Бан'
         verbose_name_plural = 'Баны'
 
     def __str__(self):
         return f'{self.user}'
+

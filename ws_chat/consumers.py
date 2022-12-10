@@ -7,7 +7,9 @@ from django.core.exceptions import ValidationError
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
-from accaunts.models import CustomUser
+from django.shortcuts import get_object_or_404
+
+from accaunts.models import CustomUser, Ban
 from configs.settings import BASE_DIR
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
@@ -16,6 +18,8 @@ from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 # подключаемся к редису
 r = redis.Redis()
+
+from django.contrib.auth.decorators import user_passes_test
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -133,6 +137,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                  "list_message": serializer.data.get('message')})
         except:
             pass
+
+
+    @sync_to_async()
+    def get_ban_chat_user(self, user):
+        """Проверка бана пользователя в общем чате"""
+        user = CustomUser.objects.get(username=user).pk
+        try:
+            if get_object_or_404(Ban, user=user).ban_chat:
+                return True
+            else:
+                return False
+        except:
+            return False
 
     async def send_support_chat_message(self, channel_name, message, user, file_path=None):
         """Отправка сообщения в суппорт чат . Аргументы channel_name,message,user """
@@ -290,7 +307,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                         "file_path": f'/{file_path}',
                                                                         "user": sender_user, })  # отправка сообщения пользователю в рум
         elif text_data_json.get('chat_type') == 'all_chat':
-            '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем'''
+            '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
+            Проводим проверку на длинну сообщения не более 250 символов.
+            Проводим проверку на бан пользователя.'''
             all_chat_message = {"type": "chat_message",
                                 "chat_type": text_data_json.get('chat_type'),
                                 "message": text_data_json["message"],
@@ -299,8 +318,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "rubin": text_data_json.get("rubin"),
                                 }
             if len(all_chat_message["message"]) <= 250:
-                await self.channel_layer.group_send(self.room_group_name, all_chat_message)
-                await self.save_user_message_all_chat(all_chat_message)
+                if await self.get_ban_chat_user(text_data_json["user"]):
+                    all_chat_message["chat_type"] = "ban_all_chat"
+                    print("user is banned ===", all_chat_message)
+                    await self.channel_layer.group_send(self.room_group_name, all_chat_message)
+                else:
+                    print("user is not ban ===", all_chat_message)
+                    await self.channel_layer.group_send(self.room_group_name, all_chat_message)
+                    await self.save_user_message_all_chat(all_chat_message)
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
