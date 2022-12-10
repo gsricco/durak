@@ -14,9 +14,8 @@ let timerBlock = document.querySelector('#timerTwo')
 const usBalance = document.querySelector('.header__profile-sum')
 let profileCaseTitle
 let caseData
-let cs = chatSocket
 
-cs.addEventListener('open', (event) => {
+chatSocket.addEventListener('open', (event) => {
     chatSocket.send(JSON.stringify({
         'item': 'init_item',
     }))
@@ -39,12 +38,14 @@ function super_new(f) {
         }
         if (data.cases) {
             setModalConst(data.cases)
+
         }
         if (data.current_balance) {
             usBalance.innerHTML = `${data.current_balance}`
         }
     }
 }
+
 
 //отрисовывает лвл и кристалы
 function set_lvl_info(data) {
@@ -71,9 +72,10 @@ function setModalConst(data) {
         minuteTime = (open_time - secTime) / 60
 
     }
+    console.log(timerBlock)
     //проверка запущен ли уже таймер
     if (timerBlock.textContent === '') {
-        timerSecond()
+        timerSecond(data)
     }
 }
 
@@ -106,15 +108,22 @@ function case_click(e) {
     console.log('кликнули кейс')
     chatSocket.send(JSON.stringify({
         'cases': 'cases',
-        'modal_item': 'modal_item'
     }))
     profileCaseTitle = e.querySelector('.profil__slider-title').textContent
 }
 
+let butClick = () => {
+    console.log('ршршшр')
+    chatSocket.send(JSON.stringify({
+        'open_case': profileCaseTitle
+    }))
+}
 
 //! Таймер
-function timerSecond() {
-    ttt = 1
+function timerSecond(caseData) {
+    let btnTimerCase = document.querySelector(".modal-case__btn");
+    btnTimerCase.classList.add("btn_white")
+    btnTimerCase.style.background = "#272727";
     let timer = setInterval(function () {
         if (secTime < 60 && secTime > 0) {
             secTime -= 1;
@@ -125,12 +134,16 @@ function timerSecond() {
             secTime = 59;
         }
 
-        if (minuteTime < 1 && secTime < 1) {
-            console.log(secTime)
-            console.log(minuteTime)
+        if (minuteTime === 0 && secTime === 0) {
             clearInterval(timer);
-            fff()
-
+            if (caseData.user_cases[profileCaseTitle].count > 0) {
+                console.log((caseData.user_cases[profileCaseTitle].count))
+                btnTimerCase = document.querySelector(".modal-case__btn");
+                btnTimerCase.removeEventListener('click',butClick)
+                btnTimerCase.classList.remove("btn_white");
+                btnTimerCase.style.background = "#c4364e";
+                btnTimerCase.addEventListener('click',butClick)
+            }
         }
         if (minuteTime === 0 && secTime === 0) {
             timerBlock.innerHTML = ''
@@ -146,19 +159,6 @@ function timerSecond() {
     }, 1000);
 }
 
-function fff() {
-    if (true) {
-        let btnTimerCase = document.querySelector(".modal-case__btn");
-        btnTimerCase.classList.remove("btn_white");
-        btnTimerCase.style.background = "#c4364e";
-        btnTimerCase.addEventListener('click', () => {
-            chatSocket.send(JSON.stringify({
-                'open_case': profileCaseTitle
-            }))
-        })
-    }
-
-}
 
 function newUserItem(data) {
     let profCaseItem = document.querySelector('.profil__items')
