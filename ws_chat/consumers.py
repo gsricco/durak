@@ -269,7 +269,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # сохраняет время открытия кейса
                 # owned_case.date_opened = datetime.datetime.now()
                 # время открытия для тестов - 1ч
-                # owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(minutes=59)
+                owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3520)
                 owned_case.save()
                 # отправляет результат рандома открытия кейса
                 async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
@@ -280,9 +280,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # проверка является ли выпавший предмет деньгами
                 # если да пополняет баланс , если нет добавляет предмет в инвентарь
                 if chosen_item.is_money:
-                    print()
                     user.detailuser.balance += chosen_item.selling_price
                     user.detailuser.save()
+                    print('это бабки')
+                    async_to_sync(self.channel_layer.send)(self.channel_name, {
+                        'type': 'get_balance',
+                        'balance_update': {
+                            'current_balance': user.detailuser.balance
+                        }
+                            })
                 else:
                     ItemForUser.objects.create(user=user, user_item=chosen_item)
             else:
@@ -426,6 +432,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
+
         # получение предметов в инвентарь
         if text_data_json.get('item'):
             await self.get_user_items()
@@ -438,10 +445,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # информация о кейсах
         if text_data_json.get('cases'):
             await self.get_cases_info()
-            # await self.channel_layer.group_send(
-            #     self.room_group_name, {"type": "send_cases_info",
-            #                            "cases": cases
-            #                            })
 
         if text_data_json.get('online') == "online":
             online = self.channel_layer.receive_count
@@ -678,7 +681,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Отправляет по каналу сообщение о кейсах"""
         message = dict()
         message["user_items"] = event.get("user_items")
-        print(event)
         await self.send(json.dumps(message))
 
     async def case_roll(self, event):

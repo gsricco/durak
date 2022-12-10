@@ -7,7 +7,7 @@ const messageBlock = document.querySelector('.online-chat__list')
 const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
-const UserBalance = document.querySelector('.header__profile-sum>span')
+// const UserBalance = document.querySelector('.header__profile-sum')
 const online = document.querySelector('.online-chat__current')
 // WS Connection
 const chatSocket = new WebSocket(
@@ -100,7 +100,7 @@ if (data.message && data.chat_type === 'all_chat') {
     }
     if (data.chat_type === 'all_chat_list') {
         const set = new Set(data.list);
-        console.log("list_50")
+        // console.log("list_50")
         for (let count of set) {
             const data = count
 
@@ -164,7 +164,7 @@ if (data.message && data.chat_type === 'all_chat') {
         }
     }
     if (data.lvlup) {
-            console.log("You have a new level: " + data.lvlup.new_lvl)
+            // console.log("You have a new level: " + data.lvlup.new_lvl)
             level_data_next = document.querySelector('.level_data_next')
             level_data_back = document.querySelector('.level_data_back')
             level_data_back.innerHTML = data.lvlup.levels + 'ур.'

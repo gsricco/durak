@@ -11,9 +11,42 @@ let curLvlBarCount = document.querySelector('.progress-bar_cur_count')
 let nextLvlBarCount = document.querySelector('.progress-bar_next_count')
 // let countdown = document.getElementById("timer"); // получить элемент тега
 let timerBlock = document.querySelector('#timerTwo')
+const usBalance = document.querySelector('.header__profile-sum')
 let profileCaseTitle
 let caseData
+let cs = chatSocket
 
+cs.addEventListener('open', (event) => {
+    chatSocket.send(JSON.stringify({
+        'item': 'init_item',
+    }))
+
+});
+
+chatSocket.onmessage = super_new(chatSocket.onmessage);
+
+function super_new(f) {
+    return function () {
+        let ws_connect = f.apply(this, arguments);
+        let data = JSON.parse(arguments[0].data)
+        if (data.user_items) {
+            newUserItem(data.user_items)
+            newModalUserItem(data.user_items)
+        }
+
+        if (data.lvl_info) {
+            set_lvl_info(data.lvl_info)
+        }
+        if (data.cases) {
+            setModalConst(data.cases)
+        }
+        if (data.current_balance) {
+            usBalance.innerHTML = `${data.current_balance}`
+        }
+    }
+}
+
+//отрисовывает лвл и кристалы
 function set_lvl_info(data) {
     curLvlImage.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
     curLvlBar.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
@@ -23,24 +56,26 @@ function set_lvl_info(data) {
 }
 
 function setModalConst(data) {
-    caseData = data
     //отображение количества кейсов и их количества в модалке
-
     modalCaseTitle.innerHTML = profileCaseTitle
-    modalCaseLvl.innerHTML = caseData.user_cases[profileCaseTitle].open_lvl + '+ LVL'
-    modalCaseCount.innerHTML = "X" + caseData.user_cases[profileCaseTitle].count
-    console.log(3600 - data.open_time.seconds_since_prev_open)
+    modalCaseLvl.innerHTML = data.user_cases[profileCaseTitle].open_lvl + '+ LVL'
+    modalCaseCount.innerHTML = "X" + data.user_cases[profileCaseTitle].count
+    //переводит секунды в секунды и минуты
+    if (data.open_time.can_be_opened) {
+        secTime = 0
+        minuteTime = 0
+        console.log('можно открыть открыть')
+    } else {
+        open_time = 3600 - data.open_time.seconds_since_prev_open
+        secTime = open_time % 60
+        minuteTime = (open_time - secTime) / 60
 
-
-    open_time = 3600 - data.open_time.seconds_since_prev_open
-    secTime = open_time % 60
-    minuteTime = (open_time - secTime) / 60
+    }
+    //проверка запущен ли уже таймер
     if (timerBlock.textContent === '') {
         timerSecond()
     }
-
 }
-
 
 function newModalUserItem(data) {
     let modalCaseItem = document.querySelector('.modal-cases-all__case')
@@ -68,18 +103,20 @@ function newModalUserItem(data) {
 
 //функция дергается при клике на кейс , берет имя кейса и записывает в переменную
 function case_click(e) {
+    console.log('кликнули кейс')
     chatSocket.send(JSON.stringify({
-        'cases': 'cases'
+        'cases': 'cases',
+        'modal_item': 'modal_item'
     }))
     profileCaseTitle = e.querySelector('.profil__slider-title').textContent
 }
 
 
 //! Таймер
-// if (document.querySelector(".timer")) {
 function timerSecond() {
+    ttt = 1
     let timer = setInterval(function () {
-        if (secTime < 60) {
+        if (secTime < 60 && secTime > 0) {
             secTime -= 1;
         }
 
@@ -89,40 +126,45 @@ function timerSecond() {
         }
 
         if (minuteTime < 1 && secTime < 1) {
-            var countclick = 0
-            console.log(timerBlock)
+            console.log(secTime)
+            console.log(minuteTime)
             clearInterval(timer);
-            let btnTimerCase = document.querySelector(".modal-case__btn");
-                if (caseData.user_cases[profileCaseTitle].count !== 0 ) {
-                    btnTimerCase.classList.remove("btn_white");
-                    btnTimerCase.style.background = "#c4364e";
-                    btnTimerCase.addEventListener('click', () => {
-                        chatSocket.send(JSON.stringify({
-                            'open_case': profileCaseTitle
-                        }))
-                    })
-                }
+            fff()
 
         }
+        if (minuteTime === 0 && secTime === 0) {
+            timerBlock.innerHTML = ''
+        } else {
+            if (secTime >= 10) {
+                timerBlock.innerHTML = `${minuteTime}:${secTime}`;
+            }
 
-        if (secTime >= 10) {
-            timerBlock.innerHTML = `${minuteTime}:${secTime}`;
-        }
-
-        if (secTime < 10 && secTime >= 0) {
-            timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
+            if (secTime < 10 && secTime >= 0) {
+                timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
+            }
         }
     }, 1000);
 }
 
-// }
+function fff() {
+    if (true) {
+        let btnTimerCase = document.querySelector(".modal-case__btn");
+        btnTimerCase.classList.remove("btn_white");
+        btnTimerCase.style.background = "#c4364e";
+        btnTimerCase.addEventListener('click', () => {
+            chatSocket.send(JSON.stringify({
+                'open_case': profileCaseTitle
+            }))
+        })
+    }
+
+}
 
 function newUserItem(data) {
     let profCaseItem = document.querySelector('.profil__items')
     let allProfCaseItem = document.querySelectorAll('.profil__item')
     allProfCaseItem.forEach((e) => e.remove())
     data.forEach((e) => {
-        console.log(e)
         let new_div = document.createElement('div')
         new_div.className = 'profil__item'
         new_div.innerHTML = `
