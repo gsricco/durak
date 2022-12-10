@@ -267,9 +267,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 chosen_item = Item.objects.get(pk=chosen_item_in_case.item.pk)
                 owned_case.item = chosen_item
                 # сохраняет время открытия кейса
-                # owned_case.date_opened = datetime.datetime.now()
+                owned_case.date_opened = datetime.datetime.now()
                 # время открытия для тестов - 1ч
-                owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3400)
+                # owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3400)
                 owned_case.save()
                 # отправляет результат рандома открытия кейса
                 async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
