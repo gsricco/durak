@@ -143,6 +143,7 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
                             newUserMessage(`${data.message}`, data.user)
                         }
                     }
+                    chatBlock.scrollTop = chatBlock.scrollHeight
                 }
             }
 

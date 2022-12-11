@@ -7,6 +7,7 @@ from accaunts import models
 from caseapp.models import OwnedCase
 from channels.layers import get_channel_layer
 import random
+from accaunts.models import Level
 
 channel_layer = get_channel_layer()
 r = Redis()
@@ -199,6 +200,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     users_rewards = []
     # обработка ставок для каждого пользователя
     for user in users:
+        lev = Level.objects.last()
+        max_level = lev.level
+        max_exp = lev.experience_range.upper
         # получение информации о ставке пользователя
         bet_key = user.pk
         # получаем словарь со всеми ставками юзера
@@ -225,11 +229,20 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # если уровень пользователя изменился
         if prev_level != user.level.level:
             if channel_name := bets_info[str(bet_key)]['channel_name']:
+                level = user.level.level
+                new_level = level +1
+                if level == max_level:
+                    new_level = 'max'
                 message = {
                     "type": "send_new_level",
                     "lvlup": {
-                        "new_lvl": user.level.level + 1,
-                        "levels": user.level.level ,
+                        "new_lvl": new_level,   "type": "send_new_level",
+                        "lvlup": {
+                            "new_lvl": new_level,
+                            "levels": level,
+                        },
+
+                        "levels": level,
                     },
                 }
                 async_to_sync(channel_layer.send)(channel_name, message)
@@ -261,9 +274,8 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
     return 0
 
-
 def send_exp(user, channel_name):
-    print('отправился опыт')
+
     max_exp = user.level.experience_range.upper
     min_exp = user.level.experience_range.lower
     delta_exp = max_exp - min_exp
@@ -271,6 +283,8 @@ def send_exp(user, channel_name):
     percent_exp_line = (exp - min_exp) / (delta_exp / 100)
     if percent_exp_line >= 100:
         percent_exp_line -= 100
+    if percent_exp_line == max_exp:
+        percent_exp_line = 100
     message = {
         "type": "send_new_level",
         "expr": {

@@ -42,7 +42,7 @@ const room_cleaner = () => {
 }
 
 function newUserMessage(message, user, file_path) {
-    if (user === username || user === room_id) {
+    if (true) {
         const li = document.createElement('li')
         li.className = 'support__chat-message support__chat-message_your'
         const div = document.createElement('div')
@@ -58,7 +58,7 @@ function newUserMessage(message, user, file_path) {
             li.style.justifyContent = 'flex-start'
             li.style.paddingLeft = '0%'
             li.style.paddingRight = '16%'
-            div.style.background = 'orange'
+            div.style.background = '#2f2f2f'
             div.style.borderRadius = '15px 15px 15px 0px'
             spanUser.style.textAlign = 'left'
         }
@@ -90,26 +90,26 @@ function newUserMessage(message, user, file_path) {
     }
 }
 
-const newRoom = (room_name) => {
-    if (room_name !== username) {
-        const div = document.querySelector('.admin_support_chat_wrapper')
-        const room = document.createElement('p')
-        room.className = 'support__chat__room'
-        room.innerHTML = room_name
-        room.addEventListener('click', () => {
-            let room_value = room.innerText
-            room_id = room_value
-            topBlock.innerHTML = `Чат поддержки с ${room_id}`
-            chat_cleaner()
-            room_cleaner()
-            chatS.send(JSON.stringify({
-                'chat_type': 'support_admin',
-                'receiver_user_room': room_value
-            }))
-        })
-        div.appendChild(room)
-    }
-};
+// const newRoom = (room_name) => {
+//     if (room_name !== username) {
+//         const div = document.querySelector('.admin_support_chat_wrapper')
+//         const room = document.createElement('p')
+//         room.className = 'support__chat__room'
+//         room.innerHTML = room_name
+//         room.addEventListener('click', () => {
+//             let room_value = room.innerText
+//             room_id = room_value
+//             topBlock.innerHTML = `Чат поддержки с ${room_id}`
+//             chat_cleaner()
+//             room_cleaner()
+//             chatS.send(JSON.stringify({
+//                 'chat_type': 'support_admin',
+//                 'receiver_user_room': room_value
+//             }))
+//         })
+//         div.appendChild(room)
+//     }
+// };
 
 // const chatS = new WebSocket(
 //     'ws://'
@@ -139,6 +139,7 @@ function super_new(f) {
                 }
             }
         }
+        chatBlock.scrollTop = chatBlock.scrollHeight
     }
 }
 

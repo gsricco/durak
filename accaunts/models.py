@@ -1,6 +1,6 @@
 from tempfile import NamedTemporaryFile
 from urllib.request import urlopen
-
+from caseapp.models import Item
 from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -150,7 +150,7 @@ class Level(models.Model):
         #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
         #     ),
         # ]
-        ordering = ['-level']
+        ordering = ['level']
         verbose_name = 'Уровень в игре'
         verbose_name_plural = 'Уровни в игре'
 
@@ -221,3 +221,10 @@ class Ban(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+
+class ItemForUser(models.Model):
+
+    user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
+    user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
+    is_used = models.BooleanField(verbose_name='Использован',default=False)
