@@ -50,9 +50,6 @@ const createBidItems = (data) => {
     document.querySelector(`.spades`).innerHTML = ''
 
     let usersId = (Object.keys(data))
-
-    console.log(usersId, 'UseridDDD')
-    console.log(data)
     let heartsCounts = 0;
     let coinCounts = 0;
     let spadesCounts = 0;
@@ -114,8 +111,6 @@ const createBidItems = (data) => {
         let avatar = data[user]['avatar']
         let rubin = data[user]['rubin']
         let userName = data[user]['userName']
-        console.log(objAmount,'objAmount')
-        console.log(keys,'KEYS')
 
         keys.map(card => {
             user = {
@@ -125,13 +120,9 @@ const createBidItems = (data) => {
                 rubin: rubin,
                 userName: userName
             }
-            console.log(user,'USER')
-
             usersBids.push(user)//создание массива всех ставок
-            console.log(usersBids,'USERS')
 
             usersBids.sort((a,b)=>b.bidCount - a.bidCount)//сортировка по ставкам
-            console.log(usersBids,'USERS')
         })
     })
 
@@ -174,7 +165,6 @@ const createBidItems = (data) => {
 
 // const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
-    console.log('itemClick')
 
 
     let bidCount = document.querySelector('.roulette__table-input').value * 1000;
@@ -192,7 +182,6 @@ const itemsClick = (bidCard) => {
     } else if (bidCount) {
 
         let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
-        console.log(balanceUser, 'balanceUser')
         // console.log(cells)
         if (balanceUser + 1 >= Number(bidCount)) {
 

@@ -362,6 +362,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "roll": 'rolling',
             "winner": winner,
+            "c": event.get('c'),
+            "p": event.get('p')
         }))
 
     async def stopper(self, event):
@@ -376,6 +378,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Откатывает рулетку на первоначальное состояние"""
         await self.send(text_data=json.dumps({
             'back': 'go-back',
+            'previous_rolls': event.get('previous_rolls'),
         }))
 
     async def get_bid(self, event):

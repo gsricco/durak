@@ -1,30 +1,29 @@
-function generateItems(winnerCard) {
+function generateItems(winnerCard, cardNumber) {
     const list = document.querySelector('.list');
-    // let cells = 111
-    let cells;
+    let cells = cardNumber
+    // let cells;
     const heartsArray = [103, 107, 111, 115]
     const spadesArray = [101, 105, 109, 117]
 
 
-    switch (winnerCard) {
-        case'hearts':
-            winnerCard = heartsArray[Math.round(Math.random() * (2 + 1))]
-            break
-        case'spades':
-            winnerCard = spadesArray[Math.round(Math.random() * (2 + 1))]
-            break
-        case'coin':
-            winnerCard = 113
-            break
-    }
+    // switch (winnerCard) {
+    //     case'hearts':
+    //         winnerCard = heartsArray[Math.round(Math.random() * (2 + 1))]
+    //         break
+    //     case'spades':
+    //         winnerCard = spadesArray[Math.round(Math.random() * (2 + 1))]
+    //         break
+    //     case'coin':
+    //         winnerCard = 113
+    //         break
+    // }
 
-    let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))
-    if (winnerCard) {
-        cells = winnerCard
-    } else {
-        cells = (numbersCards % 2 === 0) ? numbersCards + 1 : numbersCards
-    }
-    console.log(cells)
+    // let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))
+    // if (winnerCard) {
+    //     cells = winnerCard
+    // } else {
+    //     cells = (numbersCards % 2 === 0) ? numbersCards + 1 : numbersCards
+    // }
 
     let h = 8;
     // четные элементы красные, нечетные черные, каждая 8 карта coin
@@ -58,9 +57,9 @@ function generateItems(winnerCard) {
     }
 }
 // анимация прокрутки
-function startRoll(winnerCard) {
+function startRoll(winnerCard, cardNumber, cardPosition) {
     list.innerHTML = '';
-    generateItems(winnerCard);
+    generateItems(winnerCard, cardNumber);
 
     items[0].style.pointerEvents = 'none';
     items[1].style.pointerEvents = 'none';
@@ -81,12 +80,11 @@ function startRoll(winnerCard) {
 
     function randomInteger(min, max) {
         // получить случайное число от (min-0.5) до (max+0.5)
-        let rand = min + Math.random() * (max - min + 1);
+        let rand = min + cardPosition * (max - min + 1);
         return Math.round(rand);
     }
 
     let swingFinish = `translate3d(${randomInteger(-496, -504) / 10}%, 0, 0)`
-    console.log('sss ' + swingFinish)
 
     list.style.left = '50%'
     list.style.transform = swingFinish
@@ -198,23 +196,21 @@ function super_new(f){
             timerCounter(remainTime)
         }
         if (data.init.state === 'rolling') {
-            console.log(data)
 
             startRoll(data.init.winner)
 
         }
     }
     if (data.current_balance) {
-        console.log(data.current_balance, 'CURRENT BALANCE')
         UserBalance.innerHTML = `${data.current_balance}`
     }
 
     if (data.from_json) {
-        console.log(data.from_json, 'eto FROM_JSON bid!!!!!!!!!!!!!!!')
         createBidItems(data.from_json)
     }
     if (data.roll) {
-        startRoll(data.winner)
+        console.log(data, 'new data for BIDS')
+        startRoll(data.winner, data.c, data.p)
     }
     // if (data.stop) {
     //     let winnerCard = data.w
@@ -230,7 +226,6 @@ function super_new(f){
         let winnerCard = data.w
         //winnerCard from backend
         // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-        console.log(winnerCard)
         let bidsNumber = document.querySelectorAll('.roulette__item-money')
         const bidsButtons = document.querySelectorAll('.roulette__radio-item')
         let signWinnerhearts = document.querySelectorAll('.signWinnerhearts');
@@ -364,9 +359,9 @@ function super_new(f){
         }}
 
     if (data.back) {
-        console.log(data.back, 'ETO BACK DATA')
         //winnerCard from backend
-        let rollCards = ['hearts', 'spades', 'hearts','hearts','hearts', 'hearts','hearts', 'spades'] //-message back roll
+        // let rollCards = ['hearts', 'spades', 'hearts','hearts','hearts', 'hearts','hearts', 'spades'] //-message back roll
+        let rollCards = data.previous_rolls
         let rollWinnerOld = document.querySelector('.roulette__previous-items');
         rollWinnerOld.innerHTML = ``
         rollCards.map(roll=>{
