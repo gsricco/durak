@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, DayHash, RouletteRound
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
 
@@ -12,6 +12,7 @@ admin.site.unregister(UserSocialAuth)
 admin.site.unregister(Nonce)
 admin.site.unregister(Association)
 
+admin.site.register(RouletteRound)
 
 @admin.register(ReferalUser)
 class ReferalUserAdmin(admin.ModelAdmin):
@@ -112,6 +113,11 @@ class LevelAdmin(admin.ModelAdmin):
             return 'Нет изображения'
 
     preview.short_description = 'Картинка уровня'
+
+
+@admin.register(DayHash)
+class DayHashAdmin(admin.ModelAdmin):
+    readonly_fields = 'private_key', 'public_key'
 
 
 # admin.site.register(ReferalUser)

@@ -2,13 +2,14 @@ import datetime
 import uuid
 from hashlib import sha256
 from configs import celery_app
-from celery import shared_task
+from celery import shared_task, schedules
 from redis import Redis
 from asgiref.sync import async_to_sync
 from accaunts import models
 from caseapp.models import OwnedCase
 from channels.layers import get_channel_layer
 import random
+from django.core.exceptions import ObjectDoesNotExist
 
 channel_layer = get_channel_layer()
 r = Redis()
@@ -274,7 +275,6 @@ def generate_private_key() -> str:
         str: private key
     """
     private_key = sha256(str(uuid.uuid4()).encode()).hexdigest()
-    r.set(SERVER_SEED, private_key)
     return private_key
 
 
@@ -285,7 +285,6 @@ def generate_public_key() -> str:
         str: public key
     """
     public_key = ''.join(f"{random.randint(0, 39):02d}" for _ in range(6))
-    r.set(PUBLIC_SEED, public_key)
     return public_key
 
 
@@ -355,4 +354,28 @@ def generate_round_result(process_after_generating: bool = False) -> int:
     return 0
 
 
+@shared_task
+def generate_daily_hash():
+    """Генерирует хеши для получения результатов раундов"""
+    day_hash = models.DayHash()
+    day_hash.private_key = generate_private_key()
+    day_hash.public_key = generate_public_key()
+    day_hash.save()
+    r.set(SERVER_SEED, day_hash.private_key)
+    r.set(PUBLIC_SEED, day_hash.public_key)
+
+
+# считывает из БД ключи для генерации результатов раунда, если их нет в редис
+r.delete(SERVER_SEED)
+if r.get(SERVER_SEED) is None or r.get(PUBLIC_SEED) is None:
+    try:
+        day_hash = models.DayHash.objects.get(date_generated=datetime.date.today())
+        r.set(SERVER_SEED, day_hash.private_key)
+        r.set(PUBLIC_SEED, day_hash.public_key)
+    except ObjectDoesNotExist:
+        # создаёт в БД ключи для текущего дня
+        generate_daily_hash()
+        
+
 celery_app.add_periodic_task(30.03, debug_task.s(), name='debug_task every 30.03')
+celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily_hash.s(), name='Генерация хеша каждый день')

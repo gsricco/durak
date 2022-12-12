@@ -221,3 +221,33 @@ class Ban(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+
+class DayHash(models.Model):
+    """Модель для хранения сгенерированных public_key и private_key"""
+    public_key = models.CharField(verbose_name='Публичный ключ', max_length=16)
+    private_key = models.CharField(verbose_name='Приватный ключ', max_length=64)
+    date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.date_generated}: {self.private_key}-{self.public_key}"
+
+    class Meta:
+        verbose_name = 'Хеш'
+        verbose_name_plural = 'Хеши'
+
+
+class RouletteRound(models.Model):
+    """Модель для сохранения раунда рулетки"""
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер рауда', default=0)
+    round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
+    total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
+    winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда')
+    day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f"Раунд номер {self.round_number}: {self.total_bet_amount} кредитов."
+
+    class Meta:
+        verbose_name = 'Раунд рулетки'
+        verbose_name_plural = 'Раунды рулетки'
