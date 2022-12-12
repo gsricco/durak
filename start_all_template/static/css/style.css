@@ -4594,6 +4594,14 @@ h3 {
   line-height: 133.3333333333%;
   font-weight: 400;
 }
+#spanCardHearts,#spanCardCoin, #spanCardSpades{
+  margin-left: 2px;
+  color:#FFECA8;
+  font-size: 0.9375em;
+  line-height: 133.3333333333%;
+  font-weight: 400;
+}
+
 
 .roulette__item-sum {
   color: #ffeca8;
@@ -4991,6 +4999,7 @@ h3 {
 .roulette__rull {
 margin-top: 10px;
 }
+
 }
 
 @media (min-width: 1200px) {
@@ -5949,7 +5958,7 @@ margin-top: 36px;
 }
 
 @media (min-width: 991px) {
-  .online-chat_active {
+  .online-chat_active {#5DD887
     bottom: 0;
   }
 }
@@ -9751,3 +9760,45 @@ margin-top: 36px;
   font-size: 1.125em;
   color: red;
 }
+
+
+.listCase {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}
+
+
+#modal-cases {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}
+
+
+@media (max-width: 1280px) {
+  .list {
+    transform: translate3d(-500px, 0, 0);
+  }
+}
+@media (min-width: 1282px) and (max-width: 1366px) {
+  .list {
+    transform: translate3d(-470px, 0, 0);
+  }
+}
+/*@media (min-width: 410px) and (max-width: 570px) {*/
+/*  .list {*/
+/*    transform: translate3d(-845px, 0, 0);*/
+/*  }*/
+/*}*/
+/*@media (min-width: 360px)  {*/
+/*  .list {*/
+/*    transform: translate3d(-730px, 0, 0);*/
+/*  }*/
+/*}*/
