@@ -1,4 +1,5 @@
 import datetime
+import math
 import uuid
 from hashlib import sha256
 from configs import celery_app
@@ -9,13 +10,16 @@ from accaunts import models
 from caseapp.models import OwnedCase
 from channels.layers import get_channel_layer
 import random
+from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
 
 channel_layer = get_channel_layer()
 r = Redis()
 # ROUND_RESULTS = ('coin',)
 ROUND_RESULTS = ('spades', 'hearts', 'coin')
+ROUND_WEIGHTS = (7, 7, 1)
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
+ROUND_TIME = 30.03
 KEYS_STORAGE_NAME = 'USERID:list'
 SERVER_SEED = 'server_seed:str'
 PUBLIC_SEED = 'public_seed:str'
@@ -24,6 +28,22 @@ PUBLIC_SEED = 'public_seed:str'
 WIN_COEF = 1
 LOSE_COEF = 1
 CREDITS_TO_EXP_COEF = 1000
+
+
+def record_work_time(function):
+    """Засекает время работы функции"""
+    def wrapper(*args, **kwargs):
+        start = datetime.datetime.now()
+        print(f"Time record from {__name__} for function {function.__name__}")
+        print(f"Start at {start}")
+        res = function(*args, **kwargs)
+        end = datetime.datetime.now()
+        print(f"End at {end}")
+        delta = end - start
+        print(f'Worked for {delta}')
+        return res
+    
+    return wrapper
 
 
 @shared_task
@@ -54,13 +74,23 @@ def roll():
     t = datetime.datetime.now()
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
-    result = roll_fair(ROUND_RESULTS, weights=(7, 7, 1))
+    # достаёт из БД результат раунда
+    round_number = int(r.get('round'))
+    try:
+        current_round = models.RouletteRound.objects.get(round_number=round_number)
+    except ObjectDoesNotExist:
+        # если раунда нет в БД, то произойдёт проверка текущего 
+        # и следующих раундов на день - если их нет, они создадутся
+        check_rounds()
+        current_round = models.RouletteRound.objects.get(round_number=round_number)
+    result = current_round.round_roll
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
                                                 "winner": result,
                                             })
     r.set(ROUND_RESULT_FIELD_NAME, result)
+
 
 @shared_task
 def go_back():
@@ -150,6 +180,31 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
             credits += - int(user_bet[bet_card])
     print(f'Кол-во кредитов к начислению : {credits}')
     return credits
+
+
+def save_round_results(bets_keys, bets_info):
+    """Сохраняет результаты раунда
+
+    Args:
+        bets_keys (dict): ключи ставок
+        bets_info (dict): ставки
+    """
+    total_amount = 0
+    winners = []
+    round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
+
+    for user_pk, bet in bets_info.items():
+        # накапливает общую сумму ставок
+        total_amount += bet.get('bidCount', 0)
+        # если пользователь ставил на победивший знак, то запоминает его
+        if round_result in bet.get('amount', {}):
+            winners.append(user_pk)
+
+    # сохраняет раунд в БД
+    round_number = r.get('round')
+    round_started = datetime.datetime.fromtimestamp(int(r.get('start:time')) / 1000)
+    # TODO: save round results to DB
+    
 
 @shared_task()
 def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
@@ -288,12 +343,8 @@ def generate_public_key() -> str:
     return public_key
 
 
-def roll_fair(round_results: list, weights: tuple=None) -> str:
+def roll_fair(private_key: str, public_key: str, round_number: int, round_results: list, weights: tuple=None) -> str:
     """Генерирует результат раунда через хеш (как на csgoempire.com)
-
-    Args:
-        round_results (list): массив с возможными результатами раунда (результат - str)
-        weights (tuple, optional): вес соответствующего результата. Defaults to None.
 
     Returns:
         str: результат раунда
@@ -301,27 +352,8 @@ def roll_fair(round_results: list, weights: tuple=None) -> str:
     # генерация весов по умолчание, если они не были переданы
     if weights is None:
         weights = (1 for _ in range(len(round_results)))
-    # получаем server_seed из redis
-    server_seed_byte = r.get(SERVER_SEED)
-    server_seed = ''
-    if server_seed_byte is None:
-        server_seed = generate_private_key()
-    else:
-        server_seed = server_seed_byte.decode("utf-8")
-    # получаем public_seed из redis
-    public_seed_byte = r.get(PUBLIC_SEED)
-    public_seed = ''
-    if public_seed_byte is None:
-        public_seed = generate_public_key()
-    else:
-        public_seed = public_seed_byte.decode("utf-8")
-    # получаем номер раунда из redis
-    round_number_byte = r.get('round')
-    round_number = 1
-    if not round_number_byte is None:
-        round_number = int(round_number_byte)
     # генерация хеша раунда
-    unhashed_round = f"{server_seed}-{public_seed}-{round_number:06d}"
+    unhashed_round = f"{private_key}-{public_key}-{round_number:06d}"
     round_hash = sha256(unhashed_round.encode())
     # получение результата раунда по хешу
     # в acc_sum хранятся пороговые значения для результатов раундов при их выборе
@@ -337,7 +369,7 @@ def roll_fair(round_results: list, weights: tuple=None) -> str:
 
 @shared_task()
 def generate_round_result(process_after_generating: bool = False) -> int:
-    """Generates round result and stores it in redis
+    """Просто вызывает process_bets, больше ничего не делает
 
     Args:
         process_after_generating (bool): defines whether to process round results after its generating or not
@@ -355,27 +387,90 @@ def generate_round_result(process_after_generating: bool = False) -> int:
 
 
 @shared_task
-def generate_daily_hash():
-    """Генерирует хеши для получения результатов раундов"""
-    day_hash = models.DayHash()
-    day_hash.private_key = generate_private_key()
-    day_hash.public_key = generate_public_key()
-    day_hash.save()
-    r.set(SERVER_SEED, day_hash.private_key)
-    r.set(PUBLIC_SEED, day_hash.public_key)
+@record_work_time
+def generate_daily(day_hash_pk=None, update_rounds=True):
+    """Генерирует хеши для получения результатов раундов и сами раунды"""
+    # генерация хеша
+    if day_hash_pk is None:
+        day_hash = models.DayHash()
+        day_hash.private_key = generate_private_key()
+        day_hash.public_key = generate_public_key()
+        day_hash.save()
+    else:
+        day_hash = models.DayHash.objects.get(pk=day_hash_pk)
+
+    # генерация результатов раундов
+    # определение количества раундов для генерации
+    seconds_per_day = 24*60*60
+    # при делении получается нецелое число - количество раундов округляется вверх
+    rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME)
+    # print(rounds_per_day,'rounds per day')
+    current_round = int(r.get('round'))
+    # print(current_round,'current round')
+
+    # получение следующих за текущим раундов для их обновления
+    existing_rounds = models.RouletteRound.objects.filter(round_number__gte=current_round)
+    existing_rounds_dict = {round.round_number: round for round in existing_rounds}
+    # обновление старых и создание новых раундов
+    roulette_rounds = []
+    for round_number in range(current_round, current_round + rounds_per_day + 1):
+        if round_number in existing_rounds_dict:
+            if not update_rounds:
+                continue
+            round = existing_rounds_dict[round_number]
+        else:
+            round = models.RouletteRound(round_number=round_number)
+            roulette_rounds.append(round)
+        round.round_roll = roll_fair(
+            day_hash.private_key, 
+            day_hash.public_key, 
+            round_number, 
+            ROUND_RESULTS, 
+            ROUND_WEIGHTS
+        )
+        round.day_hash = day_hash
+    # сохранение обновлённых раундов в БД
+    if update_rounds:
+        models.RouletteRound.objects.bulk_update(existing_rounds, ['round_roll', 'day_hash'])
+    # сохранение новых раундов в БД
+    models.RouletteRound.objects.bulk_create(roulette_rounds)
+    # считает количество выпавших на сегодня результатов рулетки
+    # print('Generated rounds for this day:')
+    # for result in ROUND_RESULTS:
+    #     amount = models.RouletteRound.objects.filter(round_number__gte=current_round, round_roll=result).count()
+    #     print(f"{result} = {amount}")
 
 
-# считывает из БД ключи для генерации результатов раунда, если их нет в редис
-r.delete(SERVER_SEED)
-if r.get(SERVER_SEED) is None or r.get(PUBLIC_SEED) is None:
+def check_round_number():
+    """проверяет, есть ли в redis счётчик числа раундов"""
+    if r.get('round') is None:
+        last_round = models.RouletteRound.objects.exclude(round_started=None).aggregate(Max('round_number'))
+        last_round_number = last_round.get('round_number__max')
+        if last_round_number is None:
+            last_round_number = 1
+        r.set('round', last_round_number)
+
+
+def check_rounds():
+    """проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
         day_hash = models.DayHash.objects.get(date_generated=datetime.date.today())
-        r.set(SERVER_SEED, day_hash.private_key)
-        r.set(PUBLIC_SEED, day_hash.public_key)
+        # дополнит бд недостающими раундами, если их нет
+        generate_daily(
+            day_hash_pk=day_hash.pk,
+            update_rounds=False
+        )
     except ObjectDoesNotExist:
-        # создаёт в БД ключи для текущего дня
-        generate_daily_hash()
-        
+        generate_daily()
 
-celery_app.add_periodic_task(30.03, debug_task.s(), name='debug_task every 30.03')
-celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily_hash.s(), name='Генерация хеша каждый день')
+
+def initialize_rounds():
+    """Проверяет, есть ли в redis номер текущего раунда, а в БД - сами раунды"""
+    check_round_number()
+    check_rounds()
+
+
+initialize_rounds()
+
+celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
+celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
