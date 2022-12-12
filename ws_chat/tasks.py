@@ -319,9 +319,9 @@ def roll_fair(round_results: list, weights: tuple=None) -> str:
     round_number_byte = r.get('round')
     round_number = 1
     if not round_number_byte is None:
-        round_number = round_number_byte.decode("utf-8")
+        round_number = int(round_number_byte)
     # генерация хеша раунда
-    unhashed_round = f"{server_seed}-{public_seed}-{round_number}"
+    unhashed_round = f"{server_seed}-{public_seed}-{round_number:06d}"
     round_hash = sha256(unhashed_round.encode())
     # получение результата раунда по хешу
     # в acc_sum хранятся пороговые значения для результатов раундов при их выборе
