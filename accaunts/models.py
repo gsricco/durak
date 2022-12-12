@@ -239,11 +239,21 @@ class DayHash(models.Model):
 
 class RouletteRound(models.Model):
     """Модель для сохранения раунда рулетки"""
+    ROUND_RESULT_CHOISES = [
+        ('spades', 'Пики'),
+        ('hearts', 'Червы'),
+        ('coin', 'Монетка'),
+    ]
+
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
+    round_hash = models.CharField(verbose_name='Хеш раунда', max_length=8, default='')
+    round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
+    day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
+    show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
+
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
-    winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда')
-    day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT)
+    winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
 
     def __str__(self):
         return f"Раунд номер {self.round_number}: {self.total_bet_amount} кредитов."
