@@ -3663,7 +3663,11 @@ h3 {
     -1px 0 0 rgba(0, 0, 0, 0.15), 1px 0 0 rgba(0, 0, 0, 0.15), -1px -1px 0 rgba(0, 0, 0, 0.15), 1px -1px 0 rgba(0, 0, 0, 0.15), -1px 1px 0 rgba(0, 0, 0, 0.15), 1px 1px 0 rgba(0, 0, 0, 0.15),
     -1px -1px 0 rgba(0, 0, 0, 0.15), 1px -1px 0 rgba(0, 0, 0, 0.15), -1px 1px 0 rgba(0, 0, 0, 0.15), 1px 1px 0 rgba(0, 0, 0, 0.15);
 }
-
+.support__chat-message-text img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 .support__chat-message_your .support__chat-avatar {
   margin-left: 10px;
   margin-right: 0;
@@ -8204,6 +8208,7 @@ margin-top: 36px;
 
   .support__chat-message-text {
     padding: 13px 10px;
+    max-width: 270px;
   }
 
   .support__chat-avatar {
