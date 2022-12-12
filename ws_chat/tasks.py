@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from hashlib import sha256
 from configs import celery_app
 from celery import shared_task
@@ -266,6 +267,28 @@ def send_exp(user, channel_name):
     async_to_sync(channel_layer.send)(channel_name, message)
 
 
+def generate_private_key() -> str:
+    """Генерирует private key (server seed)
+
+    Returns:
+        str: private key
+    """
+    private_key = sha256(str(uuid.uuid4()).encode()).hexdigest()
+    r.set(SERVER_SEED, private_key)
+    return private_key
+
+
+def generate_public_key() -> str:
+    """Генерирует public key (public seed) (6ть пар случайных чисел от 00 до 39) и сохраняет его в redis
+
+    Returns:
+        str: public key
+    """
+    public_key = ''.join(f"{random.randint(0, 39):02d}" for _ in range(6))
+    r.set(PUBLIC_SEED, public_key)
+    return public_key
+
+
 def roll_fair(round_results: list, weights: tuple=None) -> str:
     """Генерирует результат раунда через хеш (как на csgoempire.com)
 
@@ -290,7 +313,7 @@ def roll_fair(round_results: list, weights: tuple=None) -> str:
     public_seed_byte = r.get(PUBLIC_SEED)
     public_seed = ''
     if public_seed_byte is None:
-        public_seed = '1234567890'
+        public_seed = generate_public_key()
     else:
         public_seed = public_seed_byte.decode("utf-8")
     # получаем номер раунда из redis
@@ -300,20 +323,15 @@ def roll_fair(round_results: list, weights: tuple=None) -> str:
         round_number = round_number_byte.decode("utf-8")
     # генерация хеша раунда
     unhashed_round = f"{server_seed}-{public_seed}-{round_number}"
-    print(unhashed_round)
     round_hash = sha256(unhashed_round.encode())
     # получение результата раунда по хешу
     # в acc_sum хранятся пороговые значения для результатов раундов при их выборе
     acc_sum = [weights[0] - 1]
     for i in range(1, len(weights)):
         acc_sum.append(acc_sum[-1] + weights[i])
-    print(acc_sum)
     roll = int(round_hash.hexdigest()[:8], 16) % sum(weights)
-    print(roll)
     for i, border in enumerate(acc_sum):
-        print(border)
         if roll <= border:
-            print(round_results[i])
             return round_results[i]
     return random.choice(round_results)
 
