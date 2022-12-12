@@ -36,6 +36,10 @@ class CustomUser(AbstractUser):
         if not DetailUser.objects.filter(user=self):
             detail = DetailUser(user=self)
             detail.save()
+        if not Ban.objects.filter(user=self):    # создание бана при регистрации пользователя
+            ban = Ban(user=self)
+            Ban.objects.get_or_create()
+            ban.save()
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -212,10 +216,10 @@ class GameID(models.Model):
 
 class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
-    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
-    ban_site = models.BooleanField(verbose_name='Бан на сайте', default=False)
-    ban_chat = models.BooleanField(verbose_name='Бан в чате', default=False)
-    ban_ip = models.BooleanField(verbose_name='Бан по ip', default=False)
+    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
+    ban_site = models.BooleanField(verbose_name='Бан пользователя на сайте', default=False)
+    ban_chat = models.BooleanField(verbose_name='Бан пользователя в общем чате', default=False)
+    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)         #Надоли по IP????
 
     class Meta:
         verbose_name = 'Бан'

@@ -116,7 +116,7 @@ class LevelAdmin(admin.ModelAdmin):
 @admin.register(Ban)
 class BanUserAdmin(admin.ModelAdmin):
     list_display = 'user','ban_site', 'ban_chat',  'ban_ip'
-    search_fields = 'user',
+    search_fields = 'user__id', 'user__username',
 
 # admin.site.register(ReferalUser)
 # admin.site.unregister(Group)
