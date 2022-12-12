@@ -37,6 +37,7 @@ function super_new(f) {
             set_lvl_info(data.lvl_info)
         }
         if (data.cases) {
+            console.log(data, 'eto data CASES')
             setModalConst(data.cases)
 
         }
@@ -57,6 +58,7 @@ function set_lvl_info(data) {
 }
 
 function setModalConst(data) {
+    console.log(data, 'DATA IN SETMODAL CONST')
     //отображение количества кейсов и их количества в модалке
     modalCaseTitle.innerHTML = profileCaseTitle
     modalCaseLvl.innerHTML = data.user_cases[profileCaseTitle].open_lvl + '+ LVL'

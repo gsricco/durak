@@ -37,10 +37,12 @@ class CustomVKOAuth2(VKOAuth2):
         )
         photo = (response.get('photo', ''))
         screen_name = (response.get('screen_name', ''))
-        return {'username': response.get('screen_name'),
+        return {
+                'username': response.get('screen_name'),
                 'email': response.get('email', ''),
                 'fullname': fullname,
                 'first_name': first_name,
                 'last_name': last_name,
                 'photo': photo,
-                'vk_url': screen_name}
+                'vk_url': 'https://vk.com/' + screen_name
+                }

@@ -75,7 +75,7 @@ def roll():
         r.json().set('last_winners', '.', [])
     r.json().arrappend('last_winners', '.', result[0])
     if arr_len := r.json().arrlen('last_winners') > 8:
-        r.json().arrtrim('last_winners', '.', arr_len-8, -1)
+        r.json().arrtrim('last_winners', '.', arr_len-9, -1)
 
 @shared_task
 def go_back():
