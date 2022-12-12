@@ -319,11 +319,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 }
             if len(all_chat_message["message"]) <= 250:
                 if await self.get_ban_chat_user(text_data_json["user"]):
-                    all_chat_message["chat_type"] = "ban_all_chat"
                     print("user is banned ===", all_chat_message)
-                    await self.channel_layer.group_send(self.room_group_name, all_chat_message)
+                    await self.send(text_data=json.dumps(all_chat_message))
+
                 else:
-                    print("user is not ban ===", all_chat_message)
                     await self.channel_layer.group_send(self.room_group_name, all_chat_message)
                     await self.save_user_message_all_chat(all_chat_message)
 
