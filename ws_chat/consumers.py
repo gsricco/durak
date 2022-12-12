@@ -82,7 +82,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 print(user)
                 user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
                 print(user_mess, 'user mesage')
-                # user_mess.full_clean()
+                user_mess.full_clean(exclude=['user_posted', 'chat_room', 'file_message', 'date', 'is_read'])
                 user_mess.save()
                 room.message.add(user_mess, bulk=False)
                 async_to_sync(self.get_all_room)()
