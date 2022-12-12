@@ -227,7 +227,7 @@ class DayHash(models.Model):
     """Модель для хранения сгенерированных public_key и private_key"""
     public_key = models.CharField(verbose_name='Публичный ключ', max_length=16)
     private_key = models.CharField(verbose_name='Приватный ключ', max_length=64)
-    date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True)
+    date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
 
     def __str__(self):
         return f"{self.date_generated}: {self.private_key}-{self.public_key}"
@@ -247,7 +247,6 @@ class RouletteRound(models.Model):
 
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
-    round_hash = models.CharField(verbose_name='Хеш раунда', max_length=8, default='')
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
     show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
@@ -256,7 +255,7 @@ class RouletteRound(models.Model):
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
 
     def __str__(self):
-        return f"Раунд номер {self.round_number}: {self.total_bet_amount} кредитов."
+        return f"Раунд номер {self.round_number}: {self.total_bet_amount} кредитов. {self.round_roll}"
 
     class Meta:
         verbose_name = 'Раунд рулетки'
