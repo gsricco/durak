@@ -239,7 +239,7 @@ class DayHash(models.Model):
 
 class RouletteRound(models.Model):
     """Модель для сохранения раунда рулетки"""
-    round_number = models.PositiveBigIntegerField(verbose_name='Номер рауда', default=0)
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда')
