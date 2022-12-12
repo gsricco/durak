@@ -306,7 +306,7 @@ def roll_fair(round_results: list, weights: tuple=None) -> str:
     server_seed_byte = r.get(SERVER_SEED)
     server_seed = ''
     if server_seed_byte is None:
-        server_seed = '1234567890'
+        server_seed = generate_private_key()
     else:
         server_seed = server_seed_byte.decode("utf-8")
     # получаем public_seed из redis
