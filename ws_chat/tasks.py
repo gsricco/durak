@@ -24,7 +24,7 @@ r = Redis()
 #                  ('spades', 117), ('hearts', 115),
 #                  ('spades', 121), ('hearts', 119),
 #                  ('spades', 125), ('hearts', 123),)
-ROUND_RESULTS = ('spades', 'hearts', 'coin')
+ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 ROUND_TIME = 30.03
