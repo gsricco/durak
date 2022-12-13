@@ -74,3 +74,10 @@ class ItemForCaseSerializer(serializers.Serializer):
     item = ItemSerializer()
     class Meta:
         model = ItemForCase
+
+class CaseAndCaseItemSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    image = serializers.CharField()
+    itemforcase_set = ItemForCaseSerializer(many=True)
+    class Meta:
+        model = Case

@@ -9751,3 +9751,22 @@ margin-top: 36px;
   font-size: 1.125em;
   color: red;
 }
+
+.listCase {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}
+
+
+#modal-cases {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}

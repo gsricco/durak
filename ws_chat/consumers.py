@@ -4,7 +4,7 @@ import json
 import os
 from random import choices
 from caseapp.serializers import OwnedCaseTimeSerializer, ItemSerializer, ItemForUserSerializer, OwnedCaseSerializer, \
-    ItemForCaseSerializer
+    ItemForCaseSerializer, CaseAndCaseItemSerializer
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from asgiref.sync import sync_to_async, async_to_sync
@@ -199,10 +199,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         all_case_name = Case.objects.all()
         case_count_for_name = {}
         for case_name in all_case_name:
-            case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
+            # case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
             case_count_for_name[case_name.name] = {'count': 0,
                                                    'open_lvl': case_name.user_lvl_for_open,
-                                                   'case_info': case_item_series.data
+                                                   # 'case_info': case_item_series.data
                                                    }
 
         # подсчитываем сколько каких кейсов есть у юзера
@@ -218,6 +218,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name, {"type": "send_cases_info",
                                    "cases": message
                                    })
+
+
+    @sync_to_async()
+    def get_items_for_cases(self):
+        cases_items = Case.objects.all()
+        serializer = CaseAndCaseItemSerializer(cases_items,many=True)
+        message = {}
+        for case in serializer.data:
+            message[case['name']] = {'image':case['image'],
+                                  'items':case['itemforcase_set']
+                                  }
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "send_cases_items",
+                                   "cases_items": message
+                                   })
+
+
 
     @sync_to_async()
     def get_user_items(self):
@@ -296,102 +313,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             print('Нет такого кейса')
 
-    # @sync_to_async()
-    # def get_cases_info(self, user):
-    #     '''функция отправки информации о кейсах'''
-    #     # поулчаем все выданные и не открытые кейсы
-    #     owned_cases_for_user = OwnedCase.objects.filter(owner=user)
-    #     not_owned_case = owned_cases_for_user.filter(date_opened=None)
-    #     # получаем все имена кейсов из бд и делаем из них дикт
-    #     all_case_name = Case.objects.all()
-    #     case_count_for_name = {}
-    #     for case_name in all_case_name:
-    #         case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
-    #         case_count_for_name[case_name.name] = {'count': 0,
-    #                                                'open_lvl': case_name.user_lvl_for_open,
-    #                                                'case_info': case_item_series.data
-    #                                                }
-    #
-    #     # подсчитываем сколько каких кейсов есть у юзера
-    #     for case in not_owned_case:
-    #         case_count_for_name[str(case.case)]['count'] += 1
-    #     last_open_owned_case = owned_cases_for_user.exclude(date_opened=None).order_by("-date_opened").first()
-    #     case_time = {'date_opened': '', 'seconds_since_prev_open': 3600, 'can_be_opened': True}
-    #     if last_open_owned_case:
-    #         serializer = OwnedCaseTimeSerializer(last_open_owned_case)
-    #         case_time = serializer.data
-    #     return {'cases': {'open_time': case_time, 'user_cases': case_count_for_name}}
-    #
-    # @sync_to_async()
-    # def get_user_items(self):
-    #     '''Send user item functions'''
-    #     user = self.scope['user']
-    #     user_items = ItemForUser.objects.filter(user=user)
-    #     serializer = ItemForUserSerializer(user_items, many=True)
-    #     message = {
-    #         'type': 'send_user_item',
-    #         'user_items': serializer.data
-    #     }
-    #     async_to_sync(self.channel_layer.send)(self.channel_name, message)
-    #
-    # @sync_to_async()
-    # def open_case(self, case):
-    #     '''Open case function'''
-    #     user = self.scope['user']
-    #     case_id = Case.objects.filter(name=case).first()
-    #     if case_id:
-    #         owned_case = OwnedCase.objects.filter(owner=user.pk) \
-    #             .filter(date_opened=None) \
-    #             .filter(case=case_id) \
-    #             .last()
-    #         if owned_case:
-    #             if owned_case.owner.pk != user.pk:
-    #                 print({"details": "Access forbidden"})
-    #
-    #             if owned_case.item is not None:
-    #                 print({"details": "Case is already opened"})
-    #
-    #             last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
-    #                 .exclude(date_opened=None) \
-    #                 .order_by("-date_opened") \
-    #                 .first()
-    #
-    #             if last_user_case is not None:
-    #                 delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
-    #                 if delta_time < datetime.timedelta(hours=1):
-    #                     print({"details": "Wait before you can open next case"})
-    #
-    #             case = owned_case.case
-    #             case_items = ItemForCase.objects.filter(case=case)
-    #             weights = [float(item['chance']) for item in case_items.values('chance')]
-    #             print(weights, 'веса итема')
-    #             chosen_item_in_case = choices(case_items, weights=weights, k=1)[0]
-    #             print(chosen_item_in_case)
-    #             chosen_item = Item.objects.get(pk=chosen_item_in_case.item.pk)
-    #             owned_case.item = chosen_item
-    #             # сохраняет время открытия кейса
-    #             # owned_case.date_opened = datetime.datetime.now()
-    #             # время открытия для тестов - 1ч
-    #             owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(minutes=59)
-    #             owned_case.save()
-    #             # отправляет результат рандома открытия кейса
-    #             async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
-    #                                                                        'case_roll_result': chosen_item.name
-    #                                                                        })
-    #             # отправляет пользователю всё предметы
-    #             # async_to_sync(self.get_user_items)()
-    #             # проверка является ли выпавший предмет деньгами
-    #             # если да пополняет баланс , если нет добавляет предмет в инвентарь
-    #             if chosen_item.is_money:
-    #                 print()
-    #                 user.detailuser.balance += chosen_item.selling_price
-    #                 user.detailuser.save()
-    #             else:
-    #                 ItemForUser.objects.create(user=user, user_item=chosen_item)
-    #         else:
-    #             print('Нет выданного кейса')
-    #     else:
-    #         print('Нет такого кейса')
 
     async def connect(self):
         """Подключение пользователя"""
@@ -432,7 +353,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
-
+        if text_data_json.get('get_cases_items'):
+            await self.get_items_for_cases()
         # получение предметов в инвентарь
         if text_data_json.get('item'):
             await self.get_user_items()
@@ -677,7 +599,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Отправляет по каналу сообщение о кейсах"""
         message = dict()
         message["cases"] = event.get("cases").get('cases')
-        # print(event)
+        await self.send(json.dumps(message))
+
+    async def send_cases_items(self, event):
+        """Отправляет по каналу сообщение о кейсах"""
+        message = dict()
+        message["cases_items"] = event.get("cases_items")
         await self.send(json.dumps(message))
 
     async def send_user_item(self, event):

@@ -12,14 +12,16 @@ let nextLvlBarCount = document.querySelector('.progress-bar_next_count')
 // let countdown = document.getElementById("timer"); // получить элемент тега
 let timerBlock = document.querySelector('#timerTwo')
 const usBalance = document.querySelector('.header__profile-sum')
+const listCase = document.querySelector('.listCase');
+const modalCase = document.querySelector('.modal-cases__case');
 let profileCaseTitle
-let caseData
+let caseItems
 
 chatSocket.addEventListener('open', (event) => {
     chatSocket.send(JSON.stringify({
         'item': 'init_item',
+        'get_cases_items': 'get_cases_items'
     }))
-
 });
 
 chatSocket.onmessage = super_new(chatSocket.onmessage);
@@ -44,9 +46,14 @@ function super_new(f) {
         if (data.current_balance) {
             usBalance.innerHTML = `${data.current_balance}`
         }
+        if (data.cases_items) {
+            caseItems = data.cases_items
+        }
+        if (data.case_roll_result){
+            generateItemsCase(caseItems[profileCaseTitle].items,data.case_roll_result)
+        }
     }
 }
-
 
 //отрисовывает лвл и кристалы
 function set_lvl_info(data) {
@@ -112,13 +119,40 @@ function case_click(e) {
         'cases': 'cases',
     }))
     profileCaseTitle = e.querySelector('.profil__slider-title').textContent
+    startCaseListRoll()
+
+}
+
+function startCaseListRoll() {
+    modalCase.innerHTML = ''
+    listCase.className = ''
+    listCase.style.left = ''
+    listCase.style.transform = ''
+    listCase.style.transition = ''
+    caseItems[profileCaseTitle].items.map((e) => {
+        modalCase.innerHTML += `<div class="modal-case-overflow__item">
+                                     <div class="modal-case__wrapper">
+                                    <div class="modal-case__img">
+                                        <svg>
+                                            <use xlink:href="${static_prefix}/img/icons/sprite.svg#${e.item.image}"></use>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-case__title">
+                                        ${e.item.name}
+                                    </div>
+                                </div>
+                                   </div>`
+
+    })
+
 }
 
 let butClick = () => {
-    console.log('ршршшр')
     chatSocket.send(JSON.stringify({
         'open_case': profileCaseTitle
     }))
+    modalCase.innerHTML = '';
+    ;
 }
 
 //! Таймер
@@ -186,27 +220,4 @@ function newUserItem(data) {
         profCaseItem.appendChild(new_div)
     })
 }
-
-// if (document.querySelector(".instruction")) {
-//     let repeateOne = 0;
-//     document
-//         .querySelector(".instruction")
-//         .addEventListener("click", function () {
-//             if (repeateOne < 1) {
-//                 timerSecond("#timerOne", function () {
-//                     let btnTimerInstructin =
-//                         document.querySelector(".modal-manual__btn");
-//                     btnTimerInstructin.classList.remove("btn_white");
-//                     btnTimerInstructin.innerHTML = "Начать";
-//                     btnTimerInstructin.addEventListener("click", function (event) {
-//                         if (event.target.textContent == "Начать") {
-//                             event.target.innerHTML = "<span>Ожидайте..</span>";
-//                             event.target.classList.add("btn_white");
-//                         }
-//                     });
-//                 });
-//                 repeateOne++;
-//             }
-//         });
-// }
 
