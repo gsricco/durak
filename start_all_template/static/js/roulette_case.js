@@ -13,7 +13,7 @@ function generateItemsCase(caseMessage, winner) {
             return Math.round(rand);
         }
 
-        //докрутка рулеткиd
+        //докрутка рулетки
         let swingFinish = `translate3d(${randomInteger(-496, -504) / 10}%, 0, 0)`
         listCase.style.left = '50%'
         listCase.style.transform = swingFinish

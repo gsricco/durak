@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        {% if user.is_authenticated %}
                         <div class="profil__progressbar">
                             <div class="profil__progressbar-lvl">
                                 <svg class="profil__progressbar-lvl-img">
@@ -109,6 +109,7 @@
                                 </div>
                             </div>
                         </div>
+                    {% endif %}
                     </div>
 
                     <div class="profil__block-wrapper">

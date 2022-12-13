@@ -3,6 +3,7 @@ let modalCaseCount = document.querySelector('.modal-cases__mum')
 let modalCaseTitle = document.querySelector('.modal-cases__title')
 let minuteTime, secTime, open_time; // переменные для единиц времени
 //значки кристалов по уровням
+let bigProfLvl = document.querySelector('.profil__progressbar-lvl-num')
 let curLvlImage = document.querySelector('.profil__progressbar-lvl-img')
 let curLvlBar = document.querySelector('.progress-bar_cur_svg')
 let nextLvlBar = document.querySelector('.progress-bar_next_svg')
@@ -11,9 +12,11 @@ let curLvlBarCount = document.querySelector('.progress-bar_cur_count')
 let nextLvlBarCount = document.querySelector('.progress-bar_next_count')
 // let countdown = document.getElementById("timer"); // получить элемент тега
 let timerBlock = document.querySelector('#timerTwo')
-const usBalance = document.querySelector('.header__profile-sum')
+const usBalance = document.querySelector('#userBal')
 const listCase = document.querySelector('.listCase');
 const modalCase = document.querySelector('.modal-cases__case');
+let profilProgressLine = document.querySelector('.profil_profil__progressbar-line')
+let profilProgressExp = document.querySelector('.profil__progressbar-lvl-progress')
 let profileCaseTitle
 let caseItems
 
@@ -38,8 +41,13 @@ function super_new(f) {
         if (data.lvl_info) {
             set_lvl_info(data.lvl_info)
         }
+        if(data.lvlup){
+                bigProfLvl.innerHTML = data.lvlup.levels + ' LVL'
+        }
+        if (data.expr) {
+            setExp(data.expr)
+        }
         if (data.cases) {
-            console.log(data, 'eto data CASES')
             setModalConst(data.cases)
 
         }
@@ -49,15 +57,25 @@ function super_new(f) {
         if (data.cases_items) {
             caseItems = data.cases_items
         }
-        if (data.case_roll_result){
-            generateItemsCase(caseItems[profileCaseTitle].items,data.case_roll_result)
+        if (data.case_roll_result) {
+            generateItemsCase(caseItems[profileCaseTitle].items, data.case_roll_result)
         }
     }
 }
 
+function setExp(data) {
+    profilProgressLine.style.width = data.percent + '%'
+    profilProgressExp.innerHTML = data.current_exp+'/'+data.max_current_lvl_exp
+}
+
 //отрисовывает лвл и кристалы
 function set_lvl_info(data) {
-    curLvlImage.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
+    if (data.max_lvl) {
+        curLvlImage.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.next_lvl_img}"></use>`
+    } else {
+        curLvlImage.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
+    }
+
     curLvlBar.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
     nextLvlBar.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.next_lvl_img}"></use>`
     curLvlBarCount.innerHTML = data.cur_lvl_case_count + 'шт.'
@@ -65,7 +83,6 @@ function set_lvl_info(data) {
 }
 
 function setModalConst(data) {
-    console.log(data, 'DATA IN SETMODAL CONST')
     //отображение количества кейсов и их количества в модалке
     modalCaseTitle.innerHTML = profileCaseTitle
     modalCaseLvl.innerHTML = data.user_cases[profileCaseTitle].open_lvl + '+ LVL'
@@ -74,14 +91,12 @@ function setModalConst(data) {
     if (data.open_time.can_be_opened) {
         secTime = 0
         minuteTime = 0
-        console.log('можно открыть открыть')
     } else {
         open_time = 3600 - data.open_time.seconds_since_prev_open
         secTime = open_time % 60
         minuteTime = (open_time - secTime) / 60
 
     }
-    console.log(timerBlock)
     //проверка запущен ли уже таймер
     if (timerBlock.textContent === '') {
         timerSecond(data)
@@ -114,7 +129,6 @@ function newModalUserItem(data) {
 
 //функция дергается при клике на кейс , берет имя кейса и записывает в переменную
 function case_click(e) {
-    console.log('кликнули кейс')
     chatSocket.send(JSON.stringify({
         'cases': 'cases',
     }))
@@ -173,12 +187,11 @@ function timerSecond(caseData) {
         if (minuteTime === 0 && secTime === 0) {
             clearInterval(timer);
             if (caseData.user_cases[profileCaseTitle].count > 0) {
-                console.log((caseData.user_cases[profileCaseTitle].count))
                 btnTimerCase = document.querySelector(".modal-case__btn");
-                btnTimerCase.removeEventListener('click',butClick)
+                btnTimerCase.removeEventListener('click', butClick)
                 btnTimerCase.classList.remove("btn_white");
                 btnTimerCase.style.background = "#c4364e";
-                btnTimerCase.addEventListener('click',butClick)
+                btnTimerCase.addEventListener('click', butClick)
             }
         }
         if (minuteTime === 0 && secTime === 0) {
