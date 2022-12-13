@@ -49,10 +49,10 @@ const createBidItems = (data) => {
     document.querySelector(`.coin`).innerHTML = ''
     document.querySelector(`.spades`).innerHTML = ''
 
-    let usersId = (Object.keys(data))
+    console.log(data,'Datas')
+    console.log(username,'USERNAME')
 
-    console.log(usersId, 'UseridDDD')
-    console.log(data)
+    let usersId = (Object.keys(data))
     let heartsCounts = 0;
     let coinCounts = 0;
     let spadesCounts = 0;
@@ -62,60 +62,62 @@ const createBidItems = (data) => {
     let usersBids=[]
     usersId.map(user => {
 //суммирование в заголовке
-        if (data[user]['amount']['hearts']) {
-            heartsCounts += data[user]['amount']['hearts']
-            if (heartsCounts / 1000 > 9 && heartsCounts / 1000 < 1000) {
-                heartsCountsShow = `${heartsCounts / 1000}K`
-            } else {
-                if (heartsCounts / 1000000 > 0) {
-                    heartsCountsShow = `${heartsCounts / 1000000}M`
-                } else
+        if(data[user]['userName']===username) {
+            if (data[user]['amount']['hearts']) {
+                heartsCounts += data[user]['amount']['hearts']
+                if (heartsCounts / 1000 > 9 && heartsCounts / 1000 < 1000) {
+                    heartsCountsShow = `${heartsCounts / 1000}K`
+                } else {
+                    if (heartsCounts / 1000000 > 0) {
+                        heartsCountsShow = `${heartsCounts / 1000000}M`
+                    } else
+                        heartsCountsShow = `${heartsCounts}`
+                }
+                if (heartsCounts / 1000 > 0 && heartsCounts / 1000 < 10) {
                     heartsCountsShow = `${heartsCounts}`
+                }
+                document.querySelector('#titleHearts').innerHTML = `Черви: `;
+                document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
             }
-            if (heartsCounts / 1000 > 0 && heartsCounts / 1000 < 10) {
-                heartsCountsShow = `${heartsCounts}`
-            }
-            document.querySelector('#spanCardHearts').innerHTML = `<span class="signWinnerHearts">:</span> ${heartsCountsShow}`
-        }
-        if (data[user]['amount']['coin']) {
-            coinCounts += data[user]['amount']['coin']
-            if (coinCounts / 1000 > 9 && coinCounts / 1000 < 1000) {
-                coinCountsShow = `${coinCounts / 1000}K`
-            } else {
-                if (coinCounts / 1000000 > 0) {
-                    coinCountsShow = `${coinCounts / 1000000}M`
-                } else
+            if (data[user]['amount']['coin']) {
+                coinCounts += data[user]['amount']['coin']
+                if (coinCounts / 1000 > 9 && coinCounts / 1000 < 1000) {
+                    coinCountsShow = `${coinCounts / 1000}K`
+                } else {
+                    if (coinCounts / 1000000 > 0) {
+                        coinCountsShow = `${coinCounts / 1000000}M`
+                    } else
+                        coinCountsShow = `${coinCounts}`
+                }
+                if (coinCounts / 1000 > 0 && coinCounts / 1000 < 10) {
                     coinCountsShow = `${coinCounts}`
-            }
-            if (coinCounts / 1000 > 0 && coinCounts / 1000 < 10) {
-                coinCountsShow = `${coinCounts}`
-            }
-            document.querySelector('#spanCardCoin').innerHTML = `<span class="signWinnerCoin">:</span>  ${coinCountsShow}`
+                }
+                document.querySelector('#titleCoin').innerHTML = `Монета: `;
+                document.querySelector('#spanCardCoin').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
 
-        }
-        if (data[user]['amount']['spades']) {
-            spadesCounts += data[user]['amount']['spades']
-            if (spadesCounts / 1000 > 9 && spadesCounts / 1000 < 1000) {
-                spadesCountsShow = `${spadesCounts / 1000}K`
-            } else {
-                if (spadesCounts / 1000000 > 0) {
-                    spadesCountsShow = `${spadesCounts / 1000000}M`
-                } else
+            }
+            if (data[user]['amount']['spades']) {
+                spadesCounts += data[user]['amount']['spades']
+                if (spadesCounts / 1000 > 9 && spadesCounts / 1000 < 1000) {
+                    spadesCountsShow = `${spadesCounts / 1000}K`
+                } else {
+                    if (spadesCounts / 1000000 > 0) {
+                        spadesCountsShow = `${spadesCounts / 1000000}M`
+                    } else
+                        spadesCountsShow = `${spadesCounts}`
+                }
+                if (spadesCounts / 1000 > 0 && spadesCounts / 1000 < 10) {
                     spadesCountsShow = `${spadesCounts}`
+                }
+                document.querySelector('#titleSpades').innerHTML = `Пики: `;
+                document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`
             }
-            if (spadesCounts / 1000 > 0 && spadesCounts / 1000 < 10) {
-                spadesCountsShow = `${spadesCounts}`
-            }
-            document.querySelector('#spanCardSpades').innerHTML = `<span class="signWinnerSpades">:</span>  ${spadesCountsShow}`
         }
-
         let objAmount = data[user]['amount']
         let keys = Object.keys(objAmount); //получаем ключи объекта в виде массива
         let avatar = data[user]['avatar']
         let rubin = data[user]['rubin']
         let userName = data[user]['userName']
-        console.log(objAmount,'objAmount')
-        console.log(keys,'KEYS')
 
         keys.map(card => {
             user = {
@@ -125,13 +127,9 @@ const createBidItems = (data) => {
                 rubin: rubin,
                 userName: userName
             }
-            console.log(user,'USER')
-
             usersBids.push(user)//создание массива всех ставок
-            console.log(usersBids,'USERS')
 
             usersBids.sort((a,b)=>b.bidCount - a.bidCount)//сортировка по ставкам
-            console.log(usersBids,'USERS')
         })
     })
 
@@ -150,7 +148,7 @@ const createBidItems = (data) => {
 
                 const itemMoney = document.createElement('div')
                 itemMoney.className = 'roulette__item-money'
-                itemMoney.innerHTML = `<span class="signWinner${el.bidCard}"></span>${el.bidCount}`
+                itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${el.bidCount}`
                 bidItem.appendChild(itemMoney)
 
                 const itemAvatar = document.createElement('div')
@@ -174,7 +172,6 @@ const createBidItems = (data) => {
 
 // const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
-    console.log('itemClick')
 
 
     let bidCount = document.querySelector('.roulette__table-input').value * 1000;
@@ -192,7 +189,6 @@ const itemsClick = (bidCard) => {
     } else if (bidCount) {
 
         let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
-        console.log(balanceUser, 'balanceUser')
         // console.log(cells)
         if (balanceUser + 1 >= Number(bidCount)) {
 

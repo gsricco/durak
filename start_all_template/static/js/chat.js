@@ -37,7 +37,6 @@ chatSocket.onmessage = function (e) {
     }
 
 if (data.message && data.chat_type === 'all_chat') {
-        console.log("all_chat")
         const li = document.createElement('li')
         li.className = 'online-chat__li'
         messageBlock.appendChild(li)
@@ -81,7 +80,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
         const btnDelete = document.createElement('button')
         btnDelete.type = 'submit'
-        btnDelete.onclick = ()=>onClickDeleteHandler()
+        btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
         btnDelete.className = 'online__chat-img'
         divButtons.appendChild(btnDelete)
 
@@ -101,7 +100,6 @@ if (data.message && data.chat_type === 'all_chat') {
     }
     if (data.chat_type === 'all_chat_list') {
         const set = new Set(data.list);
-        console.log("list_50")
         for (let count of set) {
             const data = count
 
@@ -145,7 +143,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnDelete = document.createElement('button')
             btnDelete.type = 'submit'
-            btnDelete.onclick = () => onClickDeleteHandler()
+            btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
             btnDelete.className = 'online__chat-img'
             divButtons.appendChild(btnDelete)
 
@@ -155,7 +153,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnBan = document.createElement('button')
             btnBan.type = 'submit'
-            btnBan.onclick = () => onClickBanHandler()
+            btnBan.onclick = ()=>onClickBanHandler()
             btnBan.className = 'online__chat-img'
             divButtons.appendChild(btnBan)
 
@@ -164,9 +162,7 @@ if (data.message && data.chat_type === 'all_chat') {
             btnBan.appendChild(svgBan)
         }
     }
-
     if (data.lvlup) {
-            console.log("You have a new level: " + data.lvlup.new_lvl)
             level_data_next = document.querySelector('.level_data_next')
             level_data_back = document.querySelector('.level_data_back')
             level_data_back.innerHTML = data.lvlup.levels + 'ур.'
@@ -216,9 +212,14 @@ chatSocket.onopen = function (e) {
     }));
 
 };
-const onClickDeleteHandler=()=>{
-    alert('delete message')
+const onClickDeleteHandler=(li,m)=>{
+    alert(`Сообщение ${m} будет удалено`)
+    li.remove()
+           chatSocket.send(JSON.stringify({
+            'message': m,
+        }));
+
 }
 const onClickBanHandler=()=>{
-    alert('ban message')
+    alert('ban message1')
 }

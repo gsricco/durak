@@ -2,6 +2,9 @@ import base64
 import datetime
 import json
 import os
+from random import choices
+from caseapp.serializers import OwnedCaseTimeSerializer, ItemSerializer, ItemForUserSerializer, OwnedCaseSerializer, \
+    ItemForCaseSerializer, CaseAndCaseItemSerializer
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from asgiref.sync import sync_to_async, async_to_sync
@@ -11,6 +14,8 @@ from django.shortcuts import get_object_or_404
 
 from accaunts.models import CustomUser, Ban
 from configs.settings import BASE_DIR
+from accaunts.models import CustomUser, Level, ItemForUser
+from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 # хранит победную карту текущего раунда
@@ -68,32 +73,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_user_message(self, room, user, message, file_path=''):  # сохраняет сообщение в бд
         """Cохраняет сообщения из чата поддержки в БД"""
         if user:
-            try:
-                # if user:
-                #     user = CustomUser.objects.get(username=user).pk
-                #     user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
-                #     # user_mess.full_clean()
-                #     user_mess.save()
-                #     room.message.add(user_mess, bulk=False)
-                #     room.save()
-
-                #     return user_mess
-                user = CustomUser.objects.get(username=user).pk
-                print(user)
-                user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
-                print(user_mess, 'user mesage')
-                user_mess.full_clean(exclude=['user_posted', 'chat_room', 'file_message', 'date', 'is_read'])
-                user_mess.save()
-                room.message.add(user_mess, bulk=False)
-                async_to_sync(self.get_all_room)()
-                return user_mess
-            except ValidationError:
-                print("Message support_chat more 500")
+            user = CustomUser.objects.get(username=user).pk
+            user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
+            # user_mess.full_clean()
+            user_mess.save()
+            room.message.add(user_mess, bulk=False)
+            room.save()
+            async_to_sync(self.get_all_room)()
+            return user_mess
 
     @sync_to_async()
     def get_all_room(self):
         """Отправляет комнаты в админ чат при коннекте или при появлении нового сообщения"""
-        try:
+        if UserChatRoom.objects.all().exists():
             rooms = UserChatRoom.objects.all()
             serializer = OnlyRoomSerializer(rooms, many=True)
             room_list = []
@@ -103,9 +95,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                          {
                                                              'type': 'get_rooms',
                                                              'room_name': room_list
-                                                          })
-        except:
-            print('error get_all_room')
+                                                         })
+        # else:
+        #     print('error get_all_room')
 
     async def send_online(self, num):
         """Отправка онлайна при коннекте и дисконнекте пользователя"""
@@ -129,14 +121,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async()
     def init_support_chat(self, channel, room_name):
         """Отправка истории сообщений в чат поддержки"""
-        try:
+        if UserChatRoom.objects.filter(room_id=room_name).exists():
             room_data = UserChatRoom.objects.get(room_id=room_name)  # получаем комнату
             serializer = RoomSerializer(room_data)  # сериализуем ее
             async_to_sync(self.channel_layer.send)(channel, {"type": "support_chat_message",
-                                                                 "chat_type": "support",
-                                                                 "list_message": serializer.data.get('message')})
-        except:
-            pass
+                                                             "chat_type": "support",
+                                                             "list_message": serializer.data.get('message')})
+
 
 
     @sync_to_async()
@@ -167,20 +158,57 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Отправляет информацию об уровне пользователя.
         Рассчитывает в процентах сколько опыта у пользователя для данного уровня
         """
+        # last_level = Level.objects.last()
+        # max_level_number = last_level.level
+        # max_level_exp = last_level.experience_range.upper
+        current_level = user.level.level
         max_exp = user.level.experience_range.upper
         min_exp = user.level.experience_range.lower
         delta_exp = max_exp - min_exp
         exp = user.experience
         percent_exp_line = (exp - min_exp) / (delta_exp / 100)
-        message = {
-            "lvlup": {
-                "new_lvl": user.level.level + 1,
-                "levels": user.level.level},
-            "expr": {
-                        "start": min_exp,
-                        "end": max_exp,
-                        "percent": percent_exp_line,
-                    }}
+        message = {}
+
+        if Level.objects.filter(level=current_level + 1).exists():
+            next_lvl = Level.objects.get(level=current_level + 1)
+            message = {
+                "lvlup": {
+                    "new_lvl": next_lvl.level,
+                    "levels": current_level,
+                },
+                "expr": {
+                    "current_exp": exp,
+                    "max_current_lvl_exp": user.level.experience_range.upper,
+                    "percent": percent_exp_line,
+                },
+                "lvl_info": {
+                    'cur_lvl_img': user.level.img_name,
+                    'cur_lvl_case_count': user.level.amount,
+                    'next_lvl_img': next_lvl.img_name,
+                    'next_lvl_case_count': next_lvl.amount,
+                }
+            }
+
+        else:
+            if Level.objects.filter(level=current_level - 1).exists():
+                previous_lvl = Level.objects.get(level=current_level - 1)
+                message = {"lvlup": {
+                    "new_lvl": current_level,
+                    "levels": previous_lvl.level,
+                },
+                    "expr": {
+                        "current_exp": previous_lvl.experience_range.upper,
+                        "max_current_lvl_exp": previous_lvl.experience_range.upper,
+                        "percent": 100,
+                    },
+                    "lvl_info": {
+                        'max_lvl': True,
+                        'cur_lvl_img': previous_lvl.img_name,
+                        'cur_lvl_case_count': previous_lvl.amount,
+                        'next_lvl_img': user.level.img_name,
+                        'next_lvl_case_count': user.level.amount,
+                    }
+                }
         return message
 
     async def send_lvl_and_exp(self, event):
@@ -191,6 +219,135 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             message = await self.eval_xp_and_lvl(user)
             await self.send(text_data=json.dumps(message))
+    async def send_task_lvl_and_exp(self, event):
+        """Отправляет уровень и опыт пользователю при подключении"""
+        message = {}
+        message['lvlup'] = event.get('lvlup')
+        message['expr'] = event.get('expr')
+        message['lvl_info'] = event.get('lvl_info')
+        await self.send(text_data=json.dumps(message))
+    @sync_to_async()
+    def get_cases_info(self):
+        '''функция отправки информации о кейсах'''
+        # поулчаем все выданные и не открытые кейсы
+        users = self.scope['user']
+        owned_cases_for_user = OwnedCase.objects.filter(owner=users.pk)
+        not_owned_case = owned_cases_for_user.filter(date_opened=None)
+        # получаем все имена кейсов из бд и делаем из них дикт
+        all_case_name = Case.objects.all()
+        case_count_for_name = {}
+        for case_name in all_case_name:
+            # case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
+            case_count_for_name[case_name.name] = {'count': 0,
+                                                   'open_lvl': case_name.user_lvl_for_open,
+                                                   # 'case_info': case_item_series.data
+                                                   }
+
+        # подсчитываем сколько каких кейсов есть у юзера
+        for case in not_owned_case:
+            case_count_for_name[str(case.case)]['count'] += 1
+        last_open_owned_case = owned_cases_for_user.exclude(date_opened=None).order_by("-date_opened").first()
+        case_time = {'date_opened': '', 'seconds_since_prev_open': 3600, 'can_be_opened': True}
+        if last_open_owned_case:
+            serializer = OwnedCaseTimeSerializer(last_open_owned_case)
+            case_time = serializer.data
+        message = {'cases': {'open_time': case_time, 'user_cases': case_count_for_name}}
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "send_cases_info",
+                                   "cases": message
+                                   })
+
+    @sync_to_async()
+    def get_items_for_cases(self):
+        cases_items = Case.objects.all()
+        serializer = CaseAndCaseItemSerializer(cases_items, many=True)
+        message = {}
+        for case in serializer.data:
+            message[case['name']] = {'image': case['image'],
+                                     'items': case['itemforcase_set']
+                                     }
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "send_cases_items",
+                                   "cases_items": message
+                                   })
+
+    @sync_to_async()
+    def get_user_items(self):
+        '''Send user item functions'''
+        user = self.scope['user']
+        if user.is_authenticated:
+            user_items = ItemForUser.objects.filter(user=user)
+            serializer = ItemForUserSerializer(user_items, many=True)
+            message = {
+                'type': 'send_user_item',
+                'user_items': serializer.data
+            }
+            async_to_sync(self.channel_layer.send)(self.channel_name, message)
+
+    @sync_to_async()
+    def open_case(self, case):
+        '''Open case function'''
+        user = self.scope['user']
+        case_id = Case.objects.filter(name=case).first()
+        if case_id:
+            owned_case = OwnedCase.objects.filter(owner=user.pk) \
+                .filter(date_opened=None) \
+                .filter(case=case_id) \
+                .last()
+            if owned_case:
+                if owned_case.owner.pk != user.pk:
+                    print({"details": "Access forbidden"})
+
+                if owned_case.item is not None:
+                    print({"details": "Case is already opened"})
+
+                last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
+                    .exclude(date_opened=None) \
+                    .order_by("-date_opened") \
+                    .first()
+
+                if last_user_case is not None:
+                    delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
+                    if delta_time < datetime.timedelta(hours=1):
+                        print({"details": "Wait before you can open next case"})
+
+                case = owned_case.case
+                case_items = ItemForCase.objects.filter(case=case)
+                weights = [float(item['chance']) for item in case_items.values('chance')]
+                print(weights, 'веса итема')
+                chosen_item_in_case = choices(case_items, weights=weights, k=1)[0]
+                print(chosen_item_in_case)
+                chosen_item = Item.objects.get(pk=chosen_item_in_case.item.pk)
+                owned_case.item = chosen_item
+                # сохраняет время открытия кейса
+                # owned_case.date_opened = datetime.datetime.now()
+                # время открытия для тестов - 1ч
+                owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3400)
+                owned_case.save()
+                # отправляет результат рандома открытия кейса
+                async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
+                                                                           'case_roll_result': chosen_item.name
+                                                                           })
+                # отправляет пользователю всё предметы
+                # async_to_sync(self.get_user_items)()
+                # проверка является ли выпавший предмет деньгами
+                # если да пополняет баланс , если нет добавляет предмет в инвентарь
+                if chosen_item.is_money:
+                    user.detailuser.balance += chosen_item.selling_price
+                    user.detailuser.save()
+                    print('это бабки')
+                    async_to_sync(self.channel_layer.send)(self.channel_name, {
+                        'type': 'get_balance',
+                        'balance_update': {
+                            'current_balance': user.detailuser.balance
+                        }
+                    })
+                else:
+                    ItemForUser.objects.create(user=user, user_item=chosen_item)
+            else:
+                print('Нет выданного кейса')
+        else:
+            print('Нет такого кейса')
 
     async def connect(self):
         """Подключение пользователя"""
@@ -231,6 +388,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
+        if text_data_json.get('get_cases_items'):
+            await self.get_items_for_cases()
+        # получение предметов в инвентарь
+        if text_data_json.get('item'):
+            await self.get_user_items()
+        # кнопка открытия кейса
+        if text_data_json.get('open_case'):
+            this_case = text_data_json.get('open_case')
+            await self.open_case(this_case)
+            await self.get_user_items()
+            await self.get_cases_info()
+        # информация о кейсах
+        if text_data_json.get('cases'):
+            await self.get_cases_info()
+
         if text_data_json.get('online') == "online":
             online = self.channel_layer.receive_count
             await self.channel_layer.group_send(
@@ -268,7 +440,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     filed = text_data_json.get('file')
                     file_path = await self.base64_to_image(filed)
                 user = str(self.scope.get('user'))
-                room = await self.create_or_get_support_chat_room(user)  # получает рум из бд
+                room = await self.create_or_get_support_chat_room(user)
                 # сохранение сообщения
                 await self.save_user_message(room, user, text_data_json["message"], file_path)
                 if not self.scope.get('user').is_staff:
@@ -364,7 +536,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         file_path = event.get('file_path')
         chat_type = event.get('chat_type')
         await self.send(text_data=json.dumps({"message": message,
-                                              "list_message":list_message,
+                                              "list_message": list_message,
                                               "chat_type": chat_type,
                                               "user": user,
                                               "file_path": file_path,
@@ -386,6 +558,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "roll": 'rolling',
             "winner": winner,
+            "c": event.get('c'),
+            "p": event.get('p')
         }))
 
     async def stopper(self, event):
@@ -400,6 +574,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Откатывает рулетку на первоначальное состояние"""
         await self.send(text_data=json.dumps({
             'back': 'go-back',
+            'previous_rolls': event.get('previous_rolls'),
         }))
 
     async def get_bid(self, event):
@@ -429,17 +604,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     #         pipe.hmset(dict_key, dictionary)
     #         pipe.execute()
 
-
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
         bet["channel_name"] = self.channel_name
         await tasks.save_as_nested(storage_name, user_pk, bet)
-
-    async def init_xp_and_lvl(self, event):
-        message = event
-        print(message)
-        await self.send(json.dumps(message))
 
     async def send_new_level(self, event):
         """Отправляет по каналу сообщение о новом уровне"""
@@ -465,4 +634,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if state.decode('utf-8') == 'rolling':
             round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
             message['init']['winner'] = round_result
+        await self.send(json.dumps(message))
+
+    async def send_cases_info(self, event):
+        """Отправляет по каналу сообщение о кейсах"""
+        message = dict()
+        message["cases"] = event.get("cases").get('cases')
+        await self.send(json.dumps(message))
+
+    async def send_cases_items(self, event):
+        """Отправляет по каналу сообщение о кейсах"""
+        message = dict()
+        message["cases_items"] = event.get("cases_items")
+        await self.send(json.dumps(message))
+
+    async def send_user_item(self, event):
+        """Отправляет по каналу сообщение о кейсах"""
+        message = dict()
+        message["user_items"] = event.get("user_items")
+        await self.send(json.dumps(message))
+
+    async def case_roll(self, event):
+        """Отправляет результат выпадения кейса"""
+        message = dict()
+        message["case_roll_result"] = event.get("case_roll_result")
         await self.send(json.dumps(message))
