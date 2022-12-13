@@ -13,13 +13,13 @@ channel_layer = get_channel_layer()
 r = Redis()
 # ROUND_RESULTS = ('coin',)
 ROUND_RESULTS = (
-                 ('spades', 101), ('hearts', 103),
-                 ('spades', 105), ('hearts', 107),
-                 ('spades', 109), ('hearts', 111),
-                 ('coin', 113),
-                 ('spades', 117), ('hearts', 115),
-                 ('spades', 121), ('hearts', 119),
-                 ('spades', 125), ('hearts', 123),)
+    ('spades', 101), ('hearts', 103),
+    ('spades', 105), ('hearts', 107),
+    ('spades', 109), ('hearts', 111),
+    ('coin', 113),
+    ('spades', 117), ('hearts', 115),
+    ('spades', 121), ('hearts', 119),
+    ('spades', 125), ('hearts', 123),)
 # ROUND_RESULTS = ('spades', 'hearts', 'coin')
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 KEYS_STORAGE_NAME = 'USERID:list'
@@ -43,6 +43,7 @@ def sender():
                                             }
                                             )
     r.json().delete('round_bets')
+
 
 @shared_task
 def debug_task():
@@ -75,7 +76,8 @@ def roll():
         r.json().set('last_winners', '.', [])
     r.json().arrappend('last_winners', '.', result[0])
     if arr_len := r.json().arrlen('last_winners') > 8:
-        r.json().arrtrim('last_winners', '.', arr_len-9, -1)
+        r.json().arrtrim('last_winners', '.', arr_len - 9, -1)
+
 
 @shared_task
 def go_back():
@@ -87,6 +89,7 @@ def go_back():
                                                 'type': 'go_back',
                                                 'previous_rolls': r.json().get('last_winners')
                                             })
+
 
 @shared_task
 def stop():
@@ -119,10 +122,12 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         if str(dict_key) in round_bets:
             previous_bet = r.json().get('round_bets', dict_key)
             if bet_info['bidCard'] in previous_bet['amount']:
-                print(f'{bet_info["userName"]} Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+                print(
+                    f'{bet_info["userName"]} Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
                 r.json().numincrby('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
             else:
-                print(f'{bet_info["userName"]} Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+                print(
+                    f'{bet_info["userName"]} Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
                 r.json().set('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
         else:
             r.json().set('round_bets', f".{dict_key}", bet_to_redis_json)
@@ -130,7 +135,7 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         r.json().set('round_bets', ".", to_save)
 
 
-def eval_experience(user_bet: dict, round_result:str) -> int:
+def eval_experience(user_bet: dict, round_result: str) -> int:
     """Рассчитывает опыт в зависимости от ставки пользователя
 
     Args:
@@ -166,6 +171,7 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
             credits += - int(user_bet[bet_card])
     print(f'Кол-во кредитов к начислению : {credits}')
     return credits
+
 
 @shared_task()
 def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
@@ -230,13 +236,13 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         if prev_level != user.level.level:
             if channel_name := bets_info[str(bet_key)]['channel_name']:
                 level = user.level.level
-                new_level = level +1
+                new_level = level + 1
                 if level == max_level:
                     new_level = 'max'
                 message = {
                     "type": "send_new_level",
                     "lvlup": {
-                        "new_lvl": new_level,   "type": "send_new_level",
+                        "new_lvl": new_level, "type": "send_new_level",
                         "lvlup": {
                             "new_lvl": new_level,
                             "levels": level,
@@ -274,27 +280,60 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
     return 0
 
-def send_exp(user, channel_name):
 
+def send_exp(user, channel_name):
+    current_level = user.level.level
     max_exp = user.level.experience_range.upper
     min_exp = user.level.experience_range.lower
     delta_exp = max_exp - min_exp
     exp = user.experience
     percent_exp_line = (exp - min_exp) / (delta_exp / 100)
-    if percent_exp_line >= 100:
-        percent_exp_line -= 100
-    if percent_exp_line == max_exp:
-        percent_exp_line = 100
-    message = {
-        "type": "send_new_level",
-        "expr": {
-            "min_exp": min_exp,
-            "max_exp": max_exp,
-            "expr":exp,
-            "percent":percent_exp_line,
-        },
-    }
-    async_to_sync(channel_layer.send)(channel_name, message)
+    message = {}
+
+    if Level.objects.filter(level=current_level + 1).exists():
+        next_lvl = Level.objects.get(level=current_level + 1)
+        message = {
+            "type": 'send_task_lvl_and_exp',
+            "lvlup": {
+                "new_lvl": next_lvl.level,
+                "levels": current_level,
+            },
+            "expr": {
+                "current_exp": exp,
+                "max_current_lvl_exp": user.level.experience_range.upper,
+                "percent": percent_exp_line,
+            },
+            "lvl_info": {
+                'cur_lvl_img': user.level.img_name,
+                'cur_lvl_case_count': user.level.amount,
+                'next_lvl_img': next_lvl.img_name,
+                'next_lvl_case_count': next_lvl.amount,
+            }
+        }
+
+    else:
+        if Level.objects.filter(level=current_level - 1).exists():
+            previous_lvl = Level.objects.get(level=current_level - 1)
+            message = {
+                "type": 'send_task_lvl_and_exp',
+                "lvlup": {
+                    "new_lvl": current_level,
+                    "levels": previous_lvl.level,
+                },
+                "expr": {
+                    "current_exp": previous_lvl.experience_range.upper,
+                    "max_current_lvl_exp": previous_lvl.experience_range.upper,
+                    "percent": 100,
+                },
+                "lvl_info": {
+                    'max_lvl': True,
+                    'cur_lvl_img': previous_lvl.img_name,
+                    'cur_lvl_case_count': previous_lvl.amount,
+                    'next_lvl_img': user.level.img_name,
+                    'next_lvl_case_count': user.level.amount,
+                }
+            }
+    async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
 
 
 @shared_task()
