@@ -4598,6 +4598,14 @@ h3 {
   line-height: 133.3333333333%;
   font-weight: 400;
 }
+#spanCardHearts,#spanCardCoin, #spanCardSpades{
+  margin-left: 2px;
+  color:#FFECA8;
+  font-size: 0.9375em;
+  line-height: 133.3333333333%;
+  font-weight: 400;
+}
+
 
 .roulette__item-sum {
   color: #ffeca8;
@@ -9755,4 +9763,33 @@ margin-top: 36px;
 #modalTitle {
   font-size: 1.125em;
   color: red;
+}
+@media (max-width: 1280px) {
+  .list {
+    transform: translate3d(-500px, 0, 0);
+  }
+}
+@media (min-width: 1282px) and (max-width: 1366px) {
+  .list {
+    transform: translate3d(-470px, 0, 0);
+  }
+}
+
+.listCase {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}
+
+
+#modal-cases {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
 }

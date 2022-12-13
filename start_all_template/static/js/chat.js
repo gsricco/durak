@@ -80,7 +80,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
         const btnDelete = document.createElement('button')
         btnDelete.type = 'submit'
-        btnDelete.onclick = ()=>onClickDeleteHandler()
+        btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
         btnDelete.className = 'online__chat-img'
         divButtons.appendChild(btnDelete)
 
@@ -143,7 +143,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnDelete = document.createElement('button')
             btnDelete.type = 'submit'
-            btnDelete.onclick = ()=>onClickDeleteHandler()
+            btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
             btnDelete.className = 'online__chat-img'
             divButtons.appendChild(btnDelete)
 
@@ -212,9 +212,14 @@ chatSocket.onopen = function (e) {
     }));
 
 };
-const onClickDeleteHandler=()=>{
-    alert('delete message')
+const onClickDeleteHandler=(li,m)=>{
+    alert(`Сообщение ${m} будет удалено`)
+    li.remove()
+           chatSocket.send(JSON.stringify({
+            'message': m,
+        }));
+
 }
 const onClickBanHandler=()=>{
-    alert('ban message')
+    alert('ban message1')
 }

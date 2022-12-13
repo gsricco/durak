@@ -92,13 +92,15 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
             # проверяет, находится ли юзер в бане
             try:
-                ban_tuple = await Ban.objects.aget_or_create(user=user)
+                # ban_tuple = await Ban.objects.aget_or_create(user=user)
+                ban_tuple = await Ban.objects.aget(user=user)
             except Error as err:
                 await self.send(json.dumps({"status": "error", "detail": "Error while trying to access database."}))
                 print(f"Error while trying to access database, {type(err)}: {err}")
                 return
-            ban = await sync_to_async(ban_tuple.__getitem__)(0)
-            if ban.ban:
+            # ban = await sync_to_async(ban_tuple.__getitem__)(0)
+            # if ban.ban_site:
+            if ban_tuple.ban_site:
                 message = {"status": "error","detail": "user banned"}
                 await self.send(json.dumps(message))
                 return
@@ -313,7 +315,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     if info.get('ban'):
                         try:
                             ban = await Ban.objects.aget(user=user_request.user)
-                            ban.ban = True
+                            ban.ban_site = True
                             await sync_to_async(ban.save)()
                         except Error as err:
                             await self.send(json.dumps({"status": "error", "detail": f"Database error. User was banned by bot server but bat wasn't saved. {type(err)}"}))

@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        {% if user.is_authenticated %}
                         <div class="profil__progressbar">
                             <div class="profil__progressbar-lvl">
                                 <svg class="profil__progressbar-lvl-img">
@@ -109,6 +109,7 @@
                                 </div>
                             </div>
                         </div>
+                    {% endif %}
                     </div>
 
                     <div class="profil__block-wrapper">
@@ -671,93 +672,9 @@
                         <div class="modal-cases__pointer"></div>
 {#--------------------------------------------------------------------------------------------#}
 {#ПОЛОСА ПРОКРУТКИ КЕЙСОВ#}
+                        <div class="listCase">
                         <div class="modal-cases__case modal-case modal-case-overflow">
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
-                                        </svg>
-                                    </div>
-{#                                    полоса прокрутки 1 элемент  #}
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>
-                                        </svg>
-                                    </div>
-{#                                    конец элемента полосы прокрутки#}
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
-                                        </svg>
-                                    </div>
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>
-                                        </svg>
-                                    </div>
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>
-                                        </svg>
-                                    </div>
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>
-                                        </svg>
-                                    </div>
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-case-overflow__item">
-                                <div class="modal-case__wrapper">
-                                    <div class="modal-case__img">
-                                        <svg>
-                                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>
-                                        </svg>
-                                    </div>
-                                    <div class="modal-case__title">
-                                        Набор смайлов
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="modal-case-overflow__item">
                                 <div class="modal-case__wrapper">
                                     <div class="modal-case__img">
@@ -772,6 +689,7 @@
                             </div>
 
                         </div>
+                         </div>
                     </div>
 
 
@@ -784,104 +702,6 @@
 {#                инвентарь в модалке #}
                 <div class="modal-cases-all">
                     <div class="modal-cases-all__case modal-case modal-case__content">
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_bear"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов робот#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_robot"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_vampire"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{##}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
-{##}
-{#                        <a href="##" class="modal-case__item">#}
-{#                            <div class="modal-case__wrapper">#}
-{#                                <div class="modal-case__img">#}
-{#                                    <svg>#}
-{#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#smile_unicorn"></use>#}
-{#                                    </svg>#}
-{#                                </div>#}
-{#                                <div class="modal-case__title">#}
-{#                                    Набор смайлов#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </a>#}
 
                     </div>
 
@@ -891,7 +711,9 @@
         </div>
     </div>
 </div>
+<script src="{% static 'js/roulette_case.js' %}"></script>
 <script src="{% static 'js/chat.js' %}"></script>
 <script src="{% static 'js/profile.js' %}"></script>
+
 
 {% endblock %}

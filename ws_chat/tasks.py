@@ -16,7 +16,6 @@ from accaunts.models import Level
 
 channel_layer = get_channel_layer()
 r = Redis()
-# ROUND_RESULTS = ('coin',)
 # ROUND_RESULTS = (
 #                  ('spades', 101), ('hearts', 103),
 #                  ('spades', 105), ('hearts', 107),
@@ -51,7 +50,7 @@ def record_work_time(function):
         delta = end - start
         print(f'Worked for {delta}')
         return res
-    
+
     return wrapper
 
 
@@ -68,6 +67,7 @@ def sender():
                                             }
                                             )
     r.json().delete('round_bets')
+
 
 @shared_task
 def debug_task():
@@ -90,7 +90,7 @@ def roll():
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     except ObjectDoesNotExist:
-        # если раунда нет в БД, то произойдёт проверка текущего 
+        # если раунда нет в БД, то произойдёт проверка текущего
         # и следующих раундов на день - если их нет, они создадутся
         check_rounds()
         current_round = models.RouletteRound.objects.get(round_number=round_number)
@@ -110,7 +110,7 @@ def roll():
         r.json().set('last_winners', '.', [])
     r.json().arrappend('last_winners', '.', result[0])
     if arr_len := r.json().arrlen('last_winners') > 8:
-        r.json().arrtrim('last_winners', '.', arr_len-9, -1)
+        r.json().arrtrim('last_winners', '.', arr_len - 9, -1)
 
 
 @shared_task
@@ -123,6 +123,7 @@ def go_back():
                                                 'type': 'go_back',
                                                 'previous_rolls': r.json().get('last_winners')
                                             })
+
 
 @shared_task
 def stop():
@@ -166,7 +167,7 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         r.json().set('round_bets', ".", to_save)
 
 
-def eval_experience(user_bet: dict, round_result:str) -> int:
+def eval_experience(user_bet: dict, round_result: str) -> int:
     """Рассчитывает опыт в зависимости от ставки пользователя
 
     Args:
@@ -226,7 +227,7 @@ def save_round_results(bets_keys, bets_info):
     round_number = r.get('round')
     round_started = datetime.datetime.fromtimestamp(int(r.get('start:time')) / 1000)
     # TODO: save round results to DB
-    
+
 
 @shared_task()
 def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
@@ -291,13 +292,14 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         if prev_level != user.level.level:
             if channel_name := bets_info[str(bet_key)]['channel_name']:
                 level = user.level.level
-                new_level = level +1
+                new_level = level + 1
                 if level == max_level:
                     new_level = 'max'
                 message = {
                     "type": "send_new_level",
                     "lvlup": {
-                        "new_lvl": new_level,   "type": "send_new_level",
+                        "type": "send_new_level",
+                        "new_lvl": new_level,
                         "lvlup": {
                             "new_lvl": new_level,
                             "levels": level,
@@ -335,27 +337,60 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
     return 0
 
-def send_exp(user, channel_name):
 
+def send_exp(user, channel_name):
+    current_level = user.level.level
     max_exp = user.level.experience_range.upper
     min_exp = user.level.experience_range.lower
     delta_exp = max_exp - min_exp
     exp = user.experience
     percent_exp_line = (exp - min_exp) / (delta_exp / 100)
-    if percent_exp_line >= 100:
-        percent_exp_line -= 100
-    if percent_exp_line == max_exp:
-        percent_exp_line = 100
-    message = {
-        "type": "send_new_level",
-        "expr": {
-            "min_exp": min_exp,
-            "max_exp": max_exp,
-            "expr":exp,
-            "percent":percent_exp_line,
-        },
-    }
-    async_to_sync(channel_layer.send)(channel_name, message)
+    message = {}
+
+    if Level.objects.filter(level=current_level + 1).exists():
+        next_lvl = Level.objects.get(level=current_level + 1)
+        message = {
+            "type": 'send_task_lvl_and_exp',
+            "lvlup": {
+                "new_lvl": next_lvl.level,
+                "levels": current_level,
+            },
+            "expr": {
+                "current_exp": exp,
+                "max_current_lvl_exp": user.level.experience_range.upper,
+                "percent": percent_exp_line,
+            },
+            "lvl_info": {
+                'cur_lvl_img': user.level.img_name,
+                'cur_lvl_case_count': user.level.amount,
+                'next_lvl_img': next_lvl.img_name,
+                'next_lvl_case_count': next_lvl.amount,
+            }
+        }
+
+    else:
+        if Level.objects.filter(level=current_level - 1).exists():
+            previous_lvl = Level.objects.get(level=current_level - 1)
+            message = {
+                "type": 'send_task_lvl_and_exp',
+                "lvlup": {
+                    "new_lvl": current_level,
+                    "levels": previous_lvl.level,
+                },
+                "expr": {
+                    "current_exp": previous_lvl.experience_range.upper,
+                    "max_current_lvl_exp": previous_lvl.experience_range.upper,
+                    "percent": 100,
+                },
+                "lvl_info": {
+                    'max_lvl': True,
+                    'cur_lvl_img': previous_lvl.img_name,
+                    'cur_lvl_case_count': previous_lvl.amount,
+                    'next_lvl_img': user.level.img_name,
+                    'next_lvl_case_count': user.level.amount,
+                }
+            }
+    async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
 
 
 def generate_private_key() -> str:
@@ -457,10 +492,10 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
             round = models.RouletteRound(round_number=round_number)
             roulette_rounds.append(round)
         round.round_roll = roll_fair(
-            day_hash.private_key, 
-            day_hash.public_key, 
-            round_number, 
-            ROUND_RESULTS, 
+            day_hash.private_key,
+            day_hash.public_key,
+            round_number,
+            ROUND_RESULTS,
             ROUND_WEIGHTS
         )
         round.day_hash = day_hash

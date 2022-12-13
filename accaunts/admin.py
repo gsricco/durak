@@ -125,6 +125,10 @@ class LevelAdmin(admin.ModelAdmin):
 
     preview.short_description = 'Картинка уровня'
 
+@admin.register(Ban)
+class BanUserAdmin(admin.ModelAdmin):
+    list_display = 'user','ban_site', 'ban_chat',  'ban_ip'
+    search_fields = 'user__id', 'user__username',
 
 @admin.register(DayHash)
 class DayHashAdmin(admin.ModelAdmin):
