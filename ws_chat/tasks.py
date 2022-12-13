@@ -26,6 +26,10 @@ r = Redis()
 #                  ('spades', 125), ('hearts', 123),)
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
+ROUND_NUMBERS = {
+                 'spades': (101, 105, 109, 117, 121, 125),
+                 'hearts': (103, 107, 111, 115, 119, 123),
+                 'coin': (113,),}
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 ROUND_TIME = 30.03
 KEYS_STORAGE_NAME = 'USERID:list'
@@ -96,19 +100,20 @@ def roll():
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     result = current_round.round_roll
     # result = random.choice(ROUND_RESULTS)
+    result_c = random.choice(ROUND_NUMBERS[result])
     position = random.random()
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
-                                                "winner": result[0],
-                                                "c": result[1],
+                                                "winner": result,
+                                                "c": result_c,
                                                 "p": position
                                             })
-    r.set(ROUND_RESULT_FIELD_NAME, result[0])
+    r.set(ROUND_RESULT_FIELD_NAME, result)
     # Логика последних 8 побед
     if not (r.exists('last_winners')):
         r.json().set('last_winners', '.', [])
-    r.json().arrappend('last_winners', '.', result[0])
+    r.json().arrappend('last_winners', '.', result)
     if arr_len := r.json().arrlen('last_winners') > 8:
         r.json().arrtrim('last_winners', '.', arr_len - 9, -1)
 
