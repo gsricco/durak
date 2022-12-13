@@ -12,10 +12,19 @@ from channels.layers import get_channel_layer
 import random
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
+from accaunts.models import Level
 
 channel_layer = get_channel_layer()
 r = Redis()
 # ROUND_RESULTS = ('coin',)
+# ROUND_RESULTS = (
+#                  ('spades', 101), ('hearts', 103),
+#                  ('spades', 105), ('hearts', 107),
+#                  ('spades', 109), ('hearts', 111),
+#                  ('coin', 113),
+#                  ('spades', 117), ('hearts', 115),
+#                  ('spades', 121), ('hearts', 119),
+#                  ('spades', 125), ('hearts', 123),)
 ROUND_RESULTS = ('spades', 'hearts', 'coin')
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
@@ -62,8 +71,10 @@ def sender():
 
 @shared_task
 def debug_task():
+    t = datetime.datetime.now()
     sender.apply_async()
-    roll.apply_async(countdown=20)
+    # roll.apply_async(countdown=19.5)
+    roll.apply_async(eta=t + datetime.timedelta(seconds=20))
     generate_round_result.apply_async(countdown=24, args=(True,))
     stop.apply_async(countdown=25)
     go_back.apply_async(countdown=28)
@@ -84,12 +95,22 @@ def roll():
         check_rounds()
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     result = current_round.round_roll
+    # result = random.choice(ROUND_RESULTS)
+    position = random.random()
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
-                                                "winner": result,
+                                                "winner": result[0],
+                                                "c": result[1],
+                                                "p": position
                                             })
-    r.set(ROUND_RESULT_FIELD_NAME, result)
+    r.set(ROUND_RESULT_FIELD_NAME, result[0])
+    # Логика последних 8 побед
+    if not (r.exists('last_winners')):
+        r.json().set('last_winners', '.', [])
+    r.json().arrappend('last_winners', '.', result[0])
+    if arr_len := r.json().arrlen('last_winners') > 8:
+        r.json().arrtrim('last_winners', '.', arr_len-9, -1)
 
 
 @shared_task
@@ -100,6 +121,7 @@ def go_back():
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'go_back',
+                                                'previous_rolls': r.json().get('last_winners')
                                             })
 
 @shared_task
@@ -239,6 +261,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     users_rewards = []
     # обработка ставок для каждого пользователя
     for user in users:
+        lev = Level.objects.last()
+        max_level = lev.level
+        max_exp = lev.experience_range.upper
         # получение информации о ставке пользователя
         bet_key = user.pk
         # получаем словарь со всеми ставками юзера
@@ -265,11 +290,20 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # если уровень пользователя изменился
         if prev_level != user.level.level:
             if channel_name := bets_info[str(bet_key)]['channel_name']:
+                level = user.level.level
+                new_level = level +1
+                if level == max_level:
+                    new_level = 'max'
                 message = {
                     "type": "send_new_level",
                     "lvlup": {
-                        "new_lvl": user.level.level + 1,
-                        "levels": user.level.level ,
+                        "new_lvl": new_level,   "type": "send_new_level",
+                        "lvlup": {
+                            "new_lvl": new_level,
+                            "levels": level,
+                        },
+
+                        "levels": level,
                     },
                 }
                 async_to_sync(channel_layer.send)(channel_name, message)
@@ -301,9 +335,8 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
     return 0
 
-
 def send_exp(user, channel_name):
-    print('отправился опыт')
+
     max_exp = user.level.experience_range.upper
     min_exp = user.level.experience_range.lower
     delta_exp = max_exp - min_exp
@@ -311,6 +344,8 @@ def send_exp(user, channel_name):
     percent_exp_line = (exp - min_exp) / (delta_exp / 100)
     if percent_exp_line >= 100:
         percent_exp_line -= 100
+    if percent_exp_line == max_exp:
+        percent_exp_line = 100
     message = {
         "type": "send_new_level",
         "expr": {

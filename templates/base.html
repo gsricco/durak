@@ -113,7 +113,7 @@
                                             <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                                         </svg>
                                     </div>
-                                    <span>{{ detail_user.balance }}</span>
+                                    <span id="userBal">{{ detail_user.balance }}</span>
                                 </a>
                                 <a href="#modalPayment" class="header__profile-link popup-link">
                                     Пополнить
@@ -121,7 +121,7 @@
                                 <a href="#selectAmountInput" class="header__profile-link popup-link">
                                     Вывести
                                 </a>
-                                <a href="/logout" class="header__profile-link logout-btn">Выйти</a>
+{#                                <a href="/logout" class="header__profile-link logout-btn">Выйти</a>#}
                                 {% endif %}
 
                                 <!-- If not logged-in -->
@@ -1219,5 +1219,7 @@
 {{ static_prefix|json_script:'static_prefix' }}
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+{#<script type="text/javascript" src="{% static 'js/chat.js' %}"></script>#}
+
 </body>
 </html>

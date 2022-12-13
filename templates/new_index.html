@@ -2,226 +2,264 @@
 {% load static %}
 
 {% block title %}
-{{ title }}
+    {{ title }}
 {% endblock %}
 
 {% block maincontent %}
 
-<div class="popup" id="modalMoney">
-    <div class="popup__body">
-        <div class="popup__content modal modal_popup modal_authorization">
-            <a href="#" class="popup__close close-popup">
-                <svg class="close-popup__icon ">
-                    <use xlink:href="static/img/icons/sprite.svg#close"></use>
-                </svg>
-            </a>
-            <div class="modal-enter">
-                <div class="closedBlock">
-                    <img src="{% static 'img/icons/clousedGroup.svg' %}" alt="Durak">
+    <div class="popup" id="modalMoney">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal_authorization">
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="static/img/icons/sprite.svg#close"></use>
+                    </svg>
+                </a>
+                <div class="modal-enter">
+                    <div class="closedBlock">
+                        <img src="{% static 'img/icons/clousedGroup.svg' %}" alt="Durak">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="profil-main__content">
-    <section class="roulette">
-        <div class="roulette__rull">
+    <div class="profil-main__content">
+        <section class="roulette">
+            <div class="roulette__rull">
 
-            <div class="roulette__rull-timer-wrapper">
-                <div class="roulette__rull-timer-block">
-                    <p class="roulette__rull-timer-text">ПРОКРУТКА</p>
-                    <span class="roulette__rull-timer">20с</span>
+                <div class="roulette__rull-timer-wrapper">
+                    <div class="roulette__rull-timer-block">
+                        <p class="roulette__rull-timer-text">ПРОКРУТКА</p>
+                        <span class="roulette__rull-timer">20с</span>
+                    </div>
+
                 </div>
 
+                <div class="roulette__rull-wrapper scrollbar-overflow roulette__rull-wrapper_blur">
+{#                <div class="p">#}
+                    <div class="list">
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#coin_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
+                            </svg>
+                        </div>
+                        <div class="roulette__rull-img">
+                            <svg>
+                                <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
+                            </svg>
+                        </div>
+                    </div>
+{#                </div>#}
+            </div>
+                <div class="roulette__rull-line" style="display: none;"></div>
             </div>
 
-            <div class="roulette__rull-wrapper scrollbar-overflow roulette__rull-wrapper_blur"></div>
-            <div class="list">
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#coin_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
-                    </svg>
-                </div>
-                <div class="roulette__rull-img">
-                    <svg>
-                        <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
-                    </svg>
-                </div>
-            </div>
-            <div class="roulette__rull-line" style="display: none;"></div>
-        </div>
+            <div class="roulette__previous-wrapper">
+                <div class="roulette__previous">
+                    <div class="roulette__previous-text">Предыдущие роллы</div>
+                    <div class="roulette__previous-items">
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-        <div class="roulette__previous-wrapper">
-            <div class="roulette__previous">
-                <div class="roulette__previous-text">Предыдущие роллы</div>
-                <div class="roulette__previous-items">
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
-                        </svg>
-                    </div>
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_stroke_grey"></use>
-                        </svg>
-                    </div>
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
-                        </svg>
-                    </div>
-
-                    <div class="roulette__previous-item" style="
+                        <div class="roulette__previous-item" style="
     margin-left: 1px;
     margin-right: 2px;
 ">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#coin_stroke_grey"></use>
-                        </svg>
-                    </div>
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#coin_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
-                        </svg>
-                    </div>
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_stroke_grey"></use>
-                        </svg>
-                    </div>
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
-                        </svg>
-                    </div>
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_stroke_grey"></use>
+                            </svg>
+                        </div>
 
-                    <div class="roulette__previous-item">
-                        <svg>
-                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_stroke_grey"></use>
-                        </svg>
+                        <div class="roulette__previous-item">
+                            <svg>
+                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_stroke_grey"></use>
+                            </svg>
+                        </div>
                     </div>
+                    <a href="##" class="roulette__previous-sound sound" data-value="soundOn">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#sound_off"></use>
+                        </svg>
+                    </a>
                 </div>
-                <a href="##" class="roulette__previous-sound sound" data-value="soundOn">
-                    <svg>
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#sound_off"></use>
-                    </svg>
-                </a>
-            </div>
-        </div>
-
-        <div class="roulette__table-wrapper">
-            <div class="roulette__table">
-                <div class="roulette__input-block">
-                    <svg>
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
-                    </svg>
-                    <input inputmode="numeric" placeholder="Введите сумму..." type="tel" step="1" name="add-sum"
-                           class="roulette__table-input">
-                    <div class="roulette__current-block">Введите сумму...</div>
-                </div>
-
-                <div class="roulette__table-row">
-                    <a href="##" class="roulette__table-link roulette__table-link_fw">CLEAR</a>
-                    <a href="##" class="roulette__table-link">+10K</a>
-                    <a href="##" class="roulette__table-link">+100K</a>
-                    <a href="##" class="roulette__table-link">+1M</a>
-                    <a href="##" class="roulette__table-link">+10M</a>
-                    <div class="roulette__table-link-wrapper">
-                        <a href="##"
-                           class="roulette__table-link roulette__table-link_min roulette__table-link_fw">1/2</a>
-                        <a href="##"
-                           class="roulette__table-link roulette__table-link_min roulette__table-link_fw">X2</a>
-                    </div>
-                    <a href="##" class="roulette__table-link roulette__table-link_fw">MAX</a>
-                </div>
-                <div class="roulette__msg"></div>
             </div>
 
-        </div>
+            <div class="roulette__table-wrapper">
+                <div class="roulette__table">
+                    <div class="roulette__input-block">
+                        <svg>
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                        </svg>
+                        <input inputmode="numeric" placeholder="Введите сумму..." type="tel" step="1" name="add-sum"
+                               class="roulette__table-input">
+                        <div class="roulette__current-block">Введите сумму...</div>
+                    </div>
 
-        <div class="roulette__radio-wrapper">
-            <div class="roulette__radio-item">
+                    <div class="roulette__table-row">
+                        <a href="##" class="roulette__table-link roulette__table-link_fw">CLEAR</a>
+                        <a href="##" class="roulette__table-link">+10K</a>
+                        <a href="##" class="roulette__table-link">+100K</a>
+                        <a href="##" class="roulette__table-link">+1M</a>
+                        <a href="##" class="roulette__table-link">+10M</a>
+                        <div class="roulette__table-link-wrapper">
+                            <a href="##"
+                               class="roulette__table-link roulette__table-link_min roulette__table-link_fw">1/2</a>
+                            <a href="##"
+                               class="roulette__table-link roulette__table-link_min roulette__table-link_fw">X2</a>
+                        </div>
+                        <a href="##" class="roulette__table-link roulette__table-link_fw">MAX</a>
+                    </div>
+                    <div class="roulette__msg"></div>
+                </div>
+
+            </div>
+
+            <div class="roulette__radio-wrapper">
+            <div id="roulHearts" class="roulette__radio-item">
                 <input class="roulette__radio" id="bid-1" type="radio" name="bid">
                 <label for="bid-1" class="roulette__item-header">
                     <div class="roulette__item-name">
@@ -230,14 +268,15 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts_bet_button_pc"></use>
                             </svg>
                         </div>
-                        <h3 class="roulette__item-title">Черви</h3>
+                        <h3 id="titleHearts" class="roulette__item-title">Черви</h3>
+                        <span id="spanCardHearts"><span id="signWinnerHearts"></span></span>
                     </div>
                     <div class="roulette__item-bid">
                         <span>Ставка</span> X2
                     </div>
                 </label>
             </div>
-            <div class="roulette__radio-item">
+            <div id="roulCoin" class="roulette__radio-item">
                 <input class="roulette__radio" id="bid-2" type="radio" name="bid">
                 <label for="bid-2" class="roulette__item-header">
                     <div class="roulette__item-name">
@@ -246,14 +285,15 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#coin_bet_button_pc"></use>
                             </svg>
                         </div>
-                        <h3 class="roulette__item-title">Монета</h3>
+                        <h3 id="titleCoin" class="roulette__item-title">Монета</h3>
+                        <span id="spanCardCoin"><span id="signWinnerCoin"></span></span>
                     </div>
                     <div class="roulette__item-bid">
                         <span>Ставка</span> Х14
                     </div>
                 </label>
             </div>
-            <div class="roulette__radio-item">
+            <div id="roulSpades" class="roulette__radio-item">
                 <input class="roulette__radio" id="bid-3" type="radio" name="bid">
                 <label for="bid-3" class="roulette__item-header">
                     <div class="roulette__item-name">
@@ -262,7 +302,8 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades_bet_button_pc"></use>
                             </svg>
                         </div>
-                        <h3 class="roulette__item-title">Пики</h3>
+                        <h3 id="titleSpades" class="roulette__item-title">Пики</h3>
+                        <span id="spanCardSpades"><span id="signWinnerSpades"></span></span>
                     </div>
                     <div class="roulette__item-bid">
                         <span>Ставка</span> X2
@@ -270,108 +311,110 @@
                 </label>
             </div>
         </div>
-        <div class="roulette-msg">
+            <div class="roulette-msg">
 
-        </div>
+            </div>
 
-        <div class="roulette__items">
-            <div class="accordion-wrapper roulette__accordion-wrapper">
-                <button class="accordion roulette__accardion">
-                    <div class="roulette__accardion-wrapper">
-                        <div class="roulette__accardion-left">
-                            <svg class="roulette__accardion-img">
-                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts"></use>
-                            </svg>
-                            <div class="roulette__accardion-count">
-                                37 участников
+            <div class="roulette__items">
+                <div class="accordion-wrapper roulette__accordion-wrapper">
+                    <button class="accordion roulette__accardion">
+                        <div class="roulette__accardion-wrapper">
+                            <div class="roulette__accardion-left">
+                                <svg class="roulette__accardion-img">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#hearts"></use>
+                                </svg>
+                                <div class="roulette__accardion-count">
+                                    37 участников
+                                </div>
+                            </div>
+
+                            <div class="roulette__accardion-num">
+                                <svg>
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                </svg>
+                                <span>222K</span>
                             </div>
                         </div>
+                        <svg class="accordion-icon">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </button>
+                    <div class="panel">
+                        <div class="roulette__item">
+                            <div class="roulette__item-body hearts">
 
-                        <div class="roulette__accardion-num">
-                            <svg>
-                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
-                            </svg>
-                            <span>222K</span>
-                        </div>
-                    </div>
-                    <svg class="accordion-icon">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
-                    </svg>
-                </button>
-                <div class="panel">
-                    <div class="roulette__item">
-                        <div class="roulette__item-body hearts">
-
-                        </div>
-                    </div>
-                </div>
-
-
-                <button class="accordion roulette__accardion">
-                    <div class="roulette__accardion-wrapper">
-                        <div class="roulette__accardion-left">
-                            <svg class="roulette__accardion-img">
-                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#coin"></use>
-                            </svg>
-                            <div class="roulette__accardion-count">
-                                37 участников
                             </div>
                         </div>
-
-                        <div class="roulette__accardion-num">
-                            <svg>
-                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
-                            </svg>
-                            <span>222K</span>
-                        </div>
                     </div>
-                    <svg class="accordion-icon">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
-                    </svg>
-                </button>
-                <div class="panel">
-                    <div class="roulette__item">
-                        <div class="roulette__item-body coin">
 
 
-                        </div>
-                    </div>
-                </div>
+                    <button class="accordion roulette__accardion">
+                        <div class="roulette__accardion-wrapper">
+                            <div class="roulette__accardion-left">
+                                <svg class="roulette__accardion-img">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#coin"></use>
+                                </svg>
+                                <div class="roulette__accardion-count">
+                                    37 участников
+                                </div>
+                            </div>
 
-                <button class="accordion roulette__accardion">
-                    <div class="roulette__accardion-wrapper">
-                        <div class="roulette__accardion-left">
-                            <svg class="roulette__accardion-img">
-                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades"></use>
-                            </svg>
-                            <div class="roulette__accardion-count">
-                                37 участников
+                            <div class="roulette__accardion-num">
+                                <svg>
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                </svg>
+                                <span>222K</span>
                             </div>
                         </div>
+                        <svg class="accordion-icon">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </button>
+                    <div class="panel">
+                        <div class="roulette__item">
+                            <div class="roulette__item-body coin">
 
-                        <div class="roulette__accardion-num">
-                            <svg>
-                                <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
-                            </svg>
-                            <span>222K</span>
+
+                            </div>
                         </div>
                     </div>
-                    <svg class="accordion-icon">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
-                    </svg>
-                </button>
-                <div class="panel">
-                    <div class="roulette__item">
-                        <div class="roulette__item-body spades">
 
+                    <button class="accordion roulette__accardion">
+                        <div class="roulette__accardion-wrapper">
+                            <div class="roulette__accardion-left">
+                                <svg class="roulette__accardion-img">
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#spades"></use>
+                                </svg>
+                                <div class="roulette__accardion-count">
+                                    37 участников
+                                </div>
+                            </div>
+
+                            <div class="roulette__accardion-num">
+                                <svg>
+                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                </svg>
+                                <span>222K</span>
+                            </div>
+                        </div>
+                        <svg class="accordion-icon">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
+                        </svg>
+                    </button>
+                    <div class="panel">
+                        <div class="roulette__item">
+                            <div class="roulette__item-body spades">
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
 
-<script type="text/javascript" src="{% static 'js/roulette_bids.js'%}"></script>
-<script src="{% static 'js/roulette.js' %}"></script>
+    <script src="{% static 'js/chat.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/roulette_bids.js' %}"></script>
+    <script src="{% static 'js/roulette.js' %}"></script>
+
 {% endblock %}

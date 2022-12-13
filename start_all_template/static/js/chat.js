@@ -73,10 +73,33 @@ if (data.message && data.chat_type === 'all_chat') {
         spanMessage.innerHTML = `${data.message}`
 
         p.appendChild(spanMessage)
+
+        const divButtons = document.createElement('div')
+        divButtons.className = 'online-chat-buttons'
+        li.appendChild(divButtons)
+
+        const btnDelete = document.createElement('button')
+        btnDelete.type = 'submit'
+        btnDelete.onclick = ()=>onClickDeleteHandler()
+        btnDelete.className = 'online__chat-img'
+        divButtons.appendChild(btnDelete)
+
+        const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
+        btnDelete.appendChild(svgDel)
+
+        const btnBan = document.createElement('button')
+        btnBan.type = 'submit'
+        btnBan.onclick = ()=>onClickBanHandler()
+        btnBan.className = 'online__chat-img'
+        divButtons.appendChild(btnBan)
+
+        const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
+        btnBan.appendChild(svgBan)
     }
     if (data.chat_type === 'all_chat_list') {
         const set = new Set(data.list);
-        console.log("list_50")
         for (let count of set) {
             const data = count
 
@@ -91,8 +114,6 @@ if (data.message && data.chat_type === 'all_chat') {
             const divRub = document.createElement('div')
             divRub.className = 'online-chat__li-rubin'
             divWrap.appendChild(divRub)
-            console.log(data.rubin, 'ETO RUBIN')
-            console.log(data.avatar, 'ETO AVATAR')
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
             svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
             divRub.appendChild(svg)
@@ -115,7 +136,41 @@ if (data.message && data.chat_type === 'all_chat') {
             spanMessage.innerHTML = `${data.message}`
 
             p.appendChild(spanMessage)
+
+            const divButtons = document.createElement('div')
+            divButtons.className = 'online-chat-buttons'
+            li.appendChild(divButtons)
+
+            const btnDelete = document.createElement('button')
+            btnDelete.type = 'submit'
+            btnDelete.onclick = ()=>onClickDeleteHandler()
+            btnDelete.className = 'online__chat-img'
+            divButtons.appendChild(btnDelete)
+
+            const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
+            btnDelete.appendChild(svgDel)
+
+            const btnBan = document.createElement('button')
+            btnBan.type = 'submit'
+            btnBan.onclick = ()=>onClickBanHandler()
+            btnBan.className = 'online__chat-img'
+            divButtons.appendChild(btnBan)
+
+            const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
+            btnBan.appendChild(svgBan)
         }
+    }
+    if (data.lvlup) {
+            level_data_next = document.querySelector('.level_data_next')
+            level_data_back = document.querySelector('.level_data_back')
+            level_data_back.innerHTML = data.lvlup.levels + 'ур.'
+            level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
+            }
+    if (data.expr){
+        level_line = document.querySelector('.header__profile-line_span')
+        level_line.style.width = data.expr.percent + '%'
     }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
@@ -157,3 +212,9 @@ chatSocket.onopen = function (e) {
     }));
 
 };
+const onClickDeleteHandler=()=>{
+    alert('delete message')
+}
+const onClickBanHandler=()=>{
+    alert('ban message')
+}

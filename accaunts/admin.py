@@ -3,9 +3,10 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, DayHash, RouletteRound
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, ItemForUser, DayHash, RouletteRound
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
+from caseapp.models import OwnedCase
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
 admin.site.unregister(UserSocialAuth)
@@ -13,6 +14,15 @@ admin.site.unregister(Nonce)
 admin.site.unregister(Association)
 
 admin.site.register(RouletteRound)
+
+class OwnedCaseTabularInline(admin.TabularInline):
+    model = OwnedCase
+    extra = 1
+
+class ItemForUserInline(admin.TabularInline):
+    model = ItemForUser
+    extra = 0
+
 
 @admin.register(ReferalUser)
 class ReferalUserAdmin(admin.ModelAdmin):
@@ -56,7 +66,8 @@ class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
     list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
     search_fields = 'usernameinfo',
-    inlines = [UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline]
+    inlines = [UserAgentInline, UserIPInline, DetailUserInline,
+               ReferalCodeInline, GameIDInline, BanInline,OwnedCaseTabularInline,ItemForUserInline]
     readonly_fields = 'preview',
     fieldsets = (
         (None, {'fields': ('username', 'password')}),

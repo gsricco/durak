@@ -54,4 +54,4 @@ celery -A configs flower beat -l INFO --scheduler django_celery_beat.schedulers:
 
 celery -A configs beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
-celery -A configs worker --loglevel=info
+celery -A configs worker --loglevel=info 
