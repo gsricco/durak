@@ -216,7 +216,7 @@ class GameID(models.Model):
 
 class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
-    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
+    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, null=True)
     ban_site = models.BooleanField(verbose_name='Бан пользователя на сайте', default=False)
     ban_chat = models.BooleanField(verbose_name='Бан пользователя в общем чате', default=False)
     ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)         #Надоли по IP????
