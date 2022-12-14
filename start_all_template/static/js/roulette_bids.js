@@ -3,6 +3,15 @@ const bidsBlock = document.querySelectorAll('.roulette__item-body')
 const bidsButtons = document.querySelectorAll('.roulette__radio-item')
 let balanceUserShow;
 
+var heartsCountsShow;
+var heartsCounts;
+var coinCounts;
+var spadesCounts;
+var coinCountsShow ;
+var spadesCountsShow ;
+
+
+
 // const createBidItemRow = (data) => {
 //     const bidItemBlock = document.querySelector(`.${data.bet.bidCard}`)
 //
@@ -53,12 +62,12 @@ const createBidItems = (data) => {
     console.log(username,'USERNAME')
 
     let usersId = (Object.keys(data))
-    let heartsCounts = 0;
-    let coinCounts = 0;
-    let spadesCounts = 0;
-    let heartsCountsShow = '';
-    let coinCountsShow = '';
-    let spadesCountsShow = '';
+    heartsCounts = 0;
+    coinCounts = 0;
+    spadesCounts = 0;
+    heartsCountsShow = '';
+    coinCountsShow = '';
+    spadesCountsShow = '';
     let usersBids=[]
     usersId.map(user => {
 //суммирование в заголовке
@@ -76,8 +85,10 @@ const createBidItems = (data) => {
                 if (heartsCounts / 1000 > 0 && heartsCounts / 1000 < 10) {
                     heartsCountsShow = `${heartsCounts}`
                 }
-                document.querySelector('#titleHearts').innerHTML = `Черви: `;
-                document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
+                if(window.screen.width>768){
+                    document.querySelector('#titleHearts').innerHTML = `Черви: `;
+                    document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
+                }else{document.querySelector('#spanCardHeartsMob').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`}
             }
             if (data[user]['amount']['coin']) {
                 coinCounts += data[user]['amount']['coin']
@@ -92,9 +103,10 @@ const createBidItems = (data) => {
                 if (coinCounts / 1000 > 0 && coinCounts / 1000 < 10) {
                     coinCountsShow = `${coinCounts}`
                 }
-                document.querySelector('#titleCoin').innerHTML = `Монета: `;
-                document.querySelector('#spanCardCoin').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
-
+                if(window.screen.width>768){
+                    document.querySelector('#titleCoin').innerHTML = `Монета: `;
+                    document.querySelector('#spanCardCoin').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
+                }else{document.querySelector('#spanCardCoinMob').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`}
             }
             if (data[user]['amount']['spades']) {
                 spadesCounts += data[user]['amount']['spades']
@@ -109,8 +121,10 @@ const createBidItems = (data) => {
                 if (spadesCounts / 1000 > 0 && spadesCounts / 1000 < 10) {
                     spadesCountsShow = `${spadesCounts}`
                 }
-                document.querySelector('#titleSpades').innerHTML = `Пики: `;
-                document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`
+                if(window.screen.width>768) {
+                    document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`;
+                    document.querySelector('#titleSpades').innerHTML = `Пики: `;
+                } else {document.querySelector('#spanCardSpadesMob').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`}
             }
         }
         let objAmount = data[user]['amount']

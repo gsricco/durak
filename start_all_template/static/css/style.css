@@ -9792,6 +9792,11 @@ margin-top: 36px;
     transform: translate3d(-470px, 0, 0);
   }
 }
+@media (max-width: 360px) {
+  .list {
+    transform: translate3d(-740px, 0, 0);
+  }
+}
 /*@media (min-width: 410px) and (max-width: 570px) {*/
 /*  .list {*/
 /*    transform: translate3d(-845px, 0, 0);*/
