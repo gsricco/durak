@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'caseapp',
     'bot_payment',
 
-    'robokassa_pay',  # оплата через карты и др.
+    'pay',  # оплата через карты и др.
 ]
 
 MIDDLEWARE = [
@@ -215,3 +215,5 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IGNORE_RESULT = True
+
+

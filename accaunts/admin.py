@@ -3,6 +3,8 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
+
+from pay.models import Popoln
 from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, \
     AvatarProfile
 from .forms import LevelForm
@@ -51,6 +53,11 @@ class BanInline(admin.TabularInline):
     extra = 0
 
 
+class PopolnInline(admin.TabularInline):
+    model = Popoln
+    extra = 0
+
+
 @admin.register(AvatarProfile)
 class AvatarProfileAdmin(admin.ModelAdmin):
     """Аватарки профиля (стандартные)"""
@@ -72,7 +79,6 @@ class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
     list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
     search_fields = 'usernameinfo',
-    inlines = [UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline]
     readonly_fields = 'preview',
     fieldsets = (
         (None, {'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default', 'username', 'password')}),
@@ -81,6 +87,7 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('last_login', 'date_joined')}),
         ('Игровые данные', {'fields': ('experience', 'level')})
     )
+    inlines = [UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline, PopolnInline]
 
     def preview(self, obj):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')

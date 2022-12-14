@@ -46,7 +46,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ws_chat/', include('ws_chat.urls')),
     path('refill_chat/', include('bot_payment.urls')),
-    path('pay/', include('robokassa_pay.urls')),  # оплата через карты и др.
+    path('pay/', include('pay.urls')),  # оплата через карты и др.
     path('ckeditor/', include('ckeditor_uploader.urls')),  # редактор текста в админке
     path('', include('content_manager.urls')),  # управление контентом на сайте
     path('', include('django.contrib.auth.urls')),  # выход из личного кабинета
