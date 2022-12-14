@@ -9,6 +9,7 @@
    flex-direction: column;
    align-items: stretch;
 }
+
 .admin_support_chat_wrapper p{
    border-radius: 5px;
    text-align: center;
@@ -16,9 +17,13 @@
    background: #c4364e;
 
 }
-.admin_support_chat_wrapper p:active{
-   background:#96283a ;
+.active_room{
+   background: white !important;
+   color: black;
 }
+/*.admin_support_chat_wrapper p:active{*/
+/*   background: red;*/
+/*}*/
 .admin_support_chat_wrapper p:hover{
    /*opacity: 0.5;*/
    cursor: pointer;

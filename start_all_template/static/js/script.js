@@ -25,9 +25,9 @@ window.addEventListener("DOMContentLoaded", () => {
     if (document.querySelector(".header")) {
         window.addEventListener("resize", function () {
             if (document.documentElement.clientWidth < 540) {
-                document
-                    .querySelector(".header__profile")
-                    .append(document.querySelector(".header__profile-progressbar"));
+                // document
+                //     .querySelector(".header__profile")
+                //     .append(document.querySelector(".header__profile-progressbar"));
                 document
                     .querySelector(".header__profile")
                     .append(document.querySelector(".header__btns"));
@@ -35,8 +35,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (document.documentElement.clientWidth > 540) {
                 document
-                    .querySelector(".header__profile-info")
-                    .append(document.querySelector(".header__profile-progressbar"));
+                    // .querySelector(".header__profile-info")
+                    // .append(document.querySelector(".header__profile-progressbar"));
                 document
                     .querySelector(".header__profile-info")
                     .append(document.querySelector(".header__btns"));
@@ -55,8 +55,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (document.documentElement.clientWidth < 540) {
             document
-                .querySelector(".header__profile")
-                .append(document.querySelector(".header__profile-progressbar"));
+                // .querySelector(".header__profile")
+                // .append(document.querySelector(".header__profile-progressbar"));
             document
                 .querySelector(".header__profile")
                 .append(document.querySelector(".header__btns"));
@@ -64,8 +64,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (document.documentElement.clientWidth > 540) {
             document
-                .querySelector(".header__profile-info")
-                .append(document.querySelector(".header__profile-progressbar"));
+                // .querySelector(".header__profile-info")
+                // .append(document.querySelector(".header__profile-progressbar"));
             document
                 .querySelector(".header__profile-info")
                 .append(document.querySelector(".header__btns"));
@@ -83,15 +83,15 @@ window.addEventListener("DOMContentLoaded", () => {
     if (document.querySelector(".profil")) {
         window.addEventListener("resize", function () {
             if (document.documentElement.clientWidth < 541) {
-                document
-                    .querySelector(".profil__name-text")
-                    .prepend(document.querySelector(".profil__progressbar-lvl-img"));
-                document
-                    .querySelector(".profil__name-text")
-                    .append(document.querySelector(".profil__progressbar-lvl-num"));
-                document
-                    .querySelector(".profil__progressbar-row")
-                    .append(document.querySelector(".profil__progressbar-lvl-progress"));
+                // document
+                //     .querySelector(".profil__name-text")
+                //     .prepend(document.querySelector(".profil__progressbar-lvl-img"));
+                // document
+                //     .querySelector(".profil__name-text")
+                //     .append(document.querySelector(".profil__progressbar-lvl-num"));
+                // document
+                //     .querySelector(".profil__progressbar-row")
+                //     .append(document.querySelector(".profil__progressbar-lvl-progress"));
                 document
                     .querySelector(".profil__row")
                     .append(document.querySelector(".profil__btns"));
@@ -99,14 +99,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (document.documentElement.clientWidth > 541) {
                 document
-                    .querySelector(".profil__progressbar-lvl")
-                    .append(document.querySelector(".profil__progressbar-lvl-img"));
-                document
-                    .querySelector(".profil__progressbar-lvl")
-                    .append(document.querySelector(".profil__progressbar-lvl-num"));
-                document
-                    .querySelector(".profil__progressbar-lvl")
-                    .append(document.querySelector(".profil__progressbar-lvl-progress"));
+                //     .querySelector(".profil__progressbar-lvl")
+                //     .append(document.querySelector(".profil__progressbar-lvl-img"));
+                // document
+                //     .querySelector(".profil__progressbar-lvl")
+                //     .append(document.querySelector(".profil__progressbar-lvl-num"));
+                // document
+                //     .querySelector(".profil__progressbar-lvl")
+                //     .append(document.querySelector(".profil__progressbar-lvl-progress"));
                 document
                     .querySelector(".profil__info")
                     .append(document.querySelector(".profil__btns"));
@@ -115,29 +115,29 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (document.documentElement.clientWidth < 541) {
             document
-                .querySelector(".profil__name-text")
-                .prepend(document.querySelector(".profil__progressbar-lvl-img"));
-            document
-                .querySelector(".profil__name-text")
-                .append(document.querySelector(".profil__progressbar-lvl-num"));
-            document
-                .querySelector(".profil__progressbar-row")
-                .append(document.querySelector(".profil__progressbar-lvl-progress"));
+            //     .querySelector(".profil__name-text")
+            //     .prepend(document.querySelector(".profil__progressbar-lvl-img"));
+            // document
+            //     .querySelector(".profil__name-text")
+            //     .append(document.querySelector(".profil__progressbar-lvl-num"));
+            // document
+            //     .querySelector(".profil__progressbar-row")
+            //     .append(document.querySelector(".profil__progressbar-lvl-progress"));
             document
                 .querySelector(".profil__row")
                 .append(document.querySelector(".profil__btns"));
         }
 
         if (document.documentElement.clientWidth > 541) {
-            document
-                .querySelector(".profil__progressbar-lvl")
-                .append(document.querySelector(".profil__progressbar-lvl-img"));
-            document
-                .querySelector(".profil__progressbar-lvl")
-                .append(document.querySelector(".profil__progressbar-lvl-num"));
-            document
-                .querySelector(".profil__progressbar-lvl")
-                .append(document.querySelector(".profil__progressbar-lvl-progress"));
+            // document
+            //     .querySelector(".profil__progressbar-lvl")
+                // .append(document.querySelector(".profil__progressbar-lvl-img"));
+            // document
+            //     .querySelector(".profil__progressbar-lvl")
+                // .append(document.querySelector(".profil__progressbar-lvl-num"));
+            // document
+            //     .querySelector(".profil__progressbar-lvl")
+                // .append(document.querySelector(".profil__progressbar-lvl-progress"));
             document
                 .querySelector(".profil__info")
                 .append(document.querySelector(".profil__btns"));

@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, ItemForUser
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, ItemForUser, DayHash, RouletteRound
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
@@ -13,6 +13,7 @@ admin.site.unregister(UserSocialAuth)
 admin.site.unregister(Nonce)
 admin.site.unregister(Association)
 
+admin.site.register(RouletteRound)
 
 class OwnedCaseTabularInline(admin.TabularInline):
     model = OwnedCase
@@ -21,6 +22,7 @@ class OwnedCaseTabularInline(admin.TabularInline):
 class ItemForUserInline(admin.TabularInline):
     model = ItemForUser
     extra = 0
+
 
 @admin.register(ReferalUser)
 class ReferalUserAdmin(admin.ModelAdmin):
@@ -122,6 +124,15 @@ class LevelAdmin(admin.ModelAdmin):
             return 'Нет изображения'
 
     preview.short_description = 'Картинка уровня'
+
+@admin.register(Ban)
+class BanUserAdmin(admin.ModelAdmin):
+    list_display = 'user','ban_site', 'ban_chat',  'ban_ip'
+    search_fields = 'user__id', 'user__username',
+
+@admin.register(DayHash)
+class DayHashAdmin(admin.ModelAdmin):
+    readonly_fields = 'private_key', 'public_key'
 
 
 # admin.site.register(ReferalUser)

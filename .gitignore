@@ -13,6 +13,8 @@ __pycache__/
 content_manager/migrations/*.py
 accaunts/migrations/*.py
 support_chat/migrations/*.py
+bot_payment/migrations/*.py
+!bot_payment/migrations/__init__.py
 */migrations/*.py
 # C extensions
 *.so
