@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from accaunts.models import Level
 
 channel_layer = get_channel_layer()
-r = Redis()
+r = Redis(encoding="utf-8", decode_responses=True)
 # ROUND_RESULTS = (
 #                  ('spades', 101), ('hearts', 103),
 #                  ('spades', 105), ('hearts', 107),
@@ -67,7 +67,7 @@ def sender():
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'roulette_countdown_starter',
-                                                'round': r.get('round').decode('utf-8')
+                                                'round': r.get('round')
                                             }
                                             )
     r.json().delete('round_bets')
@@ -99,6 +99,7 @@ def roll():
         check_rounds()
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     result = current_round.round_roll
+    print(result, 'eto result')
     # result = random.choice(ROUND_RESULTS)
     result_c = random.choice(ROUND_NUMBERS[result])
     position = random.random()
@@ -135,7 +136,7 @@ def stop():
     t = datetime.datetime.now()
     r.set('state', 'stop', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
-    winner = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
+    winner = r.get(ROUND_RESULT_FIELD_NAME)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'stopper',
@@ -219,7 +220,7 @@ def save_round_results(bets_keys, bets_info):
     """
     total_amount = 0
     winners = []
-    round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
+    round_result = r.get(ROUND_RESULT_FIELD_NAME)
 
     for user_pk, bet in bets_info.items():
         # накапливает общую сумму ставок
@@ -259,7 +260,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     print(f"Users with a bet: f{users}")
 
     # Get round results
-    round_result = r.get(round_result_field_name).decode("utf-8")
+    round_result = r.get(round_result_field_name)
     print(f"Current round result: {round_result}")
 
     # список с наградами пользователей за новые уровни -

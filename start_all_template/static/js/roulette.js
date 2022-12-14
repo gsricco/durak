@@ -194,6 +194,8 @@ function super_new(f){
         let ws_connect = f.apply(this, arguments);
         let data = JSON.parse(arguments[0].data)
         if (data.init) {
+            console.log('eto init', data.init.previous_rolls)
+            previous_rolls(data.init.previous_rolls)
         if (data.init.state === 'countdown') {
             let timeNow = Date.now()
             let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
@@ -383,20 +385,7 @@ function super_new(f){
         }}
 
     if (data.back) {
-        //winnerCard from backend
-        // let rollCards = ['hearts', 'spades', 'hearts','hearts','hearts', 'hearts','hearts', 'spades'] //-message back roll
-        let rollCards = data.previous_rolls
-        let rollWinnerOld = document.querySelector('.roulette__previous-items');
-        rollWinnerOld.innerHTML = ``
-        rollCards.map(roll=>{
-            rollWinnerOld.innerHTML += `
-            <div class="roulette__previous-item">
-                <svg>
-                    <use xlink:href="${static_prefix}/img/icons/sprite.svg#${roll}_stroke_grey"></use>
-                </svg>
-            </div>
-            `
-        })
+        previous_rolls(data.previous_rolls)
         returnToStartPosition()
     }
     if (data.roulette) {
@@ -417,3 +406,18 @@ function super_new(f){
     }
 
 }}
+// Отрисовка предыдущих победителей
+function previous_rolls(rolls){
+    console.log('eto prev roll', rolls)
+        let rollWinnerOld = document.querySelector('.roulette__previous-items');
+        rollWinnerOld.innerHTML = ``
+        rolls.map(roll=>{
+            rollWinnerOld.innerHTML += `
+            <div class="roulette__previous-item">
+                <svg>
+                    <use xlink:href="${static_prefix}/img/icons/sprite.svg#${roll}_stroke_grey"></use>
+                </svg>
+            </div>
+            `
+        })
+}

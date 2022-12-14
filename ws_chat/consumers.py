@@ -22,7 +22,7 @@ from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 # подключаемся к редису
-r = redis.Redis()
+r = redis.Redis(encoding="utf-8", decode_responses=True)
 
 from django.contrib.auth.decorators import user_passes_test
 
@@ -628,11 +628,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         state = r.get('state')
 
         t = r.get('start:time')
-        message = {'init': {"state": state.decode('utf-8'),
-                            "t": str(t.decode('utf-8'))}
+        message = {'init': {"state": state,
+                            "t": str(t),
+                            "previous_rolls": r.json().get('last_winners'),
+                            }
                    }
-        if state.decode('utf-8') == 'rolling':
-            round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
+        if state == 'rolling':
+            round_result = r.get(ROUND_RESULT_FIELD_NAME)
             message['init']['winner'] = round_result
         await self.send(json.dumps(message))
 
