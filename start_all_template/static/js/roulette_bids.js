@@ -7,9 +7,8 @@ var heartsCountsShow;
 var heartsCounts;
 var coinCounts;
 var spadesCounts;
-var coinCountsShow ;
-var spadesCountsShow ;
-
+var coinCountsShow;
+var spadesCountsShow;
 
 
 // const createBidItemRow = (data) => {
@@ -58,8 +57,8 @@ const createBidItems = (data) => {
     document.querySelector(`.coin`).innerHTML = ''
     document.querySelector(`.spades`).innerHTML = ''
 
-    console.log(data,'Datas')
-    console.log(username,'USERNAME')
+    console.log(data, 'Datas')
+    console.log(username, 'USERNAME')
 
     let usersId = (Object.keys(data))
     heartsCounts = 0;
@@ -68,10 +67,10 @@ const createBidItems = (data) => {
     heartsCountsShow = '';
     coinCountsShow = '';
     spadesCountsShow = '';
-    let usersBids=[]
+    let usersBids = []
     usersId.map(user => {
 //суммирование в заголовке
-        if(data[user]['userName']===username) {
+        if (data[user]['userName'] === username) {
             if (data[user]['amount']['hearts']) {
                 heartsCounts += data[user]['amount']['hearts']
                 if (heartsCounts / 1000 > 9 && heartsCounts / 1000 < 1000) {
@@ -85,10 +84,10 @@ const createBidItems = (data) => {
                 if (heartsCounts / 1000 > 0 && heartsCounts / 1000 < 10) {
                     heartsCountsShow = `${heartsCounts}`
                 }
-                if(window.screen.width>768){
-                    document.querySelector('#titleHearts').innerHTML = `Черви: `;
-                    document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
-                }else{document.querySelector('#spanCardHeartsMob').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`}
+                document.querySelector('#titleHearts').innerHTML = `Черви: `;
+                document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
+                document.querySelector('#spanCardHeartsMob').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
+
             }
             if (data[user]['amount']['coin']) {
                 coinCounts += data[user]['amount']['coin']
@@ -103,11 +102,11 @@ const createBidItems = (data) => {
                 if (coinCounts / 1000 > 0 && coinCounts / 1000 < 10) {
                     coinCountsShow = `${coinCounts}`
                 }
-                if(window.screen.width>768){
-                    document.querySelector('#titleCoin').innerHTML = `Монета: `;
-                    document.querySelector('#spanCardCoin').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
-                }else{document.querySelector('#spanCardCoinMob').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`}
+                document.querySelector('#titleCoin').innerHTML = `Монета: `;
+                document.querySelector('#spanCardCoin').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
+                document.querySelector('#spanCardCoinMob').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
             }
+
             if (data[user]['amount']['spades']) {
                 spadesCounts += data[user]['amount']['spades']
                 if (spadesCounts / 1000 > 9 && spadesCounts / 1000 < 1000) {
@@ -121,12 +120,12 @@ const createBidItems = (data) => {
                 if (spadesCounts / 1000 > 0 && spadesCounts / 1000 < 10) {
                     spadesCountsShow = `${spadesCounts}`
                 }
-                if(window.screen.width>768) {
-                    document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`;
-                    document.querySelector('#titleSpades').innerHTML = `Пики: `;
-                } else {document.querySelector('#spanCardSpadesMob').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`}
+                document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`;
+                document.querySelector('#titleSpades').innerHTML = `Пики: `;
+                document.querySelector('#spanCardSpadesMob').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`
             }
         }
+
         let objAmount = data[user]['amount']
         let keys = Object.keys(objAmount); //получаем ключи объекта в виде массива
         let avatar = data[user]['avatar']
@@ -143,45 +142,45 @@ const createBidItems = (data) => {
             }
             usersBids.push(user)//создание массива всех ставок
 
-            usersBids.sort((a,b)=>b.bidCount - a.bidCount)//сортировка по ставкам
+            usersBids.sort((a, b) => b.bidCount - a.bidCount)//сортировка по ставкам
         })
     })
 
 
-    usersBids.map(el=>{
-                // отрисовка  ставки одной масти одного пользователя
-                const bidItemBlock = document.querySelector(`.${el.bidCard}`)
+    usersBids.map(el => {
+        // отрисовка  ставки одной масти одного пользователя
+        const bidItemBlock = document.querySelector(`.${el.bidCard}`)
 
-                const bidItem = document.createElement('div')
-                bidItem.className = 'roulette__item-row'
-                bidItemBlock.appendChild(bidItem)
+        const bidItem = document.createElement('div')
+        bidItem.className = 'roulette__item-row'
+        bidItemBlock.appendChild(bidItem)
 
-                const bidItemLeftBlock = document.createElement('div')
-                bidItemLeftBlock.className = 'roulette__item-left'
-                bidItem.appendChild(bidItemLeftBlock)
+        const bidItemLeftBlock = document.createElement('div')
+        bidItemLeftBlock.className = 'roulette__item-left'
+        bidItem.appendChild(bidItemLeftBlock)
 
-                const itemMoney = document.createElement('div')
-                itemMoney.className = 'roulette__item-money'
-                itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${el.bidCount}`
-                bidItem.appendChild(itemMoney)
+        const itemMoney = document.createElement('div')
+        itemMoney.className = 'roulette__item-money'
+        itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${el.bidCount}`
+        bidItem.appendChild(itemMoney)
 
-                const itemAvatar = document.createElement('div')
-                itemAvatar.className = 'roulette__item-avatar'
-                itemAvatar.innerHTML = `<img src="${el.avatar}" alt="">`
-                bidItemLeftBlock.appendChild(itemAvatar)
+        const itemAvatar = document.createElement('div')
+        itemAvatar.className = 'roulette__item-avatar'
+        itemAvatar.innerHTML = `<img src="${el.avatar}" alt="">`
+        bidItemLeftBlock.appendChild(itemAvatar)
 
-                const itemStone = document.createElement('div')
-                itemStone.className = 'roulette__item-stoun'
-                const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${el.rubin}"></use>`
-                itemStone.appendChild(stone)
-                bidItemLeftBlock.appendChild(itemStone)
+        const itemStone = document.createElement('div')
+        itemStone.className = 'roulette__item-stoun'
+        const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+        stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${el.rubin}"></use>`
+        itemStone.appendChild(stone)
+        bidItemLeftBlock.appendChild(itemStone)
 
-                const itemUserName = document.createElement('div')
-                itemUserName.className = 'roulette__item-username'
-                itemUserName.innerHTML = `${el.userName}`
-                bidItemLeftBlock.appendChild(itemUserName)
-            })
+        const itemUserName = document.createElement('div')
+        itemUserName.className = 'roulette__item-username'
+        itemUserName.innerHTML = `${el.userName}`
+        bidItemLeftBlock.appendChild(itemUserName)
+    })
 }
 
 // const items = document.querySelectorAll('.roulette__radio-item > label')

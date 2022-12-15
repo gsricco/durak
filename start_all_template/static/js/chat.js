@@ -9,6 +9,7 @@ const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
 const UserBalance = document.querySelector('.header__profile-sum>span')
 const online = document.querySelector('.online-chat__current')
+const onlineMob = document.querySelector('#onlineChatMob')
 // WS Connection
 const chatSocket = new WebSocket(
     'ws://'
@@ -34,6 +35,7 @@ chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
     if (data.get_online > 0) {
         online.innerHTML = `${data.get_online}`
+        onlineMob.innerHTML = `${data.get_online}`
     }
 
 if (data.message && data.chat_type === 'all_chat') {

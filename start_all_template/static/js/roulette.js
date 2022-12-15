@@ -55,6 +55,7 @@ function generateItems(winnerCard, cardNumber) {
 
     }
 }
+
 // анимация прокрутки
 function startRoll(winnerCard, cardNumber, cardPosition) {
     list.innerHTML = '';
@@ -93,7 +94,21 @@ function startRoll(winnerCard, cardNumber, cardPosition) {
 // анимация возврата после прокрутки
 const returnToStartPosition = () => {
     let trWidth;
-    if (window.screen.width === 1280) trWidth = 500; else if (window.screen.width === 1920) trWidth = 380; else  if (window.screen.width === 360) trWidth = 740;
+    // if (window.screen.width === 1280) trWidth = 500; else if (window.screen.width === 1920) trWidth = 380; else  if (window.screen.width === 360) trWidth = 740;
+    if (window.screen.width === 1920) trWidth = 380;
+    if (window.screen.width === 1366) trWidth = 470;
+    if (window.screen.width === 1280) trWidth = 500;
+    if (window.screen.width === 1080) trWidth = 530;
+    if (window.screen.width === 1024) trWidth = 550;
+    if (window.screen.width === 991) trWidth = 420;
+    if (window.screen.width === 800) trWidth = 515;
+    if (window.screen.width === 767) trWidth = 530;
+    if (window.screen.width === 750) trWidth = 530;
+    if (window.screen.width === 640) trWidth = 590;
+    if (window.screen.width === 414) trWidth = 850;
+    if (window.screen.width === 412) trWidth = 860;
+    if (window.screen.width === 375) trWidth = 650;
+    if (window.screen.width === 360) trWidth = 655;
 
 
     list.style.left = '0%'
@@ -188,163 +203,125 @@ chatSocket.onmessage = super_new(chatSocket.onmessage);
 //         });
 //     });
 // }
-function super_new(f){
-    return function (){
+function super_new(f) {
+    return function () {
         let ws_connect = f.apply(this, arguments);
         let data = JSON.parse(arguments[0].data)
         if (data.init) {
             console.log('eto init', data.init.previous_rolls)
             previous_rolls(data.init.previous_rolls)
-        if (data.init.state === 'countdown') {
-            let timeNow = Date.now()
-            let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
-            timerCounter(remainTime)
+            if (data.init.state === 'countdown') {
+                let timeNow = Date.now()
+                let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
+                timerCounter(remainTime)
+            }
+            if (data.init.state === 'rolling') {
+
+                startRoll(data.init.winner)
+
+            }
         }
-        if (data.init.state === 'rolling') {
-
-            startRoll(data.init.winner)
-
+        if (data.current_balance) {
+            UserBalance.innerHTML = `${data.current_balance}`
         }
-    }
-    if (data.current_balance) {
-        UserBalance.innerHTML = `${data.current_balance}`
-    }
 
-    if (data.from_json) {
-        createBidItems(data.from_json)
-    }
-    if (data.roll) {
-        console.log(data, 'new data for BIDS')
-        startRoll(data.winner, data.c, data.p)
-    }
-    // if (data.stop) {
-    //     let winnerCard = data.w
-    //     //winnerCard from backend
-    //     // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-    //     // console.log(winnerCard)
-    //     let bidsNumber = document.querySelectorAll('.roulette__item-money')
-    //     const bidsButtons = document.querySelectorAll('.roulette__radio-item')
-    //     bidsNumber.forEach(el => {
-    //         el.style.color = 'red'
-    //     })}
+        if (data.from_json) {
+            createBidItems(data.from_json)
+        }
+        if (data.roll) {
+            console.log(data, 'new data for BIDS')
+            startRoll(data.winner, data.c, data.p)
+        }
+
         if (data.stop) {
-        let winnerCard = data.w
-        //winnerCard from backend
-        // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-        let bidsNumber = document.querySelectorAll('.roulette__item-money')
-        const bidsButtons = document.querySelectorAll('.roulette__radio-item')
-        let signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
-        let signWinnercoin = document.querySelectorAll('#signWinnercoin');
-        let signWinnerspades = document.querySelectorAll('#signWinnerspades');
-        let userUser = document.querySelector('.header__profile-name>span').textContent
-            console.log(userUser,'UserUser')
+            let winnerCard = data.w
+            //winnerCard from backend
+            // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
+            let bidsNumber = document.querySelectorAll('.roulette__item-money')
+            let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
+            const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+            let signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
+            let signWinnercoin = document.querySelectorAll('#signWinnercoin');
+            let signWinnerspades = document.querySelectorAll('#signWinnerspades');
+            let userUser = document.querySelector('.header__profile-name>span').textContent
+            console.log(userUser, 'UserUser')
 
-        bidsNumber.forEach(el => {
-            el.style.color = '#C4364E'
-            document.querySelector('#spanCardHearts').style.color = '#C4364E';
-            document.querySelector('#spanCardCoin').style.color = '#C4364E';
-            document.querySelector('#spanCardSpades').style.color = '#C4364E';
-             if(signWinnerhearts){
-                 signWinnerhearts.forEach(s=>{
-                     s.innerHTML=`-`;
-                 })
-             }
-            if(signWinnercoin){
-                signWinnercoin.forEach(s=>{
-                    s.innerHTML=`-`;
-                })
-            }
-            if(signWinnerspades){
-                signWinnerspades.forEach(s=>{
-                    s.innerHTML=`-`;
-                })
-            }
-
-            if (document.querySelector('#signWinnerhearts')) document.querySelector('#signWinnerhearts').innerHTML = '-';
-            if(document.querySelector('#signWinnercoin'))document.querySelector('#signWinnercoin').innerHTML = '-';
-            if(document.querySelector('#signWinnerspades'))document.querySelector('#signWinnerspades').innerHTML = '-';
-        })
-    //     if (winnerCard === 'hearts') {
-    //         let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
-    //         bidsNumber.forEach(el => {
-    //             //обновление баланса user////
-    //             let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-    //             console.log(balanceUser)
-    //             // /////////////////////
-    //             el.style.color = 'green'
-    //             document.querySelector('.hearts').style.opacity = '1'
-    //             bidsButtons[0].style.opacity = '1'
-    //         })
-    //     } else if (winnerCard === 'coin') {
-    //         let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
-    //         bidsNumber.forEach(el => {
-    //             //обновление баланса user////
-    //             let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-    //             console.log(balanceUser)
-    //             // /////////////////////
-    //             el.style.color = 'green'
-    //             document.querySelector('.coin').style.opacity = '1'
-    //             bidsButtons[1].style.opacity = '1'
-    //         })
-    //     } else if (winnerCard === 'spades') {
-    //         let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
-    //         bidsNumber.forEach(el => {
-    //             //обновление баланса user////
-    //             let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-    //             console.log(balanceUser)
-    //             // /////////////////////
-    //             el.style.color = 'green'
-    //             document.querySelector('.spades').style.opacity = '1'
-    //             bidsButtons[2].style.opacity = '1'
-    //         })
-    //     }
-    // }
-            if (winnerCard === 'hearts') {
-            let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
             bidsNumber.forEach(el => {
-                // //обновление баланса user////
-                // let balanceUser = `+ document.querySelector('.header__profile-sum>span').innerText`;
-                // console.log(balanceUser)
-                // // /////////////////////
-                el.style.color = '#5DD887'
+                el.style.color = '#C4364E'
+                document.querySelector('#spanCardHearts').style.color = '#C4364E';
+                document.querySelector('#spanCardCoin').style.color = '#C4364E';
+                document.querySelector('#spanCardSpades').style.color = '#C4364E';
 
-                if(signWinnerhearts){
-                    signWinnerhearts.forEach(s=>{
-                        s.innerHTML=`+`;
+                if (signWinnerhearts) {
+                    signWinnerhearts.forEach(s => {
+                        s.innerHTML = `-`;
+                    })
+                }
+                if (signWinnercoin) {
+                    signWinnercoin.forEach(s => {
+                        s.innerHTML = `-`;
+                    })
+                }
+                if (signWinnerspades) {
+                    signWinnerspades.forEach(s => {
+                        s.innerHTML = `-`;
                     })
                 }
 
-                    if (username === userUser) {
-                        if (document.querySelector('#spanCardHearts').textContent != '') {
-                            if (heartsCounts / 1000 > 9 && heartsCounts / 1000 < 1000) {
-                                heartsCountsShow = `${heartsCounts / 1000}K`
-                            } else {
-                                if (heartsCounts / 1000000 > 0) {
-                                    heartsCountsShow = `${heartsCounts / 1000000}M`
-                                } else
-                                    heartsCountsShow = `${heartsCounts}`
-                            }
-                            if (heartsCounts / 1000 > 0 && heartsCounts / 1000 < 10) {
-                                heartsCountsShow = `${heartsCounts * 2}`
-                            }
-                            if (window.screen.width > 768) {
-                                document.querySelector('#spanCardHearts').innerHTML = `+${heartsCountsShow}`;
-                                document.querySelector('#titleHearts').innerHTML = `Победа:`;
-                                document.querySelector('#signWinnerhearts').innerHTML = ' +';
-                            }
+                if (document.querySelector('#signWinnerhearts')) document.querySelector('#signWinnerhearts').innerHTML = '-';
+                if (document.querySelector('#signWinnercoin')) document.querySelector('#signWinnercoin').innerHTML = '-';
+                if (document.querySelector('#signWinnerspades')) document.querySelector('#signWinnerspades').innerHTML = '-';
 
-                            document.querySelector('#spanCardHearts').style.color = '#5DD887';
-                            document.querySelector('#roulHearts').style.border = '2px solid #5DD887';
-                            document.querySelector('#roulHearts').style.borderRadius = '5px';
+            })
+            bidsNumberMob.forEach(el => {
+                el.style.color = '#C4364E'
+                document.querySelector('#spanCardHeartsMob').style.color = '#C4364E';
+                document.querySelector('#spanCardCoinMob').style.color = '#C4364E';
+                document.querySelector('#spanCardSpadesMob').style.color = '#C4364E';
 
 
+                if (document.querySelector('#signWinnerhearts')) document.querySelector('#spanCardHeartsMob').innerHTML = `-${heartsCountsShow}`;
+                if (document.querySelector('#signWinnercoin')) document.querySelector('#spanCardCoinMob').innerHTML = `-${coinCountsShow}`;
+                if (document.querySelector('#signWinnerspades')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
+
+            })
+
+            if (winnerCard === 'hearts') {
+                let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
+                bidsNumber.forEach(el => {
+                    // //обновление баланса user////
+                    // let balanceUser = `+ document.querySelector('.header__profile-sum>span').innerText`;
+                    // console.log(balanceUser)
+                    // // /////////////////////
+                    el.style.color = '#5DD887'
+
+                    if (signWinnerhearts) {
+                        signWinnerhearts.forEach(s => {
+                            s.innerHTML = `+`;
+                        })
+                    }
+                    if (username === userUser && document.querySelector('#spanCardHearts').textContent != '') {
+                        if (heartsCounts*2 / 1000 > 9 && heartsCounts*2 / 1000 < 1000) {
+                            heartsCountsShow = `${heartsCounts*2 / 1000}K`
                         } else {
-                            if (window.screen.width < 768 && heartsCountsShow) {
-                                document.querySelector('#titleHearts').innerHTML = `Победа: +${heartsCountsShow}`;
-                                // document.querySelector('.roulette__item-bid').innerHTML = ``;
-                                // document.querySelector('#signWinnerhearts').innerHTML = '';
-
-                            }
+                            if (heartsCounts*2 / 1000000 > 0) {
+                                heartsCountsShow = `${heartsCounts*2/ 1000000}M`
+                            } else
+                                heartsCountsShow = `${heartsCounts*2}`
+                        }
+                        if (heartsCounts*2 / 1000 > 0 && heartsCounts*2 / 1000 < 10) {
+                            heartsCountsShow = `${heartsCounts * 2}`
+                        }
+                        document.querySelector('#spanCardHearts').innerHTML = `+${heartsCountsShow}`;
+                        document.querySelector('#titleHearts').innerHTML = `Победа:`;
+                        document.querySelector('#signWinnerhearts').innerHTML = ' +';
+                        document.querySelector('#spanCardHearts').style.color = '#5DD887';
+                        document.querySelector('#roulHearts').style.border = '1px solid #5DD887';
+                        document.querySelector('#roulHearts').style.borderRadius = '5px';
+                        if (window.screen.width < 768) {
+                            document.querySelector('#spanCardHeartsMob').innerHTML = `+${heartsCountsShow}`;
+                            document.querySelector('#spanCardHeartsMob').style.color = '#5DD887';
+                            document.querySelector('#itemHeartsBid').innerHTML = ``;
                         }
                     }
                     document.querySelector('.hearts').style.opacity = '1'
@@ -364,132 +341,125 @@ function super_new(f){
                         })
                     }
 
-
-                    if (username === userUser) {
-                        if (document.querySelector('#spanCardCoin').textContent != '') {
-                            if (coinCounts / 1000 > 9 && coinCounts / 1000 < 1000) {
-                                coinCountsShow = `${coinCounts / 1000}K`
-                            } else {
-                                if (coinCounts / 1000000 > 0) {
-                                    coinCountsShow = `${coinCounts / 1000000}M`
-                                } else
-                                    coinCountsShow = `${coinCounts}`
-                            }
-                            if (coinCounts / 1000 > 0 && coinCounts / 1000 < 10) {
-                                coinCountsShow = `${coinCounts * 14}`
-                            }
-                            if (window.screen.width > 768) {
-                                document.querySelector('#spanCardCoin').innerHTML = `+${coinCountsShow}`;
-                                document.querySelector('#titleCoin').innerHTML = `Победа:`;
-                                document.querySelector('#signWinnercoin').innerHTML = ' +';
-                            }
-
-                            document.querySelector('#spanCardCoin').style.color = '#5DD887';
-                            document.querySelector('#roulCoin').style.border = '2px solid #5DD887';
-                            document.querySelector('#roulCoin').style.borderRadius = '5px';
-
-
+                    if (username === userUser && document.querySelector('#spanCardCoin').textContent != '') {
+                        if (coinCounts*14 / 1000 > 9 && coinCounts*14 / 1000 < 1000) {
+                            coinCountsShow = `${coinCounts*14 / 1000}K`
                         } else {
-                            if (window.screen.width < 768 && username === coinCountsShow) {
-                                document.querySelector('#titleCoin').innerHTML = `Победа: +${coinCountsShow}`;
-                                // document.querySelector('.roulette__item-bid').innerHTML = ``;
-                                // document.querySelector('#signWinnercoin').innerHTML = '';
+                            if (coinCounts*14 / 1000000 > 0) {
+                                coinCountsShow = `${coinCounts*14 / 1000000}M`
+                            } else
+                                coinCountsShow = `${coinCounts*14}`
+                        }
+                        if (coinCounts*14 / 1000 > 0 && coinCounts*14 / 1000 < 10) {
+                            coinCountsShow = `${coinCounts * 14}`
+                        }
+                        document.querySelector('#spanCardCoin').innerHTML = `+${coinCountsShow}`;
+                        document.querySelector('#titleCoin').innerHTML = `Победа:`;
+                        document.querySelector('#signWinnercoin').innerHTML = ' +';
+                        document.querySelector('#spanCardCoin').style.color = '#5DD887';
+                        document.querySelector('#roulCoin').style.border = '1px solid #5DD887';
+                        document.querySelector('#roulCoin').style.borderRadius = '5px';
 
-                            }
+                        if (window.screen.width < 768) {
+                            document.querySelector('#spanCardCoinMob').innerHTML = `+${coinCountsShow}`;
+                            document.querySelector('#spanCardCoinMob').style.color = '#5DD887';
+                            document.querySelector('#itemCoinBid').innerHTML = ``;
                         }
                     }
                     document.querySelector('.coin').style.opacity = '1'
                     bidsButtons[1].style.opacity = '1'
 
-            })
-        } else if (winnerCard === 'spades') {
-            let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
-            bidsNumber.forEach(el => {
-                // //обновление баланса user////
-                // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                // console.log(balanceUser)
-                // // /////////////////////
-                el.style.color = 'green'
-                if(signWinnerspades){
-                    signWinnerspades.forEach(s=>{
-                        s.innerHTML=`+`;
-                    })
-                }
-                if (username === userUser) {
-                    if (document.querySelector('#spanCardSpades').textContent != '') {
-                        if (spadesCounts / 1000 > 9 && spadesCounts / 1000 < 1000) {
-                            spadesCountsShow = `${spadesCounts / 1000}K`
+                })
+            } else if (winnerCard === 'spades') {
+                let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
+                bidsNumber.forEach(el => {
+                    // //обновление баланса user////
+                    // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
+                    // console.log(balanceUser)
+                    // // /////////////////////
+                    el.style.color = 'green'
+                    if (signWinnerspades) {
+                        signWinnerspades.forEach(s => {
+                            s.innerHTML = `+`;
+                        })
+                    }
+                    if (username === userUser && document.querySelector('#spanCardSpades').textContent != '') {
+
+                        if (spadesCounts*2 / 1000 > 9 && spadesCounts *2/ 1000 < 1000) {
+                            spadesCountsShow = `${spadesCounts*2 / 1000}K`
                         } else {
-                            if (spadesCounts / 1000000 > 0) {
-                                spadesCountsShow = `${spadesCounts / 1000000}M`
+                            if (spadesCounts*2 / 1000000 > 0) {
+                                spadesCountsShow = `${spadesCounts *2/ 1000000}M`
                             } else
-                                spadesCountsShow = `${spadesCounts}`
+                                spadesCountsShow = `${spadesCounts*2}`
                         }
-                        if (spadesCounts / 1000 > 0 && spadesCounts / 1000 < 10) {
+                        if (spadesCounts*2 / 1000 > 0 && spadesCounts*2 / 1000 < 10) {
                             spadesCountsShow = `${spadesCounts * 2}`
                         }
-                        if (window.screen.width > 768) {
-                            document.querySelector('#spanCardSpades').innerHTML = `+${spadesCountsShow}`;
-                            document.querySelector('#titleSpades').innerHTML = `Победа:`;
-                            document.querySelector('#signWinnerspades').innerHTML = ' +';
-                        }
 
-
+                        document.querySelector('#spanCardSpades').innerHTML = `+${spadesCountsShow}`;
+                        document.querySelector('#titleSpades').innerHTML = `Победа:`;
+                        document.querySelector('#signWinnerspades').innerHTML = ' +';
                         document.querySelector('#spanCardSpades').style.color = '#5DD887';
-
-                        document.querySelector('#roulSpades').style.border = '2px solid #5DD887';
+                        document.querySelector('#roulSpades').style.border = '1px solid #5DD887';
                         document.querySelector('#roulSpades').style.borderRadius = '5px';
-
-
-                    } else {
-                        if (window.screen.width < 768 && spadesCountsShow) {
-                            document.querySelector('#titleSpades').innerHTML = `Победа: +${spadesCountsShow}`;
-                            // document.querySelector('.roulette__item-bid').innerHTML = ``;
-                            // document.querySelector('#signWinnerspades').innerHTML = '';
-
+                        if (window.screen.width < 768) {
+                            document.querySelector('#spanCardSpadesMob').innerHTML = `+${spadesCountsShow}`;
+                            document.querySelector('#spanCardSpadesMob').style.color = '#5DD887';
+                            document.querySelector('#itemSpadesBid').innerHTML = ``;
                         }
                     }
-                }
-                document.querySelector('.spades').style.opacity = '1'
-                bidsButtons[2].style.opacity = '1'
-            })
+                    document.querySelector('.spades').style.opacity = '1'
+                    bidsButtons[2].style.opacity = '1'
+                })
             }
         }
 
-    if (data.back) {
-        previous_rolls(data.previous_rolls)
-        returnToStartPosition()
-    }
-    if (data.roulette) {
-        document.querySelector('#spanCardHearts').innerHTML = ``
-        document.querySelector('#spanCardCoin').innerHTML = ``
-        document.querySelector('#spanCardSpades').innerHTML = ``
-        document.querySelector('#spanCardHearts').style.color = '#FFECA8';
-        document.querySelector('#spanCardCoin').style.color = '#FFECA8';
-        document.querySelector('#spanCardSpades').style.color = '#FFECA8';
-        document.querySelector('#titleHearts').innerHTML = `Черви`
-        document.querySelector('#titleCoin').innerHTML = `Монета`
-        document.querySelector('#titleSpades').innerHTML = `Пики`
-        document.querySelector('#roulSpades').style.border = 'none';
-        document.querySelector('#roulCoin').style.border = 'none';
-        document.querySelector('#roulHearts').style.border = 'none';
+        if (data.back) {
+            previous_rolls(data.previous_rolls)
+            returnToStartPosition()
+        }
+        if (data.roulette) {
+            document.querySelector('#spanCardHearts').innerHTML = ``
+            document.querySelector('#spanCardHeartsMob').innerHTML = ``
+            document.querySelector('#spanCardCoin').innerHTML = ``
+            document.querySelector('#spanCardCoinMob').innerHTML = ``
+            document.querySelector('#spanCardSpades').innerHTML = ``
+            document.querySelector('#spanCardSpadesMob').innerHTML = ``
+            document.querySelector('#spanCardHearts').style.color = '#FFECA8';
+            document.querySelector('#spanCardCoin').style.color = '#FFECA8';
+            document.querySelector('#spanCardSpades').style.color = '#FFECA8';
+            document.querySelector('#spanCardHeartsMob').style.color = '#FFECA8';
+            document.querySelector('#spanCardCoinMob').style.color = '#FFECA8';
+            document.querySelector('#spanCardSpadesMob').style.color = '#FFECA8';
+            document.querySelector('#titleHearts').innerHTML = `Черви`
+            document.querySelector('#titleCoin').innerHTML = `Монета`
+            document.querySelector('#titleSpades').innerHTML = `Пики`
+            document.querySelector('#roulSpades').style.border = 'none';
+            document.querySelector('#roulCoin').style.border = 'none';
+            document.querySelector('#roulHearts').style.border = 'none';
+            document.querySelector('#itemHeartsBid').innerHTML = `<span>Ставка</span> Х2`;
+            document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х2`;
+            document.querySelector('#itemSpadesBid').innerHTML = `<span>Ставка</span> Х2`;
 
-        timerCounter(data.roulette)
-    }
+            timerCounter(data.roulette)
+        }
 
-}}
+    }
+}
+
 // Отрисовка предыдущих победителей
-function previous_rolls(rolls){
+function previous_rolls(rolls) {
     console.log('eto prev roll', rolls)
-        let rollWinnerOld = document.querySelector('.roulette__previous-items');
-        rollWinnerOld.innerHTML = ``
-        rolls.map(roll=>{
-            rollWinnerOld.innerHTML += `
+    let rollWinnerOld = document.querySelector('.roulette__previous-items');
+    rollWinnerOld.innerHTML = ``
+    rolls.map(roll => {
+        rollWinnerOld.innerHTML += `
             <div class="roulette__previous-item">
                 <svg>
                     <use xlink:href="${static_prefix}/img/icons/sprite.svg#${roll}_stroke_grey"></use>
                 </svg>
             </div>
             `
-        })
+    })
 }
