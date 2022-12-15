@@ -99,8 +99,9 @@ def roll():
         check_rounds()
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     result = current_round.round_roll
-    current_round.rolled = True
-    current_round.save()
+    # сохранение этого параметра перенесено в обработку результатов ставок
+    # current_round.rolled = True
+    # current_round.save()
     # result = random.choice(ROUND_RESULTS)
     result_c = random.choice(ROUND_NUMBERS[result])
     position = random.random()
@@ -212,28 +213,39 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
     return credits
 
 
-def save_round_results(bets_keys, bets_info):
+def save_round_results(bets_info):
     """Сохраняет результаты раунда
 
     Args:
-        bets_keys (dict): ключи ставок
         bets_info (dict): ставки
     """
     total_amount = 0
     winners = []
     round_result = r.get(ROUND_RESULT_FIELD_NAME).decode("utf-8")
-
+    # обработка раундов без ставок
+    if bets_info is None:
+        bets_info = {}
+    # накопление результатов раунда
     for user_pk, bet in bets_info.items():
+        bet_amount = bet.get('amount', {})
         # накапливает общую сумму ставок
-        total_amount += bet.get('bidCount', 0)
+        for bet_val in bet_amount.values():
+            total_amount += bet_val
         # если пользователь ставил на победивший знак, то запоминает его
-        if round_result in bet.get('amount', {}):
+        if bet_amount.get(round_result, 0) > 0:
             winners.append(user_pk)
-
     # сохраняет раунд в БД
-    round_number = r.get('round')
+    round_number = int(r.get('round'))
     round_started = datetime.datetime.fromtimestamp(int(r.get('start:time')) / 1000)
-    # TODO: save round results to DB
+    try:
+        current_round = models.RouletteRound.objects.get(round_number=round_number)
+    except ObjectDoesNotExist:
+        current_round = models.RouletteRound()
+    current_round.rolled = True
+    current_round.total_bet_amount = total_amount
+    current_round.winners.set(winners)
+    current_round.round_started = round_started
+    current_round.save()
 
 
 @shared_task()
@@ -252,11 +264,14 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     # получаем информацию о всех ставках на текущий раунд
     bets_info = r.json().get('round_bets')
 
+    # обработка результатов раунда
+    save_round_results(bets_info)
+
     print(f"Extracted keys: {bets_keys}", type(bets_keys))
     if not bets_keys:
         print('There were no bets for this round')
         return 1
-    # make async in future
+
     users = models.CustomUser.objects.filter(pk__in=list(map(lambda x: int(x), bets_keys)))
     print(f"Users with a bet: f{users}")
 
