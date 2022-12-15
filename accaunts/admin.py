@@ -134,7 +134,7 @@ class BanUserAdmin(admin.ModelAdmin):
 class RouletteRoundAdmin(admin.ModelAdmin):
     list_display = 'round_number', 'round_roll', 'rolled', 'show_round'
     list_editable = 'round_roll', 'show_round'
-    search_fields = 'round_number',
+    search_fields = '=round_number',
 
 
 @admin.register(DayHash)
