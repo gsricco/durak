@@ -254,6 +254,7 @@ class RouletteRound(models.Model):
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
+    rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
     show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
 

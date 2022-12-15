@@ -99,6 +99,8 @@ def roll():
         check_rounds()
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     result = current_round.round_roll
+    current_round.rolled = True
+    current_round.save()
     # result = random.choice(ROUND_RESULTS)
     result_c = random.choice(ROUND_NUMBERS[result])
     position = random.random()
@@ -467,10 +469,13 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     """Генерирует хеши для получения результатов раундов и сами раунды"""
     # генерация хеша
     if day_hash_pk is None:
-        day_hash = models.DayHash()
-        day_hash.private_key = generate_private_key()
-        day_hash.public_key = generate_public_key()
-        day_hash.save()
+        try:
+            day_hash = models.DayHash.objects.get(date_generated=datetime.date.today())
+        except ObjectDoesNotExist:
+            day_hash = models.DayHash()
+            day_hash.private_key = generate_private_key()
+            day_hash.public_key = generate_public_key()
+            day_hash.save()
     else:
         day_hash = models.DayHash.objects.get(pk=day_hash_pk)
 
@@ -519,7 +524,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
 def check_round_number():
     """проверяет, есть ли в redis счётчик числа раундов"""
     if r.get('round') is None:
-        last_round = models.RouletteRound.objects.exclude(round_started=None).aggregate(Max('round_number'))
+        last_round = models.RouletteRound.objects.filter(rolled=True).aggregate(Max('round_number'))
         last_round_number = last_round.get('round_number__max')
         if last_round_number is None:
             last_round_number = 1
