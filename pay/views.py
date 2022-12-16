@@ -1,110 +1,20 @@
-# from django.shortcuts import render, redirect
-# from django.http import HttpResponse
-# from hashlib import sha256, md5
-# from django.views.decorators.csrf import csrf_exempt
-#
-#
-# # Страница купить
-# def buy(request):
-#     return render(request, 'pay/sys.html')
-#
-#
-# # Формирование запроса для оплаты
-# def popoln(request):
-#     mrh_login = "Fotobuka"
-#     mrh_pass1 = "uh4ft6593h6tcn"
-#     inv_id = '678678'
-#     inv_desc = "Товары для животных"
-#     out_summ = 100
-#     IsTest = 1
-#     # Формирование контрольной суммы
-#     result_string = "{}:{}:{}:{}".format(mrh_login, out_summ, inv_id, mrh_pass1)
-#     SignatureValue = md5(result_string.encode())
-#     # crc = sign_hash.hexdigest().upper()
-#     url = "https://auth.robokassa.ru/Merchant/Index.aspx?mrh_login={}&out_summ={}&inv_id={}&SignatureValue={}".format(
-#         mrh_login, out_summ, inv_id, SignatureValue)
-#     # https: // auth.robokassa.ru / Merchant / PaymentForm / FormMS.js?".
-#     # "MerchantLogin=$mrh_login&OutSum=$out_summ&InvoiceID=$inv_id"
-#
-#     if request.method == "POST":
-#         # К примеру запись в талицу пополнения
-#
-#         # Переход на страницу оплаты в робокасса
-#         return redirect(url)
-#     return render(request, 'popln.html')
-#
-#
-# # Проверка плотежа
-# @csrf_exempt
-# def res(request):
-#     if not request.method == 'POST':
-#         return HttpResponse('error')
-#     mrh_pass2 = "Ваш пароль 2"
-#     # Проверка заголовка авторизации
-#     if request.method == 'POST':
-#         out_summ = request.POST['OutSum']
-#         inv_id = request.POST['InvId']
-#         crc = request.POST['SignatureValue']
-#         crc = crc.upper()
-#         crc = str(crc)
-#         # Формирование своей контрольной суммы
-#         result_string = "{}:{}:{}".format(out_summ, inv_id, mrh_pass2)
-#         sign_hash = sha256(result_string.encode())
-#         my_crc = sign_hash.hexdigest().upper()
-#         # Проверка сумм
-#         if my_crc not in crc:
-#             # Ответ ошибки
-#             context = "bad sign"
-#             return HttpResponse(context)
-#         else:
-#             # Ответ все верно
-#             context = "OK{}".format(inv_id)
-#             return HttpResponse(context)
-#
-#
-# # Платеж принят
-# @csrf_exempt
-# def success(request):
-#     if not request.method == 'POST':
-#         return HttpResponse('error')
-#     mrh_pass1 = "Ваш пароль 1"
-#     # Проверка заголовка авторизации
-#     if request.method == 'POST':
-#         out_summ = request.POST['OutSum']
-#         inv_id = request.POST['InvId']
-#         crc = request.POST['SignatureValue']
-#         crc = crc.upper()
-#         crc = str(crc)
-#         # Формирование своей контрольной суммы
-#         result_string = "{}:{}:{}".format(out_summ, inv_id, mrh_pass1)
-#         sign_hash = sha256(result_string.encode())
-#         my_crc = sign_hash.hexdigest().upper()
-#         # Проверка сумм
-#         if my_crc not in crc:
-#             # Ошибка
-#             context = "bad sign"
-#             return HttpResponse(context)
-#         else:
-#             # Показ страницы успешной оплаты
-#             return render(request, 'pay/success.html')
-#
-#
-# # Платеж не принят
-# @csrf_exempt
-# def fail(request):
-#     if request.method == "POST":
-#         return render(request, 'pay/fail.html')
 import hashlib
 
-from django.shortcuts import redirect
-# 3+xJ+XKCLdORi.5
-# /xlZ0v8h4Fj_5yp
+import requests
+from django.shortcuts import redirect, render
+from rest_framework import response, status
+from rest_framework.decorators import api_view
+
+from accaunts.models import DetailUser
+from pay.models import Popoln
+
+MERCHANT_ID = '26363'  # id магазина
 
 
-# # Тут создается форма платежа, она вроде как работает
+# # Cоздается форма платежа
 # def balance(request):
-#     merchant_id = '26162' # id магазина
-#     secret_word = '3+xJ+XKCLdORi.5' # Секретное слово
+#     merchant_id = '26162'  # id магазина
+#     secret_word = '3+xJ+XKCLdORi.5'  # Секретное слово
 #     order_id = '154'
 #     order_amount = '10.11'
 #     currency = 'RUB'
@@ -118,10 +28,9 @@ from django.shortcuts import redirect
 #     #     'currency': currency
 #     # }
 #     # https: // pay.freekassa.ru /?m = & oa = 1000 & i = & currency = RUB & em = & phone = & o = 123 & pay = PAY & s = e723c585cb601241c5bb5727efa16b08
-#     return redirect(f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&s={sign}')
+#     return redirect(
+#         f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&s={sign}')
 #     # return redirect(f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&i=&currency={currency}&em=&phone=&o={order_id}&pay=PAY&s={sign}')
-
-
 
 
 # # Тут создается форма платежа, она вроде как работает
@@ -151,47 +60,141 @@ from django.shortcuts import redirect
 #     return redirect(f'https://api.freekassa.ru/v1/orders/create/?'+body)
 
 
+# # Тут создается форма платежа, она вроде как работает
+# def balance(request):
+#     merchant_id = '26162' # id магазина
+#     secret_word = '3+xJ+XKCLdORi.5' # Секретное слово
+#     order_id = '154'
+#     order_amount = '10.11'
+#     currency = 'RUB'
+#     params = {
+#         'shopId': merchant_id,
+#         'nonce': order_id,
+#         # 'i': 4,
+#         # 'email': 'olegpustovalov220@gmail.com',
+#         # 'ip': '37.214.41.80',
+#         # 'amount': order_amount,
+#         # 'currency': currency,
+#     }
+#     pa = dict(sorted([(key, val) for key, val in params.items()], key=lambda x:x[0]))
+#     api_key = '064d42e30564b0fd0dd93a0005f0fd31'
+#     ma = '|'.join(str(val) for val in pa.values())+api_key
+#     sign = hashlib.sha256(ma.encode()).hexdigest()
+#     print(sign, '**********')
+#     params['signature']=sign
+#     body = '&'.join(f'{key}={val}' for key, val in params.items())
+#     print(body, 'bodybodybodybodybody')
+#     return redirect(f'https://api.freekassa.ru/v1/balance?'+body)
 
-# Тут создается форма платежа, она вроде как работает
-def balance(request):
-    merchant_id = '26162' # id магазина
-    secret_word = '3+xJ+XKCLdORi.5' # Секретное слово
-    order_id = '154'
-    order_amount = '10.11'
-    currency = 'RUB'
-    params = {
-        'shopId': merchant_id,
-        'nonce': order_id,
-        # 'i': 4,
-        # 'email': 'olegpustovalov220@gmail.com',
-        # 'ip': '37.214.41.80',
-        # 'amount': order_amount,
-        # 'currency': currency,
-    }
-    pa = dict(sorted([(key, val) for key, val in params.items()], key=lambda x:x[0]))
-    api_key = '064d42e30564b0fd0dd93a0005f0fd31'
-    ma = '|'.join(str(val) for val in pa.values())+api_key
-    sign = hashlib.sha256(ma.encode()).hexdigest()
-    print(sign, '**********')
-    params['signature']=sign
-    body = '&'.join(f'{key}={val}' for key, val in params.items())
-    print(body, 'bodybodybodybodybody')
-    return redirect(f'https://api.freekassa.ru/v1/balance?'+body)
+
+# # Тут создается форма платежа, она вроде как работает
+# def balance(request):
+#     merchant_id = '26363'  # id магазина
+#     secret_word = 'Oleg1988'  # Секретное слово
+#     order_id = '154'
+#     order_amount = '10.11'
+#     currency = 'RUB'
+#     # ip = '37.214.41.80'
+#     # email = 'olegpustovalov220@gmail.com'
+#     params = {
+#         'shopId': merchant_id,
+#         'nonce': order_id,
+#         'i': 4,
+#         'email': 'olegpustovalov220@gmail.com',
+#         'ip': '37.214.41.80',
+#         'amount': order_amount,
+#         'currency': currency,
+#     }
+#     pa = dict(sorted([(key, val) for key, val in params.items()], key=lambda x: x[0]))
+#     api_key = '9097f84c55ec99807ed1138b1bc94f91'
+#     ma = '|'.join(str(val) for val in pa.values()) + api_key
+#     sign = hashlib.sha256(ma.encode()).hexdigest()
+#     params['signature'] = sign
+#     req = requests.post(f'https://api.freekassa.ru/v1/orders/create', json=params)
+#     print(req.json(), '*****************')
+
+# body = '&'.join(f'{key}={val}' for key, val in params.items())
+# print(body, 'bodybodybodybodybody')
+# return redirect(f'https://api.freekassa.ru/v1/balance?' + body)
 
 
-# # Суда приходят данные с URL оповещения. Вот тут и проблема в том что в переменную amount ничего не присваивается.
+# # Суда приходят данные с URL оповещения.
 # def payment_alerts(request):
 #     amount = request.GET.get("AMOUNT")
-#     current_user = UserProfile.objects.get(pk=request.user.id)
+#     current_user = Popoln.objects.get(pk=request.user.id)
 #     current_user.balance = current_user.balance + amount
 #     current_user.save()
-#
-#
+
+
 # # При успешной оплате
 # def payment_success(request):
-#     return render(request, 'main/payment/success.html')
+#     user_pay = Popoln.objects.filter(status_pay=True)
+#     cotext = {
+#         'user_pay': user_pay,
+#     }
+#     return render(request, 'new_profil.html', cotext)
 #
 #
 # # При ошибке в оплате
 # def payment_error(request):
-#     return render(request, 'main/payment/error.html')
+#     user_pay = Popoln.objects.filter(status_pay=False)
+#     cotext = {
+#         'user_pay': user_pay,
+#     }
+#     return render(request, 'new_profil.html', cotext)
+
+# MERCHANT_ID=123&
+# AMOUNT=100&intid=123456&
+# MERCHANT_ORDER_ID=test_order&
+# P_EMAIL=test_user@test_site.ru&
+# P_PHONE=71231231212&CUR_ID=4&
+# payer_account=123456xxxxxx1234&
+# us_field1=123&
+# us_field2=321&
+# SIGN=68GH247bb77e0ab49f6e429b86bc3e2f
+
+
+def rub_to_pay(rub):
+    """Креды, полученные за реальные деньг"""
+    if 0 <= rub <= 109:
+        return rub * 725
+    if 110 <= rub <= 179:
+        return rub * 910
+    if 180 <= rub <= 239:
+        return rub * 1389
+    if 240 <= rub <= 459:
+        return rub * 2084
+    if 460 <= rub <= 1274:
+        return rub * 2174
+    if 1275 <= rub:
+        return rub * 2353
+
+
+# MERCHANT_ID=26363&AMOUNT=100&intid=2022&MERCHANT_ORDER_ID=202220&P_EMAIL=olegpustovalov220@gmail.com&P_PHONE=71231231212&CUR_ID=4&payer_account=123456xxxxxx1234&us_field1=123&us_field2=321&SIGN=f1e7d50ae605effd7cd782e4f2e8fc42
+@api_view(['GET'])
+def pay_user(request):
+    ip = (request.META['REMOTE_ADDR'])
+    merchant_id = MERCHANT_ID  # id магазина
+    order_amount = request.GET.get('AMOUNT', '')
+    intid = request.GET.get('intid', '')
+    order_id = request.GET.get('MERCHANT_ORDER_ID', '')
+    email = request.GET.get('P_EMAIL', '')
+    phone = request.GET.get('P_PHONE', '')
+    secret_word = 'Oleg1988'  # Секретное слово
+    sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{order_id}'.encode('utf-8')).hexdigest()
+    print(sign, 'signsignsignsign')
+    po = request.GET.get('SIGN')
+    if sign != po:
+        return response.Response(status=status.HTTP_400_BAD_REQUEST)
+    if ip in ['168.119.157.136', '168.119.60.227', '138.201.88.124', '178.154.197.79']:  # проверка ip
+        return response.Response(status=status.HTTP_403_FORBIDDEN)
+    order = Popoln.objects.get(pk=order_id)
+    order.sum = int(order_amount)
+    order.status_pay = True
+    order.pay = rub_to_pay(order.sum)
+    order.save()
+    det_user = DetailUser.objects.get(user=order.user_game)
+    det_user.balance += order.pay
+    print(det_user)
+    det_user.save()
+    return response.Response(status=status.HTTP_200_OK, data={})
