@@ -3458,6 +3458,33 @@ h3 {
   max-width: 20%;
 }
 
+.step-links {
+  display: flex;
+}
+
+.step-links > span, a {
+  padding: 10px;
+  margin: 2px;
+  border-radius: 3px;
+}
+
+.step-links > a {
+  background-color: rgba(51,53,65,0.8);
+}
+
+.step-links > a:hover {
+  background-color: rgba(80,80,80,0.8);
+  transition-duration: 0.5s;
+}
+
+.step-links > span {
+  background-color: rgba(61,63,65,0.4);
+}
+
+.step-links > .current {
+  background-color: rgba(80,80,80,0.7);
+}
+
 .faq__title {
   font-size: 1em;
   line-height: 125%;
