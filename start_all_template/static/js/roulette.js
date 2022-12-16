@@ -234,9 +234,9 @@ function super_new(f) {
                 document.querySelector('#spanCardSpadesMob').style.color = '#C4364E';
 
 
-                if (document.querySelector('#signWinnerhearts')) document.querySelector('#spanCardHeartsMob').innerHTML = `-${heartsCountsShow}`;
-                if (document.querySelector('#signWinnercoin')) document.querySelector('#spanCardCoinMob').innerHTML = `-${coinCountsShow}`;
-                if (document.querySelector('#signWinnerspades')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
+                if (document.querySelector('#signWinnerheartsMob')) document.querySelector('#spanCardHeartsMob').innerHTML = `-${heartsCountsShow}`;
+                if (document.querySelector('#signWinnercoinMob')) document.querySelector('#spanCardCoinMob').innerHTML = `-${coinCountsShow}`;
+                if (document.querySelector('#signWinnerspadesMob')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
 
             })
         }
