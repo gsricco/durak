@@ -246,18 +246,25 @@ const itemsClick = (bidCard) => {
             /////////////////////////////////////////////////
         } else {
             //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ
-            let modalMoney = document.querySelector('#modalMoney')
-            modalMoney.classList.add("open");
-            // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
-            modalMoney.addEventListener("click", function (e) {
-                if (!e.target.closest(".popup__content")) {
-                    document.querySelector('.popup.open').classList.remove("open");
-                }
-            });
+            if (window.screen.width > 542){
+                let modalMoney = document.querySelector('#modalMoney')
+                modalMoney.classList.add("open");
+                // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
+                modalMoney.addEventListener("click", function (e) {
+                    if (!e.target.closest(".popup__content")) {
+                        document.querySelector('.popup.open').classList.remove("open");
+                    }
+                });
+            } else {document.querySelector('.roulette__msg').innerHTML = `Недостастаточно кредитов`;
+                setTimeout(()=>{
+                    document.querySelector('.roulette__msg').innerHTML = ``;
+                },2000)
+            }
 ///////////////////////////////////////////////////////////////////////////////////
         }
         document.querySelector('.roulette__table-input').value = ''
         document.querySelector('.roulette__current-block').innerHTML = '';
+
     }
 }
 

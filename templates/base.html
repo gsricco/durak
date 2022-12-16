@@ -42,7 +42,7 @@
 
                     <!-- If not logged-in -->
                     {% if user.is_authenticated == False %}
-                    <div class="header__login" style="display: none;">
+                    <div class="header__login" style="">
                         <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
                             <svg>
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
@@ -59,7 +59,7 @@
                     <!-- If logged-in and has balance -->
                     {% if user.is_authenticated %}
                     <a href="{% url 'profil' %}" class="header__balance">
-                        <span>{{ detail_user.balance|json_script:"balanceUser"  }}</span>
+                        <span>{{ detail_user.balance }}</span>
                     </a>
                     {% endif %}
                 </div>
@@ -140,9 +140,21 @@
                                 </a>
 
                                 <!-- Login btn mobile shown if not logged-in-->
-                                <a href="#" class="header__login-btn" style="display: none;">
+<!--                                <a href="#" class="header__login-btn" style="display: none;">-->
+<!--                                    <svg>-->
+<!--                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-btn"
+                                   style="">
                                     <svg>
-                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
+                                    </svg>
+                                </a>
+                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-btn"
+                                   style="">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                                     </svg>
                                 </a>
                                 {% endif %}
@@ -216,7 +228,10 @@
                                 </svg>
                                 <h4 class="online-chat__title">Чат</h4>
                             </div>
-
+                            <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
+                                <div id="onlineChatMob" class="online-chat__current"></div>
+                                <span class="online-chat__torch"></span>
+                            </div>
                             <svg class="online-chat__icon-close">
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
                             </svg>
@@ -224,10 +239,7 @@
                                 <div class="online-chat__current"></div>
                                 <span class="online-chat__torch"></span>
                             </div>
-                            <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
-                                <div id="onlineChatMob" class="online-chat__current"></div>
-                                <span class="online-chat__torch"></span>
-                            </div>
+
                         </div>
 
                         <div class="online-chat__body">

@@ -2750,6 +2750,7 @@ h3 {
   width: 18px;
   height: 18px;
   margin-right: 2px;
+  margin-left: 10px;
   display: none;
 }
 
@@ -2763,6 +2764,7 @@ h3 {
 
 .online-chat_active .online-chat__icon-close {
   display: block;
+  margin-left: 10px;
 }
 
 .heigth-max-class {
@@ -4462,7 +4464,8 @@ h3 {
 }
 
 .roulette__item {
-  height: 34vh;
+  max-height: 34vh;
+  height: auto;
   -webkit-box-flex: 0;
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
@@ -6531,7 +6534,7 @@ margin-top: 36px;
   }
 
   .header__login-btn {
-    display: block;
+    display: block!important;
     width: 20px;
     height: 23px;
     margin-top: 6px;
@@ -6659,6 +6662,7 @@ margin-top: 36px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    margin-left: auto;
   }
 
   .online-chat__body {
@@ -7656,6 +7660,10 @@ margin-top: 36px;
     font-size: 0.875em;
     line-height: 121.4285714286%;
   }
+  .footer_dofix{
+    margin-top: 10px !important;
+  }
+
 
   .panel {
     margin-bottom: 15px;
@@ -8040,6 +8048,7 @@ margin-top: 36px;
     max-width: 120px;
     max-height: 120px;
     margin-right: 0;
+    margin-bottom: 20px;
   }
 
   .profil__info {
@@ -8863,10 +8872,16 @@ margin-top: 36px;
     height: 80vh;
   }
 }
+@media (min-width: 350px) and (max-width: 542px) {
+  main {
+    height: auto !important;
+  }
+}
 
 @media (max-width: 540px) {
   main {
     padding: 45px 0px 25px 0px;
+    /*height: auto !important;*/
   }
 
   .header {
