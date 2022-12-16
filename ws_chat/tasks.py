@@ -490,6 +490,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
             day_hash = models.DayHash()
             day_hash.private_key = generate_private_key()
             day_hash.public_key = generate_public_key()
+            day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
             day_hash.save()
     else:
         day_hash = models.DayHash.objects.get(pk=day_hash_pk)
