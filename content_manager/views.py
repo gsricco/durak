@@ -118,7 +118,7 @@ def honesty(request):
     if page_obj.number <= 2:
         page_range = range(1, 6)
     elif page_obj.number >= paginator.num_pages - 1:
-        page_range = range(paginator.num_pages - 5, paginator.num_pages + 1)
+        page_range = range(max(paginator.num_pages - 4, 1), paginator.num_pages + 1)
     else: 
         page_range = range(page_obj.number - 2, page_obj.number + 3)
 
