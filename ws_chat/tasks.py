@@ -12,6 +12,7 @@ from channels.layers import get_channel_layer
 import random
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from accaunts.models import Level
 
 channel_layer = get_channel_layer()
@@ -45,11 +46,11 @@ CREDITS_TO_EXP_COEF = 1000
 def record_work_time(function):
     """Засекает время работы функции"""
     def wrapper(*args, **kwargs):
-        start = datetime.datetime.now()
+        start = timezone.now()
         print(f"Time record from {__name__} for function {function.__name__}")
         print(f"Start at {start}")
         res = function(*args, **kwargs)
-        end = datetime.datetime.now()
+        end = timezone.now()
         print(f"End at {end}")
         delta = end - start
         print(f'Worked for {delta}')
@@ -485,7 +486,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     # генерация хеша
     if day_hash_pk is None:
         try:
-            day_hash = models.DayHash.objects.get(date_generated=datetime.date.today())
+            day_hash = models.DayHash.objects.get(date_generated=timezone.datetime.today())
         except ObjectDoesNotExist:
             day_hash = models.DayHash()
             day_hash.private_key = generate_private_key()
@@ -550,7 +551,7 @@ def check_round_number():
 def check_rounds():
     """проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
-        day_hash = models.DayHash.objects.get(date_generated=datetime.date.today())
+        day_hash = models.DayHash.objects.get(date_generated=timezone.datetime.today())
         # дополнит бд недостающими раундами, если их нет
         generate_daily(
             day_hash_pk=day_hash.pk,
