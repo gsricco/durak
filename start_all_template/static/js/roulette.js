@@ -1,28 +1,6 @@
 function generateItems(winnerCard, cardNumber) {
     const list = document.querySelector('.list');
     let cells = cardNumber
-    // let cells;
-    const heartsArray = [103, 107, 111, 115]
-    const spadesArray = [101, 105, 109, 117]
-
-    // switch (winnerCard) {
-    //     case'hearts':
-    //         winnerCard = heartsArray[Math.round(Math.random() * (2 + 1))]
-    //         break
-    //     case'spades':
-    //         winnerCard = spadesArray[Math.round(Math.random() * (2 + 1))]
-    //         break
-    //     case'coin':
-    //         winnerCard = 113
-    //         break
-    // }
-
-    // let numbersCards = Math.round(100 + Math.random() * (121 - 100 + 1))
-    // if (winnerCard) {
-    //     cells = winnerCard
-    // } else {
-    //     cells = (numbersCards % 2 === 0) ? numbersCards + 1 : numbersCards
-    // }
 
     let h = 8;
     // четные элементы красные, нечетные черные, каждая 8 карта coin
@@ -94,7 +72,6 @@ function startRoll(winnerCard, cardNumber, cardPosition) {
 // анимация возврата после прокрутки
 const returnToStartPosition = () => {
     let trWidth;
-    // if (window.screen.width === 1280) trWidth = 500; else if (window.screen.width === 1920) trWidth = 380; else  if (window.screen.width === 360) trWidth = 740;
     if (window.screen.width === 1920) trWidth = 380;
     if (window.screen.width === 1366) trWidth = 470;
     if (window.screen.width === 1280) trWidth = 500;
@@ -187,65 +164,42 @@ let timerCounter = (back_counter) => {
 
 //ставим функцию на каждые 29сек
 chatSocket.onmessage = super_new(chatSocket.onmessage);
-// ! Плавные скроллбары
-// if (document.querySelector(".scrollbar-overflow")) {
-//     let blockArrow = document.querySelectorAll(".scrollbar-overflow");
-//
-//     blockArrow.forEach(function (item) {
-//         item.addEventListener("touchmove", function () {
-//             item.classList.add("scrollbar-overflow_active");
-//         });
-//
-//         item.addEventListener("touchend", function () {
-//             setTimeout(function () {
-//                 item.classList.remove("scrollbar-overflow_active");
-//             }, 1000);
-//         });
-//     });
-// }
+
 function super_new(f) {
     return function () {
-        let ws_connect = f.apply(this, arguments);
-        let data = JSON.parse(arguments[0].data)
-        if (data.init) {
-            console.log('eto init', data.init.previous_rolls)
-            previous_rolls(data.init.previous_rolls)
-            if (data.init.state === 'countdown') {
-                let timeNow = Date.now()
-                let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
-                timerCounter(remainTime)
-            }
-            if (data.init.state === 'rolling') {
+        let bidsNumber = document.querySelectorAll('.roulette__item-money')
+        let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
+        const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+        let signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
+        let signWinnercoin = document.querySelectorAll('#signWinnercoin');
+        let signWinnerspades = document.querySelectorAll('#signWinnerspades');
+        let userUser = document.querySelector('.header__profile-name>span').textContent
 
-                startRoll(data.init.winner)
-
-            }
+        function rouletteInitialSettings() {
+            document.querySelector('#spanCardHearts').innerHTML = ``
+            document.querySelector('#spanCardHeartsMob').innerHTML = ``
+            document.querySelector('#spanCardCoin').innerHTML = ``
+            document.querySelector('#spanCardCoinMob').innerHTML = ``
+            document.querySelector('#spanCardSpades').innerHTML = ``
+            document.querySelector('#spanCardSpadesMob').innerHTML = ``
+            document.querySelector('#spanCardHearts').style.color = '#FFECA8';
+            document.querySelector('#spanCardCoin').style.color = '#FFECA8';
+            document.querySelector('#spanCardSpades').style.color = '#FFECA8';
+            document.querySelector('#spanCardHeartsMob').style.color = '#FFECA8';
+            document.querySelector('#spanCardCoinMob').style.color = '#FFECA8';
+            document.querySelector('#spanCardSpadesMob').style.color = '#FFECA8';
+            document.querySelector('#titleHearts').innerHTML = `Черви`
+            document.querySelector('#titleCoin').innerHTML = `Монета`
+            document.querySelector('#titleSpades').innerHTML = `Пики`
+            document.querySelector('#roulSpades').style.border = 'none';
+            document.querySelector('#roulCoin').style.border = 'none';
+            document.querySelector('#roulHearts').style.border = 'none';
+            document.querySelector('#itemHeartsBid').innerHTML = `<span>Ставка</span> Х2`;
+            document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х2`;
+            document.querySelector('#itemSpadesBid').innerHTML = `<span>Ставка</span> Х2`;
         }
-        if (data.current_balance) {
-            UserBalance.innerHTML = `${data.current_balance}`
-        }
 
-        if (data.from_json) {
-            createBidItems(data.from_json)
-        }
-        if (data.roll) {
-            console.log(data, 'new data for BIDS')
-            startRoll(data.winner, data.c, data.p)
-        }
-
-        if (data.stop) {
-            let winnerCard = data.w
-            //winnerCard from backend
-            // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
-            let bidsNumber = document.querySelectorAll('.roulette__item-money')
-            let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
-            const bidsButtons = document.querySelectorAll('.roulette__radio-item')
-            let signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
-            let signWinnercoin = document.querySelectorAll('#signWinnercoin');
-            let signWinnerspades = document.querySelectorAll('#signWinnerspades');
-            let userUser = document.querySelector('.header__profile-name>span').textContent
-            console.log(userUser, 'UserUser')
-
+        function winnerCheckInitialSettings() {
             bidsNumber.forEach(el => {
                 el.style.color = '#C4364E'
                 document.querySelector('#spanCardHearts').style.color = '#C4364E';
@@ -285,133 +239,111 @@ function super_new(f) {
                 if (document.querySelector('#signWinnerspades')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
 
             })
+        }
 
+        function checkWinner(cardWinner, bidIncrease) {
+            let signWinner, counts, countsShow;
+            let lowerCard = cardWinner.toLowerCase();
+            let nameWinnerCard = cardWinner[0].toUpperCase() + cardWinner.slice(1);
+            console.log(lowerCard, nameWinnerCard)
+            let bidsNumber = document.querySelectorAll(`.${lowerCard} .roulette__item-money`)
+            bidsNumber.forEach(el => {
+                el.style.color = '#5DD887'
+
+                switch (lowerCard) {
+                    case 'hearts': {
+                        signWinner = signWinnerhearts;
+                        counts = heartsCounts;
+                        countsShow = heartsCountsShow;
+                        break;
+                    }
+                    case 'coin': {
+                        signWinner = signWinnercoin;
+                        counts = coinCounts;
+                        countsShow = coinCountsShow;
+                        break;
+                    }
+                    case 'spades': {
+                        signWinner = signWinnerspades;
+                        counts = spadesCounts;
+                        countsShow = spadesCountsShow;
+                        break;
+                    }
+
+                }
+
+                if (signWinner) {
+                    signWinner.forEach(s => {
+                        s.innerHTML = `+`;
+                    })
+                }
+                if (username === userUser && document.querySelector(`#spanCard${nameWinnerCard}`).textContent != '') {
+                    if (counts * bidIncrease / 1000 > 9 && counts * bidIncrease / 1000 < 1000) {
+                        countsShow = `${counts * 2 / 1000}K`
+                    } else {
+                        if (counts * bidIncrease / 1000000 > 0) {
+                            countsShow = `${counts * bidIncrease / 1000000}M`
+                        } else
+                            countsShow = `${counts * bidIncrease}`
+                    }
+                    if (counts * bidIncrease / 1000 > 0 && counts * bidIncrease / 1000 < 10) {
+                        countsShow = `${counts * bidIncrease}`
+                    }
+                    console.log(countsShow)
+                    document.querySelector(`#spanCard${nameWinnerCard}`).innerHTML = `+${countsShow}`;
+                    document.querySelector(`#title${nameWinnerCard}`).innerHTML = `Победа:`;
+                    document.querySelector(`#signWinner${lowerCard}`).innerHTML = ' +';
+                    document.querySelector(`#spanCard${nameWinnerCard}`).style.color = '#5DD887';
+                    document.querySelector(`#roul${nameWinnerCard}`).style.border = '1px solid #5DD887';
+                    document.querySelector(`#roul${nameWinnerCard}`).style.borderRadius = '5px';
+                    if (window.screen.width < 768) {
+                        document.querySelector(`#spanCard${nameWinnerCard}Mob`).innerHTML = `+${countsShow}`;
+                        document.querySelector(`#spanCard${nameWinnerCard}Mob`).style.color = '#5DD887';
+                        document.querySelector(`#item${nameWinnerCard}Bid`).innerHTML = ``;
+                    }
+                }
+                document.querySelector(`.${lowerCard}`).style.opacity = '1'
+                bidsButtons[0].style.opacity = '1'
+            })
+        }
+
+        let ws_connect = f.apply(this, arguments);
+        let data = JSON.parse(arguments[0].data)
+        if (data.init) {
+            console.log('eto init', data.init.previous_rolls)
+            previous_rolls(data.init.previous_rolls)
+            if (data.init.state === 'countdown') {
+                let timeNow = Date.now()
+                let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
+                timerCounter(remainTime)
+            }
+            if (data.init.state === 'rolling') {
+
+                startRoll(data.init.winner)
+
+            }
+        }
+        if (data.current_balance) {
+            UserBalance.innerHTML = `${data.current_balance}`
+        }
+
+        if (data.from_json) {
+            createBidItems(data.from_json)
+        }
+        if (data.roll) {
+            console.log(data, 'new data for BIDS')
+            startRoll(data.winner, data.c, data.p)
+        }
+
+        if (data.stop) {
+            let winnerCard = data.w
+            winnerCheckInitialSettings();
             if (winnerCard === 'hearts') {
-                let bidsNumber = document.querySelectorAll('.hearts .roulette__item-money')
-                bidsNumber.forEach(el => {
-                    // //обновление баланса user////
-                    // let balanceUser = `+ document.querySelector('.header__profile-sum>span').innerText`;
-                    // console.log(balanceUser)
-                    // // /////////////////////
-                    el.style.color = '#5DD887'
-
-                    if (signWinnerhearts) {
-                        signWinnerhearts.forEach(s => {
-                            s.innerHTML = `+`;
-                        })
-                    }
-                    if (username === userUser && document.querySelector('#spanCardHearts').textContent != '') {
-                        if (heartsCounts*2 / 1000 > 9 && heartsCounts*2 / 1000 < 1000) {
-                            heartsCountsShow = `${heartsCounts*2 / 1000}K`
-                        } else {
-                            if (heartsCounts*2 / 1000000 > 0) {
-                                heartsCountsShow = `${heartsCounts*2/ 1000000}M`
-                            } else
-                                heartsCountsShow = `${heartsCounts*2}`
-                        }
-                        if (heartsCounts*2 / 1000 > 0 && heartsCounts*2 / 1000 < 10) {
-                            heartsCountsShow = `${heartsCounts * 2}`
-                        }
-                        document.querySelector('#spanCardHearts').innerHTML = `+${heartsCountsShow}`;
-                        document.querySelector('#titleHearts').innerHTML = `Победа:`;
-                        document.querySelector('#signWinnerhearts').innerHTML = ' +';
-                        document.querySelector('#spanCardHearts').style.color = '#5DD887';
-                        document.querySelector('#roulHearts').style.border = '1px solid #5DD887';
-                        document.querySelector('#roulHearts').style.borderRadius = '5px';
-                        if (window.screen.width < 768) {
-                            document.querySelector('#spanCardHeartsMob').innerHTML = `+${heartsCountsShow}`;
-                            document.querySelector('#spanCardHeartsMob').style.color = '#5DD887';
-                            document.querySelector('#itemHeartsBid').innerHTML = ``;
-                        }
-                    }
-                    document.querySelector('.hearts').style.opacity = '1'
-                    bidsButtons[0].style.opacity = '1'
-                })
+                checkWinner('hearts', 2)
             } else if (winnerCard === 'coin') {
-                let bidsNumber = document.querySelectorAll('.coin .roulette__item-money')
-                bidsNumber.forEach(el => {
-                    // //обновление баланса user////
-                    // let balanceUser = `+document.querySelector('.header__profile-sum>span').innerText`;
-                    // console.log(balanceUser)
-                    // // /////////////////////
-                    el.style.color = 'green'
-                    if (signWinnercoin) {
-                        signWinnercoin.forEach(s => {
-                            s.innerHTML = `+`;
-                        })
-                    }
-
-                    if (username === userUser && document.querySelector('#spanCardCoin').textContent != '') {
-                        if (coinCounts*14 / 1000 > 9 && coinCounts*14 / 1000 < 1000) {
-                            coinCountsShow = `${coinCounts*14 / 1000}K`
-                        } else {
-                            if (coinCounts*14 / 1000000 > 0) {
-                                coinCountsShow = `${coinCounts*14 / 1000000}M`
-                            } else
-                                coinCountsShow = `${coinCounts*14}`
-                        }
-                        if (coinCounts*14 / 1000 > 0 && coinCounts*14 / 1000 < 10) {
-                            coinCountsShow = `${coinCounts * 14}`
-                        }
-                        document.querySelector('#spanCardCoin').innerHTML = `+${coinCountsShow}`;
-                        document.querySelector('#titleCoin').innerHTML = `Победа:`;
-                        document.querySelector('#signWinnercoin').innerHTML = ' +';
-                        document.querySelector('#spanCardCoin').style.color = '#5DD887';
-                        document.querySelector('#roulCoin').style.border = '1px solid #5DD887';
-                        document.querySelector('#roulCoin').style.borderRadius = '5px';
-
-                        if (window.screen.width < 768) {
-                            document.querySelector('#spanCardCoinMob').innerHTML = `+${coinCountsShow}`;
-                            document.querySelector('#spanCardCoinMob').style.color = '#5DD887';
-                            document.querySelector('#itemCoinBid').innerHTML = ``;
-                        }
-                    }
-                    document.querySelector('.coin').style.opacity = '1'
-                    bidsButtons[1].style.opacity = '1'
-
-                })
+                checkWinner('coin', 14)
             } else if (winnerCard === 'spades') {
-                let bidsNumber = document.querySelectorAll('.spades .roulette__item-money')
-                bidsNumber.forEach(el => {
-                    // //обновление баланса user////
-                    // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                    // console.log(balanceUser)
-                    // // /////////////////////
-                    el.style.color = 'green'
-                    if (signWinnerspades) {
-                        signWinnerspades.forEach(s => {
-                            s.innerHTML = `+`;
-                        })
-                    }
-                    if (username === userUser && document.querySelector('#spanCardSpades').textContent != '') {
-
-                        if (spadesCounts*2 / 1000 > 9 && spadesCounts *2/ 1000 < 1000) {
-                            spadesCountsShow = `${spadesCounts*2 / 1000}K`
-                        } else {
-                            if (spadesCounts*2 / 1000000 > 0) {
-                                spadesCountsShow = `${spadesCounts *2/ 1000000}M`
-                            } else
-                                spadesCountsShow = `${spadesCounts*2}`
-                        }
-                        if (spadesCounts*2 / 1000 > 0 && spadesCounts*2 / 1000 < 10) {
-                            spadesCountsShow = `${spadesCounts * 2}`
-                        }
-
-                        document.querySelector('#spanCardSpades').innerHTML = `+${spadesCountsShow}`;
-                        document.querySelector('#titleSpades').innerHTML = `Победа:`;
-                        document.querySelector('#signWinnerspades').innerHTML = ' +';
-                        document.querySelector('#spanCardSpades').style.color = '#5DD887';
-                        document.querySelector('#roulSpades').style.border = '1px solid #5DD887';
-                        document.querySelector('#roulSpades').style.borderRadius = '5px';
-                        if (window.screen.width < 768) {
-                            document.querySelector('#spanCardSpadesMob').innerHTML = `+${spadesCountsShow}`;
-                            document.querySelector('#spanCardSpadesMob').style.color = '#5DD887';
-                            document.querySelector('#itemSpadesBid').innerHTML = ``;
-                        }
-                    }
-                    document.querySelector('.spades').style.opacity = '1'
-                    bidsButtons[2].style.opacity = '1'
-                })
+                checkWinner('spades', 2)
             }
         }
 
@@ -420,27 +352,28 @@ function super_new(f) {
             returnToStartPosition()
         }
         if (data.roulette) {
-            document.querySelector('#spanCardHearts').innerHTML = ``
-            document.querySelector('#spanCardHeartsMob').innerHTML = ``
-            document.querySelector('#spanCardCoin').innerHTML = ``
-            document.querySelector('#spanCardCoinMob').innerHTML = ``
-            document.querySelector('#spanCardSpades').innerHTML = ``
-            document.querySelector('#spanCardSpadesMob').innerHTML = ``
-            document.querySelector('#spanCardHearts').style.color = '#FFECA8';
-            document.querySelector('#spanCardCoin').style.color = '#FFECA8';
-            document.querySelector('#spanCardSpades').style.color = '#FFECA8';
-            document.querySelector('#spanCardHeartsMob').style.color = '#FFECA8';
-            document.querySelector('#spanCardCoinMob').style.color = '#FFECA8';
-            document.querySelector('#spanCardSpadesMob').style.color = '#FFECA8';
-            document.querySelector('#titleHearts').innerHTML = `Черви`
-            document.querySelector('#titleCoin').innerHTML = `Монета`
-            document.querySelector('#titleSpades').innerHTML = `Пики`
-            document.querySelector('#roulSpades').style.border = 'none';
-            document.querySelector('#roulCoin').style.border = 'none';
-            document.querySelector('#roulHearts').style.border = 'none';
-            document.querySelector('#itemHeartsBid').innerHTML = `<span>Ставка</span> Х2`;
-            document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х2`;
-            document.querySelector('#itemSpadesBid').innerHTML = `<span>Ставка</span> Х2`;
+            rouletteInitialSettings();
+            // document.querySelector('#spanCardHearts').innerHTML = ``
+            // document.querySelector('#spanCardHeartsMob').innerHTML = ``
+            // document.querySelector('#spanCardCoin').innerHTML = ``
+            // document.querySelector('#spanCardCoinMob').innerHTML = ``
+            // document.querySelector('#spanCardSpades').innerHTML = ``
+            // document.querySelector('#spanCardSpadesMob').innerHTML = ``
+            // document.querySelector('#spanCardHearts').style.color = '#FFECA8';
+            // document.querySelector('#spanCardCoin').style.color = '#FFECA8';
+            // document.querySelector('#spanCardSpades').style.color = '#FFECA8';
+            // document.querySelector('#spanCardHeartsMob').style.color = '#FFECA8';
+            // document.querySelector('#spanCardCoinMob').style.color = '#FFECA8';
+            // document.querySelector('#spanCardSpadesMob').style.color = '#FFECA8';
+            // document.querySelector('#titleHearts').innerHTML = `Черви`
+            // document.querySelector('#titleCoin').innerHTML = `Монета`
+            // document.querySelector('#titleSpades').innerHTML = `Пики`
+            // document.querySelector('#roulSpades').style.border = 'none';
+            // document.querySelector('#roulCoin').style.border = 'none';
+            // document.querySelector('#roulHearts').style.border = 'none';
+            // document.querySelector('#itemHeartsBid').innerHTML = `<span>Ставка</span> Х2`;
+            // document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х2`;
+            // document.querySelector('#itemSpadesBid').innerHTML = `<span>Ставка</span> Х2`;
 
             timerCounter(data.roulette)
         }
@@ -463,3 +396,15 @@ function previous_rolls(rolls) {
             `
     })
 }
+
+
+
+
+
+
+
+
+
+
+
+
