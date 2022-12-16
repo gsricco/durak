@@ -236,12 +236,18 @@ class DayHash(models.Model):
     private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True, blank=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
 
+    def round_range(self):
+        """возвращает первый и последний сыгранный раунды для данного хеша"""
+        first = self.roundroulette_set
+        
+
     def __str__(self):
         return f"{self.date_generated}: {self.private_key}-{self.public_key}"
 
     class Meta:
         verbose_name = 'Хеш'
         verbose_name_plural = 'Хеши'
+        ordering = ['-date_generated']
 
 
 class RouletteRound(models.Model):
@@ -268,6 +274,7 @@ class RouletteRound(models.Model):
     class Meta:
         verbose_name = 'Раунд рулетки'
         verbose_name_plural = 'Раунды рулетки'
+        ordering = ['round_number']
 
 
 class ItemForUser(models.Model):

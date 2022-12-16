@@ -486,7 +486,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     # генерация хеша
     if day_hash_pk is None:
         try:
-            day_hash = models.DayHash.objects.get(date_generated=timezone.datetime.today())
+            day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         except ObjectDoesNotExist:
             day_hash = models.DayHash()
             day_hash.private_key = generate_private_key()
@@ -551,7 +551,7 @@ def check_round_number():
 def check_rounds():
     """проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
-        day_hash = models.DayHash.objects.get(date_generated=timezone.datetime.today())
+        day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
         generate_daily(
             day_hash_pk=day_hash.pk,

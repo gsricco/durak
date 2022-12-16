@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from social_django.models import UserSocialAuth
+from django.core.paginator import Paginator
+from django.utils import timezone
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP
+from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash
 from .models import FAQ, SiteContent
 
 
@@ -106,7 +108,26 @@ def honesty(request):
             'sitecontent': sitecontent,
             'title': 'Честность',
         }
-    return render(request, 'new_honesty.html', context)
+    # получение хешей для отображения
+    day_hashes = DayHash.objects.all()
+
+    paginator = Paginator(day_hashes, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if page_obj.number <= 2:
+        page_range = range(1, 6)
+    elif page_obj.number >= paginator.num_pages - 1:
+        page_range = range(paginator.num_pages - 5, paginator.num_pages + 1)
+    else: 
+        page_range = range(page_obj.number - 2, page_obj.number + 3)
+
+    context['page_obj'] = page_obj
+    context['paginator'] = paginator
+    context['today'] = timezone.now().date()
+    context['page_range'] = page_range
+
+    return render(request, 'new_honesty_fairness.html', context)
 
 
 def profil(request):
