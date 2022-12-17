@@ -4,8 +4,12 @@ let inputValue = document.querySelector('.support__chat-input')
 const chatBlock = document.querySelector('.support__chat-block')
 // const username = JSON.parse(document.getElementById('username').textContent)
 const showFile = document.querySelector('#showFile')
+let imageTypeList = ['jpg', 'jpeg', 'gif', 'pjpeg', 'svg', 'svg+xml', 'tiff', 'icon', 'wbmp', 'webp', 'png']
+let inputFile = document.querySelector('#file-add')
+let host_url = window.location.host
 let room_id = ''
 let byteFile
+
 let topBlock = document.querySelector('.support_chat_top_block')
 
 
@@ -30,19 +34,19 @@ function checkFileSize(elem) {
 
 
 }
-
-const chat_cleaner = () => {
-    const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
-    clear_chat_block.forEach(item => item.remove())
-}
-
-const room_cleaner = () => {
-    const clear_room = document.querySelectorAll('.support__chat__room')
-    clear_room.forEach(item => item.remove())
-}
+//
+// const chat_cleaner = () => {
+//     const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
+//     clear_chat_block.forEach(item => item.remove())
+// }
+//
+// const room_cleaner = () => {
+//     const clear_room = document.querySelectorAll('.support__chat__room')
+//     clear_room.forEach(item => item.remove())
+// }
 
 function newUserMessage(message, user, file_path) {
-    if (true) {
+
         const li = document.createElement('li')
         li.className = 'support__chat-message support__chat-message_your'
         const div = document.createElement('div')
@@ -63,32 +67,126 @@ function newUserMessage(message, user, file_path) {
             spanUser.style.textAlign = 'left'
         }
         chatBlock.appendChild(li)
-        li.appendChild(div)
-
         spanUser.innerHTML = user
         span.innerHTML = message
         div.appendChild(span)
         fullDiv.appendChild(spanUser)
-        fullDiv.appendChild(div)
         if (file_path) {
+            const file_preview = document.querySelectorAll('.support__chat-message-text')
             const file_url = document.createElement('div')
             file_url.innerHTML = 'Файл'
             file_url.className = 'file_name'
             file_url.addEventListener('click', () => {
-                window.open(`http://127.0.0.1:8000${file_path}`)
+
+                window.open(`http://${host_url}${file_path}`)
             })
-            if (user !== username) {
-                li.appendChild(fullDiv)
-                li.appendChild(file_url)
+
+            if (imageTypeList.includes(file_path.split('.').slice(-1)[0])) {
+                if (user !== username) {
+                    let newDiv = document.createElement('div')
+                    newDiv.innerHTML = `<div style="display: flex; flex-direction: column; padding-bottom: 10px">
+                                            <div class="support__chat-message-text" style=" padding: 0px ">
+                                                <img src="http://${host_url}${file_path}">
+                                            </div>                
+                                        </div>`
+                    div.style.alignItems = 'flex-start'
+                    fullDiv.appendChild(newDiv)
+                    if(message){fullDiv.appendChild(div)
+                        }
+                    li.appendChild(fullDiv)
+
+                } else {
+                    let newDiv = document.createElement('div')
+                    newDiv.innerHTML = `<div style="display: flex; flex-direction: column; padding-bottom: 10px">
+                                            <div class="support__chat-message-text" style=" padding: 0px ">
+                                                <img src="http://${host_url}${file_path}">
+                                            </div>                
+                                        </div>`
+                    div.style.alignItems = 'flex-end'
+                    fullDiv.appendChild(newDiv)
+                    if(message){fullDiv.appendChild(div)}
+                    li.appendChild(fullDiv)
+                }
             } else {
-                li.appendChild(file_url)
-                li.appendChild(fullDiv)
+                if(message){
+                    fullDiv.appendChild(div)
+                    fullDiv.appendChild(file_url)
+                }else {
+                    fullDiv.appendChild(file_url)
+                }
+                if (user !== username) {
+                    file_url.style.flexDirection = 'flex-start'
+                    li.appendChild(fullDiv)
+                } else {
+                    li.appendChild(fullDiv)
+                }
             }
         } else {
+            fullDiv.appendChild(div)
             li.appendChild(fullDiv)
+
         }
     }
-}
+
+
+
+// function newUserMessage(message, user, file_path) {
+//     if (true) {
+//         const li = document.createElement('li')
+//         li.className = 'support__chat-message support__chat-message_your'
+//         const div = document.createElement('div')
+//         div.className = 'support__chat-message-text'
+//         const spanUser = document.createElement('span')
+//         const span = document.createElement('span')
+//         const fullDiv = document.createElement('div')
+//         fullDiv.style.display = 'flex'
+//         fullDiv.style.flexDirection = 'column'
+//         spanUser.style.textAlign = 'right'
+//         if (user !== username) {
+//             li.style.flexDirection = ''
+//             li.style.justifyContent = 'flex-start'
+//             li.style.paddingLeft = '0%'
+//             li.style.paddingRight = '16%'
+//             div.style.background = '#2f2f2f'
+//             div.style.borderRadius = '15px 15px 15px 0px'
+//             spanUser.style.textAlign = 'left'
+//         }
+//         chatBlock.appendChild(li)
+//         li.appendChild(div)
+//
+//         spanUser.innerHTML = user
+//         span.innerHTML = message
+//         div.appendChild(span)
+//         fullDiv.appendChild(spanUser)
+//         fullDiv.appendChild(div)
+//         const file_url = document.createElement('div')
+//             file_url.innerHTML = 'Файл'
+//             file_url.className = 'file_name'
+//             file_url.addEventListener('click', () => {
+//                 window.open(`http://127.0.0.1:8000${file_path}`)
+//             })
+//         if (file_path) {
+//             // const file_url = document.createElement('div')
+//             // file_url.innerHTML = 'Файл'
+//             // file_url.className = 'file_name'
+//             // file_url.style.textAlign = ''
+//             // file_url.addEventListener('click', () => {
+//             //     window.open(`http://127.0.0.1:8000${file_path}`)
+//             // })
+//             if (user !== username) {
+//                 file_url.style.textAlign = 'flex-start'
+//                 file_url.style.background = 'red'
+//                 li.appendChild(fullDiv)
+//                 li.appendChild(file_url)
+//             } else {
+//                 li.appendChild(file_url)
+//                 li.appendChild(fullDiv)
+//             }
+//         } else {
+//             li.appendChild(fullDiv)
+//         }
+//     }
+// }
 
 // const newRoom = (room_name) => {
 //     if (room_name !== username) {
@@ -139,7 +237,7 @@ function super_new(f) {
                 }
             }
         }
-        chatBlock.scrollTop = chatBlock.scrollHeight
+        setTimeout(()=>{chatBlock.scrollTop = chatBlock.scrollHeight},100)
     }
 }
 
@@ -151,12 +249,14 @@ inputValue.onkeyup = function (e) {
 };
 sendBtn.addEventListener('click', () => {
     if (is_auth === true) {
+        if(byteFile || inputValue.value){
         chatSocket.send(JSON.stringify({
             'file': byteFile,
             "chat_type": "support",
             'message': inputValue.value,
 
         }));
+        }
     } else {
         let modalAuth = document.querySelector('#authorization')
         modalAuth.classList.add("open");
@@ -168,5 +268,6 @@ sendBtn.addEventListener('click', () => {
     }
     inputValue.value = '';
     byteFile = ''
+    inputFile.value = ''
 })
 
