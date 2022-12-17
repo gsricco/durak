@@ -1666,9 +1666,9 @@ h3 {
 
 .game-currency__img {
   width: 173px;
-  height: 195px;
-  margin-left: auto;
-  margin-right: 50px;
+  height: 100px;
+  margin: auto;
+  /*margin-right: 50px;*/
 }
 
 .game-currency__img svg {
@@ -7177,7 +7177,7 @@ margin-top: 36px;
     justify-content: flex-start;
   }
 
-  .modal-payment__card:nth-child(n + 3) {
+  .modal-payment__card:nth-child(n + 4) {
     display: none;
   }
 
@@ -7212,7 +7212,7 @@ margin-top: 36px;
   .game-currency__img {
     margin: 0;
     width: 123px;
-    height: 139px;
+    height: 60px;
     margin-left: -5px;
   }
 
@@ -9899,13 +9899,26 @@ margin-top: 36px;
     transform: translate3d(-655px, 0, 0);
   }
 }
-/*@media (min-width: 410px) and (max-width: 570px) {*/
-/*  .list {*/
-/*    transform: translate3d(-845px, 0, 0);*/
-/*  }*/
+
+
+
+/*.modal-payment-title{*/
+/*  display: flex;*/
+/*  width: 100%;*/
+/*  justify-content: center;*/
+/*  margin-bottom: 10px;*/
 /*}*/
-/*@media (min-width: 360px)  {*/
-/*  .list {*/
-/*    transform: translate3d(-730px, 0, 0);*/
-/*  }*/
+/*.modal-payment-cards{*/
+/*  display: flex;*/
+/*  width: 100%;*/
 /*}*/
+#modal-payment-ul{
+  flex-wrap: nowrap;
+  margin: auto;
+}
+@media (max-width: 768px) {
+  #modal-payment-ul{
+    flex-wrap: wrap;
+    height: auto;
+  }
+}
