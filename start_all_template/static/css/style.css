@@ -3348,7 +3348,7 @@ h3 {
   height: 100%;
   overflow: hidden;
   overflow-y: auto;
-  height: 822px;
+  /*height: 822px;*/
 }
 
 .transactions__titles {

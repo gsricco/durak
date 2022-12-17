@@ -61,7 +61,7 @@
                     </div>
                 </div>
             </div>
-            <div class="transactions transactions_honesty">
+            <div class="transactions transactions_honesty" id="transctions_honesty_container">
                 <div class="transactions__wrapper">
                     <div class="transactions__titles">
                         <h3 class="transactions__name">ДАТА</h3>
@@ -98,8 +98,8 @@
                         <div class="pagination">
                             <span class="step-links">
                                 {% if page_obj.has_previous %}
-                                    <a href="?page=1">&laquo; Первая</a>
-                                    <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                                    <a href="?page=1#transctions_honesty_container">&laquo; Первая</a>
+                                    <a href="?page={{ page_obj.previous_page_number }}#transctions_honesty_container">Предыдущая</a>
                                 {% else %}
                                     <span>&laquo; Первая</span>
                                     <span>Предыдущая</span>
@@ -111,13 +111,13 @@
                                         {{ page_obj.number }}
                                     </span>
                                     {% elif page_num <= paginator.num_pages %}
-                                    <a href="?page={{ page_num }}">{{ page_num }}</a>
+                                    <a href="?page={{ page_num }}#transctions_honesty_container">{{ page_num }}</a>
                                     {% endif %}
                                 {% endfor %}
                         
                                 {% if page_obj.has_next %}
-                                    <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
-                                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+                                    <a href="?page={{ page_obj.next_page_number }}#transctions_honesty_container">Следующая</a>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}#transctions_honesty_container">Последняя &raquo;</a>
                                 {% else %}
                                     <span>Следующая</span>
                                     <span>Последняя &raquo;</span>
