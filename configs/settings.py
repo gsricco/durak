@@ -216,4 +216,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IGNORE_RESULT = True
 
-
+"""freekassa"""
+MERCHANT_ID = os.getenv('MERCHANT_ID')  # ID Вашего магазина
+SECRET_WORD = os.getenv('SECRET_WORD')  # Секретное слово
