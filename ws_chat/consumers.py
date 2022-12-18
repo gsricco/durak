@@ -628,11 +628,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         state = r.get('state')
 
         t = r.get('start:time')
+        bets = r.json().get('round_bets')
         message = {'init': {"state": state,
                             "t": str(t),
                             "previous_rolls": r.json().get('last_winners'),
                             }
                    }
+        if bets is not None:
+            message['init']['b'] = bets
         if state == 'rolling':
             round_result = r.get(ROUND_RESULT_FIELD_NAME)
             message['init']['winner'] = round_result

@@ -193,24 +193,25 @@ function super_new(f){
     return function (){
         let ws_connect = f.apply(this, arguments);
         let data = JSON.parse(arguments[0].data)
-        if (data.init) {
-            console.log('eto init', data.init.previous_rolls)
+    if (data.init) {
+            console.log('eto init bets', data.init.b)
+            if(data.init.b) {
+                createBidItems(data.init.b)
+            }
             previous_rolls(data.init.previous_rolls)
-        if (data.init.state === 'countdown') {
+
+    if (data.init.state === 'countdown') {
             let timeNow = Date.now()
             let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
             timerCounter(remainTime)
         }
-        if (data.init.state === 'rolling') {
-
+    if (data.init.state === 'rolling') {
             startRoll(data.init.winner)
-
         }
     }
     if (data.current_balance) {
         UserBalance.innerHTML = `${data.current_balance}`
     }
-
     if (data.from_json) {
         createBidItems(data.from_json)
     }
@@ -228,7 +229,7 @@ function super_new(f){
     //     bidsNumber.forEach(el => {
     //         el.style.color = 'red'
     //     })}
-        if (data.stop) {
+    if (data.stop) {
         let winnerCard = data.w
         //winnerCard from backend
         // let winnerCard = `coin` //    !!!!!!!!!!!!!!!!!! data.winner - undefined !!!!!!!!!!!!!!!!!!!!!!!!
