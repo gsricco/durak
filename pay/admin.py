@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Popoln, Currency
+from .models import Popoln
 
 
 @admin.register(Popoln)
@@ -10,6 +10,6 @@ class PopolnAdmin(admin.ModelAdmin):
     search_fields = 'user_game',
 
 
-@admin.register(Currency)
-class CurrencyAdmin(admin.ModelAdmin):
-    list_display = 'name',
+# @admin.register(Currency)
+# class CurrencyAdmin(admin.ModelAdmin):
+#     list_display = 'name',
