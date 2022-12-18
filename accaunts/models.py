@@ -231,8 +231,9 @@ class Ban(models.Model):
 
 class DayHash(models.Model):
     """Модель для хранения сгенерированных public_key и private_key"""
-    public_key = models.CharField(verbose_name='Публичный ключ', max_length=16, null=True)
-    private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True)
+    public_key = models.CharField(verbose_name='Публичный ключ', max_length=16, null=True, blank=True)
+    private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True, blank=True)
+    private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True, blank=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
 
     def __str__(self):
@@ -241,6 +242,7 @@ class DayHash(models.Model):
     class Meta:
         verbose_name = 'Хеш'
         verbose_name_plural = 'Хеши'
+        ordering = ['-date_generated']
 
 
 class RouletteRound(models.Model):
@@ -254,6 +256,7 @@ class RouletteRound(models.Model):
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
+    rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
     show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
 
@@ -266,6 +269,7 @@ class RouletteRound(models.Model):
     class Meta:
         verbose_name = 'Раунд рулетки'
         verbose_name_plural = 'Раунды рулетки'
+        ordering = ['round_number']
 
 
 class ItemForUser(models.Model):

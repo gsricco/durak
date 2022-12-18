@@ -13,7 +13,6 @@ admin.site.unregister(UserSocialAuth)
 admin.site.unregister(Nonce)
 admin.site.unregister(Association)
 
-admin.site.register(RouletteRound)
 
 class OwnedCaseTabularInline(admin.TabularInline):
     model = OwnedCase
@@ -129,6 +128,14 @@ class LevelAdmin(admin.ModelAdmin):
 class BanUserAdmin(admin.ModelAdmin):
     list_display = 'user','ban_site', 'ban_chat',  'ban_ip'
     search_fields = 'user__id', 'user__username',
+
+
+@admin.register(RouletteRound)
+class RouletteRoundAdmin(admin.ModelAdmin):
+    list_display = 'round_number', 'round_roll', 'rolled', 'show_round'
+    list_editable = 'round_roll', 'show_round'
+    search_fields = '=round_number',
+
 
 @admin.register(DayHash)
 class DayHashAdmin(admin.ModelAdmin):

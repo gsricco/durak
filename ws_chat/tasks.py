@@ -12,6 +12,7 @@ from channels.layers import get_channel_layer
 import random
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from accaunts.models import Level
 
 channel_layer = get_channel_layer()
@@ -45,11 +46,11 @@ CREDITS_TO_EXP_COEF = 1000
 def record_work_time(function):
     """Засекает время работы функции"""
     def wrapper(*args, **kwargs):
-        start = datetime.datetime.now()
+        start = timezone.now()
         print(f"Time record from {__name__} for function {function.__name__}")
         print(f"Start at {start}")
         res = function(*args, **kwargs)
-        end = datetime.datetime.now()
+        end = timezone.now()
         print(f"End at {end}")
         delta = end - start
         print(f'Worked for {delta}')
@@ -99,7 +100,9 @@ def roll():
         check_rounds()
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     result = current_round.round_roll
-    print(result, 'eto result')
+    # сохранение этого параметра перенесено в обработку результатов ставок
+    # current_round.rolled = True
+    # current_round.save()
     # result = random.choice(ROUND_RESULTS)
     result_c = random.choice(ROUND_NUMBERS[result])
     position = random.random()
@@ -211,28 +214,39 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
     return credits
 
 
-def save_round_results(bets_keys, bets_info):
+def save_round_results(bets_info):
     """Сохраняет результаты раунда
 
     Args:
-        bets_keys (dict): ключи ставок
         bets_info (dict): ставки
     """
     total_amount = 0
     winners = []
     round_result = r.get(ROUND_RESULT_FIELD_NAME)
-
+    # обработка раундов без ставок
+    if bets_info is None:
+        bets_info = {}
+    # накопление результатов раунда
     for user_pk, bet in bets_info.items():
+        bet_amount = bet.get('amount', {})
         # накапливает общую сумму ставок
-        total_amount += bet.get('bidCount', 0)
+        for bet_val in bet_amount.values():
+            total_amount += bet_val
         # если пользователь ставил на победивший знак, то запоминает его
-        if round_result in bet.get('amount', {}):
+        if bet_amount.get(round_result, 0) > 0:
             winners.append(user_pk)
-
     # сохраняет раунд в БД
-    round_number = r.get('round')
+    round_number = int(r.get('round'))
     round_started = datetime.datetime.fromtimestamp(int(r.get('start:time')) / 1000)
-    # TODO: save round results to DB
+    try:
+        current_round = models.RouletteRound.objects.get(round_number=round_number)
+    except ObjectDoesNotExist:
+        current_round = models.RouletteRound()
+    current_round.rolled = True
+    current_round.total_bet_amount = total_amount
+    current_round.winners.set(winners)
+    current_round.round_started = round_started
+    current_round.save()
 
 
 @shared_task()
@@ -251,11 +265,14 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     # получаем информацию о всех ставках на текущий раунд
     bets_info = r.json().get('round_bets')
 
+    # обработка результатов раунда
+    save_round_results(bets_info)
+
     print(f"Extracted keys: {bets_keys}", type(bets_keys))
     if not bets_keys:
         print('There were no bets for this round')
         return 1
-    # make async in future
+
     users = models.CustomUser.objects.filter(pk__in=list(map(lambda x: int(x), bets_keys)))
     print(f"Users with a bet: f{users}")
 
@@ -468,10 +485,14 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     """Генерирует хеши для получения результатов раундов и сами раунды"""
     # генерация хеша
     if day_hash_pk is None:
-        day_hash = models.DayHash()
-        day_hash.private_key = generate_private_key()
-        day_hash.public_key = generate_public_key()
-        day_hash.save()
+        try:
+            day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
+        except ObjectDoesNotExist:
+            day_hash = models.DayHash()
+            day_hash.private_key = generate_private_key()
+            day_hash.public_key = generate_public_key()
+            day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
+            day_hash.save()
     else:
         day_hash = models.DayHash.objects.get(pk=day_hash_pk)
 
@@ -520,7 +541,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
 def check_round_number():
     """проверяет, есть ли в redis счётчик числа раундов"""
     if r.get('round') is None:
-        last_round = models.RouletteRound.objects.exclude(round_started=None).aggregate(Max('round_number'))
+        last_round = models.RouletteRound.objects.filter(rolled=True).aggregate(Max('round_number'))
         last_round_number = last_round.get('round_number__max')
         if last_round_number is None:
             last_round_number = 1
@@ -530,7 +551,7 @@ def check_round_number():
 def check_rounds():
     """проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
-        day_hash = models.DayHash.objects.get(date_generated=datetime.date.today())
+        day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
         generate_daily(
             day_hash_pk=day_hash.pk,
