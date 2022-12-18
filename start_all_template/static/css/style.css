@@ -3349,7 +3349,7 @@ h3 {
   height: 100%;
   overflow: hidden;
   overflow-y: auto;
-  /*height: 822px;*/
+  height: 822px;
 }
 
 .transactions__titles {
@@ -3463,7 +3463,7 @@ h3 {
   display: flex;
 }
 
-.step-links > span, a {
+.step-links > span, .step-links > a {
   padding: 10px;
   margin: 2px;
   border-radius: 3px;
