@@ -9,7 +9,7 @@ from .models import FAQ, SiteContent
 
 
 def index(request):
-    """ГЛАВНАЯ"""
+    """ГЛАВНАЯ (логика при оплатах через freekassa)"""
     sitecontent = SiteContent.objects.all()
     show_modal = False
     if request.user.is_authenticated:
