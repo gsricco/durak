@@ -634,12 +634,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                             "previous_rolls": r.json().get('last_winners'),
                             }
                    }
-        if bets is not None:
-            message['init']['b'] = bets
         if state == 'rolling':
             round_result = r.get(ROUND_RESULT_FIELD_NAME)
             message['init']['winner'] = round_result
         await self.send(json.dumps(message))
+        if bets is not None:
+            print(bets)
+            init_bets = {'bets': bets}
+            await self.send(json.dumps(init_bets))
 
     async def send_cases_info(self, event):
         """Отправляет по каналу сообщение о кейсах"""
