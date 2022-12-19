@@ -14,6 +14,10 @@ class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
                               default='img/avatar/user/avatar.svg')
+    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=True,
+                                     help_text='Рандомная аватарка с галочкой, а стандартная без')
+    avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
+                                       on_delete=models.CASCADE, null=True, blank=True)
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
     level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
@@ -277,3 +281,18 @@ class ItemForUser(models.Model):
     user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
     user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
     is_used = models.BooleanField(verbose_name='Использован',default=False)
+
+
+class AvatarProfile(models.Model):
+    """Модель Аватарки профиля"""
+    name = models.CharField(verbose_name='Название аватарки профиля', max_length=50, blank=True, null=True)
+    avatar_img = models.ImageField(verbose_name='Аватарки профиля', help_text='Аватарки профиля (рандомные)',
+                                       upload_to='img/avatar/default/')
+
+    class Meta:
+        verbose_name = 'Аватарки профиля (рандомные)'
+        verbose_name_plural = 'Аватарки профиля (рандомные)'
+        ordering = 'id',
+
+    def __str__(self):
+        return f'{self.name}'
