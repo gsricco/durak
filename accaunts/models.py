@@ -231,8 +231,8 @@ class Ban(models.Model):
 
 class DayHash(models.Model):
     """Модель для хранения сгенерированных public_key и private_key"""
-    public_key = models.CharField(verbose_name='Публичный ключ', max_length=16)
-    private_key = models.CharField(verbose_name='Приватный ключ', max_length=64)
+    public_key = models.CharField(verbose_name='Публичный ключ', max_length=16, null=True)
+    private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
 
     def __str__(self):
