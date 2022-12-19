@@ -66,6 +66,7 @@ def pay_user(request):
     if order.status_pay:
         return response.Response(status=status.HTTP_412_PRECONDITION_FAILED, data={})
     order.status_pay = True
+    order.url_ok = True
     order.intid = intid
     order.save()
     det_user = DetailUser.objects.get(user=order.user_game)

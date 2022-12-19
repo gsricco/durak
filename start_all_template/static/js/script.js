@@ -1375,3 +1375,6 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 const media_prefix = JSON.parse(document.getElementById('media_prefix').textContent);
 const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
+
+
+

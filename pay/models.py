@@ -12,7 +12,7 @@ class Popoln(models.Model):
     pay = models.IntegerField(verbose_name="Сумма купленных кредитов", blank=True, null=True)
     date = models.DateTimeField(verbose_name="Дата покупки", default=timezone.now)
     status_pay = models.BooleanField(verbose_name="Оплачено", default=False)
-    url_pay = models.URLField(verbose_name='Страница для редиректа', blank=True, null=True)
+    url_ok = models.BooleanField(verbose_name='Показывать модалку', default=True)
     intid = models.IntegerField(verbose_name='Номер операции Free-Kassa', blank=True, null=True)
 
 
