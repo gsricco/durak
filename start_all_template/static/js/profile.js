@@ -35,7 +35,7 @@ function super_new(f) {
         let data = JSON.parse(arguments[0].data)
         if (data.user_items) {
             newUserItem(data.user_items)
-            newModalUserItem(data.user_items)
+            // newModalUserItem(data.user_items)
         }
 
         if (data.lvl_info) {
@@ -115,11 +115,11 @@ function newModalUserItem(data) {
         <div class="modal-case__wrapper">
                                 <div class="modal-case__img">
                                     <svg>
-                                        <use xlink:href="${static_prefix}/img/icons/sprite.svg#${e.user_item.image}"></use>
+                                        <use xlink:href="${static_prefix}/img/icons/sprite.svg#${e.item.image}"></use>
                                     </svg>
                                 </div>
                                 <div class="modal-case__title">
-                                    ${e.user_item.name}
+                                    ${e.item.name}
                                 </div>
                             </div>
         `
@@ -134,15 +134,17 @@ function case_click(e) {
     }))
     profileCaseTitle = e.querySelector('.profil__slider-title').textContent
     startCaseListRoll()
+    newModalUserItem(caseItems[profileCaseTitle].items)
+
 
 }
 
 function startCaseListRoll() {
-    modalCase.innerHTML = ''
-    listCase.className = ''
-    listCase.style.left = ''
-    listCase.style.transform = ''
-    listCase.style.transition = ''
+    // modalCase.innerHTML = ''
+    // listCase.className = ''
+    // listCase.style.left = ''
+    // listCase.style.transform = ''
+    // listCase.style.transition = ''
     caseItems[profileCaseTitle].items.map((e) => {
         modalCase.innerHTML += `<div class="modal-case-overflow__item">
                                      <div class="modal-case__wrapper">
@@ -165,7 +167,7 @@ let butClick = () => {
     chatSocket.send(JSON.stringify({
         'open_case': profileCaseTitle
     }))
-    modalCase.innerHTML = '';
+    // modalCase.innerHTML = '';
     ;
 }
 

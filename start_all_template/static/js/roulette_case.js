@@ -17,9 +17,9 @@ function generateItemsCase(caseMessage, winner) {
         let swingFinish = `translate3d(${randomInteger(-496, -504) / 10}%, 0, 0)`
         listCase.style.left = '50%'
         listCase.style.transform = swingFinish
-        listCase.style.transition = '5s cubic-bezier(0.21, 0.53, 0.29, 0.99)'
+        listCase.style.transition = '4s cubic-bezier(0.21, 0.53, 0.29, 0.99)'
     }
-
+     modalCase.innerHTML = '';
     function oneRollItem() {
         let item;
         item = `<svg>
@@ -80,9 +80,8 @@ function generateItemsCase(caseMessage, winner) {
     for (let i = 0; i < 24; i++) {
         oneRollItem()
     }
-
     roll()
-    setTimeout(returnToStartPosition, 6000)
+    setTimeout(returnToStartPosition, 5500)
 }
 
 

@@ -11,7 +11,7 @@
 }
 
 .admin_support_chat_wrapper p{
-   border-radius: 5px;
+   border-radius: 2px;
    text-align: center;
    margin-top: 5px;
    background: #c4364e;
@@ -33,4 +33,13 @@
 .support__chat-block{
    height: 550px;
    width: 600px;
+}
+.file_name{
+   text-align: center;
+}
+
+.file_name:hover{
+   background: white;
+   cursor: pointer;
+   border-radius: 4px;
 }

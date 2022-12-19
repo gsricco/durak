@@ -9821,3 +9821,11 @@ margin-top: 36px;
   list-style: none;
   transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
 }
+.file_name{
+   text-align: center;
+}
+
+.file_name:hover{
+   background: white;
+   cursor: pointer;
+   border-radius: 4px;
