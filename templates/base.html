@@ -42,7 +42,7 @@
 
                     <!-- If not logged-in -->
                     {% if user.is_authenticated == False %}
-                    <div class="header__login" style="display: none;">
+                    <div class="header__login" style="">
                         <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-link">
                             <svg>
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
@@ -59,7 +59,7 @@
                     <!-- If logged-in and has balance -->
                     {% if user.is_authenticated %}
                     <a href="{% url 'profil' %}" class="header__balance">
-                        <span>{{ detail_user.balance|json_script:"balanceUser"  }}</span>
+                        <span>{{ detail_user.balance }}</span>
                     </a>
                     {% endif %}
                 </div>
@@ -140,9 +140,21 @@
                                 </a>
 
                                 <!-- Login btn mobile shown if not logged-in-->
-                                <a href="#" class="header__login-btn" style="display: none;">
+<!--                                <a href="#" class="header__login-btn" style="display: none;">-->
+<!--                                    <svg>-->
+<!--                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-btn"
+                                   style="">
                                     <svg>
-                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
+                                    </svg>
+                                </a>
+                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-btn"
+                                   style="">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
                                     </svg>
                                 </a>
                                 {% endif %}
@@ -198,7 +210,11 @@
 
     <main>
         <div class="container">
-
+            <div class="chat-open-btn">
+                <svg>
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat-btn"></use>
+                </svg>
+            </div>
 
             <section class="profil-main">
 
@@ -212,7 +228,10 @@
                                 </svg>
                                 <h4 class="online-chat__title">Чат</h4>
                             </div>
-
+                            <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
+                                <div id="onlineChatMob" class="online-chat__current"></div>
+                                <span class="online-chat__torch"></span>
+                            </div>
                             <svg class="online-chat__icon-close">
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
                             </svg>
@@ -220,6 +239,7 @@
                                 <div class="online-chat__current"></div>
                                 <span class="online-chat__torch"></span>
                             </div>
+
                         </div>
 
                         <div class="online-chat__body">
@@ -227,10 +247,10 @@
                                 <ul class="online-chat__list scrollbar-overflow">
 
                                 </ul>
-                                <div class="online-chat__header-rigth online-chat__header-rigth_mobile">
-                                    <span class="online-chat__torch"></span>
-                                    <div class="online-chat__current">239</div>
-                                </div>
+<!--                                <div class="online-chat__header-rigth online-chat__header-rigth_mobile">-->
+<!--                                    <span class="online-chat__torch"></span>-->
+<!--                                    <div class="online-chat__current"></div>-->
+<!--                                </div>-->
                             </div>
 
                         </div>
@@ -592,7 +612,7 @@
                         <h3 class="modal__title modal-payment__title">
                             Пополнить деньгами
                         </h3>
-                        <ul class="modal-payment__cards cards">
+                        <ul id="modal-payment-ul" class="modal-payment__cards cards">
                             <li class="modal-payment__card payment-system">
                                 <div class="payment-system__img payment-system__img_big">
                                     <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
@@ -608,8 +628,6 @@
                                 <div class="payment-system__title">
                                     Киви кошелёк
                                 </div>
-
-
                             </li>
                             <li class="modal-payment__card payment-system">
                                 <div class="payment-system__img">
@@ -618,38 +636,6 @@
                                 <div class="payment-system__title">
                                     ЮMoney
                                 </div>
-
-
-                            </li>
-                            <li class="modal-payment__card payment-system">
-                                <div class="payment-system__img">
-                                    <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
-                                </div>
-                                <div class="payment-system__title">
-                                    Apple pay
-                                </div>
-
-
-                            </li>
-                            <li class="modal-payment__card payment-system">
-                                <div class="payment-system__img">
-                                    <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
-                                </div>
-                                <div class="payment-system__title">
-                                    Google pay
-                                </div>
-
-
-                            </li>
-                            <li class="modal-payment__card payment-system">
-                                <div class="payment-system__img">
-                                    <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
-                                </div>
-                                <div class="payment-system__title">
-                                    Samsung pay
-                                </div>
-
-
                             </li>
                         </ul>
 
@@ -768,97 +754,7 @@
                                         </div>
                                     </label>
                                 </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="Webmoney"
-                                           name="paymentSystem"
-                                           value="Webmoney">
-                                    <label for="Webmoney" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/Webmoney.png' %}" alt="Webmoney">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            Webmoney
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="SamsungPay"
-                                           name="paymentSystem"
-                                           value="SamsungPay">
-                                    <label for="SamsungPay" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/Samsung-pay.png' %}" alt="Samsung pay">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            Samsung pay
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="ApplePay"
-                                           name="paymentSystem"
-                                           value="ApplePay">
-                                    <label for="ApplePay" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/Apple-pay.png' %}" alt="Apple pay">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            Apple pay
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="MobOperators"
-                                           name="paymentSystem"
-                                           value="Моб.операторы">
-                                    <label for="MobOperators" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/Mob-operators.png' %}"
-                                                 alt="Моб. операторы">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            Моб. операторы
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="Cryptocurrency"
-                                           name="paymentSystem"
-                                           value="Криптовалюта">
-                                    <label for="Cryptocurrency" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/Cryptocurrency.png' %}" alt="Криптовалюта">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            Криптовалюта
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="PayPal" name="paymentSystem"
-                                           value="PayPal">
-                                    <label for="PayPal" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/PayPal.png' %}" alt="PayPal">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            PayPal
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="swiper-slide amount-selection__slide">
-                                    <input type="radio" class="amount-selection__check" id="GooglePay"
-                                           name="paymentSystem"
-                                           value="GooglePay">
-                                    <label for="GooglePay" class="amount-selection__card payment-system">
-                                        <div class="payment-system__img">
-                                            <img src="{% static 'img/gallery/Google-pay.png' %}" alt="Google pay">
-                                        </div>
-                                        <div class="payment-system__title">
-                                            Google pay
-                                        </div>
-                                    </label>
-                                </div>
+
 
                             </div>
                         </div>
