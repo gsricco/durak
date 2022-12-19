@@ -1666,9 +1666,9 @@ h3 {
 
 .game-currency__img {
   width: 173px;
-  height: 195px;
-  margin-left: auto;
-  margin-right: 50px;
+  height: 100px;
+  margin: auto;
+  /*margin-right: 50px;*/
 }
 
 .game-currency__img svg {
@@ -2750,6 +2750,7 @@ h3 {
   width: 18px;
   height: 18px;
   margin-right: 2px;
+  margin-left: 10px;
   display: none;
 }
 
@@ -2763,6 +2764,7 @@ h3 {
 
 .online-chat_active .online-chat__icon-close {
   display: block;
+  margin-left: 10px;
 }
 
 .heigth-max-class {
@@ -2840,6 +2842,7 @@ h3 {
 }
 
 .profil__avatar img {
+  border-radius: 50%;
   width: 100%;
   -o-object-fit: cover;
   object-fit: cover;
@@ -3663,7 +3666,11 @@ h3 {
     -1px 0 0 rgba(0, 0, 0, 0.15), 1px 0 0 rgba(0, 0, 0, 0.15), -1px -1px 0 rgba(0, 0, 0, 0.15), 1px -1px 0 rgba(0, 0, 0, 0.15), -1px 1px 0 rgba(0, 0, 0, 0.15), 1px 1px 0 rgba(0, 0, 0, 0.15),
     -1px -1px 0 rgba(0, 0, 0, 0.15), 1px -1px 0 rgba(0, 0, 0, 0.15), -1px 1px 0 rgba(0, 0, 0, 0.15), 1px 1px 0 rgba(0, 0, 0, 0.15);
 }
-
+.support__chat-message-text img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 .support__chat-message_your .support__chat-avatar {
   margin-left: 10px;
   margin-right: 0;
@@ -4457,7 +4464,8 @@ h3 {
 }
 
 .roulette__item {
-  height: 34vh;
+  max-height: 34vh;
+  height: auto;
   -webkit-box-flex: 0;
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
@@ -4594,6 +4602,14 @@ h3 {
   line-height: 133.3333333333%;
   font-weight: 400;
 }
+#spanCardHearts,#spanCardCoin, #spanCardSpades{
+  margin-left: 2px;
+  color:#FFECA8;
+  font-size: 0.9375em;
+  line-height: 133.3333333333%;
+  font-weight: 400;
+}
+
 
 .roulette__item-sum {
   color: #ffeca8;
@@ -4991,6 +5007,7 @@ h3 {
 .roulette__rull {
 margin-top: 10px;
 }
+
 }
 
 @media (min-width: 1200px) {
@@ -6517,7 +6534,7 @@ margin-top: 36px;
   }
 
   .header__login-btn {
-    display: block;
+    display: block!important;
     width: 20px;
     height: 23px;
     margin-top: 6px;
@@ -6645,6 +6662,7 @@ margin-top: 36px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    margin-left: auto;
   }
 
   .online-chat__body {
@@ -7159,7 +7177,7 @@ margin-top: 36px;
     justify-content: flex-start;
   }
 
-  .modal-payment__card:nth-child(n + 3) {
+  .modal-payment__card:nth-child(n + 4) {
     display: none;
   }
 
@@ -7194,7 +7212,7 @@ margin-top: 36px;
   .game-currency__img {
     margin: 0;
     width: 123px;
-    height: 139px;
+    height: 60px;
     margin-left: -5px;
   }
 
@@ -7642,6 +7660,10 @@ margin-top: 36px;
     font-size: 0.875em;
     line-height: 121.4285714286%;
   }
+  .footer_dofix{
+    margin-top: 10px !important;
+  }
+
 
   .panel {
     margin-bottom: 15px;
@@ -8026,6 +8048,7 @@ margin-top: 36px;
     max-width: 120px;
     max-height: 120px;
     margin-right: 0;
+    margin-bottom: 20px;
   }
 
   .profil__info {
@@ -8204,6 +8227,7 @@ margin-top: 36px;
 
   .support__chat-message-text {
     padding: 13px 10px;
+    max-width: 270px;
   }
 
   .support__chat-avatar {
@@ -8848,10 +8872,16 @@ margin-top: 36px;
     height: 80vh;
   }
 }
+@media (min-width: 350px) and (max-width: 542px) {
+  main {
+    height: auto !important;
+  }
+}
 
 @media (max-width: 540px) {
   main {
     padding: 45px 0px 25px 0px;
+    /*height: auto !important;*/
   }
 
   .header {
@@ -9074,11 +9104,14 @@ margin-top: 36px;
   }
 
   .height640-799 .roulette__item-title,
-  .height640-799 .roulette__item-bid {
+  .height640-799 .roulette__item-bid, #spanCardHearts {
     font-size: 0.75em;
     line-height: 125%;
   }
-
+/*#spanCardHearts{*/
+/*  font-size: 0.75em;*/
+/*  line-height: 125%;*/
+/*}*/
   .height640-799 .roulette__rull-img {
     width: 96px;
     height: 96px;
@@ -9368,7 +9401,7 @@ margin-top: 36px;
   }
 
   .height800-895 .roulette__item-title,
-  .height800-895 .roulette__item-bid {
+  .height800-895 .roulette__item-bid, #spanCardHearts {
     font-size: 0.8125em;
   }
 
@@ -9750,4 +9783,142 @@ margin-top: 36px;
 #modalTitle {
   font-size: 1.125em;
   color: red;
+}
+
+
+.listCase {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}
+
+
+#modal-cases {
+  position: relative;
+  display: inline-flex;
+  left: 0;
+  transform: translate3d(-380px, 0, 0);
+  list-style: none;
+  transition: 5s cubic-bezier(0.21, 0.53, 0.29, 0.99);
+}
+
+
+@media (max-width: 1280px) {
+  .list {
+    transform: translate3d(-500px, 0, 0);
+  }
+}
+@media (min-width: 1282px) and (max-width: 1366px) {
+  .list {
+    transform: translate3d(-470px, 0, 0);
+  }
+}
+@media (max-width: 1080px) {
+  .list {
+    transform: translate3d(-530px, 0, 0);
+  }
+}
+@media (min-width: 991px) and (max-width: 1080px) {
+  .list {
+    transform: translate3d(-420px, 0, 0);
+  }
+}
+@media (width: 1024px) {
+  .list {
+    transform: translate3d(-550px, 0, 0);
+  }
+}
+@media (width: 991px) {
+  .list {
+    transform: translate3d(-460px, 0, 0);
+  }
+}
+
+
+@media (min-width: 801px) and (max-width: 990px) {
+  .list {
+    transform: translate3d(-520px, 0, 0);
+  }
+}
+@media (max-width: 800px) {
+  .list {
+    transform: translate3d(-515px, 0, 0);
+  }
+}
+@media (min-width: 751px) and (max-width: 799px) {
+  .list {
+    transform: translate3d(-520px, 0, 0);
+  }
+}
+@media (width: 750px) {
+  .list {
+    transform: translate3d(-530px, 0, 0);
+  }
+}
+@media (min-width: 641px) and (max-width: 749px) {
+  .list {
+    transform: translate3d(-570px, 0, 0);
+  }
+}
+@media (max-width: 640px) {
+  .list {
+    transform: translate3d(-590px, 0, 0);
+  }
+}
+
+@media (min-width: 413px) and (max-width: 500px) {
+  .list {
+    transform: translate3d(-840px, 0, 0);
+  }
+}
+@media (width: 414px) {
+  .list {
+    transform: translate3d(-850px, 0, 0);
+  }
+}
+@media (max-width: 412px) {
+  .list {
+    transform: translate3d(-860px, 0, 0);
+  }
+}
+@media (min-width: 361px) and (max-width: 411px) {
+  .list {
+    transform: translate3d(-640px, 0, 0);
+  }
+}
+@media (width: 375px) {
+  .list {
+    transform: translate3d(-650px, 0, 0);
+  }
+}
+@media (width: 360px) {
+  .list {
+    transform: translate3d(-655px, 0, 0);
+  }
+}
+
+
+
+/*.modal-payment-title{*/
+/*  display: flex;*/
+/*  width: 100%;*/
+/*  justify-content: center;*/
+/*  margin-bottom: 10px;*/
+/*}*/
+/*.modal-payment-cards{*/
+/*  display: flex;*/
+/*  width: 100%;*/
+/*}*/
+#modal-payment-ul{
+  flex-wrap: nowrap;
+  margin: auto;
+}
+@media (max-width: 768px) {
+  #modal-payment-ul{
+    flex-wrap: wrap;
+    height: auto;
+  }
 }

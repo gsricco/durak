@@ -1,6 +1,6 @@
 from tempfile import NamedTemporaryFile
 from urllib.request import urlopen
-
+from caseapp.models import Item
 from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -40,6 +40,10 @@ class CustomUser(AbstractUser):
         if not DetailUser.objects.filter(user=self):
             detail = DetailUser(user=self)
             detail.save()
+        # if not Ban.objects.filter(user=self):    # создание бана при регистрации пользователя
+        #     ban = Ban(user=self)
+        #     Ban.objects.get_or_create()
+        #     ban.save()
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -154,7 +158,7 @@ class Level(models.Model):
         #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
         #     ),
         # ]
-        ordering = ['-level']
+        ordering = ['level']
         verbose_name = 'Уровень в игре'
         verbose_name_plural = 'Уровни в игре'
 
@@ -216,16 +220,63 @@ class GameID(models.Model):
 
 class Ban(models.Model):
     """Модель банов пользователей (нужна доработка)"""
-    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
-    ban = models.BooleanField(verbose_name='Бан', default=False)  # расписать виды банов
+    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, null=True)
+    ban_site = models.BooleanField(verbose_name='Бан пользователя на сайте', default=False)
+    ban_chat = models.BooleanField(verbose_name='Бан пользователя в общем чате', default=False)
+    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)         #Надоли по IP????
 
     class Meta:
-        verbose_name = 'Баны'
+        verbose_name = 'Бан'
         verbose_name_plural = 'Баны'
 
     def __str__(self):
         return f'{self.user}'
 
+
+class DayHash(models.Model):
+    """Модель для хранения сгенерированных public_key и private_key"""
+    public_key = models.CharField(verbose_name='Публичный ключ', max_length=16, null=True)
+    private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True)
+    date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
+
+    def __str__(self):
+        return f"{self.date_generated}: {self.private_key}-{self.public_key}"
+
+    class Meta:
+        verbose_name = 'Хеш'
+        verbose_name_plural = 'Хеши'
+
+
+class RouletteRound(models.Model):
+    """Модель для сохранения раунда рулетки"""
+    ROUND_RESULT_CHOISES = [
+        ('spades', 'Пики'),
+        ('hearts', 'Червы'),
+        ('coin', 'Монетка'),
+    ]
+
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
+    round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
+    round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
+    day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
+    show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
+
+    total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
+    winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
+
+    def __str__(self):
+        return f"Раунд номер {self.round_number}: {self.total_bet_amount} кредитов. {self.round_roll}"
+
+    class Meta:
+        verbose_name = 'Раунд рулетки'
+        verbose_name_plural = 'Раунды рулетки'
+
+
+class ItemForUser(models.Model):
+
+    user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
+    user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
+    is_used = models.BooleanField(verbose_name='Использован',default=False)
 
 class AvatarProfile(models.Model):
     """Модель Аватарки профиля"""

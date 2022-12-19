@@ -5,7 +5,7 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
         let room_id = ''
         let byteFile
         let topBlock = document.querySelector('.support_chat_top_block')
-
+        let host_url = window.location.host
 
         function checkFileSize(elem) {
             const maxSize = 10000000;
@@ -14,7 +14,7 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
                 showFile.innerHTML = "<span>Файл слишком большой  </span>"
                 setInterval(() => showFile.innerHTML = '', 2000)
             } else {
-                var reader = new FileReader();
+                let reader = new FileReader();
                 reader.readAsDataURL(elem.files[0]);
                 reader.onload = function () {
                     byteFile = reader.result
@@ -69,43 +69,68 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
                 fullDiv.appendChild(spanUser)
                 fullDiv.appendChild(div)
                 if (file_path) {
+                    const file_preview = document.querySelectorAll('.support__chat-message-text')
+                    console.log(file_preview)
                     const file_url = document.createElement('div')
                     file_url.innerHTML = 'Файл'
                     file_url.className = 'file_name'
                     file_url.addEventListener('click', () => {
-                        window.open(`http://127.0.0.1:8000${file_path}`)
+
+                        window.open(`http://${host_url}${file_path}`)
                     })
                     if (user !== username) {
-                        li.appendChild(fullDiv)
-                        li.appendChild(file_url)
-                    } else {
-                        li.appendChild(file_url)
-                        li.appendChild(fullDiv)
+                            spanUser.innerHTML = user
+                        li.innerHTML = `<div style="display: flex; flex-direction: column; ">
+                                            <span>${user}</span>
+                                            <div class="support__chat-message-text" style="background: #2f2f2f;">
+                                                <img src="http://${host_url}${file_path}">
+                                            </div>
+                                        </div>`
+                    }
+                    else{
+                        li.innerHTML = `<div style="display: flex; flex-direction: column;">
+                                            <span>${user}</span>
+                                            <div class="support__chat-message-text">
+                                                <img src="http://${host_url}${file_path}">
+                                            </div>
+                                        </div>`
                     }
                 } else {
                     li.appendChild(fullDiv)
+
                 }
             }
         }
-
+        let text;
         const newRoom = (room_name) => {
             if (room_name !== username) {
                 const div = document.querySelector('.admin_support_chat_wrapper')
                 const room = document.createElement('p')
                 room.className = 'support__chat__room'
                 room.innerHTML = room_name
-                room.addEventListener('click', () => {
+                room.addEventListener('click', (e) => {
                     let room_value = room.innerText
                     room_id = room_value
                     topBlock.innerHTML = `Чат поддержки с ${room_id}`
                     chat_cleaner()
                     room_cleaner()
+                    text = e.target.textContent
+
+                    console.log(text)
+                    e.target.classList.toggle('active_room')
                     chatS.send(JSON.stringify({
                         'chat_type': 'support_admin',
                         'receiver_user_room': room_value
                     }))
                 })
                 div.appendChild(room)
+                 let all_rooms = document.querySelectorAll('.support__chat__room')
+            console.log(all_rooms)
+                all_rooms.forEach(item=>{
+                    if(item.textContent === text){
+                        item.classList.add('active_room')
+                    }
+                })
             }
         };
 
@@ -143,6 +168,7 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
                             newUserMessage(`${data.message}`, data.user)
                         }
                     }
+                    chatBlock.scrollTop = chatBlock.scrollHeight
                 }
             }
 

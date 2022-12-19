@@ -3,17 +3,29 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, ItemForUser, DayHash, RouletteRound
 
 from pay.models import Popoln
 from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, \
     AvatarProfile
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
+from caseapp.models import OwnedCase
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
 admin.site.unregister(UserSocialAuth)
 admin.site.unregister(Nonce)
 admin.site.unregister(Association)
+
+admin.site.register(RouletteRound)
+
+class OwnedCaseTabularInline(admin.TabularInline):
+    model = OwnedCase
+    extra = 1
+
+class ItemForUserInline(admin.TabularInline):
+    model = ItemForUser
+    extra = 0
 
 
 @admin.register(ReferalUser)
@@ -79,12 +91,15 @@ class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
     list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
     search_fields = 'usernameinfo',
+    inlines = [UserAgentInline, UserIPInline, DetailUserInline,
+               ReferalCodeInline, GameIDInline, BanInline,OwnedCaseTabularInline,ItemForUserInline]
     readonly_fields = 'preview',
     fieldsets = (
         (None, {'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default', 'username', 'password')}),
         ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email', 'vk_url',)}),
         (None, {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (None, {'fields': ('last_login', 'date_joined')}),
+        ('Дополнительная информация', {'fields': ('avatar', 'vk_url', 'photo')}),
         ('Игровые данные', {'fields': ('experience', 'level')})
     )
     inlines = [UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline, PopolnInline]
@@ -123,7 +138,7 @@ class LevelAdmin(admin.ModelAdmin):
         if obj and obj.experience_range:
             upper = obj.experience_range.upper if obj.experience_range.upper else 0
             lower = obj.experience_range.lower if obj.experience_range.lower else 0
-
+        
             difference = upper - lower
 
             return difference
@@ -137,6 +152,16 @@ class LevelAdmin(admin.ModelAdmin):
             return 'Нет изображения'
 
     preview.short_description = 'Картинка уровня'
+
+@admin.register(Ban)
+class BanUserAdmin(admin.ModelAdmin):
+    list_display = 'user','ban_site', 'ban_chat',  'ban_ip'
+    search_fields = 'user__id', 'user__username',
+
+@admin.register(DayHash)
+class DayHashAdmin(admin.ModelAdmin):
+    readonly_fields = 'private_key', 'public_key'
+
 
 # admin.site.register(ReferalUser)
 # admin.site.unregister(Group)
