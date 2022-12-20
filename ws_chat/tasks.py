@@ -237,7 +237,7 @@ def save_round_results(bets_info):
             winners.append(user_pk)
     # сохраняет раунд в БД
     round_number = int(r.get('round'))
-    round_started = datetime.datetime.fromtimestamp(int(r.get('start:time')) / 1000)
+    round_started = timezone.now()
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     except ObjectDoesNotExist:
