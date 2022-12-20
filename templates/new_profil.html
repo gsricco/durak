@@ -536,7 +536,7 @@
 
 <!--                    avatarModal = {{ request.user.avatar }}-->
                 <form class="profile-settings__row">
-                    {% csrf_token %}
+{#                    {% csrf_token %}#}
                     <div class="profile-settings__item-avatar">
                         <div class="profile-settings__avatar" id="imgAva">
                             {% if user.is_authenticated %}
@@ -567,7 +567,7 @@
                         <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать
                             аватарку
                         </div>
-                        <button id="btnSaveImgAvatar" type="button" class="btn btn_danger profile-settings__btn profile-settings__btn_save">
+                        <button id="btnSaveImgAvatar" onclick="window.location.reload()" class="btn btn_danger profile-settings__btn profile-settings__btn_save">
                             Сохранить
                         </button>
                     </div>
