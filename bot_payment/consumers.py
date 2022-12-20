@@ -297,7 +297,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     r.set(f'close_{request_pk}:{self.operation}:bool', "closed", ex=10*60)
                     # изменяет статус заявки
                     user_request.close_reason = info.get('close_reason')
-                    user_request.note = info.get('note')                
+                    user_request.note = info.get('note')       
+                    user_request.game_id = info.get('game_id')         
                     user_request.date_closed = timezone.now()
                     if info.get('close_reason') == 'Success':
                         user_request.status = 'succ'
