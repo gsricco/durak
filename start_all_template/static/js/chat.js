@@ -113,7 +113,6 @@ if (data.message && data.chat_type === 'all_chat') {
             const li = document.createElement('li')
             li.className = 'online-chat__li'
             li.id = data.t
-            console.log(li)
             messageBlock.appendChild(li)
 
             const divWrap = document.createElement('div')
