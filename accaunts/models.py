@@ -169,11 +169,11 @@ class DetailUser(models.Model):
     balance = models.IntegerField(verbose_name="Баланс", default=0)
 
     class Meta:
-        verbose_name = 'Данные пользователя'
-        verbose_name_plural = 'Данные пользователя'
+        verbose_name = 'Баланс'
+        verbose_name_plural = 'Баланс'
 
     def __str__(self):
-        return f'{self.user}'
+        return f''
 
 
 class ReferalCode(models.Model):

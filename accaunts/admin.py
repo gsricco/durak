@@ -92,9 +92,10 @@ class AvatarProfileAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
-    list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
+    list_display = 'usernameinfo', 'preview', 'user_info', 'email', 'vk_url',
     search_fields = 'usernameinfo',
-    inlines = [PopolnInline, UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline, OwnedCaseTabularInline, ItemForUserInline]
+    inlines = [PopolnInline, DetailUserInline, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
+               BanInline, OwnedCaseTabularInline, ItemForUserInline]
     readonly_fields = 'preview',
     fieldsets = (
         (None, {'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default', 'username', 'password')}),
@@ -103,7 +104,6 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('last_login', 'date_joined')}),
         ('Игровые данные', {'fields': ('experience', 'level')})
     )
-
 
     def preview(self, obj):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')
