@@ -30,9 +30,9 @@ class CustomUser(AbstractUser):
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
         if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
-                level_1 = Level(level=1, experience_range=NumericRange(0, 600))
-                level_1.save()
-                self.level = level_1
+            level_1 = Level(level=1, experience_range=NumericRange(0, 600))
+            level_1.save()
+            self.level = level_1
         if self.level is None:
             print(self.experience)
             self.level = Level.objects.get(level=1)
@@ -52,7 +52,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def give_level(self, save_immediately: bool=False) -> list:
+    def give_level(self, save_immediately: bool = False) -> list:
         """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
 
         Args:
@@ -142,7 +142,8 @@ class Level(models.Model):
     level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
     experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
     img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
-    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
+    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT,
+                             null=True, blank=True)
     amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
 
     def __str__(self):
@@ -223,7 +224,7 @@ class Ban(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, null=True)
     ban_site = models.BooleanField(verbose_name='Бан пользователя на сайте', default=False)
     ban_chat = models.BooleanField(verbose_name='Бан пользователя в общем чате', default=False)
-    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)         #Надоли по IP????
+    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)  # Надоли по IP????
 
     class Meta:
         verbose_name = 'Бан'
@@ -257,7 +258,8 @@ class RouletteRound(models.Model):
 
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
-    round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
+    round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES,
+                                  default='hearts')
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
     show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
 
@@ -273,16 +275,22 @@ class RouletteRound(models.Model):
 
 
 class ItemForUser(models.Model):
+    """Предметы пользователя"""
+    user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True,
+                                  on_delete=models.CASCADE)
+    user = models.ForeignKey('CustomUser', verbose_name='Пользователь', null=True, blank=True, on_delete=models.CASCADE)
+    is_used = models.BooleanField(verbose_name='Использован', default=False)
 
-    user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
-    user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
-    is_used = models.BooleanField(verbose_name='Использован',default=False)
+    class Meta:
+        verbose_name = 'Предмет пользователя'
+        verbose_name_plural = 'Предметы пользователя'
+
 
 class AvatarProfile(models.Model):
     """Модель Аватарки профиля"""
     name = models.CharField(verbose_name='Название аватарки профиля', max_length=50, blank=True, null=True)
     avatar_img = models.ImageField(verbose_name='Аватарки профиля', help_text='Аватарки профиля (рандомные)',
-                                       upload_to='img/avatar/default/')
+                                   upload_to='img/avatar/default/')
 
     class Meta:
         verbose_name = 'Аватарки профиля (рандомные)'
