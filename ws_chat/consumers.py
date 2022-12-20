@@ -43,32 +43,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async()
     def base64_to_image(self, file):
         """Преобразование байт строки в файл и сохранение его"""
-        file_type = file.split(';')[0].split('/')[1]
-        string_file = file.split(';')[1][7:]
-        save_date = datetime.datetime.now()
-        byte_file = string_file.encode(encoding='ascii')
-        new_file = base64.decodebytes(byte_file)
-        user = self.scope['user']
-        save_name = f'media/support_chat/{user.pk}/{save_date}.{file_type}'
-        if os.path.isdir(f'{BASE_DIR}/media/support_chat'):
-            print('in if$1')
-            if os.path.isdir(f'{BASE_DIR}/media/support_chat/{user.pk}'):
-                print('in if$2')
-                with open(save_name, 'wb') as f:
-                    f.write(new_file)
+        content_type = file.split(';')[0].split('/')[0]
+        if content_type == 'data:image':
+            file_type = file.split(';')[0].split('/')[1]
+            string_file = file.split(';')[1][7:]
+            save_date = datetime.datetime.now()
+            byte_file = string_file.encode(encoding='ascii')
+            new_file = base64.decodebytes(byte_file)
+            user = self.scope['user']
+            save_name = f'media/support_chat/{user.pk}/{save_date}.{file_type}'
+            if os.path.isdir(f'{BASE_DIR}/media/support_chat'):
+                print('in if$1')
+                if os.path.isdir(f'{BASE_DIR}/media/support_chat/{user.pk}'):
+                    print('in if$2')
+                    with open(save_name, 'wb') as f:
+                        f.write(new_file)
+                else:
+                    print('in else$2')
+                    os.mkdir(f'media/support_chat/{user.pk}')
+                    with open(save_name, 'wb') as f:
+                        f.write(new_file)
             else:
-                print('in else$2')
+                print('in else$1')
+                os.mkdir('media/support_chat')
                 os.mkdir(f'media/support_chat/{user.pk}')
                 with open(save_name, 'wb') as f:
                     f.write(new_file)
+            return save_name
         else:
-            print('in else$1')
-            os.mkdir('media/support_chat')
-            os.mkdir(f'media/support_chat/{user.pk}')
-            with open(save_name, 'wb') as f:
-                f.write(new_file)
-        return save_name
-
+            return ''
     @sync_to_async
     def save_user_message(self, room, user, message, file_path=''):  # сохраняет сообщение в бд
         """Cохраняет сообщения из чата поддержки в БД"""
