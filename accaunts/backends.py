@@ -44,5 +44,4 @@ class CustomVKOAuth2(VKOAuth2):
                 'first_name': first_name,
                 'last_name': last_name,
                 'photo': photo,
-                'vk_url': 'https://vk.com/' + screen_name
-                }
+                'vk_url': 'https://vk.com/' + screen_name}

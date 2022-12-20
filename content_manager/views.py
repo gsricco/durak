@@ -1,17 +1,30 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from social_django.models import UserSocialAuth
 from django.core.paginator import Paginator
 from django.utils import timezone
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash
+from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP
+from pay.models import Popoln
 from .models import FAQ, SiteContent
 
 
 def index(request):
-    """ГЛАВНАЯ"""
+    """ГЛАВНАЯ (логика при оплатах через freekassa)"""
     sitecontent = SiteContent.objects.all()
+    show_modal = False
     if request.user.is_authenticated:
+        if MERCHANT_ORDER_ID := request.GET.get('MERCHANT_ORDER_ID'):
+            try:
+                pay = Popoln.objects.get(pk=MERCHANT_ORDER_ID)
+            except ObjectDoesNotExist:
+                pass
+            else:
+                if pay.user_game == request.user and pay.url_ok:
+                    show_modal = True
+                    pay.url_ok = False
+                    pay.save()
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
@@ -25,6 +38,9 @@ def index(request):
             'sitecontent': sitecontent,
             'title': 'Рулетка',
         }
+    context['show_modal'] = show_modal
+    if show_modal:
+        context['pay_modal'] = pay
     return render(request, 'new_index.html', context)
 
 

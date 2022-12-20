@@ -9930,18 +9930,6 @@ margin-top: 36px;
   }
 }
 
-
-
-/*.modal-payment-title{*/
-/*  display: flex;*/
-/*  width: 100%;*/
-/*  justify-content: center;*/
-/*  margin-bottom: 10px;*/
-/*}*/
-/*.modal-payment-cards{*/
-/*  display: flex;*/
-/*  width: 100%;*/
-/*}*/
 #modal-payment-ul{
   flex-wrap: nowrap;
   margin: auto;

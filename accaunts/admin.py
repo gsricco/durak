@@ -3,7 +3,10 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserBet, UserIP, Level, ItemForUser, DayHash, RouletteRound
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, \
+    ItemForUser, DayHash, RouletteRound, AvatarProfile, UserBet
+
+from pay.models import Popoln
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
@@ -17,6 +20,7 @@ admin.site.unregister(Association)
 class OwnedCaseTabularInline(admin.TabularInline):
     model = OwnedCase
     extra = 1
+
 
 class ItemForUserInline(admin.TabularInline):
     model = ItemForUser
@@ -60,22 +64,43 @@ class BanInline(admin.TabularInline):
     extra = 0
 
 
+class PopolnInline(admin.TabularInline):
+    model = Popoln
+    extra = 0
+
+
+@admin.register(AvatarProfile)
+class AvatarProfileAdmin(admin.ModelAdmin):
+    """Аватарки профиля (стандартные)"""
+    list_display = 'name', 'preview', 'avatar_img',
+    readonly_fields = 'preview',
+    list_editable = 'avatar_img',
+
+    def preview(self, obj):
+        if obj.avatar_img:
+            return mark_safe(f'<img src="{obj.avatar_img.url}" width="50" height="50">')
+        else:
+            return 'Нет изображения'
+
+    preview.short_description = 'Аватарки профиля'
+
+
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
-    list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
+    list_display = 'usernameinfo', 'preview', 'user_info', 'email', 'vk_url',
     search_fields = 'usernameinfo',
-    inlines = [UserAgentInline, UserIPInline, DetailUserInline,
-               ReferalCodeInline, GameIDInline, BanInline,OwnedCaseTabularInline,ItemForUserInline]
+    inlines = [PopolnInline, DetailUserInline, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
+               BanInline, OwnedCaseTabularInline, ItemForUserInline]
     readonly_fields = 'preview',
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email')}),
+        (None, {'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default', 'username', 'password')}),
+        ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email', 'vk_url',)}),
         (None, {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (None, {'fields': ('last_login', 'date_joined')}),
-        ('Дополнительная информация', {'fields': ('avatar', 'vk_url', 'photo')}),
         ('Игровые данные', {'fields': ('experience', 'level')})
     )
+
     def preview(self, obj):
         return mark_safe(f'<img src="{obj.avatar.url}" width="50" height="50">')
 
@@ -110,7 +135,7 @@ class LevelAdmin(admin.ModelAdmin):
         if obj and obj.experience_range:
             upper = obj.experience_range.upper if obj.experience_range.upper else 0
             lower = obj.experience_range.lower if obj.experience_range.lower else 0
-        
+
             difference = upper - lower
 
             return difference
@@ -118,15 +143,17 @@ class LevelAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         if obj.img_name:
-            return mark_safe(f'<svg style="width: 50px; height: 50px;"><use xlink:href="/static/img/icons/sprite.svg#{obj.img_name}"></use></svg>')
+            return mark_safe(
+                f'<svg style="width: 50px; height: 50px;"><use xlink:href="/static/img/icons/sprite.svg#{obj.img_name}"></use></svg>')
         else:
             return 'Нет изображения'
 
     preview.short_description = 'Картинка уровня'
 
+
 @admin.register(Ban)
 class BanUserAdmin(admin.ModelAdmin):
-    list_display = 'user','ban_site', 'ban_chat',  'ban_ip'
+    list_display = 'user', 'ban_site', 'ban_chat', 'ban_ip'
     search_fields = 'user__id', 'user__username',
 
 

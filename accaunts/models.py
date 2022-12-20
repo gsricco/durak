@@ -14,6 +14,10 @@ class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
                               default='img/avatar/user/avatar.svg')
+    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=True,
+                                     help_text='Рандомная аватарка с галочкой, а стандартная без')
+    avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
+                                       on_delete=models.CASCADE, null=True, blank=True)
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
     level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
@@ -26,9 +30,9 @@ class CustomUser(AbstractUser):
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
         if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
-                level_1 = Level(level=1, experience_range=NumericRange(0, 600))
-                level_1.save()
-                self.level = level_1
+            level_1 = Level(level=1, experience_range=NumericRange(0, 600))
+            level_1.save()
+            self.level = level_1
         if self.level is None:
             print(self.experience)
             self.level = Level.objects.get(level=1)
@@ -48,7 +52,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def give_level(self, save_immediately: bool=False) -> list:
+    def give_level(self, save_immediately: bool = False) -> list:
         """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
 
         Args:
@@ -80,7 +84,7 @@ class CustomUser(AbstractUser):
                         rewards.append(new_reward)
             else:
                 break
-        
+
         if level_changed and save_immediately:
             self.save()
             if rewards:
@@ -138,7 +142,8 @@ class Level(models.Model):
     level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
     experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
     img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
-    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
+    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT,
+                             null=True, blank=True)
     amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
 
     def __str__(self):
@@ -165,11 +170,11 @@ class DetailUser(models.Model):
     balance = models.IntegerField(verbose_name="Баланс", default=0)
 
     class Meta:
-        verbose_name = 'Данные пользователя'
-        verbose_name_plural = 'Данные пользователя'
+        verbose_name = 'Баланс'
+        verbose_name_plural = 'Баланс'
 
     def __str__(self):
-        return f'{self.user}'
+        return f''
 
 
 class ReferalCode(models.Model):
@@ -219,7 +224,7 @@ class Ban(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, null=True)
     ban_site = models.BooleanField(verbose_name='Бан пользователя на сайте', default=False)
     ban_chat = models.BooleanField(verbose_name='Бан пользователя в общем чате', default=False)
-    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)         #Надоли по IP????
+    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)  # Надоли по IP????
 
     class Meta:
         verbose_name = 'Бан'
@@ -274,10 +279,30 @@ class RouletteRound(models.Model):
 
 
 class ItemForUser(models.Model):
+    """Предметы пользователя"""
+    user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True,
+                                  on_delete=models.CASCADE)
+    user = models.ForeignKey('CustomUser', verbose_name='Пользователь', null=True, blank=True, on_delete=models.CASCADE)
+    is_used = models.BooleanField(verbose_name='Использован', default=False)
 
-    user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
-    user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
-    is_used = models.BooleanField(verbose_name='Использован',default=False)
+    class Meta:
+        verbose_name = 'Предмет пользователя'
+        verbose_name_plural = 'Предметы пользователя'
+
+
+class AvatarProfile(models.Model):
+    """Модель Аватарки профиля"""
+    name = models.CharField(verbose_name='Название аватарки профиля', max_length=50, blank=True, null=True)
+    avatar_img = models.ImageField(verbose_name='Аватарки профиля', help_text='Аватарки профиля (рандомные)',
+                                   upload_to='img/avatar/default/')
+
+    class Meta:
+        verbose_name = 'Аватарки профиля (рандомные)'
+        verbose_name_plural = 'Аватарки профиля (рандомные)'
+        ordering = 'id',
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 class UserBet(models.Model):

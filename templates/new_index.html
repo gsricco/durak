@@ -12,7 +12,7 @@
             <div class="popup__content modal modal_popup modal_authorization">
                 <a href="#" class="popup__close close-popup">
                     <svg class="close-popup__icon ">
-                        <use xlink:href="static/img/icons/sprite.svg#close"></use>
+                        <use xlink:href="{% static '/img/icons/sprite.svg' %}#close"></use>
                     </svg>
                 </a>
                 <div class="modal-enter">
@@ -23,7 +23,59 @@
             </div>
         </div>
     </div>
+{% if show_modal and pay_modal.status_pay %}
+    <div class="popup modal-manual" id="balanceOk">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal_message modal-manual__modal">
+                <div class="modal-manual__queries">
+                    Заявка {{ pay_modal.pk }}
+                </div>
+                <a href="/" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
 
+                <div class="modal-message">
+                    <div class="modal-message__img">
+                        <svg class="icon-ok">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#item"></use>
+                        </svg>
+                    </div>
+                    <div class="modal-message__text">
+                        Баланс успешно пополнен на <br> {{ pay_modal.pay }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% elif show_modal %}
+    <div class="popup modal-manual" id="balanceOk">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal_message modal-manual__modal">
+                <div class="modal-manual__queries">
+                    Заявка {{ pay_modal.pk }}
+                </div>
+                <a href="#" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+
+                <div class="modal-message">
+                    <div class="modal-message__img">
+                        <svg class="icon-error">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#error"></use>
+                        </svg>
+                    </div>
+                    <div class="modal-message__text">
+                        Баланс не пополнен. <br> Ошибка!!!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
     <div class="profil-main__content">
         <section class="roulette">
             <div class="roulette__rull">
@@ -454,5 +506,8 @@
     <script src="{% static 'js/chat.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/roulette_bids.js' %}"></script>
     <script src="{% static 'js/roulette.js' %}"></script>
+{% if show_modal %}
+    <script defer src="{% static 'js/pay.js' %}"></script>
+{% endif %}
 
 {% endblock %}

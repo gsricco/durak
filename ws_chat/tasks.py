@@ -61,6 +61,7 @@ def record_work_time(function):
 
 @shared_task
 def sender():
+
     t = datetime.datetime.now()
     r.incr('round', 1)
     r.set('state', 'countdown', ex=30)
