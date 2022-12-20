@@ -278,3 +278,21 @@ class ItemForUser(models.Model):
     user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
     user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
     is_used = models.BooleanField(verbose_name='Использован',default=False)
+
+
+class UserBet(models.Model):
+    """Модель для сохранения транзакций связанных со ставками в рулетке"""
+    sum = models.PositiveIntegerField(verbose_name='Сумма ставки', default=0)
+    sum_win = models.PositiveIntegerField(verbose_name='Сумма выигрыша', default=0)
+    win = models.BooleanField(verbose_name='Ставка выиграла', default=False)
+    date = models.DateTimeField(verbose_name='Дата совершения ставки', auto_now_add=True)
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
+
+    user = models.ForeignKey('CustomUser', verbose_name='Пользователь', on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return f"Ставка {self.sum}, {self.date}, выиграла: {self.win}"
+
+    class Meta:
+        verbose_name = 'Ставка пользователя'
+        verbose_name_plural = 'Ставки пользователей'

@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, ItemForUser, DayHash, RouletteRound
+from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserBet, UserIP, Level, ItemForUser, DayHash, RouletteRound
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
@@ -144,6 +144,9 @@ class DayHashAdmin(admin.ModelAdmin):
     readonly_fields = 'private_key', 'public_key', 'private_key_hashed'
 
 
+@admin.register(UserBet)
+class UserBetAdmin(admin.ModelAdmin):
+    pass
 # admin.site.register(ReferalUser)
 # admin.site.unregister(Group)
 # admin.site.register(ReferalCode)
