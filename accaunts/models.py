@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
                               default='img/avatar/user/avatar.svg')
-    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=True,
+    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
                                      help_text='Рандомная аватарка с галочкой, а стандартная без')
     avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
                                        on_delete=models.CASCADE, null=True, blank=True)

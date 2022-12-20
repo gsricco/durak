@@ -10,7 +10,9 @@ const scrollBlock = document.querySelector('.online-chat__body')
 const UserBalance = document.querySelector('.header__profile-sum>span')
 const online = document.querySelector('.online-chat__current')
 const onlineMob = document.querySelector('#onlineChatMob')
+const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
 // WS Connection
+
 const chatSocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -45,6 +47,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
         const divWrap = document.createElement('div')
         divWrap.className = 'online-chat__li-wrapper'
+        li.id = data.t
         li.appendChild(divWrap)
 
         const divRub = document.createElement('div')
@@ -75,38 +78,42 @@ if (data.message && data.chat_type === 'all_chat') {
         spanMessage.innerHTML = `${data.message}`
 
         p.appendChild(spanMessage)
+        if(is_user_staff) {
+            const divButtons = document.createElement('div')
+            divButtons.className = 'online-chat-buttons'
+            li.appendChild(divButtons)
 
-        const divButtons = document.createElement('div')
-        divButtons.className = 'online-chat-buttons'
-        li.appendChild(divButtons)
+            const btnDelete = document.createElement('button')
+            btnDelete.type = 'submit'
+            btnDelete.onclick = () => onClickDeleteHandler(li.id, data.message)
+            btnDelete.className = 'online__chat-img'
+            divButtons.appendChild(btnDelete)
 
-        const btnDelete = document.createElement('button')
-        btnDelete.type = 'submit'
-        btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
-        btnDelete.className = 'online__chat-img'
-        divButtons.appendChild(btnDelete)
+            const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
+            btnDelete.appendChild(svgDel)
 
-        const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-        svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
-        btnDelete.appendChild(svgDel)
+            const btnBan = document.createElement('button')
+            btnBan.type = 'submit'
+            btnBan.onclick = () => onClickBanHandler()
+            btnBan.className = 'online__chat-img'
+            divButtons.appendChild(btnBan)
 
-        const btnBan = document.createElement('button')
-        btnBan.type = 'submit'
-        btnBan.onclick = ()=>onClickBanHandler()
-        btnBan.className = 'online__chat-img'
-        divButtons.appendChild(btnBan)
-
-        const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-        svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
-        btnBan.appendChild(svgBan)
+            const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
+            btnBan.appendChild(svgBan)
+        }
     }
     if (data.chat_type === 'all_chat_list') {
+        messageBlock.innerHTML = ''
         const set = new Set(data.list);
         for (let count of set) {
             const data = count
 
             const li = document.createElement('li')
             li.className = 'online-chat__li'
+            li.id = data.t
+            console.log(li)
             messageBlock.appendChild(li)
 
             const divWrap = document.createElement('div')
@@ -138,30 +145,31 @@ if (data.message && data.chat_type === 'all_chat') {
             spanMessage.innerHTML = `${data.message}`
 
             p.appendChild(spanMessage)
+            if(is_user_staff) {
+                const divButtons = document.createElement('div')
+                divButtons.className = 'online-chat-buttons'
+                li.appendChild(divButtons)
 
-            const divButtons = document.createElement('div')
-            divButtons.className = 'online-chat-buttons'
-            li.appendChild(divButtons)
+                const btnDelete = document.createElement('button')
+                btnDelete.type = 'submit'
+                btnDelete.onclick = () => onClickDeleteHandler(li.id, data.message)
+                btnDelete.className = 'online__chat-img'
+                divButtons.appendChild(btnDelete)
 
-            const btnDelete = document.createElement('button')
-            btnDelete.type = 'submit'
-            btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
-            btnDelete.className = 'online__chat-img'
-            divButtons.appendChild(btnDelete)
+                const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
+                btnDelete.appendChild(svgDel)
 
-            const svgDel = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            svgDel.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#delete_msg"></use>`
-            btnDelete.appendChild(svgDel)
+                const btnBan = document.createElement('button')
+                btnBan.type = 'submit'
+                btnBan.onclick = () => onClickBanHandler()
+                btnBan.className = 'online__chat-img'
+                divButtons.appendChild(btnBan)
 
-            const btnBan = document.createElement('button')
-            btnBan.type = 'submit'
-            btnBan.onclick = ()=>onClickBanHandler()
-            btnBan.className = 'online__chat-img'
-            divButtons.appendChild(btnBan)
-
-            const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
-            btnBan.appendChild(svgBan)
+                const svgBan = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
+                btnBan.appendChild(svgBan)
+            }
         }
     }
     if (data.lvlup) {
@@ -191,7 +199,8 @@ buttonSend.onclick = function (e) {
             'message': message,
             'user': username,
             'avatar': ava,
-            'rubin': rubin
+            'rubin': rubin,
+            't': Date.now()
         }));
     } else {
         ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
@@ -214,13 +223,10 @@ chatSocket.onopen = function (e) {
     }));
 
 };
-const onClickDeleteHandler=(li,m)=>{
-    alert(`Сообщение ${m} будет удалено`)
-    li.remove()
+const onClickDeleteHandler=(li)=>{
            chatSocket.send(JSON.stringify({
-            'message': m,
+            'delete_message': li,
         }));
-
 }
 const onClickBanHandler=()=>{
     alert('ban message1')

@@ -2087,6 +2087,7 @@ h3 {
 }
 
 .profile-settings__avatar img {
+  background: #222222;
   border-radius: 50%;
   width: 100%;
   height: auto;

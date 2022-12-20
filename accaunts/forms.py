@@ -9,7 +9,7 @@ from psycopg2.extras import NumericRange
 class UserEditName(forms.ModelForm):
     """Форма для изменении имени в profil пользователя"""
     username = forms.CharField(max_length=20, widget=forms.TextInput(
-        attrs={'class': "form__input form profile-settings__name", 'type': "text", }))
+        attrs={'id': 'new_username', 'class': "form__input form profile-settings__name", 'type': "text", }))
 
     class Meta:
         model = CustomUser

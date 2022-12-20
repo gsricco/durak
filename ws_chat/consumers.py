@@ -12,7 +12,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
 
-from accaunts.models import CustomUser, Ban
+from accaunts.models import CustomUser, Ban, AvatarProfile
 from configs.settings import BASE_DIR
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
@@ -35,11 +35,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return chat_room
 
     async def save_user_message_all_chat(self, all_chat_message):
-        """Cохраняет последние 1-50 сообщений из общего чата в Редис"""
-        if r.llen("all_chat_50") == 50:
-            r.lpop("all_chat_50")
-        r.rpush("all_chat_50", json.dumps(all_chat_message))
-
+        """Сохраняет последние 1-50 сообщений из общего чата в Редис"""
+        # if r.llen("all_chat_50") == 50:
+        #     r.lpop("all_chat_50")
+        # r.rpush("all_chat_50", json.dumps(all_chat_message))
+        if not r.exists("all_chat_50"):
+            r.json().set("all_chat_50", ".", [])
+        r.json().arrappend("all_chat_50", ".", all_chat_message)
+        if arr_len := r.json().arrlen("all_chat_50") > 50:
+            r.json().arrtrim("all_chat_50", ".", arr_len-50, -1)
     @sync_to_async()
     def base64_to_image(self, file):
         """Преобразование байт строки в файл и сохранение его"""
@@ -109,9 +113,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def init_users_chat(self, channel):
         """Отправляет историю сообщений(до 50шт) общего чата, выгружая её из Редиса"""
-        message_with_list = []
-        for message in r.lrange("all_chat_50", 0, 49):
-            message_with_list.append(json.loads(message))
+        message_with_list = r.json().get("all_chat_50")
         await self.channel_layer.send(channel, {"type": "chat_message",
                                                 "chat_type": "all_chat_list",
                                                 "message": "list",
@@ -219,16 +221,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             message = await self.eval_xp_and_lvl(user)
             await self.send(text_data=json.dumps(message))
+
     async def send_task_lvl_and_exp(self, event):
         """Отправляет уровень и опыт пользователю при подключении"""
-        message = {}
+        message = dict()
         message['lvlup'] = event.get('lvlup')
         message['expr'] = event.get('expr')
         message['lvl_info'] = event.get('lvl_info')
         await self.send(text_data=json.dumps(message))
+
     @sync_to_async()
     def get_cases_info(self):
-        '''функция отправки информации о кейсах'''
+        """Функция отправки информации о кейсах"""
         # поулчаем все выданные и не открытые кейсы
         users = self.scope['user']
         owned_cases_for_user = OwnedCase.objects.filter(owner=users.pk)
@@ -261,7 +265,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_items_for_cases(self):
         cases_items = Case.objects.all()
         serializer = CaseAndCaseItemSerializer(cases_items, many=True)
-        message = {}
+        message = dict()
         for case in serializer.data:
             message[case['name']] = {'image': case['image'],
                                      'items': case['itemforcase_set']
@@ -273,7 +277,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async()
     def get_user_items(self):
-        '''Send user item functions'''
+        """Шлёт кейсы пользователям"""
         user = self.scope['user']
         if user.is_authenticated:
             user_items = ItemForUser.objects.filter(user=user)
@@ -286,7 +290,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async()
     def open_case(self, case):
-        '''Open case function'''
+        """Открывает кейсы"""
         user = self.scope['user']
         case_id = Case.objects.filter(name=case).first()
         if case_id:
@@ -388,6 +392,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
+        # Удаление сообщения из общего чата
+        if message_to_delete := text_data_json.get('delete_message'):
+            if self.scope['user'].is_staff:
+                new_list_all_chat_50 = await self.all_chat_delete_message(message_to_delete)
+                await self.channel_layer.group_send(self.room_group_name, {
+                                                                    "type": "chat_message",
+                                                                    "chat_type": "all_chat_list",
+                                                                    "message": "list",
+                                                                    "list": new_list_all_chat_50
+                                                                    }
+                                                    )
+        if text_data_json.get('get_avatar'):
+            await self.get_avatar(text_data_json)
+        if text_data_json.get('set_avatar'):
+            await self.set_avatar_new_username(text_data_json)
         if text_data_json.get('get_cases_items'):
             await self.get_items_for_cases()
         # получение предметов в инвентарь
@@ -480,7 +499,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                         "user": sender_user, })  # отправка сообщения пользователю в рум
         elif text_data_json.get('chat_type') == 'all_chat':
             '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
-            Проводим проверку на длинну сообщения не более 250 символов.
+            Проводим проверку на длину сообщения не более 250 символов.
             Проводим проверку на бан пользователя.'''
             all_chat_message = {"type": "chat_message",
                                 "chat_type": text_data_json.get('chat_type'),
@@ -488,6 +507,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "user": text_data_json["user"],
                                 "avatar": text_data_json["avatar"],
                                 "rubin": text_data_json.get("rubin"),
+                                "t": text_data_json.get("t")
                                 }
             if len(all_chat_message["message"]) <= 250:
                 if await self.get_ban_chat_user(text_data_json["user"]):
@@ -521,12 +541,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         avatar = event.get("avatar")
         rubin = event.get("rubin")
         list = event.get('list')
+        print('CHAT_MESSAGE WORKS')
         await self.send(text_data=json.dumps({"message": message,
                                               "chat_type": chat_type,
                                               "user": user,
                                               "avatar": avatar,
                                               "rubin": rubin,
-                                              "list": list
+                                              "list": list,
+                                              "t": event.get('t')
                                               }))
 
     async def support_chat_message(self, event):
@@ -666,3 +688,77 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = dict()
         message["case_roll_result"] = event.get("case_roll_result")
         await self.send(json.dumps(message))
+
+    async def get_avatar(self, data):
+        """Отправляет новую аватарку(или аватарку соц-сети) пользователю"""
+        if data.get('get_avatar') == 'all':
+            if avatar_id := data.get('c'):
+                updated_avatar = await self.generate_avatar(avatar_id)
+            else:
+                updated_avatar = await self.generate_avatar()
+            message = {'b_avatar': updated_avatar.avatar_img.url,
+                       'c': updated_avatar.id}
+        else:
+            updated_avatar = self.scope['user'].avatar
+            message = {'u_avatar': updated_avatar.url}
+        await self.send(json.dumps(message))
+
+    @sync_to_async
+    def generate_avatar(self, prev_avatar_id=None):
+        """Генерирует последовательно базовые аватарки"""
+        if prev_avatar_id and AvatarProfile.objects.filter(id__gt=prev_avatar_id).exists():
+            ava = AvatarProfile.objects.filter(id__gt=prev_avatar_id).first()
+        else:
+            ava = AvatarProfile.objects.first()
+        return ava
+
+    @sync_to_async
+    def check_username(self, username):
+        return CustomUser.objects.filter(username=username).exists()
+
+    @sync_to_async
+    def set_username(self, new_name):
+        print(new_name)
+        self.scope['user'].username = new_name
+        self.scope['user'].save()
+
+    @sync_to_async
+    def set_new_basic_avatar(self, avatar_id=None, basic=True):
+        if avatar_id:
+            self.scope['user'].avatar_default_id = avatar_id
+        self.scope['user'].use_avatar = basic
+        self.scope['user'].save()
+
+    async def set_avatar_new_username(self, data):
+        if data.get('user') != data.get('new_username'):
+            check_username = await self.check_username(data.get('new_username'))
+            if check_username:
+                message = {'error': 'Попробуйте другое имя...'}
+                await self.send(json.dumps(message))
+                return
+            else:
+                await self.set_username(data.get('new_username'))
+        if data.get('basic', True):
+            if ava_id := data.get('avatarId'):
+                await self.set_new_basic_avatar(ava_id)
+            else:
+                await self.set_new_basic_avatar()
+        else:
+            await self.set_new_basic_avatar(basic=False)
+        message = {'new_username': data.get('new_username'),
+                   'set_avatar': data.get('set_avatar')}
+        await self.send(json.dumps(message))
+
+    @staticmethod
+    async def all_chat_delete_message(message_to_delete):
+        """Находит и удаляет указанное сообщение в общем чате из Redis"""
+        message_index = None
+        new_list_all_chat_50 = r.json().get("all_chat_50")
+        for i, message in enumerate(new_list_all_chat_50):
+            id_t = message.get('t')
+            if str(id_t) == message_to_delete:
+                message_index = i
+                break
+        if message_index:
+            r.json().arrpop("all_chat_50", ".", message_index)
+        return r.json().get("all_chat_50")
