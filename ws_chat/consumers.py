@@ -196,6 +196,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if Level.objects.filter(level=current_level - 1).exists():
                 previous_lvl = Level.objects.get(level=current_level - 1)
                 message = {"lvlup": {
+                    'max_lvl': True,
                     "new_lvl": current_level,
                     "levels": previous_lvl.level,
                 },

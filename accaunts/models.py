@@ -16,7 +16,8 @@ class CustomUser(AbstractUser):
                               default='img/avatar/user/avatar.svg')
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", default=0,
+                              on_delete=models.PROTECT, blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
 
     def save(self, *args, **kwargs):
@@ -26,7 +27,7 @@ class CustomUser(AbstractUser):
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
         if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
-                level_1 = Level(level=1, experience_range=NumericRange(0, 600))
+                level_1 = Level(level=0, experience_range=NumericRange(0, 600))
                 level_1.save()
                 self.level = level_1
         if self.level is None:

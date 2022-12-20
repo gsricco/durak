@@ -285,9 +285,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     users_rewards = []
     # обработка ставок для каждого пользователя
     for user in users:
-        lev = Level.objects.last()
-        max_level = lev.level
-        max_exp = lev.experience_range.upper
+        # lev = Level.objects.last()
+        # max_level = lev.level
+        # max_exp = lev.experience_range.upper
         # получение информации о ставке пользователя
         bet_key = user.pk
         # получаем словарь со всеми ставками юзера
@@ -297,7 +297,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # расчёт и начисление баланса без сохранения в БД
         user.detailuser.balance += eval_balance(user_bets['amount'], round_result)
         # добавление опыта пользователю без сохранения в БД
-        user.experience += xp
+        # если уровень максимальный , не добавляем
+        if Level.objects.filter(level=user.level.level+1).exists():
+            user.experience += xp
         # запоминает номер предыдущего уровня
         prev_level = user.level.level
         if channel_name := bets_info[str(bet_key)]['channel_name']:
@@ -313,25 +315,25 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
         # если уровень пользователя изменился
         if prev_level != user.level.level:
-            if channel_name := bets_info[str(bet_key)]['channel_name']:
-                level = user.level.level
-                new_level = level + 1
-                if level == max_level:
-                    new_level = 'max'
-                message = {
-                    "type": "send_new_level",
-                    "lvlup": {
-                        "type": "send_new_level",
-                        "new_lvl": new_level,
-                        "lvlup": {
-                            "new_lvl": new_level,
-                            "levels": level,
-                        },
-
-                        "levels": level,
-                    },
-                }
-                async_to_sync(channel_layer.send)(channel_name, message)
+            # if channel_name := bets_info[str(bet_key)]['channel_name']:
+            #     level = user.level.level
+            #     new_level = level + 1
+                # if level == max_level:
+                #     new_level = 'max'
+                # message = {
+                #     "type": "send_new_level",
+                #     "lvlup": {
+                #         "type": "send_new_level",
+                #         "new_lvl": new_level,
+                #         "lvlup": {
+                #             "new_lvl": new_level,
+                #             "levels": level,
+                #         },
+                #
+                #         "levels": level,
+                #     },
+                # }
+                # async_to_sync(channel_layer.send)(channel_name, message)
 
             # проверяет награды пользователя за новый уровень
             if rewards_for_level:
@@ -397,6 +399,7 @@ def send_exp(user, channel_name):
             message = {
                 "type": 'send_task_lvl_and_exp',
                 "lvlup": {
+                    'max_lvl': True,
                     "new_lvl": current_level,
                     "levels": previous_lvl.level,
                 },

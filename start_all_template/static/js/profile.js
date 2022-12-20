@@ -42,8 +42,13 @@ function super_new(f) {
             set_lvl_info(data.lvl_info)
         }
         if(data.lvlup){
+            if(data.lvlup.max_lvl){
+                console.log('тут')
+                bigProfLvl.innerHTML = data.lvlup.new_lvl + ' LVL'
+            }else{
                 bigProfLvl.innerHTML = data.lvlup.levels + ' LVL'
-        }
+             }
+            }
         if (data.expr) {
             setExp(data.expr)
         }
