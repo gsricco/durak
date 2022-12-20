@@ -599,64 +599,63 @@
     </footer>
 
     <div class="popup" id="modalPayment">
-        <div class="popup__body">
-            <div class="popup__content modal modal_payment">
+            <div class="popup__body">
+                <div class="popup__content modal modal_payment">
 
-                <a href="#" class="popup__close close-popup">
-                    <svg class="close-popup__icon ">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
-                    </svg>
-                </a>
-                <div class="modal-payment">
-                    <a href="#amountSelection" class="modal-payment__block popup-link">
-                        <h3 class="modal__title modal-payment__title">
-                            Пополнить деньгами
-                        </h3>
-                        <ul class="modal-payment__cards cards">
-                            <li class="modal-payment__card payment-system">
-                                <div class="payment-system__img payment-system__img_big">
-                                    <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
-                                </div>
-                                <div class="payment-system__title">
-                                    Visa/Master/Мир
-                                </div>
-                            </li>
-                            <li class="modal-payment__card payment-system">
-                                <div class="payment-system__img">
-                                    <img src="{% static 'img/gallery/qivi.png' %}" alt="qivi">
-                                </div>
-                                <div class="payment-system__title">
-                                    Киви кошелёк
-                                </div>
-
-
-                            </li>
-                            <li class="modal-payment__card payment-system">
-                                <div class="payment-system__img">
-                                    <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
-                                </div>
-                                <div class="payment-system__title">
-                                    ЮMoney
-                                </div>
-                        </ul>
-
+                    <a href="#" class="popup__close close-popup">
+                        <svg class="close-popup__icon ">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                        </svg>
                     </a>
-                    <a href="#selectAmount" class="modal-payment__block popup-link">
-                        <h3 class="modal__title modal-payment__title">
-                            Пополнить игровой валютой
-                        </h3>
-                        <div class="modal-payment__game-currency game-currency">
-                            <div class="game-currency__img">
-                                <svg>
-                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
-                                </svg>
+                    <div class="modal-payment">
+                        <a href="#amountSelection" class="modal-payment__block popup-link">
+                            <h3 class="modal__title modal-payment__title">
+                                Пополнить деньгами
+                            </h3>
+                            <ul id="modal-payment-ul" class="modal-payment__cards cards">
+                                <li class="modal-payment__card payment-system">
+                                    <div class="payment-system__img payment-system__img_big">
+                                        <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
+                                    </div>
+                                    <div class="payment-system__title">
+                                        Visa/Master/Мир
+                                    </div>
+                                </li>
+                                <li class="modal-payment__card payment-system">
+                                    <div class="payment-system__img">
+                                        <img src="{% static 'img/gallery/qivi.png' %}" alt="qivi">
+                                    </div>
+                                    <div class="payment-system__title">
+                                        Киви кошелёк
+                                    </div>
+                                </li>
+                                <li class="modal-payment__card payment-system">
+                                    <div class="payment-system__img">
+                                        <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">
+                                    </div>
+                                    <div class="payment-system__title">
+                                        ЮMoney
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </a>
+                        <a href="#selectAmount" class="modal-payment__block popup-link">
+                            <h3 class="modal__title modal-payment__title">
+                                Пополнить игровой валютой
+                            </h3>
+                            <div class="modal-payment__game-currency game-currency">
+                                <div class="game-currency__img">
+                                    <svg>
+                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
+                                    </svg>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     <div class="popup" id="amountSelection">
         <div class="popup__body">
 

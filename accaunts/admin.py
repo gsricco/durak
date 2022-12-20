@@ -94,15 +94,13 @@ class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
     list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
     search_fields = 'usernameinfo',
-    inlines = [UserAgentInline, UserIPInline, DetailUserInline,
-               ReferalCodeInline, GameIDInline, BanInline, OwnedCaseTabularInline, ItemForUserInline]
+    inlines = [PopolnInline, UserAgentInline, UserIPInline, DetailUserInline, ReferalCodeInline, GameIDInline, BanInline, OwnedCaseTabularInline, ItemForUserInline]
     readonly_fields = 'preview',
     fieldsets = (
         (None, {'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default', 'username', 'password')}),
         ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email', 'vk_url',)}),
         (None, {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (None, {'fields': ('last_login', 'date_joined')}),
-        # ('Дополнительная информация', {'fields': ('avatar', 'vk_url', 'photo',)}),
         ('Игровые данные', {'fields': ('experience', 'level')})
     )
 
