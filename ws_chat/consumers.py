@@ -718,7 +718,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def set_username(self, new_name):
-        print(new_name)
         self.scope['user'].username = new_name
         self.scope['user'].save()
 
