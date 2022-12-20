@@ -209,12 +209,12 @@
     </header>
 
     <main>
-        <div class="container">
-            <div class="chat-open-btn">
-                <svg>
-                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat-btn"></use>
-                </svg>
-            </div>
+        <div id="mobile-online-chat" class="container">
+<!--            <div class="chat-open-btn">-->
+<!--                <svg>-->
+<!--                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat-btn"></use>-->
+<!--                </svg>-->
+<!--            </div>-->
 
             <section class="profil-main">
 
@@ -236,7 +236,7 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
                             </svg>
                             <div class="online-chat__header-rigth">
-                                <div class="online-chat__current"></div>
+                                <div id="onlineChat" class="online-chat__current"></div>
                                 <span class="online-chat__torch"></span>
                             </div>
 

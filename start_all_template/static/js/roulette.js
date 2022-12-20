@@ -93,7 +93,7 @@ const returnToStartPosition = () => {
     wrapperItems.classList.add("roulette__rull-wrapper_blur");
     timerWrapper.style.display = "flex";
 
-    rull_line.style.display = "inline-block";
+    rull_line.style.display = "none";
 }
 
 //! Таймер рулетка
@@ -107,7 +107,7 @@ let rull_line = document.querySelector(".roulette__rull-line");
 let blurForTimer = () => {
     wrapperItems.classList.add("roulette__rull-wrapper_blur");
     timerWrapper.style.display = "flex";
-    rull_line.style.display = "inline-block";
+    // rull_line.style.display = "inline-block";
 }
 
 // логика счетчика таймера
@@ -184,9 +184,9 @@ function super_new(f) {
             document.querySelector('#spanCardHearts').style.color = '#FFECA8';
             document.querySelector('#spanCardCoin').style.color = '#FFECA8';
             document.querySelector('#spanCardSpades').style.color = '#FFECA8';
-            document.querySelector('#spanCardHeartsMob').style.color = '#FFECA8';
-            document.querySelector('#spanCardCoinMob').style.color = '#FFECA8';
-            document.querySelector('#spanCardSpadesMob').style.color = '#FFECA8';
+            document.querySelector('#spanCardHeartsMob').style.color = '#9A9A9A;';
+            document.querySelector('#spanCardCoinMob').style.color = '#9A9A9A;';
+            document.querySelector('#spanCardSpadesMob').style.color = '#9A9A9A;';
             document.querySelector('#titleHearts').innerHTML = `Черви`
             document.querySelector('#titleCoin').innerHTML = `Монета`
             document.querySelector('#titleSpades').innerHTML = `Пики`
@@ -194,8 +194,11 @@ function super_new(f) {
             document.querySelector('#roulCoin').style.border = 'none';
             document.querySelector('#roulHearts').style.border = 'none';
             document.querySelector('#itemHeartsBid').innerHTML = `<span>Ставка</span> Х2`;
-            document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х2`;
+            document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х14`;
             document.querySelector('#itemSpadesBid').innerHTML = `<span>Ставка</span> Х2`;
+            document.querySelector('#memberHearts').innerHTML=`0 участников`
+            document.querySelector('#memberCoin').innerHTML=`0 участников`
+            document.querySelector('#memberSpades').innerHTML=`0 участников`
         }
 
         function winnerCheckInitialSettings() {
@@ -226,18 +229,18 @@ function super_new(f) {
                 if (document.querySelector('#signWinnerspades')) document.querySelector('#signWinnerspades').innerHTML = '-';
 
             })
-            bidsNumberMob.forEach(el => {
-                el.style.color = '#C4364E'
-                document.querySelector('#spanCardHeartsMob').style.color = '#C4364E';
-                document.querySelector('#spanCardCoinMob').style.color = '#C4364E';
-                document.querySelector('#spanCardSpadesMob').style.color = '#C4364E';
-
-
-                if (document.querySelector('#signWinnerheartsMob')) document.querySelector('#spanCardHeartsMob').innerHTML = `-${heartsCountsShow}`;
-                if (document.querySelector('#signWinnercoinMob')) document.querySelector('#spanCardCoinMob').innerHTML = `-${coinCountsShow}`;
-                if (document.querySelector('#signWinnerspadesMob')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
-
-            })
+            // bidsNumberMob.forEach(el => {
+            //     el.style.color = '#C4364E'
+            //     document.querySelector('#spanCardHeartsMob').style.color = '#C4364E';
+            //     document.querySelector('#spanCardCoinMob').style.color = '#C4364E';
+            //     document.querySelector('#spanCardSpadesMob').style.color = '#C4364E';
+            //
+            //
+            //     if (document.querySelector('#signWinnerheartsMob')) document.querySelector('#spanCardHeartsMob').innerHTML = `-${heartsCountsShow}`;
+            //     if (document.querySelector('#signWinnercoinMob')) document.querySelector('#spanCardCoinMob').innerHTML = `-${coinCountsShow}`;
+            //     if (document.querySelector('#signWinnerspadesMob')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
+            //
+            // })
         }
 
         function checkWinner(cardWinner, bidIncrease) {
@@ -295,11 +298,11 @@ function super_new(f) {
                     document.querySelector(`#spanCard${nameWinnerCard}`).style.color = '#5DD887';
                     document.querySelector(`#roul${nameWinnerCard}`).style.border = '1px solid #5DD887';
                     document.querySelector(`#roul${nameWinnerCard}`).style.borderRadius = '5px';
-                    if (window.screen.width < 768) {
-                        document.querySelector(`#spanCard${nameWinnerCard}Mob`).innerHTML = `+${countsShow}`;
-                        document.querySelector(`#spanCard${nameWinnerCard}Mob`).style.color = '#5DD887';
-                        document.querySelector(`#item${nameWinnerCard}Bid`).innerHTML = ``;
-                    }
+                    // if (window.screen.width < 768) {
+                    //     document.querySelector(`#spanCard${nameWinnerCard}Mob`).innerHTML = `+${countsShow}`;
+                    //     document.querySelector(`#spanCard${nameWinnerCard}Mob`).style.color = '#5DD887';
+                    //     document.querySelector(`#item${nameWinnerCard}Bid`).innerHTML = ``;
+                    // }
                 }
                 document.querySelector(`.${lowerCard}`).style.opacity = '1'
                 bidsButtons[0].style.opacity = '1'
@@ -322,7 +325,27 @@ function super_new(f) {
 
             }
         }
+        console.log(document.querySelector('#userBal').textContent, 'BALANCE_FRONT_FOREVER')
         if (data.current_balance) {
+            console.log(data.current_balance,"BALANCE_BACK")
+            console.log(document.querySelector('#userBal').textContent, 'BALANCE_FRONT')
+            // UserBalancer = Number(data.current_balance)
+            // // Отображать надо уже преобразованное число, а использовать пришедшее
+            // if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+            //     UserBalancerShow = `${UserBalancer / 1000}K`
+            // } else {
+            //     if (UserBalancer / 1000000 > 0) {
+            //         UserBalancerShow = `${UserBalancer / 1000000}M`
+            //     } else
+            //         UserBalancerShow = `${UserBalancer}`
+            // }
+            // if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+            //     UserBalancerShow = `${UserBalancer}`
+            // }
+            //
+            //
+            //
+            // UserBalance.innerHTML = `${UserBalancerShow}`
             UserBalance.innerHTML = `${data.current_balance}`
         }
 
@@ -352,28 +375,6 @@ function super_new(f) {
         }
         if (data.roulette) {
             rouletteInitialSettings();
-            // document.querySelector('#spanCardHearts').innerHTML = ``
-            // document.querySelector('#spanCardHeartsMob').innerHTML = ``
-            // document.querySelector('#spanCardCoin').innerHTML = ``
-            // document.querySelector('#spanCardCoinMob').innerHTML = ``
-            // document.querySelector('#spanCardSpades').innerHTML = ``
-            // document.querySelector('#spanCardSpadesMob').innerHTML = ``
-            // document.querySelector('#spanCardHearts').style.color = '#FFECA8';
-            // document.querySelector('#spanCardCoin').style.color = '#FFECA8';
-            // document.querySelector('#spanCardSpades').style.color = '#FFECA8';
-            // document.querySelector('#spanCardHeartsMob').style.color = '#FFECA8';
-            // document.querySelector('#spanCardCoinMob').style.color = '#FFECA8';
-            // document.querySelector('#spanCardSpadesMob').style.color = '#FFECA8';
-            // document.querySelector('#titleHearts').innerHTML = `Черви`
-            // document.querySelector('#titleCoin').innerHTML = `Монета`
-            // document.querySelector('#titleSpades').innerHTML = `Пики`
-            // document.querySelector('#roulSpades').style.border = 'none';
-            // document.querySelector('#roulCoin').style.border = 'none';
-            // document.querySelector('#roulHearts').style.border = 'none';
-            // document.querySelector('#itemHeartsBid').innerHTML = `<span>Ставка</span> Х2`;
-            // document.querySelector('#itemCoinBid').innerHTML = `<span>Ставка</span> Х2`;
-            // document.querySelector('#itemSpadesBid').innerHTML = `<span>Ставка</span> Х2`;
-
             timerCounter(data.roulette)
         }
 

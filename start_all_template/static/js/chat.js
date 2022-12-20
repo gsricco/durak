@@ -8,14 +8,33 @@ const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
 const UserBalance = document.querySelector('.header__profile-sum>span')
-const online = document.querySelector('.online-chat__current')
+const online = document.querySelector('#onlineChat')
 const onlineMob = document.querySelector('#onlineChatMob')
+
 // WS Connection
 const chatSocket = new WebSocket(
     'ws://'
     + window.location.host
     + '/ws/chat/go/'
 );
+
+//вставка онлайн чата только на главную страницу
+console.log(window.location.pathname)
+if (window.location.pathname === '/') {
+    let mobileChat = document.querySelector('#mobile-online-chat')
+    let tempElem = document.querySelector('.profil-main')
+    let divMobChat = document.createElement('div')
+    divMobChat.className = 'chat-open-btn'
+    divMobChat.innerHTML = `    
+                <svg>
+                    <use xlink:href="/static/img/icons/sprite.svg#chat-btn"></use>
+                   
+                </svg>
+    `
+    mobileChat.insertBefore(divMobChat, tempElem);
+}
+
+
 if (document.querySelector(".scrollbar-overflow")) {
     let blockArrow = document.querySelectorAll(".scrollbar-overflow");
 
@@ -38,7 +57,7 @@ chatSocket.onmessage = function (e) {
         onlineMob.innerHTML = `${data.get_online}`
     }
 
-if (data.message && data.chat_type === 'all_chat') {
+    if (data.message && data.chat_type === 'all_chat') {
         const li = document.createElement('li')
         li.className = 'online-chat__li'
         messageBlock.appendChild(li)
@@ -82,7 +101,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
         const btnDelete = document.createElement('button')
         btnDelete.type = 'submit'
-        btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
+        btnDelete.onclick = () => onClickDeleteHandler(li, data.message)
         btnDelete.className = 'online__chat-img'
         divButtons.appendChild(btnDelete)
 
@@ -92,7 +111,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
         const btnBan = document.createElement('button')
         btnBan.type = 'submit'
-        btnBan.onclick = ()=>onClickBanHandler()
+        btnBan.onclick = () => onClickBanHandler()
         btnBan.className = 'online__chat-img'
         divButtons.appendChild(btnBan)
 
@@ -145,7 +164,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnDelete = document.createElement('button')
             btnDelete.type = 'submit'
-            btnDelete.onclick = ()=>onClickDeleteHandler(li,data.message)
+            btnDelete.onclick = () => onClickDeleteHandler(li, data.message)
             btnDelete.className = 'online__chat-img'
             divButtons.appendChild(btnDelete)
 
@@ -155,7 +174,7 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnBan = document.createElement('button')
             btnBan.type = 'submit'
-            btnBan.onclick = ()=>onClickBanHandler()
+            btnBan.onclick = () => onClickBanHandler()
             btnBan.className = 'online__chat-img'
             divButtons.appendChild(btnBan)
 
@@ -165,12 +184,12 @@ if (data.message && data.chat_type === 'all_chat') {
         }
     }
     if (data.lvlup) {
-            level_data_next = document.querySelector('.level_data_next')
-            level_data_back = document.querySelector('.level_data_back')
-            level_data_back.innerHTML = data.lvlup.levels + 'ур.'
-            level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
-            }
-    if (data.expr){
+        level_data_next = document.querySelector('.level_data_next')
+        level_data_back = document.querySelector('.level_data_back')
+        level_data_back.innerHTML = data.lvlup.levels + 'ур.'
+        level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
+    }
+    if (data.expr) {
         level_line = document.querySelector('.header__profile-line_span')
         level_line.style.width = data.expr.percent + '%'
     }
@@ -214,14 +233,14 @@ chatSocket.onopen = function (e) {
     }));
 
 };
-const onClickDeleteHandler=(li,m)=>{
+const onClickDeleteHandler = (li, m) => {
     alert(`Сообщение ${m} будет удалено`)
     li.remove()
-           chatSocket.send(JSON.stringify({
-            'message': m,
-        }));
+    chatSocket.send(JSON.stringify({
+        'message': m,
+    }));
 
 }
-const onClickBanHandler=()=>{
+const onClickBanHandler = () => {
     alert('ban message1')
 }

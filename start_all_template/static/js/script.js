@@ -1434,3 +1434,20 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 const media_prefix = JSON.parse(document.getElementById('media_prefix').textContent);
 const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
+
+
+let UserBalancer=Number(document.querySelector('#userBal').textContent)
+
+// if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+//     UserBalancerShow = `${UserBalancer / 1000}K`
+// } else {
+//     if (UserBalancer / 1000000 > 0) {
+//         UserBalancerShow = `${UserBalancer / 1000000}M`
+//     } else
+//         UserBalancerShow = `${UserBalancer}`
+// }
+// if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+//     UserBalancerShow = `${UserBalancer}`
+// }
+//
+// document.querySelector('#userBal').innerHTML = `${UserBalancerShow}`

@@ -9,49 +9,17 @@ var coinCounts;
 var spadesCounts;
 var coinCountsShow;
 var spadesCountsShow;
+var heartsCountsShowMob;
+var heartsCountsMob;
+var coinCountsMob;
+var spadesCountsMob;
+var coinCountsShowMob;
+var spadesCountsShowMob;
+var userCountHearts;
+var userCountCoin;
+var userCountSpades;
 
 
-// const createBidItemRow = (data) => {
-//     const bidItemBlock = document.querySelector(`.${data.bet.bidCard}`)
-//
-//     if (bidItemBlock.innerHTML != ``) {
-//         let itemMoney = document.querySelector(`div.${data.bet.bidCard} div.roulette__item-money`)
-//         let bidOld = Number(itemMoney.textContent) + Number(`${data.bet.bidCount}`)
-//         console.log(bidOld)
-//         itemMoney.innerHTML = bidOld;
-//     } else {
-//
-//         const bidItem = document.createElement('div')
-//         bidItem.className = 'roulette__item-row'
-//         bidItemBlock.appendChild(bidItem)
-//
-//         const bidItemLeftBlock = document.createElement('div')
-//         bidItemLeftBlock.className = 'roulette__item-left'
-//         bidItem.appendChild(bidItemLeftBlock)
-//
-//         const itemMoney = document.createElement('div')
-//         itemMoney.className = 'roulette__item-money'
-//         itemMoney.innerHTML = `${data.bet.bidCount}`
-//         bidItem.appendChild(itemMoney)
-//
-//         const itemAvatar = document.createElement('div')
-//         itemAvatar.className = 'roulette__item-avatar'
-//         itemAvatar.innerHTML = `<img src="${data.bet.avatar}" alt="">`
-//         bidItemLeftBlock.appendChild(itemAvatar)
-//
-//         const itemStone = document.createElement('div')
-//         itemStone.className = 'roulette__item-stoun'
-//         const stone = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-//         stone.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.bet.userStone}"></use>`
-//         itemStone.appendChild(stone)
-//         bidItemLeftBlock.appendChild(itemStone)
-//
-//         const itemUserName = document.createElement('div')
-//         itemUserName.className = 'roulette__item-username'
-//         itemUserName.innerHTML = `${data.bet.userName}`
-//         bidItemLeftBlock.appendChild(itemUserName)
-//     }
-// }
 const createBidItems = (data) => {
     document.querySelector(`.hearts`).innerHTML = ''
     document.querySelector(`.coin`).innerHTML = ''
@@ -61,14 +29,77 @@ const createBidItems = (data) => {
     console.log(username, 'USERNAME')
 
     let usersId = (Object.keys(data))
+    let memberHeartsShow = '';
+    let memberCoinShow = '';
+    let memberSpadesShow = '';
+    userCountHearts = 0;
+    userCountCoin = 0;
+    userCountSpades = 0;
     heartsCounts = 0;
     coinCounts = 0;
     spadesCounts = 0;
     heartsCountsShow = '';
     coinCountsShow = '';
     spadesCountsShow = '';
+    heartsCountsMob = 0;
+    coinCountsMob = 0;
+    spadesCountsMob = 0;
+    heartsCountsShowMob = '';
+    coinCountsShowMob = '';
+    spadesCountsShowMob = '';
     let usersBids = []
     usersId.map(user => {
+//суммирования всех для мобилок
+        if (data[user]['amount']['hearts']) {
+            userCountHearts += 1
+            heartsCountsMob += data[user]['amount']['hearts']
+            if (heartsCountsMob / 1000 > 9 && heartsCountsMob / 1000 < 1000) {
+                heartsCountsShowMob = `${heartsCountsMob / 1000}K`
+            } else {
+                if (heartsCountsMob / 1000000 > 0) {
+                    heartsCountsShowMob = `${heartsCountsMob / 1000000}M`
+                } else
+                    heartsCountsShowMob = `${heartsCountsMob}`
+            }
+            if (heartsCountsMob / 1000 > 0 && heartsCountsMob / 1000 < 10) {
+                heartsCountsShowMob = `${heartsCountsMob}`
+            }
+            document.querySelector('#spanCardHeartsMob').innerHTML = `${heartsCountsShowMob}`
+        }
+        if (data[user]['amount']['coin']) {
+            userCountCoin += 1
+            coinCountsMob += data[user]['amount']['coin']
+            if (coinCountsMob / 1000 > 9 && coinCountsMob / 1000 < 1000) {
+                coinCountsShowMob = `${coinCountsMob / 1000}K`
+            } else {
+                if (coinCountsMob / 1000000 > 0) {
+                    coinCountsShowMob = `${coinCountsMob / 1000000}M`
+                } else
+                    coinCountsShowMob = `${coinCountsMob}`
+            }
+            if (coinCountsMob / 1000 > 0 && coinCountsMob / 1000 < 10) {
+                coinCountsShowMob = `${coinCountsMob}`
+            }
+            document.querySelector('#spanCardCoinMob').innerHTML = `${coinCountsShowMob}`
+
+        }
+        if (data[user]['amount']['spades']) {
+            userCountSpades += 1
+            spadesCountsMob += data[user]['amount']['spades']
+            if (spadesCountsMob / 1000 > 9 && spadesCountsMob / 1000 < 1000) {
+                spadesCountsShowMob = `${spadesCountsMob / 1000}K`
+            } else {
+                if (spadesCountsMob / 1000000 > 0) {
+                    spadesCountsShowMob = `${spadesCountsMob / 1000000}M`
+                } else
+                    spadesCountsShowMob = `${spadesCountsMob}`
+            }
+            if (spadesCountsMob / 1000 > 0 && spadesCountsMob / 1000 < 10) {
+                spadesCountsShowMob = `${spadesCountsMob}`
+            }
+            document.querySelector('#spanCardSpadesMob').innerHTML = `${spadesCountsShowMob}`
+        }
+
 //суммирование в заголовке
         if (data[user]['userName'] === username) {
             if (data[user]['amount']['hearts']) {
@@ -86,7 +117,7 @@ const createBidItems = (data) => {
                 }
                 document.querySelector('#titleHearts').innerHTML = `Черви: `;
                 document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
-                document.querySelector('#spanCardHeartsMob').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
+                // document.querySelector('#spanCardHeartsMob').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
 
             }
             if (data[user]['amount']['coin']) {
@@ -104,7 +135,7 @@ const createBidItems = (data) => {
                 }
                 document.querySelector('#titleCoin').innerHTML = `Монета: `;
                 document.querySelector('#spanCardCoin').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
-                document.querySelector('#spanCardCoinMob').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
+                // document.querySelector('#spanCardCoinMob').innerHTML = `<span id="signWinnercoin"></span>${coinCountsShow}`
             }
 
             if (data[user]['amount']['spades']) {
@@ -122,7 +153,7 @@ const createBidItems = (data) => {
                 }
                 document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`;
                 document.querySelector('#titleSpades').innerHTML = `Пики: `;
-                document.querySelector('#spanCardSpadesMob').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`
+                // document.querySelector('#spanCardSpadesMob').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`
             }
         }
 
@@ -141,11 +172,10 @@ const createBidItems = (data) => {
                 userName: userName
             }
             usersBids.push(user)//создание массива всех ставок
-
             usersBids.sort((a, b) => b.bidCount - a.bidCount)//сортировка по ставкам
         })
     })
-
+    console.log(usersBids, "USER_BIDS")
 
     usersBids.map(el => {
         // отрисовка  ставки одной масти одного пользователя
@@ -181,7 +211,65 @@ const createBidItems = (data) => {
         itemUserName.innerHTML = `${el.userName}`
         bidItemLeftBlock.appendChild(itemUserName)
     })
+    console.log(userCountHearts, 'USER_COUNT')
+    switch (userCountHearts){
+        case 1: {
+            memberHeartsShow = 'участник';
+            break;
+        }
+        case 2:
+        case 3:
+        case 4:
+        {
+            memberHeartsShow = 'участника';
+            break;
+        }
+            default:{
+                memberHeartsShow = 'участников';
+                break;
+            }
+    }
+switch (userCountCoin){
+        case 1: {
+            memberCoinShow = 'участник';
+            break;
+        }
+        case 2:
+        case 3:
+        case 4:
+        {
+            memberCoinShow = 'участника';
+            break;
+        }
+            default:{
+                memberCoinShow = 'участников';
+                break;
+            }
+    }
+switch (userCountSpades){
+        case 1: {
+            memberSpadesShow = 'участник';
+            break;
+        }
+        case 2:
+        case 3:
+        case 4:
+        {
+            memberSpadesShow = 'участника';
+            break;
+        }
+            default:{
+                memberSpadesShow = 'участников';
+                break;
+            }
+    }
+
+
+    document.querySelector('#memberHearts').innerHTML = `${userCountHearts} ${memberHeartsShow}`
+    document.querySelector('#memberCoin').innerHTML = `${userCountCoin} ${memberCoinShow}`
+    document.querySelector('#memberSpades').innerHTML = `${userCountSpades} ${memberSpadesShow}`
 }
+
 
 // const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
@@ -200,6 +288,20 @@ const itemsClick = (bidCard) => {
             }
         });
     } else if (bidCount) {
+
+        // let userBalFront = document.querySelector('.header__profile-sum>span')
+        // // let userBalFront = Number(document.querySelector('.header__profile-sum>span').textContent)
+        // let userBal = userBalFront.textContent;
+        // let lastSymbol = userBal[userBal.length-1];
+        // let balanceUser;
+        //
+        //
+        // if(lastSymbol === 'M'){
+        //     balanceUser=Number(userBal.slice(0,userBal.length-1))*1000000
+        // } else if(lastSymbol === 'K'){
+        //     balanceUser=Number(userBal.slice(0,userBal.length-1))*1000
+        // }else balanceUser=Number(userBal)
+
 
         let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
         // console.log(cells)
@@ -246,7 +348,7 @@ const itemsClick = (bidCard) => {
             /////////////////////////////////////////////////
         } else {
             //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ
-            if (window.screen.width > 542){
+            if (window.screen.width > 542) {
                 let modalMoney = document.querySelector('#modalMoney')
                 modalMoney.classList.add("open");
                 // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
@@ -255,10 +357,11 @@ const itemsClick = (bidCard) => {
                         document.querySelector('.popup.open').classList.remove("open");
                     }
                 });
-            } else {document.querySelector('.roulette__msg').innerHTML = `Недостастаточно кредитов`;
-                setTimeout(()=>{
+            } else {
+                document.querySelector('.roulette__msg').innerHTML = `Недостастаточно кредитов`;
+                setTimeout(() => {
                     document.querySelector('.roulette__msg').innerHTML = ``;
-                },2000)
+                }, 2000)
             }
 ///////////////////////////////////////////////////////////////////////////////////
         }
