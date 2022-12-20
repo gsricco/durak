@@ -235,7 +235,7 @@ class DayHash(models.Model):
     private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True, blank=True)
     private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True, blank=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
-    show_hash = models.BooleanField(verbose_name='Отображение в честности', default=True)
+    show_hash = models.BooleanField(verbose_name='Показывать в честности (текущий день)', default=False)
 
     def __str__(self):
         return f"{self.date_generated}: {self.private_key}-{self.public_key}"

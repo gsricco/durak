@@ -72,26 +72,37 @@
                     <div class="transactions__items">
                         {% for day_hash in page_obj %}
                         <div class="transactions__item">
-                            <div class="transactions__item-date transactions__item-info">
-                                <span>{{ day_hash.date_generated }}</span>
-                            </div>
-                            <div class="transactions__item-seed transactions__item-info">
-                                <span>{{ day_hash.public_key }}</span>
-                            </div>
-                            <div class="transactions__item-hash transactions__item-info">
-                                {% if day_hash.date_generated == today %}
-                                <span class="transactions__item-text_red">{{ day_hash.private_key_hashed }}</span>
-                                {% else %}
-                                <span>{{ day_hash.private_key }}</span>
-                                {% endif %}
-                            </div>
-                            <div class="transactions__item-rounds transactions__item-info">
-                                {% if day_hash.date_generated == today %}
-                                <span>{{ day_hash.rouletteround_set.first.round_number }} - --</span>
-                                {% else %}
-                                <span>{{ day_hash.rouletteround_set.first.round_number }} - {{ day_hash.rouletteround_set.last.round_number }}</span>
-                                {% endif %}
-                            </div>
+                            {% if day_hash.date_generated == today and not day_hash.show_hash %}
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span></span>
+                                </div>
+                                <div class="transactions__item-seed transactions__item-info">
+                                    <span></span>
+                                </div>
+                                <div class="transactions__item-hash transactions__item-info">
+                                    <span>ХЕШ КОД НАХОДИТСЯ В РАБОТЕ</span>
+                                </div>
+                                <div class="transactions__item-rounds transactions__item-info">
+                                    <span></span>
+                                </div>
+                            {% else %}
+                                <div class="transactions__item-date transactions__item-info">
+                                    <span>{{ day_hash.date_generated }}</span>
+                                </div>
+                                <div class="transactions__item-seed transactions__item-info">
+                                    <span>{{ day_hash.public_key }}</span>
+                                </div>
+                                <div class="transactions__item-hash transactions__item-info">
+                                    {% if day_hash.date_generated == today %}
+                                    <span class="transactions__item-text_red">{{ day_hash.private_key_hashed }}</span>
+                                    {% else %}
+                                    <span>{{ day_hash.private_key }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="transactions__item-rounds transactions__item-info">
+                                    <span>{{ day_hash.rouletteround_set.first.round_number }} - {{ day_hash.rouletteround_set.last.round_number }}</span>
+                                </div>
+                            {% endif %}
                         </div>
                         {% endfor %}
                         <div class="center" style="margin-right: 10px;">

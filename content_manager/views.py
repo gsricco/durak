@@ -109,7 +109,7 @@ def honesty(request):
             'title': 'Честность',
         }
     # получение хешей для отображения
-    day_hashes = DayHash.objects.filter(show_hash=True)
+    day_hashes = DayHash.objects.all()
 
     paginator = Paginator(day_hashes, 7)
     page_number = request.GET.get('page')
