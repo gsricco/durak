@@ -132,14 +132,16 @@ class BanUserAdmin(admin.ModelAdmin):
 
 @admin.register(RouletteRound)
 class RouletteRoundAdmin(admin.ModelAdmin):
-    list_display = 'round_number', 'round_roll', 'rolled', 'show_round'
-    list_editable = 'round_roll', 'show_round'
+    list_display = 'round_number', 'round_roll', 'rolled',
+    list_editable = 'round_roll',
     search_fields = '=round_number',
 
 
 @admin.register(DayHash)
 class DayHashAdmin(admin.ModelAdmin):
-    readonly_fields = 'private_key', 'public_key'
+    list_display = 'date_generated', 'private_key', 'public_key', 'show_hash',
+    list_editable = 'show_hash',
+    readonly_fields = 'private_key', 'public_key', 'private_key_hashed'
 
 
 # admin.site.register(ReferalUser)

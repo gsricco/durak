@@ -235,6 +235,7 @@ class DayHash(models.Model):
     private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True, blank=True)
     private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True, blank=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
+    show_hash = models.BooleanField(verbose_name='Отображение в честности', default=True)
 
     def __str__(self):
         return f"{self.date_generated}: {self.private_key}-{self.public_key}"
@@ -258,7 +259,7 @@ class RouletteRound(models.Model):
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
     rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
-    show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
+    # show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
 
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
