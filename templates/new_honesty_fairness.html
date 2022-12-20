@@ -74,10 +74,10 @@
                         <div class="transactions__item">
                             {% if day_hash.date_generated == today and not day_hash.show_hash %}
                                 <div class="transactions__item-date transactions__item-info">
-                                    <span></span>
+                                    <span>{{ day_hash.date_generated }}</span>
                                 </div>
                                 <div class="transactions__item-seed transactions__item-info">
-                                    <span></span>
+                                    <span>{{ day_hash.public_key }}</span>
                                 </div>
                                 <div class="transactions__item-hash transactions__item-info">
                                     <span>ХЕШ КОД НАХОДИТСЯ В РАБОТЕ</span>
