@@ -88,6 +88,8 @@
                         <a href="{% url 'profil' %}" class="header__avatar">
                             {% if user.is_authenticated == False %}
                             <img id="ava" src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                            {% elif user.use_avatar %}
+                                <img id="ava" src="{{ user.avatar_default.avatar_img.url }}" alt="Аватар">
                             {% else %}
                             <img id="ava" src="{{ user.avatar.url }}" alt="Аватар">
                             {% endif %}
@@ -294,6 +296,7 @@
 
                     {{ room_name|json_script:"room-name" }}
                     {{ user.is_authenticated|json_script:"auth-user" }}
+                    {{ user.is_staff|json_script:"staffed" }}
                     {{ user.username|json_script:"username" }}
                     {{ user.level.img_name|json_script:"kamen" }}
 {#                    <script>#}
@@ -1109,6 +1112,7 @@
     </div>
 
 </div>
+
 {% get_media_prefix as media_prefix %}
 {% get_static_prefix as static_prefix %}
 {{ media_prefix|json_script:'media_prefix' }}
@@ -1116,6 +1120,5 @@
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 {#<script type="text/javascript" src="{% static 'js/chat.js' %}"></script>#}
-
 </body>
 </html>

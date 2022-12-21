@@ -21,7 +21,11 @@
                         <div class="profil__left">
                             <div class="profil__avatar">
                                 {% if user.is_authenticated %}
-                                <img src="{{ user.avatar.url }}" alt="">
+                                    {% if user.use_avatar %}
+                                        <img src="{{ user.avatar_default.avatar_img.url }}" alt="">
+                                    {% else %}
+                                        <img src="{{ user.avatar.url }}" alt="">
+                                    {% endif %}
                                 {% else %}
                                 <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
                                 {% endif %}
@@ -531,16 +535,19 @@
             <div class="profile-settings">
 
 <!--                    avatarModal = {{ request.user.avatar }}-->
-                <form class="profile-settings__row" method="POST">
-                    {% csrf_token %}
+                <form class="profile-settings__row">
+{#                    {% csrf_token %}#}
                     <div class="profile-settings__item-avatar">
                         <div class="profile-settings__avatar" id="imgAva">
                             {% if user.is_authenticated %}
-                            <img data-value="0" src="{{ user.avatar.url }}" alt="nickname" id="profileImage">
-                            {% else %}
-                            <img data-value="0" src="{% static 'img/avatar/user/avatar.svg' %}" alt="nickname"
-                                 id="profileImage">
-                            {% endif %}
+                                    {% if user.use_avatar %}
+                                        <img data-value="0" src="{{ user.avatar_default.avatar_img.url }}" alt="nickname" id="profileImage">
+                                    {% else %}
+                                        <img data-value="0" src="{{ user.avatar.url }}" alt="nickname" id="profileImage">
+                                    {% endif %}
+                                {% else %}
+                                <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
+                                {% endif %}
                         </div>
                     </div>
                     {% if user.is_authenticated %}
@@ -550,17 +557,17 @@
                         <!--                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}" {{ form_user.username }}-->
                         {% endif %}
 
-                        {% if user.username == username %}
+{#                        {% if user.username == username %}#}
 
-                        <div class="profile-settings__error">Попробуйте ввести другое имя..</div>
-                        {% endif %}
+                        <div id="username_error" class="profile-settings__error" style="display: none;">Попробуйте ввести другое имя..</div>
+{#                        {% endif %}#}
                     </div>
                     <div class="profile-settings__btn-block">
                         <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
                         <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать
                             аватарку
                         </div>
-                        <button id="btnSaveImgAvatar" type="submit" class="btn btn_danger profile-settings__btn profile-settings__btn_save">
+                        <button id="btnSaveImgAvatar" onclick="window.location.reload()" class="btn btn_danger profile-settings__btn profile-settings__btn_save">
                             Сохранить
                         </button>
                     </div>
@@ -711,9 +718,11 @@
         </div>
     </div>
 </div>
+{{ user.avatar.url|json_script:'user_avatar_url' }}
 <script src="{% static 'js/roulette_case.js' %}"></script>
 <script src="{% static 'js/chat.js' %}"></script>
 <script src="{% static 'js/profile.js' %}"></script>
+<script src="{% static 'js/edit_avatar.js' %}"></script>
 <script src="{% static 'js/openUserItems.js' %}"></script>
 
 
