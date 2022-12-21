@@ -340,14 +340,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     user.detailuser.balance += chosen_item.selling_price
                     user.detailuser.save()
                     print('это бабки')
-                    async_to_sync(self.channel_layer.send)(self.channel_name, {
-                        'type': 'get_balance',
-                        'balance_update': {
-                            'current_balance': user.detailuser.balance
-                        }
-                    })
+                    tasks.send_balance_delay(user.pk)
+                    # async_to_sync(self.channel_layer.send)(self.channel_name, {
+                    #     'type': 'get_balance',
+                    #     'balance_update': {
+                    #         'current_balance': user.detailuser.balance
+                    #     }
+                    # })
                 else:
                     ItemForUser.objects.create(user=user, user_item=chosen_item)
+                    tasks.send_items_delay(user.pk)
             else:
                 print('Нет выданного кейса')
         else:
@@ -401,7 +403,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if text_data_json.get('open_case'):
             this_case = text_data_json.get('open_case')
             await self.open_case(this_case)
-            await self.get_user_items()
+            # await self.get_user_items()
             await self.get_cases_info()
         # информация о кейсах
         if text_data_json.get('cases'):
