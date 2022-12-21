@@ -312,9 +312,11 @@ function super_new(f) {
         }
 
         let ws_connect = f.apply(this, arguments);
-        let data = JSON.parse(arguments[0].data)
+        let data = JSON.parse(arguments[0].data);
+        if(data.bets){
+                createBidItems(data.bets)
+            }
         if (data.init) {
-            console.log('eto init', data.init.previous_rolls)
             previous_rolls(data.init.previous_rolls)
             if (data.init.state === 'countdown') {
                 let timeNow = Date.now()

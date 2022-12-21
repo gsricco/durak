@@ -3,7 +3,9 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, ItemForUser, DayHash, RouletteRound
+from .models import (CustomUser, UserAgent, DetailUser, ReferalUser,
+                     ReferalCode, GameID, Ban, UserIP, Level, ItemForUser,
+                     DayHash, RouletteRound, AvatarProfile, )
 from .forms import LevelForm
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
@@ -60,6 +62,22 @@ class BanInline(admin.TabularInline):
     extra = 0
 
 
+@admin.register(AvatarProfile)
+class AvatarProfileAdmin(admin.ModelAdmin):
+    """Аватарки профиля (стандартные)"""
+    list_display = 'name', 'preview', 'avatar_img',
+    readonly_fields = 'preview',
+    list_editable = 'avatar_img',
+
+    def preview(self, obj):
+        if obj.avatar_img:
+            return mark_safe(f'<img src="{obj.avatar_img.url}" width="50" height="50">')
+        else:
+            return 'Нет изображения'
+
+    preview.short_description = 'Аватарки профиля'
+
+
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
@@ -69,8 +87,8 @@ class CustomUserAdmin(UserAdmin):
                ReferalCodeInline, GameIDInline, BanInline,OwnedCaseTabularInline,ItemForUserInline]
     readonly_fields = 'preview',
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email')}),
+        (None, {'fields': ('preview', 'use_avatar', 'avatar_default', 'username', 'password')}),
+        ('Данные пользователя', {'fields': ('first_name', 'last_name', 'email',)}),
         (None, {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (None, {'fields': ('last_login', 'date_joined')}),
         ('Дополнительная информация', {'fields': ('avatar', 'vk_url', 'photo')}),

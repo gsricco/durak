@@ -9,14 +9,61 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
 
+class Level(models.Model):
+    """Модель уровня игрока"""
+    RUBIN_CHOICES = (
+        ('amber_case', 'Amber'),
+        ('pearl_case', 'Pearl'),
+        ('rubin_blue', 'Sapphire'),
+        ('rubin_green', 'Emerald'),
+        ('rubin_purple', 'Amethist'),
+        ('rubin_red', 'Rubin'),
+        ('rubin_turquoise', 'Diamond'),
+    )
+    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
+    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
+    img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
+    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
+
+    def __str__(self):
+        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
+
+    @classmethod
+    def get_default_lvl(cls):
+        if cls.objects.all().exists():
+            return cls.objects.first().pk
+        # else:
+        #     level_0 = Level(level=0, experience_range=NumericRange(0, 600))
+        #     level_0.save()
+        #     return cls.objects.first().pk
+
+    class Meta:
+        # constraints = [
+        #     ExclusionConstraint(
+        #         name='exclude_overlapped_levels',
+        #         expressions=[
+        #             ('experience_range', RangeOperators.OVERLAPS),
+        #         ],
+        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
+        #     ),
+        # ]
+        ordering = ['level']
+        verbose_name = 'Уровень в игре'
+        verbose_name_plural = 'Уровни в игре'
 
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
                               default='img/avatar/user/avatar.svg')
+    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
+                                     help_text='Рандомная аватарка с галочкой, а стандартная без')
+    avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
+                                       on_delete=models.CASCADE, null=True, blank=True)
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень",default=Level.get_default_lvl,
+                              on_delete=models.PROTECT, blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
 
     def save(self, *args, **kwargs):
@@ -25,15 +72,15 @@ class CustomUser(AbstractUser):
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
-        if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
-                level_1 = Level(level=1, experience_range=NumericRange(0, 600))
-                level_1.save()
-                self.level = level_1
-        if self.level is None:
-            print(self.experience)
-            self.level = Level.objects.get(level=1)
+        # if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
+        #         level_1 = Level(level=0, experience_range=NumericRange(0, 600))
+        #         level_1.save()
+        #         self.level = level_1
+        # if self.level is None:
+        #     print(self.experience)
+        #     self.level = Level.objects.get(level=1)
         super().save(*args, **kwargs)
-        if not DetailUser.objects.filter(user=self):
+        if not DetailUser.objects.filter(user=self).exists():
             detail = DetailUser(user=self)
             detail.save()
         # if not Ban.objects.filter(user=self):    # создание бана при регистрации пользователя
@@ -124,39 +171,7 @@ class UserIP(models.Model):
         return f'{self.user}'
 
 
-class Level(models.Model):
-    """Модель уровня игрока"""
-    RUBIN_CHOICES = (
-        ('amber_case', 'Amber'),
-        ('pearl_case', 'Pearl'),
-        ('rubin_blue', 'Sapphire'),
-        ('rubin_green', 'Emerald'),
-        ('rubin_purple', 'Amethist'),
-        ('rubin_red', 'Rubin'),
-        ('rubin_turquoise', 'Diamond'),
-    )
-    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
-    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
-    img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
-    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
-    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
 
-    def __str__(self):
-        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
-
-    class Meta:
-        # constraints = [
-        #     ExclusionConstraint(
-        #         name='exclude_overlapped_levels',
-        #         expressions=[
-        #             ('experience_range', RangeOperators.OVERLAPS),
-        #         ],
-        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
-        #     ),
-        # ]
-        ordering = ['level']
-        verbose_name = 'Уровень в игре'
-        verbose_name_plural = 'Уровни в игре'
 
 
 class DetailUser(models.Model):
@@ -277,3 +292,18 @@ class ItemForUser(models.Model):
     user_item = models.ForeignKey('caseapp.Item', verbose_name='Предмет', null=True, blank=True, on_delete=models.CASCADE )
     user = models.ForeignKey('CustomUser', verbose_name='Пользователь',null=True, blank=True, on_delete=models.CASCADE)
     is_used = models.BooleanField(verbose_name='Использован',default=False)
+
+
+class AvatarProfile(models.Model):
+    """Модель Аватарки профиля"""
+    name = models.CharField(verbose_name='Название аватарки профиля', max_length=50, blank=True, null=True)
+    avatar_img = models.ImageField(verbose_name='Аватарки профиля', help_text='Аватарки профиля (рандомные)',
+                                       upload_to='img/avatar/default/')
+
+    class Meta:
+        verbose_name = 'Аватарки профиля (рандомные)'
+        verbose_name_plural = 'Аватарки профиля (рандомные)'
+        ordering = 'id',
+
+    def __str__(self):
+        return f'{self.name}'

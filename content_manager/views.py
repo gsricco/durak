@@ -134,12 +134,17 @@ def profil(request):
     """ПРОФИЛЬ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-        form_user = UserEditName(request.POST)  # Смена имени для пользователя
+          # Смена имени для пользователя
         user_ed = CustomUser.objects.get(username=request.user)
-        if request.method == 'POST' and form_user.is_valid():
-            user_ed.username = form_user.cleaned_data['username']
-            user_ed.save()
-            return redirect('profil')
+        if request.method == 'POST':
+            form_user = UserEditName(request.POST)
+            if form_user.is_valid():
+                user_ed.username = form_user.cleaned_data['username']
+                user_ed.save()
+                return redirect('profil')
+        else:
+            initial_data = {'username': user_ed.username}
+            form_user = UserEditName(initial_data)
         agent = (request.META['HTTP_USER_AGENT'])  # Информация пользователя useragent
         ip = (request.META['REMOTE_ADDR'])  # Информация пользователя ip
         us = CustomUser.objects.get(username=request.user)

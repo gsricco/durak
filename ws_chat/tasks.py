@@ -2,6 +2,7 @@ import datetime
 import math
 import uuid
 from hashlib import sha256
+from caseapp.serializers import ItemForUserSerializer
 from configs import celery_app
 from celery import shared_task, schedules
 from redis import Redis
@@ -13,7 +14,7 @@ import random
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from accaunts.models import Level
+from accaunts.models import Level, ItemForUser
 
 channel_layer = get_channel_layer()
 r = Redis(encoding="utf-8", decode_responses=True)
@@ -285,9 +286,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     users_rewards = []
     # обработка ставок для каждого пользователя
     for user in users:
-        lev = Level.objects.last()
-        max_level = lev.level
-        max_exp = lev.experience_range.upper
+        # lev = Level.objects.last()
+        # max_level = lev.level
+        # max_exp = lev.experience_range.upper
         # получение информации о ставке пользователя
         bet_key = user.pk
         # получаем словарь со всеми ставками юзера
@@ -297,7 +298,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # расчёт и начисление баланса без сохранения в БД
         user.detailuser.balance += eval_balance(user_bets['amount'], round_result)
         # добавление опыта пользователю без сохранения в БД
-        user.experience += xp
+        # если уровень максимальный , не добавляем
+        if Level.objects.filter(level=user.level.level+1).exists():
+            user.experience += xp
         # запоминает номер предыдущего уровня
         prev_level = user.level.level
         if channel_name := bets_info[str(bet_key)]['channel_name']:
@@ -313,25 +316,25 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
         # если уровень пользователя изменился
         if prev_level != user.level.level:
-            if channel_name := bets_info[str(bet_key)]['channel_name']:
-                level = user.level.level
-                new_level = level + 1
-                if level == max_level:
-                    new_level = 'max'
-                message = {
-                    "type": "send_new_level",
-                    "lvlup": {
-                        "type": "send_new_level",
-                        "new_lvl": new_level,
-                        "lvlup": {
-                            "new_lvl": new_level,
-                            "levels": level,
-                        },
-
-                        "levels": level,
-                    },
-                }
-                async_to_sync(channel_layer.send)(channel_name, message)
+            # if channel_name := bets_info[str(bet_key)]['channel_name']:
+            #     level = user.level.level
+            #     new_level = level + 1
+                # if level == max_level:
+                #     new_level = 'max'
+                # message = {
+                #     "type": "send_new_level",
+                #     "lvlup": {
+                #         "type": "send_new_level",
+                #         "new_lvl": new_level,
+                #         "lvlup": {
+                #             "new_lvl": new_level,
+                #             "levels": level,
+                #         },
+                #
+                #         "levels": level,
+                #     },
+                # }
+                # async_to_sync(channel_layer.send)(channel_name, message)
 
             # проверяет награды пользователя за новый уровень
             if rewards_for_level:
@@ -397,6 +400,7 @@ def send_exp(user, channel_name):
             message = {
                 "type": 'send_task_lvl_and_exp',
                 "lvlup": {
+                    'max_lvl': True,
                     "new_lvl": current_level,
                     "levels": previous_lvl.level,
                 },
@@ -568,6 +572,36 @@ def initialize_rounds():
 
 
 initialize_rounds()
-
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
 celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
+
+
+@shared_task
+def send_items(user_pk=None):
+    if models.CustomUser.objects.filter(pk=user_pk).exists():
+        user =models.CustomUser.objects.get(pk=user_pk)
+        user_items = ItemForUser.objects.filter(user=user)
+        serializer = ItemForUserSerializer(user_items, many=True)
+        message = {
+            'type': 'send_user_item',
+            'user_items': serializer.data
+        }
+
+        async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+
+@shared_task
+def send_balance(user_pk=None):
+    if models.CustomUser.objects.filter(pk=user_pk).exists():
+        user =models.CustomUser.objects.get(pk=user_pk)
+        message = {
+            'type': 'get_balance',
+            'balance_update': {
+                'current_balance': user.detailuser.balance
+            }
+        }
+        async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+def send_balance_delay(user_pk):
+    send_balance.apply_async(args=(user_pk,),countdown=5)
+
+def send_items_delay(user_pk):
+    send_items.apply_async(args=(user_pk,),countdown=5)
