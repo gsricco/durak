@@ -289,21 +289,22 @@ const itemsClick = (bidCard) => {
         });
     } else if (bidCount) {
 
-        // let userBalFront = document.querySelector('.header__profile-sum>span')
-        // // let userBalFront = Number(document.querySelector('.header__profile-sum>span').textContent)
-        // let userBal = userBalFront.textContent;
-        // let lastSymbol = userBal[userBal.length-1];
-        // let balanceUser;
-        //
-        //
-        // if(lastSymbol === 'M'){
-        //     balanceUser=Number(userBal.slice(0,userBal.length-1))*1000000
-        // } else if(lastSymbol === 'K'){
-        //     balanceUser=Number(userBal.slice(0,userBal.length-1))*1000
-        // }else balanceUser=Number(userBal)
+        let userBalFront = document.querySelector('.header__profile-sum>span')
+        // let userBalFront = Number(document.querySelector('.header__profile-sum>span').textContent)
+        let userBal = userBalFront.textContent;
+        let lastSymbol = userBal[userBal.length-1];
+        let balanceUser;
 
 
-        let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
+        if(lastSymbol === 'M'){
+            balanceUser=Number(userBal.slice(0,userBal.length-1))*1000000
+        } else if(lastSymbol === 'K'){
+            balanceUser=Number(userBal.slice(0,userBal.length-1))*1000
+        }else balanceUser=Number(userBal)
+
+
+
+        // let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
         // console.log(cells)
         if (balanceUser + 1 >= Number(bidCount)) {
 
@@ -342,8 +343,8 @@ const itemsClick = (bidCard) => {
             }
 
 
-            document.querySelector('.header__profile-sum>span').innerHTML = `${balanceUser}`
-
+            document.querySelector('.header__profile-sum>span').innerHTML = `${balanceUserShow}`
+            document.querySelector('#userBalMob').innerHTML = `${balanceUserShow}`
             // items[0].style.pointerEvents = 'none';
             /////////////////////////////////////////////////
         } else {

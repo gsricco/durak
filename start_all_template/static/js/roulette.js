@@ -173,6 +173,8 @@ function super_new(f) {
         let signWinnercoin = document.querySelectorAll('#signWinnercoin');
         let signWinnerspades = document.querySelectorAll('#signWinnerspades');
         let userUser = document.querySelector('.header__profile-name>span').textContent
+        const UserBalanceMob = document.querySelector('.header__balance>span')
+
 
         function rouletteInitialSettings() {
             document.querySelector('#spanCardHearts').innerHTML = ``
@@ -329,24 +331,25 @@ function super_new(f) {
         if (data.current_balance) {
             console.log(data.current_balance,"BALANCE_BACK")
             console.log(document.querySelector('#userBal').textContent, 'BALANCE_FRONT')
-            // UserBalancer = Number(data.current_balance)
+            UserBalancer = Number(data.current_balance)
             // // Отображать надо уже преобразованное число, а использовать пришедшее
-            // if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
-            //     UserBalancerShow = `${UserBalancer / 1000}K`
-            // } else {
-            //     if (UserBalancer / 1000000 > 0) {
-            //         UserBalancerShow = `${UserBalancer / 1000000}M`
-            //     } else
-            //         UserBalancerShow = `${UserBalancer}`
-            // }
-            // if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
-            //     UserBalancerShow = `${UserBalancer}`
-            // }
+            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+                UserBalancerShow = `${UserBalancer / 1000}K`
+            } else {
+                if (UserBalancer / 1000000 > 0) {
+                    UserBalancerShow = `${UserBalancer / 1000000}M`
+                } else
+                    UserBalancerShow = `${UserBalancer}`
+            }
+            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+                UserBalancerShow = `${UserBalancer}`
+            }
+
+
             //
-            //
-            //
-            // UserBalance.innerHTML = `${UserBalancerShow}`
-            UserBalance.innerHTML = `${data.current_balance}`
+            UserBalance.innerHTML = `${UserBalancerShow}`
+            UserBalanceMob.innerHTML = `${UserBalancerShow}`
+            // UserBalance.innerHTML = `${data.current_balance}`
         }
 
         if (data.from_json) {
