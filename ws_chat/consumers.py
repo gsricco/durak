@@ -572,10 +572,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def roulette_countdown_starter(self, event):
         """Начинает отсчёт рулетки"""
-        curr_round = event.get('round')
+        # curr_round = event.get('round')
         await self.send(text_data=json.dumps({
             "roulette": 20,
-            "round": curr_round,
+            # "round": curr_round,
         }))
 
     # начинает крутиться рулетка
@@ -610,7 +610,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = event.get('bid')
         await self.send(text_data=json.dumps({
             "bid": data,
-            "from_json": r.json().get('round_bets')
+            "round_bets": r.json().get('round_bets')
         }))
 
     async def get_balance(self, event):

@@ -354,8 +354,8 @@ function super_new(f) {
             // UserBalance.innerHTML = `${data.current_balance}`
         }
 
-        if (data.from_json) {
-            createBidItems(data.from_json)
+        if (data.round_bets) {
+            createBidItems(data.round_bets)
         }
         if (data.roll) {
             console.log(data, 'new data for BIDS')
