@@ -2,6 +2,7 @@ import datetime
 import math
 import uuid
 from hashlib import sha256
+from caseapp.serializers import ItemForUserSerializer
 from configs import celery_app
 from celery import shared_task, schedules
 from redis import Redis
@@ -13,7 +14,7 @@ import random
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from accaunts.models import Level
+from accaunts.models import Level, ItemForUser
 
 channel_layer = get_channel_layer()
 r = Redis(encoding="utf-8", decode_responses=True)
@@ -571,6 +572,36 @@ def initialize_rounds():
 
 
 initialize_rounds()
-
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
 celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
+
+
+@shared_task
+def send_items(user_pk=None):
+    if models.CustomUser.objects.filter(pk=user_pk).exists():
+        user =models.CustomUser.objects.get(pk=user_pk)
+        user_items = ItemForUser.objects.filter(user=user)
+        serializer = ItemForUserSerializer(user_items, many=True)
+        message = {
+            'type': 'send_user_item',
+            'user_items': serializer.data
+        }
+
+        async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+
+@shared_task
+def send_balance(user_pk=None):
+    if models.CustomUser.objects.filter(pk=user_pk).exists():
+        user =models.CustomUser.objects.get(pk=user_pk)
+        message = {
+            'type': 'get_balance',
+            'balance_update': {
+                'current_balance': user.detailuser.balance
+            }
+        }
+        async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+def send_balance_delay(user_pk):
+    send_balance.apply_async(args=(user_pk,),countdown=5)
+
+def send_items_delay(user_pk):
+    send_items.apply_async(args=(user_pk,),countdown=5)

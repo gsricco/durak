@@ -81,7 +81,7 @@ function generateItemsCase(caseMessage, winner) {
         oneRollItem()
     }
     roll()
-    setTimeout(returnToStartPosition, 5500)
+    setTimeout(returnToStartPosition, 7000)
 }
 
 
