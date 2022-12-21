@@ -280,7 +280,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         '''Send user item functions'''
         user = self.scope['user']
         if user.is_authenticated:
-            user_items = ItemForUser.objects.filter(user=user)
+            user_items = ItemForUser.objects.filter(user=user,is_used=False)
             serializer = ItemForUserSerializer(user_items, many=True)
             message = {
                 'type': 'send_user_item',
@@ -355,6 +355,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             print('Нет такого кейса')
 
+    @sync_to_async
+    def sell_item(self,data):
+        user = self.scope['user']
+        print(data)
+        if user.is_authenticated:
+            if Item.objects.filter(name=data.get('name')).exists():
+                item = Item.objects.get(name=data.get('name'))
+                if ItemForUser.objects.filter(user_item=item,user=user).exists():
+                    user_item = ItemForUser.objects.filter(user_item=item, user=user).first()
+                    user_item.is_used = True
+                    user_item.save()
+                    user.detailuser.balance += item.selling_price
+                    user.detailuser.save()
+                    async_to_sync(self.get_user_items)()
+                    async_to_sync(self.channel_layer.group_send)(f'{user.username}_room', {
+                        'type': 'get_balance',
+                        'balance_update': {
+                            'current_balance': user.detailuser.balance
+                        }
+                    })
     async def connect(self):
         """Подключение пользователя"""
         recieve_user = str(self.scope["url_route"]["kwargs"][
@@ -394,6 +414,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
+        # обмен предмета пользователя на игровые деньги
+        if text_data_json.get('sell_user_item'):
+            await self.sell_item(text_data_json.get('sell_user_item'))
+        # отправка предметов пользователя
         if text_data_json.get('get_cases_items'):
             await self.get_items_for_cases()
         # получение предметов в инвентарь
