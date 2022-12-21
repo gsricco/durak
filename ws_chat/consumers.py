@@ -618,20 +618,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event.get('balance_update')
         await self.send(text_data=json.dumps(message))
 
-    # async def save_as_nested(keys_storage_name: str, dict_key: (str | int), dictionary: dict) -> None:
-    #     """
-    #     Creates a nested structure imitation in redis.
-    #
-    #     Args:
-    #         keys_storage_name (str): name of the list where dict_key will be stored;
-    #         dict_key (str|int): name of the key to acces dict;
-    #         dictionary (dict): dict to store.
-    #     """
-    #     async with r.pipeline() as pipe:
-    #         pipe.rpush(keys_storage_name, dict_key)
-    #         pipe.hmset(dict_key, dictionary)
-    #         pipe.execute()
-
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
