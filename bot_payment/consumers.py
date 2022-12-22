@@ -40,6 +40,22 @@ class RequestConsumer(AsyncWebsocketConsumer):
         if r.get(f"user_{self.operation}:{user_pk}"):
             request_pk = int(r.getex(f"user_{self.operation}:{user_pk}", ex=10*60))
             await self.send(json.dumps({"status": "continue", "detail": request_pk}))
+            # достаёт заявку из бд
+            try:
+                user_request = await self.model.objects.aget(pk=request_pk)
+            except self.model.DoesNotExist as err:
+                user_request = self.model(request_id=request_pk+ID_SHIFT)
+                user_request.user = self.scope.get('user')
+                await self.send(json.dumps({"status": "process", "detail": "Can't find user request. New one is created"}))
+            except Error as err:
+                await self.send(json.dumps({"status": "error", "detail": f"Database error. {type(err)}"}))
+                print(f"Database error. {type(err)}: {err}.")
+                return
+            # посылает заявку на фронт
+            serializer = self.model_serializer(user_request)
+            serializer_data = await sync_to_async(getattr)(serializer, 'data')
+            await self.send(json.dumps(serializer_data))
+            # начинает обрабатывать заявку
             await self.send_request_status(request_pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user_pk}")
 
@@ -56,7 +72,10 @@ class RequestConsumer(AsyncWebsocketConsumer):
             if r.getex(f"user_{self.operation}:{self.scope['user'].pk}", ex=10*60):
                 await self.send(json.dumps({'status': 'error', 'detail': 'you already have a request.'}))
             else:
-                await self.create_request(json.loads(text_data_json['create']))
+                try:
+                    await self.create_request(text_data_json['create'])
+                except json.decoder.JSONDecodeError:
+                    await self.send(json.dumps({'status': 'error', 'detail': 'wrong request format.'}))
         else:
             await self.send(json.dumps({'status': 'error', 'detail': 'missing "create" in json'}))
 
@@ -75,6 +94,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
     async def create_request(self, text_data_json):
         """Создаёт новую заявку"""
         # проверяет правильность полученных данных
+        if text_data_json.get('user') is None:
+            text_data_json['user'] = { "id": self.scope['user'].pk }
         serializer = self.model_serializer(data=text_data_json)
         if serializer.is_valid():
             user = self.scope['user']

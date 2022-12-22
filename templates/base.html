@@ -890,9 +890,6 @@
     <div class="popup modal-manual" id="modalManual">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal-manual__modal">
-                <div class="modal-manual__queries">
-                    Заявка #22131
-                </div>
                 <a href="#" class="popup__close close-popup close-popup_close">
                     <svg class="close-popup__icon ">
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
@@ -920,10 +917,33 @@
                     </div>
 
                 </div>
-                <a href="##" class="btn btn_danger modal-manual__btn btn_white" id="modalManualBtn">
-                    <div class="timer" id="timerOne">0:10</div>
+                <a href="#modalRefill" class="btn btn_danger modal-manual__btn popup-link" id="modalManualBtn">
+                    <div class="timer" id="timerOne">Начать</div>
                 </a>
 
+            </div>
+        </div>
+    </div>
+    <div class="popup modal-manual" id="modalRefill">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal-manual__modal">
+                <div class="modal-manual__queries">
+                    Заявка #
+                </div>
+                <a href="#" class="popup__close close-popup close-popup_close">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <h3 class="modal__title">
+                    Пополнение баланса кредитами из игры
+                </h3>
+
+                <div class="modal-manual__text">
+                    <ul>
+                        
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -1119,6 +1139,7 @@
 {{ static_prefix|json_script:'static_prefix' }}
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/bot_refill.js' %}"></script>
 {#<script type="text/javascript" src="{% static 'js/chat.js' %}"></script>#}
 </body>
 </html>
