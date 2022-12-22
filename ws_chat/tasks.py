@@ -12,6 +12,7 @@ from channels.layers import get_channel_layer
 import random
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import IntegrityError
 from django.utils import timezone
 from accaunts.models import Level
 
@@ -487,13 +488,19 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     # генерация хеша
     if day_hash_pk is None:
         try:
+            try:
+                # находит существующий хеш на день
+                day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
+            except ObjectDoesNotExist:
+                # если хеша на день нет, создаёт новый
+                day_hash = models.DayHash()
+                day_hash.private_key = generate_private_key()
+                day_hash.public_key = generate_public_key()
+                day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
+                day_hash.save()
+        except IntegrityError:
+            # если новый хеш создался во время выполнения функции в другом потоке, то достаёт его
             day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
-        except ObjectDoesNotExist:
-            day_hash = models.DayHash()
-            day_hash.private_key = generate_private_key()
-            day_hash.public_key = generate_public_key()
-            day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
-            day_hash.save()
     else:
         day_hash = models.DayHash.objects.get(pk=day_hash_pk)
 
