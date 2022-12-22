@@ -10,11 +10,16 @@ __pycache__/
 !accaunts/migrations/__init__.py
 !content_manager/migrations/__init__.py
 !support_chat/migrations/__init__.py
+!pay/migrations/__init__.py
+!robokassa_pay/migrations/__init__.py
+!bot_payment/migrations/__init__.py
 content_manager/migrations/*.py
 accaunts/migrations/*.py
 support_chat/migrations/*.py
 bot_payment/migrations/*.py
-!bot_payment/migrations/__init__.py
+pay/migrations/*.py
+robokassa_pay/migrations/*.py
+!*/migrations/__init__.py
 */migrations/*.py
 # C extensions
 *.so

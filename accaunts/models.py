@@ -314,12 +314,21 @@ class AvatarProfile(models.Model):
 
 class UserBet(models.Model):
     """Модель для сохранения транзакций связанных со ставками в рулетке"""
+    COIN = 'coin'
+    HEART = 'hearts'
+    SPADES = 'spades'
+    # список состояний заявки
+    SUIT_CHOICE_LIST = [
+        (COIN, 'монетка'),
+        (HEART, 'червы'),
+        (SPADES, 'пики'),
+    ]
     sum = models.PositiveIntegerField(verbose_name='Сумма ставки', default=0)
     sum_win = models.PositiveIntegerField(verbose_name='Сумма выигрыша', default=0)
     win = models.BooleanField(verbose_name='Ставка выиграла', default=False)
     date = models.DateTimeField(verbose_name='Дата совершения ставки', auto_now_add=True)
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
-
+    placed_on = models.CharField(verbose_name='Поставлено на', max_length=6, choices=SUIT_CHOICE_LIST, default='c')
     user = models.ForeignKey('CustomUser', verbose_name='Пользователь', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):

@@ -314,8 +314,8 @@ function super_new(f) {
         let ws_connect = f.apply(this, arguments);
         let data = JSON.parse(arguments[0].data);
         if(data.bets){
-                createBidItems(data.bets)
-            }
+            createBidItems(data.bets)
+        }
         if (data.init) {
             previous_rolls(data.init.previous_rolls)
             if (data.init.state === 'countdown') {
@@ -324,9 +324,7 @@ function super_new(f) {
                 timerCounter(remainTime)
             }
             if (data.init.state === 'rolling') {
-
                 startRoll(data.init.winner)
-
             }
         }
         console.log(document.querySelector('#userBal').textContent, 'BALANCE_FRONT_FOREVER')
