@@ -225,20 +225,32 @@ def save_round_results(bets_info):
     total_amount = 0
     winners = []
     round_result = r.get(ROUND_RESULT_FIELD_NAME)
+    round_number = int(r.get('round'))
     # обработка раундов без ставок
     if bets_info is None:
         bets_info = {}
     # накопление результатов раунда
+    users_bets = []
     for user_pk, bet in bets_info.items():
         bet_amount = bet.get('amount', {})
         # накапливает общую сумму ставок
-        for bet_val in bet_amount.values():
+        for suit, bet_val in bet_amount.items():
+            if bet_val > 0:
+                # сохранение ставки пользователя
+                user_bet = models.UserBet()
+                user_bet.sum = bet_val
+                user_bet.round_number = round_number
+                user_bet.placed_on = suit
+                user_bet.user_id = user_pk
+                if user_bet.placed_on == round_result:
+                    user_bet.win = True
+                user_bet.sum_win = abs(eval_balance({user_bet.placed_on: bet_val}, round_result))
+                users_bets.append(user_bet)
             total_amount += bet_val
         # если пользователь ставил на победивший знак, то запоминает его
         if bet_amount.get(round_result, 0) > 0:
             winners.append(user_pk)
     # сохраняет раунд в БД
-    round_number = int(r.get('round'))
     round_started = timezone.now()
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
@@ -249,6 +261,7 @@ def save_round_results(bets_info):
     current_round.winners.set(winners)
     current_round.round_started = round_started
     current_round.save()
+    models.UserBet.objects.bulk_create(users_bets, batch_size=64)
 
 
 @shared_task()
