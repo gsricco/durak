@@ -8,6 +8,7 @@ from accaunts.models import CustomUser, Ban, DetailUser
 from . import models, serializers
 from django.utils import timezone
 from django.db.utils import Error
+from ws_chat.tasks import setup_check_request_status
 
 r = redis.Redis()  # подключаемся к редису
 
@@ -94,7 +95,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             try:
                 # ban_tuple = await Ban.objects.aget_or_create(user=user)
                 ban_tuple = await Ban.objects.aget(user=user)
-            except Error as err:
+            except (Error, Ban.DoesNotExist) as err:
                 await self.send(json.dumps({"status": "error", "detail": "Error while trying to access database."}))
                 print(f"Error while trying to access database, {type(err)}: {err}")
                 return
@@ -234,6 +235,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
             # удаляет из redis запись о занятии пользователем бота
             r.delete(f"bot:{bot_id}")
+            # отложенное задание - проверить статус заявки через 15 минут
+            setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, 15*60)
             # запускает процесс мониторинга состояния заявки
             await self.send_request_status(new_request.pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user.pk}")
