@@ -3,10 +3,12 @@ from django.shortcuts import render, redirect
 from social_django.models import UserSocialAuth
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.db.models import Value, F
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP
+from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet
 from pay.models import Popoln
+from bot_payment.models import RefillRequest, WithdrawalRequest
 from .models import FAQ, SiteContent
 
 
@@ -173,6 +175,18 @@ def profil(request):
             social_vk = True
         else:
             social_vk = False
+        # логика для отображения транзикций
+        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True).annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True)).values('date', 'pay', 'tr_type', 'tr_plus')
+        user_bets = UserBet.objects.filter(user=request.user).annotate(tr_type=Value('Ставка'), tr_plus=F('win')).values('date', 'sum_win', 'tr_type', 'tr_plus')
+        refill = RefillRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True)).values('date_closed', 'amount', 'tr_type', 'tr_plus')
+        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'amount', 'tr_type', 'tr_plus')
+        transactions = popoln.union(user_bets, refill, withdraw).order_by('-date')
+
+        paginator = Paginator(transactions, 1)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        page_paginated = True if page_number else False
+
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -182,6 +196,9 @@ def profil(request):
             'form_user': form_user,
             'user_ed': user_ed,
             'title': 'Профиль',
+            'page_obj': page_obj,
+            'page_paginated': page_paginated,
+            # 'paginator': paginator,
         }
     else:
         level_data = Level.objects.get(level=1)
