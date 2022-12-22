@@ -59,7 +59,7 @@
                     <!-- If logged-in and has balance -->
                     {% if user.is_authenticated %}
                     <a href="{% url 'profil' %}" class="header__balance">
-                        <span>{{ detail_user.balance }}</span>
+                        <span id="userBalMob"> {{ detail_user.balance }}</span>
                     </a>
                     {% endif %}
                 </div>
@@ -88,6 +88,8 @@
                         <a href="{% url 'profil' %}" class="header__avatar">
                             {% if user.is_authenticated == False %}
                             <img id="ava" src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                            {% elif user.use_avatar %}
+                                <img id="ava" src="{{ user.avatar_default.avatar_img.url }}" alt="Аватар">
                             {% else %}
                             <img id="ava" src="{{ user.avatar.url }}" alt="Аватар">
                             {% endif %}
@@ -209,12 +211,12 @@
     </header>
 
     <main>
-        <div class="container">
-            <div class="chat-open-btn">
-                <svg>
-                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat-btn"></use>
-                </svg>
-            </div>
+        <div id="mobile-online-chat" class="container">
+<!--            <div class="chat-open-btn">-->
+<!--                <svg>-->
+<!--                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#chat-btn"></use>-->
+<!--                </svg>-->
+<!--            </div>-->
 
             <section class="profil-main">
 
@@ -236,7 +238,7 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
                             </svg>
                             <div class="online-chat__header-rigth">
-                                <div class="online-chat__current"></div>
+                                <div id="onlineChat" class="online-chat__current"></div>
                                 <span class="online-chat__torch"></span>
                             </div>
 
@@ -294,6 +296,7 @@
 
                     {{ room_name|json_script:"room-name" }}
                     {{ user.is_authenticated|json_script:"auth-user" }}
+                    {{ user.is_staff|json_script:"staffed" }}
                     {{ user.username|json_script:"username" }}
                     {{ user.level.img_name|json_script:"kamen" }}
 {#                    <script>#}
@@ -1109,6 +1112,7 @@
     </div>
 
 </div>
+
 {% get_media_prefix as media_prefix %}
 {% get_static_prefix as static_prefix %}
 {{ media_prefix|json_script:'media_prefix' }}
@@ -1116,6 +1120,5 @@
 <script src="{% static 'libs/swiper@8_swiper-bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 {#<script type="text/javascript" src="{% static 'js/chat.js' %}"></script>#}
-
 </body>
 </html>

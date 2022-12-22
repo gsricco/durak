@@ -3,11 +3,11 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
-from .models import CustomUser, UserAgent, DetailUser, ReferalUser, ReferalCode, GameID, Ban, UserIP, Level, \
-    ItemForUser, DayHash, RouletteRound, AvatarProfile, UserBet
-
-from pay.models import Popoln
+from .models import (CustomUser, UserAgent, DetailUser, ReferalUser,
+                     ReferalCode, GameID, Ban, UserIP, Level, ItemForUser,
+                     DayHash, RouletteRound, AvatarProfile, UserBet)
 from .forms import LevelForm
+from pay.models import Popoln
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
 
@@ -88,7 +88,7 @@ class AvatarProfileAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
-    list_display = 'usernameinfo', 'preview', 'user_info', 'email', 'vk_url',
+    list_display = ('usernameinfo', 'preview', 'user_info', 'email', 'vk_url',)
     search_fields = 'usernameinfo',
     inlines = [PopolnInline, DetailUserInline, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
                BanInline, OwnedCaseTabularInline, ItemForUserInline]
@@ -135,16 +135,13 @@ class LevelAdmin(admin.ModelAdmin):
         if obj and obj.experience_range:
             upper = obj.experience_range.upper if obj.experience_range.upper else 0
             lower = obj.experience_range.lower if obj.experience_range.lower else 0
-
             difference = upper - lower
-
             return difference
         return None
 
     def preview(self, obj):
         if obj.img_name:
-            return mark_safe(
-                f'<svg style="width: 50px; height: 50px;"><use xlink:href="/static/img/icons/sprite.svg#{obj.img_name}"></use></svg>')
+            return mark_safe(f'<svg style="width: 50px; height: 50px;"><use xlink:href="/static/img/icons/sprite.svg#{obj.img_name}"></use></svg>')
         else:
             return 'Нет изображения'
 

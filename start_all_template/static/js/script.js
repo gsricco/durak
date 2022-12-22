@@ -658,9 +658,6 @@ window.addEventListener("DOMContentLoaded", () => {
     // от 1275 кол-во кредов = (введенное число руб.)*2353
 
 
-
-
-
     //!звук
     if (document.querySelector(".sound")) {
         let sound = document.querySelector(".sound");
@@ -1377,4 +1374,19 @@ const media_prefix = JSON.parse(document.getElementById('media_prefix').textCont
 const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
 
 
+let UserBalancer=Number(document.querySelector('#userBal').textContent)
 
+if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+    UserBalancerShow = `${UserBalancer / 1000}K`
+} else {
+    if (UserBalancer / 1000000 > 0) {
+        UserBalancerShow = `${UserBalancer / 1000000}M`
+    } else
+        UserBalancerShow = `${UserBalancer}`
+}
+if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+    UserBalancerShow = `${UserBalancer}`
+}
+
+document.querySelector('#userBal').innerHTML = `${UserBalancerShow}`
+document.querySelector('#userBalMob').innerHTML = `${UserBalancerShow}`

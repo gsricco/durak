@@ -9,18 +9,62 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
 
+class Level(models.Model):
+    """Модель уровня игрока"""
+    RUBIN_CHOICES = (
+        ('amber_case', 'Amber'),
+        ('pearl_case', 'Pearl'),
+        ('rubin_blue', 'Sapphire'),
+        ('rubin_green', 'Emerald'),
+        ('rubin_purple', 'Amethist'),
+        ('rubin_red', 'Rubin'),
+        ('rubin_turquoise', 'Diamond'),
+    )
+    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
+    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
+    img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
+    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
+
+    def __str__(self):
+        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
+
+    @classmethod
+    def get_default_lvl(cls):
+        if cls.objects.all().exists():
+            return cls.objects.first().pk
+        # else:
+        #     level_0 = Level(level=0, experience_range=NumericRange(0, 600))
+        #     level_0.save()
+        #     return cls.objects.first().pk
+
+    class Meta:
+        # constraints = [
+        #     ExclusionConstraint(
+        #         name='exclude_overlapped_levels',
+        #         expressions=[
+        #             ('experience_range', RangeOperators.OVERLAPS),
+        #         ],
+        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
+        #     ),
+        # ]
+        ordering = ['level']
+        verbose_name = 'Уровень в игре'
+        verbose_name_plural = 'Уровни в игре'
+
 
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
                               default='img/avatar/user/avatar.svg')
-    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=True,
+    use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
                                      help_text='Рандомная аватарка с галочкой, а стандартная без')
     avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
                                        on_delete=models.CASCADE, null=True, blank=True)
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень",default=Level.get_default_lvl,
+                              on_delete=models.PROTECT, blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
 
     def save(self, *args, **kwargs):
@@ -29,15 +73,15 @@ class CustomUser(AbstractUser):
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
-        if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
-            level_1 = Level(level=1, experience_range=NumericRange(0, 600))
-            level_1.save()
-            self.level = level_1
-        if self.level is None:
-            print(self.experience)
-            self.level = Level.objects.get(level=1)
+        # if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
+        #         level_1 = Level(level=0, experience_range=NumericRange(0, 600))
+        #         level_1.save()
+        #         self.level = level_1
+        # if self.level is None:
+        #     print(self.experience)
+        #     self.level = Level.objects.get(level=1)
         super().save(*args, **kwargs)
-        if not DetailUser.objects.filter(user=self):
+        if not DetailUser.objects.filter(user=self).exists():
             detail = DetailUser(user=self)
             detail.save()
         # if not Ban.objects.filter(user=self):    # создание бана при регистрации пользователя
@@ -52,7 +96,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def give_level(self, save_immediately: bool = False) -> list:
+    def give_level(self, save_immediately: bool=False) -> list:
         """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
 
         Args:
@@ -84,7 +128,6 @@ class CustomUser(AbstractUser):
                         rewards.append(new_reward)
             else:
                 break
-
         if level_changed and save_immediately:
             self.save()
             if rewards:
@@ -128,53 +171,17 @@ class UserIP(models.Model):
         return f'{self.user}'
 
 
-class Level(models.Model):
-    """Модель уровня игрока"""
-    RUBIN_CHOICES = (
-        ('amber_case', 'Amber'),
-        ('pearl_case', 'Pearl'),
-        ('rubin_blue', 'Sapphire'),
-        ('rubin_green', 'Emerald'),
-        ('rubin_purple', 'Amethist'),
-        ('rubin_red', 'Rubin'),
-        ('rubin_turquoise', 'Diamond'),
-    )
-    level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
-    experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
-    img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
-    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT,
-                             null=True, blank=True)
-    amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
-
-    def __str__(self):
-        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
-
-    class Meta:
-        # constraints = [
-        #     ExclusionConstraint(
-        #         name='exclude_overlapped_levels',
-        #         expressions=[
-        #             ('experience_range', RangeOperators.OVERLAPS),
-        #         ],
-        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
-        #     ),
-        # ]
-        ordering = ['level']
-        verbose_name = 'Уровень в игре'
-        verbose_name_plural = 'Уровни в игре'
-
-
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.IntegerField(verbose_name="Баланс", default=0)
 
     class Meta:
-        verbose_name = 'Баланс'
-        verbose_name_plural = 'Баланс'
+        verbose_name = 'Данные пользователя'
+        verbose_name_plural = 'Данные пользователя'
 
     def __str__(self):
-        return f''
+        return f'{self.user}'
 
 
 class ReferalCode(models.Model):
@@ -224,7 +231,7 @@ class Ban(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, null=True)
     ban_site = models.BooleanField(verbose_name='Бан пользователя на сайте', default=False)
     ban_chat = models.BooleanField(verbose_name='Бан пользователя в общем чате', default=False)
-    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)  # Надоли по IP????
+    ban_ip = models.BooleanField(verbose_name='Бан пользователя по ip', default=False)         #Надоли по IP????
 
     class Meta:
         verbose_name = 'Бан'
@@ -264,7 +271,7 @@ class RouletteRound(models.Model):
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
     rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
-    # show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
+    show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
 
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)

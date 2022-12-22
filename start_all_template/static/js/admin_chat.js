@@ -5,19 +5,25 @@ const chatBlock = document.querySelector('.support__chat-block')
 const username = JSON.parse(document.getElementById('username').textContent)
 let room_id = ''
 let byteFile
-let imageTypeList = ['jpg', 'jpeg', 'gif', 'pjpeg', 'svg', 'svg+xml', 'tiff', 'icon', 'wbmp', 'webp', 'png']
+// let imageTypeList = ['jpg', 'jpeg', 'gif', 'pjpeg', 'svg', 'svg+xml', 'tiff', 'icon', 'wbmp', 'webp', 'png']
 let topBlock = document.querySelector('.support_chat_top_block')
 let host_url = window.location.host
 
 function checkFileSize(elem) {
-
+    //проверка размера файла
     const maxSize = 10000000;
     const fileSize = elem.files[0].size;
     if (fileSize > maxSize) {
-        showFile.innerHTML = "<span>Файл слишком большой  </span>"
-        setInterval(() => showFile.innerHTML = '', 2000)
-    } else {
-        let reader = new FileReader();
+        showFile.innerHTML = "<span>File is big</span>"
+        setTimeout(() => {showFile.innerHTML = '';
+                                    inputFile.value = '';
+            }
+            , 2000)
+    }
+    else {
+        //проверка является ли файл картинкой
+        if (elem.files[0].type.split('/')[0] === 'image'){
+        var reader = new FileReader();
         reader.readAsDataURL(elem.files[0]);
         reader.onload = function () {
             byteFile = reader.result
@@ -25,11 +31,17 @@ function checkFileSize(elem) {
         reader.onerror = function (error) {
             console.log('Error: ', error);
         };
-        showFile.innerHTML = "<span>Загрузка</span>"
-        setInterval(() => showFile.innerHTML = '', 2000)
+        showFile.innerHTML = "<span>Load</span>"
+        setTimeout(() => showFile.innerHTML = '', 2000)
+            }else {
+
+            showFile.innerHTML = "<span>File not image</span>"
+            setTimeout(() => {showFile.innerHTML = ''
+                                      inputFile.value = ''
+                }
+                , 2000)
+        }
     }
-
-
 }
 
 const chat_cleaner = () => {
@@ -71,16 +83,16 @@ function newUserMessage(message, user, file_path) {
         div.appendChild(span)
         fullDiv.appendChild(spanUser)
         if (file_path) {
-            const file_preview = document.querySelectorAll('.support__chat-message-text')
-            const file_url = document.createElement('div')
-            file_url.innerHTML = 'Файл'
-            file_url.className = 'file_name'
-            file_url.addEventListener('click', () => {
+            // const file_preview = document.querySelectorAll('.support__chat-message-text')
+            // const file_url = document.createElement('div')
+            // file_url.innerHTML = 'Файл'
+            // file_url.className = 'file_name'
+            // file_url.addEventListener('click', () => {
+            //
+            //     window.open(`http://${host_url}${file_path}`)
+            // })
 
-                window.open(`http://${host_url}${file_path}`)
-            })
-
-            if (imageTypeList.includes(file_path.split('.').slice(-1)[0])) {
+            // if (imageTypeList.includes(file_path.split('.').slice(-1)[0])) {
                 if (user !== username) {
                     let newDiv = document.createElement('div')
                     newDiv.innerHTML = `<div style="display: flex; flex-direction: column; padding-bottom: 10px">
@@ -112,22 +124,22 @@ function newUserMessage(message, user, file_path) {
                     // fullDiv.appendChild(div)
                     li.appendChild(fullDiv)
                 }
-            } else {
-                if(message){
-                    fullDiv.appendChild(div)
-                    fullDiv.appendChild(file_url)
-                }else {
-                    fullDiv.appendChild(file_url)
-                }
-                if (user !== username) {
-                    file_url.style.flexDirection = 'flex-start'
-                    li.appendChild(fullDiv)
-                    // li.appendChild(file_url)
-                } else {
-                    // li.appendChild(file_url)
-                    li.appendChild(fullDiv)
-                }
-            }
+            // } else {
+            //     if(message){
+            //         fullDiv.appendChild(div)
+            //         fullDiv.appendChild(file_url)
+            //     }else {
+            //         fullDiv.appendChild(file_url)
+            //     }
+            //     if (user !== username) {
+            //         file_url.style.flexDirection = 'flex-start'
+            //         li.appendChild(fullDiv)
+            //         // li.appendChild(file_url)
+            //     } else {
+            //         // li.appendChild(file_url)
+            //         li.appendChild(fullDiv)
+            //     }
+            // }
         } else {
             // div.appendChild(span)
             // fullDiv.appendChild(spanUser)

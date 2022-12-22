@@ -2087,6 +2087,8 @@ h3 {
 }
 
 .profile-settings__avatar img {
+  background: #222222;
+  border-radius: 50%;
   width: 100%;
   height: auto;
   -o-object-fit: contain;
@@ -3727,6 +3729,8 @@ h3 {
 }
 
 .support__chat-message-text span {
+  word-break: break-all;
+  white-space: break-spaces;
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;

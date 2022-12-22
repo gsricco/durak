@@ -8,7 +8,8 @@ const messageBlock = document.querySelector('.online-chat__list')
 const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
-const UserBalance = document.querySelector('.header__profile-sum')
+const UserBalance = document.querySelector('.header__profile-sum>span')
+
 const online = document.querySelector('.online-chat__current')
 const profilLine = document.querySelector('.profil_profil__progressbar-line')
 // let balanceUser = document.querySelector('.header__profile-sum>span').innerText

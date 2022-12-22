@@ -42,8 +42,13 @@ function super_new(f) {
             set_lvl_info(data.lvl_info)
         }
         if(data.lvlup){
+            if(data.lvlup.max_lvl){
+                console.log('тут')
+                bigProfLvl.innerHTML = data.lvlup.new_lvl + ' LVL'
+            }else{
                 bigProfLvl.innerHTML = data.lvlup.levels + ' LVL'
-        }
+             }
+            }
         if (data.expr) {
             setExp(data.expr)
         }
@@ -216,6 +221,17 @@ function newUserItem(data) {
     let allProfCaseItem = document.querySelectorAll('.profil__item')
     allProfCaseItem.forEach((e) => e.remove())
     data.forEach((e) => {
+        let cost = e.user_item.selling_price
+        let format_cost
+        if(cost > 1000 && cost < 1000000 ){
+            format_cost = (cost/1000)+'К'
+            console.log(format_cost)
+        } else if (cost > 1000000 ){
+            let countM = cost/1000000
+            format_cost = countM+'M'
+        }else {
+            format_cost = cost
+        }
         let new_div = document.createElement('div')
         new_div.className = 'profil__item'
         new_div.innerHTML = `
@@ -229,10 +245,23 @@ function newUserItem(data) {
             </div>
             <div class="profil__item-tags">
                 <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
-                <a href="#question" class="profil__item-tag popup-link">Продать за ${e.user_item.selling_price}</a>
+                <a href="#question" class="profil__item-tag popup-link">Продать за ${format_cost}</a>
             </div>`
 
         profCaseItem.appendChild(new_div)
     })
+    let popupLi = document.querySelectorAll(".profil__item-tag")
+    if (popupLi.length > 0) {
+        for (let index = 0; index < popupLi.length; index++) {
+            const popupLink = popupLi[index];
+            popupLink.addEventListener("click", function (e) {
+                const popupName = popupLink.getAttribute("href").replace("#", "");
+                const curentPopup = document.getElementById(popupName);
+                console.log(popupLi[index])
+                popupOpen(curentPopup);
+                e.preventDefault();
+            });
+        }
+    }
 }
 
