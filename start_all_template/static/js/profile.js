@@ -43,7 +43,6 @@ function super_new(f) {
         }
         if(data.lvlup){
             if(data.lvlup.max_lvl){
-                console.log('тут')
                 bigProfLvl.innerHTML = data.lvlup.new_lvl + ' LVL'
             }else{
                 bigProfLvl.innerHTML = data.lvlup.levels + ' LVL'
@@ -214,7 +213,7 @@ function timerSecond(caseData) {
         }
     }, 1000);
 }
-
+let sellItemPrice , sellItemName
 
 function newUserItem(data) {
     let profCaseItem = document.querySelector('.profil__items')
@@ -222,11 +221,12 @@ function newUserItem(data) {
     allProfCaseItem.forEach((e) => e.remove())
     data.forEach((e) => {
         let cost = e.user_item.selling_price
+        let name = e.user_item.name
+        let image = e.user_item.image
         let format_cost
-        if(cost > 1000 && cost < 1000000 ){
+        if(cost >= 1000 && cost < 1000000 ){
             format_cost = (cost/1000)+'К'
-            console.log(format_cost)
-        } else if (cost > 1000000 ){
+        } else if (cost >= 1000000 ){
             let countM = cost/1000000
             format_cost = countM+'M'
         }else {
@@ -238,14 +238,16 @@ function newUserItem(data) {
             <div class="profil__item-wrapper">
                 <div class="profil__item-img">
                     <svg>
-                        <use xlink:href="${static_prefix}/img/icons/sprite.svg#${e.user_item.image}"></use>
+                        <use xlink:href="${static_prefix}/img/icons/sprite.svg#${image}"></use>
                     </svg>
                 </div>
-                <h3 class="profil__item-title">${e.user_item.name}</h3>
+                <h3 class="profil__item-title">${name}</h3>
             </div>
             <div class="profil__item-tags">
-                <a href="#choiceObjects" class="profil__item-tag popup-link">Получить</a>
-                <a href="#question" class="profil__item-tag popup-link">Продать за ${format_cost}</a>
+                <a href="#choiceObjects" class="profil__item-tag popup-link" 
+                onclick="set_forward_items_params('${name}','${image}')">Получить</a>
+                <a href="#question" class="profil__item-tag popup-link"
+                onclick="set_sell_items_params('${name}',${cost})">Продать за ${format_cost}</a>
             </div>`
 
         profCaseItem.appendChild(new_div)
@@ -257,7 +259,6 @@ function newUserItem(data) {
             popupLink.addEventListener("click", function (e) {
                 const popupName = popupLink.getAttribute("href").replace("#", "");
                 const curentPopup = document.getElementById(popupName);
-                console.log(popupLi[index])
                 popupOpen(curentPopup);
                 e.preventDefault();
             });

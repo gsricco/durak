@@ -358,31 +358,56 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async
     def sell_item(self,data):
         user = self.scope['user']
-        print(data)
         if user.is_authenticated:
             if Item.objects.filter(name=data.get('name')).exists():
                 item = Item.objects.get(name=data.get('name'))
-                if ItemForUser.objects.filter(user_item=item,user=user).exists():
-                    user_item = ItemForUser.objects.filter(user_item=item, user=user).first()
+                if ItemForUser.objects.filter(user_item=item,user=user,is_used=False).exists():
+                    user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
                     user_item.is_used = True
                     user_item.save()
                     user.detailuser.balance += item.selling_price
                     user.detailuser.save()
-                    async_to_sync(self.get_user_items)()
-                    async_to_sync(self.channel_layer.group_send)(f'{user.username}_room', {
+                    message = {
                         'type': 'get_balance',
                         'balance_update': {
                             'current_balance': user.detailuser.balance
                         }
-                    })
+                    }
+                    async_to_sync(self.get_user_items)()
+                    if user.is_superuser or user.is_staff:
+                        async_to_sync(self.channel_layer.group_send)(f'admin_{user.username}_room', message)
+                    else:
+                        async_to_sync(self.channel_layer.group_send)(f'{user.username}_room', message)
+
+
+
+    @sync_to_async
+    def forward_item(self, data):
+        print(data)
+        user = self.scope['user']
+        if user.is_authenticated:
+            if Item.objects.filter(name=data.get('item_name')).exists():
+                item = Item.objects.get(name=data.get('item_name'))
+                if ItemForUser.objects.filter(user_item=item, user=user).exists():
+                    user_item = ItemForUser.objects.filter(user_item=item, user=user).first()
+                    print(user_item)
+                    # user_item.is_used = True
+                    # user_item.save()
+                    # async_to_sync(self.get_user_items)()
+                    message = {
+                        'type': 'send_forward_item',
+                        'forward_item': data }
+                    async_to_sync(self.channel_layer.group_send)(f'{user.username}_room',message )
+                    async_to_sync(self.channel_layer.group_send)('admin_group',message )
     async def connect(self):
         """Подключение пользователя"""
         recieve_user = str(self.scope["url_route"]["kwargs"][
                                "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = str(self.scope['user'])  # TODO получаем имя пользователя который подключился с фронта
         if self.scope['user'].is_authenticated:
-            if self.scope['user'].is_staff:
+            if self.scope['user'].is_staff or self.scope['user'].is_superuser:
                 await self.channel_layer.group_add('admin_group', self.channel_name)
+                await self.channel_layer.group_add(f'admin_{user}_room', self.channel_name)
             else:
                 await self.channel_layer.group_add(f'{user}_room', self.channel_name)  # TODO добавляем в группу юзеров
         self.room_name = 'go'  # задаем статический румнейм для общего чата
@@ -414,9 +439,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
-        # обмен предмета пользователя на игровые деньги
+        # обмен предмета пользователя на валюту дурак-ролл
         if text_data_json.get('sell_user_item'):
             await self.sell_item(text_data_json.get('sell_user_item'))
+        # обмен предмета пользователя на валюту в дурак-онлайн
+        if text_data_json.get('forward_user_item'):
+            await self.forward_item(text_data_json.get('forward_user_item'))
         # отправка предметов пользователя
         if text_data_json.get('get_cases_items'):
             await self.get_items_for_cases()
@@ -693,4 +721,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Отправляет результат выпадения кейса"""
         message = dict()
         message["case_roll_result"] = event.get("case_roll_result")
+        await self.send(json.dumps(message))
+
+    async def send_forward_item(self, event):
+        """Отправляет результат выпадения кейса"""
+        message = dict()
+        message["forward_item"] = event.get("forward_item")
         await self.send(json.dumps(message))

@@ -50,7 +50,6 @@ document.addEventListener("keydown", function (e) {
 function popupOpen(curentPopup) {
     if (curentPopup && unlock) {
         const popupActive = document.querySelector(".popup.open");
-        console.log(popupActive)
         if (popupActive) {
             popupClose(popupActive, false);
         } else {
@@ -74,8 +73,40 @@ function popupClose(popupActive, doUnLock = true) {
     }
 }
 
+var soldItemName, soldItemCost, forwarItemName, forwarItemUrl
+
+function set_sell_items_params(name, cost) {
+    soldItemName = name
+    soldItemCost = cost
+}
+
+function set_forward_items_params(name, image) {
+    forwarItemName = name
+    forwarItemImage = image
+}
+
+function forward_user_item() {
+    let usernameInput = document.querySelector('#modal-forward-username-input')
+    console.log(usernameInput.value)
+    chatSocket.send(JSON.stringify({
+        'chat_type':'support',
+        'forward_user_item': {
+            'durak_username': usernameInput.value,
+            'item_name': forwarItemName,
+            'item_image' : forwarItemImage
+        }
+    }))
+    let mod = document.querySelector('#choiceObjects')
+    popupClose(mod)
+
+}
+
 function sell_user_item() {
+    chatSocket.send(JSON.stringify({
+        'sell_user_item': {'name': soldItemName, 'cost': soldItemCost}
+    }))
     let mod = document.querySelector('#question')
     popupClose(mod)
-    console.log('продажа')
+    soldItemName = ''
+    soldItemCost = ''
 }

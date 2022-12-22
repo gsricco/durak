@@ -580,14 +580,17 @@ celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=g
 def send_items(user_pk=None):
     if models.CustomUser.objects.filter(pk=user_pk).exists():
         user =models.CustomUser.objects.get(pk=user_pk)
-        user_items = ItemForUser.objects.filter(user=user)
+        user_items = ItemForUser.objects.filter(user=user,is_used=False)
         serializer = ItemForUserSerializer(user_items, many=True)
         message = {
             'type': 'send_user_item',
             'user_items': serializer.data
         }
 
-        async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+        if user.is_superuser or user.is_staff:
+            async_to_sync(channel_layer.group_send)(f'admin_{user.username}_room', message)
+        else:
+            async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
 
 @shared_task
 def send_balance(user_pk=None):
@@ -599,7 +602,10 @@ def send_balance(user_pk=None):
                 'current_balance': user.detailuser.balance
             }
         }
-        async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+        if user.is_superuser or user.is_staff:
+            async_to_sync(channel_layer.group_send)(f'admin_{user.username}_room', message)
+        else:
+            async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
 def send_balance_delay(user_pk):
     send_balance.apply_async(args=(user_pk,),countdown=5)
 
