@@ -182,7 +182,7 @@ def profil(request):
         withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'amount', 'tr_type', 'tr_plus')
         transactions = popoln.union(user_bets, refill, withdraw).order_by('-date')
 
-        paginator = Paginator(transactions, 10)
+        paginator = Paginator(transactions, 8)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         page_paginated = True if page_number else False
