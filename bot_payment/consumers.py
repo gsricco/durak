@@ -9,6 +9,8 @@ from . import models, serializers
 from django.utils import timezone
 from django.db.utils import Error
 
+from .models import WithdrawalRequest
+
 r = redis.Redis()  # подключаемся к редису
 
 # url сервера с ботами
@@ -304,30 +306,41 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         user_request.status = 'succ'
                     else:
                         user_request.status = 'fail'
-                    # производит операции с балансом пользователя
-                    try:
-                        await self.process_balance(user_request, info)
-                        await sync_to_async(user_request.save)()
-                    except Error as err:
-                        await self.send(json.dumps({"status": "error", "detail": f"Database error. Request is not saved. {type(err)}"}))
-                        print(f"Database error. {type(err)}: {err}.")
+
+                    if WithdrawalRequest.objects.filter(game_id=user_request.game_id).count() >= 4:
+                        ban = await Ban.objects.aget(user=user_request.user)
+                        ban.ban_site = True
+                        await sync_to_async(ban.save)()
+                        message = {"status": "error", "detail": "user banned"}
+                        await self.send(json.dumps(message))
+                        user_request.status = 'fail'
                         return
-                    # банит пользователя, если его забанил сервер
-                    if info.get('ban'):
+                    else:
+
+                        # производит операции с балансом пользователя
                         try:
-                            ban = await Ban.objects.aget(user=user_request.user)
-                            ban.ban_site = True
-                            await sync_to_async(ban.save)()
+                            await self.process_balance(user_request, info)
+                            await sync_to_async(user_request.save)()
                         except Error as err:
-                            await self.send(json.dumps({"status": "error", "detail": f"Database error. User was banned by bot server but bat wasn't saved. {type(err)}"}))
+                            await self.send(json.dumps({"status": "error", "detail": f"Database error. Request is not saved. {type(err)}"}))
                             print(f"Database error. {type(err)}: {err}.")
                             return
-                    # посылает закрытую заявку на клиент
-                    serializer = self.model_serializer(user_request)
-                    serializer_data = await sync_to_async(getattr)(serializer, 'data')
-                    await self.send(json.dumps(serializer_data))
+                        # банит пользователя, если его забанил сервер
+                        if info.get('ban'):
+                            try:
+                                ban = await Ban.objects.aget(user=user_request.user)
+                                ban.ban_site = True
+                                await sync_to_async(ban.save)()
+                            except Error as err:
+                                await self.send(json.dumps({"status": "error", "detail": f"Database error. User was banned by bot server but bat wasn't saved. {type(err)}"}))
+                                print(f"Database error. {type(err)}: {err}.")
+                                return
+                        # посылает закрытую заявку на клиент
+                        serializer = self.model_serializer(user_request)
+                        serializer_data = await sync_to_async(getattr)(serializer, 'data')
+                        await self.send(json.dumps(serializer_data))
 
-                    return
+                        return
                 # задержка перед следующим опросом сервера
                 await asyncio.sleep(delay)
 
