@@ -63,7 +63,7 @@ document.querySelector('#modalManualBtn').addEventListener("click", function(e) 
     const message = 'messageInputDom.value';
     if(is_auth) {
         request = {
-            "amount": 1000
+            "amount": 100
         }
         refillSocket.send(JSON.stringify({
             'create': request,

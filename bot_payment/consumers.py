@@ -46,9 +46,9 @@ class RequestConsumer(AsyncWebsocketConsumer):
             except self.model.DoesNotExist as err:
                 user_request = self.model(request_id=request_pk+ID_SHIFT)
                 user_request.user = self.scope.get('user')
-                await self.send(json.dumps({"status": "process", "detail": "Can't find user request. New one is created"}))
+                await self.send(json.dumps({"status": "process", "detail": "Создаём новый запрос в базе данных..."}))
             except Error as err:
-                await self.send(json.dumps({"status": "error", "detail": f"Database error. {type(err)}"}))
+                await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                 print(f"Database error. {type(err)}: {err}.")
                 return
             # посылает заявку на фронт
@@ -70,14 +70,14 @@ class RequestConsumer(AsyncWebsocketConsumer):
         # если в полученном json есть ключ create, под которым должен храниться json для создания запроса
         if text_data_json.get('create'):
             if r.getex(f"user_{self.operation}:{self.scope['user'].pk}", ex=10*60):
-                await self.send(json.dumps({'status': 'error', 'detail': 'you already have a request.'}))
+                await self.send(json.dumps({'status': 'error', 'detail': 'Вы уже создали запрос.'}))
             else:
                 try:
                     await self.create_request(text_data_json['create'])
                 except json.decoder.JSONDecodeError:
-                    await self.send(json.dumps({'status': 'error', 'detail': 'wrong request format.'}))
+                    await self.send(json.dumps({'status': 'error', 'detail': 'Неверный формат запроса.'}))
         else:
-            await self.send(json.dumps({'status': 'error', 'detail': 'missing "create" in json'}))
+            await self.send(json.dumps({'status': 'error', 'detail': 'Отсутствует "create" в json.'}))
 
     async def check_conditions(self, text_data_json):
         """Проверяет условия создания заявки. OK - заявку можно продолжать создавать"""
@@ -108,7 +108,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             
             # проверяет, создаётся ли заявка для текущего юзера
             if user.pk != serializer.validated_data['user']['id']:
-                message = {"status": "error","detail": "can't create request for other user"}
+                message = {"status": "error","detail": "Нельзя создать заявку для другого пользователя."}
                 await self.send(json.dumps(message))
                 return
 
@@ -117,13 +117,13 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 # ban_tuple = await Ban.objects.aget_or_create(user=user)
                 ban_tuple = await Ban.objects.aget(user=user)
             except (Error, Ban.DoesNotExist) as err:
-                await self.send(json.dumps({"status": "error", "detail": "Error while trying to access database."}))
+                await self.send(json.dumps({"status": "error", "detail": "Ошибка доступа к базе данных."}))
                 print(f"Error while trying to access database, {type(err)}: {err}")
                 return
             # ban = await sync_to_async(ban_tuple.__getitem__)(0)
             # if ban.ban_site:
             if ban_tuple.ban_site:
-                message = {"status": "error","detail": "user banned"}
+                message = {"status": "error","detail": "На сервере ведутся технические работы."}
                 await self.send(json.dumps(message))
                 return
 
@@ -142,7 +142,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     retries += 1
                     # если слишком много запрсов, то перестаём искать
                     if retries > MAX_RETRIES:
-                        message = {"status": "error","detail": "Can't find a free bot"}
+                        message = {"status": "error","detail": "Нет свободных ботов."}
                         await self.send(json.dumps(message))
                         return
                     # пытается получить от сервера ответ
@@ -151,18 +151,18 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         bot_response = await resp.json()
                     except (aiohttp.ClientConnectionError, aiohttp.ServerTimeoutError, asyncio.exceptions.TimeoutError) as err:
                         # при этих ошибках можно попробовать продолжить посылать запросы серверу
-                        await self.send(json.dumps({"status": "process", "detail": f"Error while trying to connect to the bot server{type(err)}"}))
+                        await self.send(json.dumps({"status": "process", "detail": f"Ошибка подключения к серверу ботов."}))
                         await asyncio.sleep(self.connection_delay)
                         continue
                     except aiohttp.ClientError as err:
-                        await self.send(json.dumps({"status": "error", "detail": f"Can't connect to the bot server ({type(err)})"}))
+                        await self.send(json.dumps({"status": "error", "detail": f"Ошибка подключения к серверу ботов."}))
                         print(f"{type(err)}: {err}")
                         return
                     finally:
                         resp.close()
 
                     if 'bot_id' not in bot_response:
-                        message = {"status": "error", "detail": "missing bot_id"}
+                        message = {"status": "error", "detail": "Отсутствует bot_id."}
                         await self.send(json.dumps(message))
                         return
                     bot_id = bot_response['bot_id']
@@ -170,7 +170,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     # -1 в id бота - на сервере нет свободных ботов
                     if bot_id == -1:
                         # отсылаем на фронт ответ о том, что поиск ещё идёт
-                        message = {"status": "process","detail": "finding free bots"}
+                        message = {"status": "process","detail": "Поиск свободных ботов..."}
                         await self.send(json.dumps(message))
                         await asyncio.sleep(self.connection_delay)
                     else:
@@ -183,12 +183,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
                 # если бота кто-то использовал, то прерывает создание заявки
                 if bot_owner is None:
-                    message = {"status": "error","detail": "None get when trying to get a bot_owner"}
+                    message = {"status": "error","detail": "Игровой бот занят."}
                     await self.send(json.dumps(message))
                     return
                 # если бота занял другой пользователь, то прерывает создание заявки
                 if int(bot_owner) != user.pk:
-                    message = {"status": "error","detail": "bot were taken"}
+                    message = {"status": "error","detail": "Игровой бот занят."}
                     await self.send(json.dumps(message))
                     return 
                 # получает имя бота по его id 
@@ -198,7 +198,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     resp = await session.get(url_get_bot_info)
                     bot_list = await resp.json()
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
-                    await self.send(json.dumps({"status": "error", "detail": f"Error while trying to get a bot name ({type(err)})"}))
+                    await self.send(json.dumps({"status": "error", "detail": f"Ошибка получения имени бота."}))
                     print(f"{type(err)}: {err}")
                     return
                 finally:
@@ -213,7 +213,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 try:
                     new_request = await sync_to_async(serializer.save)()
                 except Error as err:
-                    await self.send(json.dumps({"status": "error", "detail": "Can't save request to DB"}))
+                    await self.send(json.dumps({"status": "error", "detail": "Невозможно сохранить заявку в базе данных."}))
                     print(f"{(type(err))}: {err}")
                     return
 
@@ -235,7 +235,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     resp = await session.get(url_request_create)
                     bot_response = await resp.json()
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
-                    await self.send(json.dumps({"status": "error", "detail": "Can't create request on the bot server"}))
+                    await self.send(json.dumps({"status": "error", "detail": "Сервер ботов недоступен."}))
                     print(f"Can't create request on the bot server. {type(err)}: {err}")
                     return
                 finally:
@@ -243,7 +243,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
             # проверяет, создалась ли заявка на сервере
             if bot_response.get('ok') == False:
-                message = {"status": "error","detail": f"Error while creating a request: {bot_response.get('message')})"}
+                message = {"status": "error","detail": f"Ошибка создания заявки на сервере ботов: {bot_response.get('message')})"}
                 await self.send(json.dumps(message))
                 return
             
@@ -264,7 +264,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             return
         
         # отрабатывает если данные для создания заявки, полученные от клиента, были неправильными
-        message = {"status": "error","detail": "bad data"}
+        message = {"status": "error","detail": "Неверный формат данных."}
         await self.send(json.dumps(message))
 
     async def send_request_status(self, request_pk, delay):
@@ -306,7 +306,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         user_request.user = self.scope.get('user')
                         await self.send(json.dumps({"status": "process", "detail": "Can't find user request. New one is created"}))
                     except Error as err:
-                        await self.send(json.dumps({"status": "error", "detail": f"Database error. {type(err)}"}))
+                        await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                         print(f"Database error. {type(err)}: {err}.")
                         return
                     # проверяет, не была ли заявка закрыта ранее
@@ -314,7 +314,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         serializer = self.model_serializer(user_request)
                         serializer_data = await sync_to_async(getattr)(serializer, 'data')
                         await self.send(json.dumps(serializer_data))
-                        await self.send(json.dumps({"status": "error", "detail": "second page prevented"}))
+                        await self.send(json.dumps({"status": "error", "detail": "Открыто более одной вкладки!"}))
                         return
                     # закрывает заявку в БД
                     # отмечает заявку как закрытую
@@ -333,17 +333,17 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         await self.process_balance(user_request, info)
                         await sync_to_async(user_request.save)()
                     except Error as err:
-                        await self.send(json.dumps({"status": "error", "detail": f"Database error. Request is not saved. {type(err)}"}))
+                        await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных. Заявка не сохранена."}))
                         print(f"Database error. {type(err)}: {err}.")
                         return
                     # банит пользователя, если его забанил сервер
                     if info.get('ban'):
                         try:
-                            ban = await Ban.objects.aget(user=user_request.user)
+                            ban = await Ban.objects.aget(user_id=user_request.user_id)
                             ban.ban_site = True
                             await sync_to_async(ban.save)()
                         except Error as err:
-                            await self.send(json.dumps({"status": "error", "detail": f"Database error. User was banned by bot server but bat wasn't saved. {type(err)}"}))
+                            await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                             print(f"Database error. {type(err)}: {err}.")
                             return
                     # посылает закрытую заявку на клиент
@@ -356,7 +356,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 await asyncio.sleep(delay)
 
         # отрабатывает если цикл выше закончился по причине большого количества повторений
-        message = {"status": "error", "detail": "Too many requests"}
+        message = {"status": "error", "detail": "Превышено максимальное количество запросов на сервер ботов."}
         await self.send(json.dumps(message))
 
     async def process_balance(self, user_request, response):
@@ -364,7 +364,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
         # начисление на баланс пользователя полученных кредитов
         user_request.amount = response.get('refiil')
         if user_request.amount > 0:
-            detail_user = await DetailUser.objects.aget(user=user_request.user)
+            detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
             detail_user.balance += user_request.amount
             await sync_to_async(detail_user.save)()
 
@@ -404,6 +404,6 @@ class WithdrawConsumer(RequestConsumer):
             # начисление на баланс пользователя полученных кредитов
             user_request.amount = response.get('withdraw')
             if user_request.amount > 0:
-                detail_user = await DetailUser.objects.aget(user=user_request.user)
+                detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
                 detail_user.balance -= user_request.amount
                 await sync_to_async(detail_user.save)()
