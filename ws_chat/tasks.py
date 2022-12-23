@@ -560,6 +560,8 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
         models.RouletteRound.objects.bulk_update(existing_rounds, ['round_roll', 'day_hash'])
     # сохранение новых раундов в БД
     models.RouletteRound.objects.bulk_create(roulette_rounds)
+    # удаление дубликатов раундов
+    models.RouletteRound.objects.filter(round_number__gte=current_round).exclude(day_hash=day_hash).delete()
     # считает количество выпавших на сегодня результатов рулетки
     # print('Generated rounds for this day:')
     # for result in ROUND_RESULTS:
@@ -670,10 +672,7 @@ def check_rounds():
     try:
         day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
-        generate_daily(
-            day_hash_pk=day_hash.pk,
-            update_rounds=False
-        )
+        generate_daily(day_hash_pk=day_hash.pk)
     except ObjectDoesNotExist:
         generate_daily()
 
@@ -686,7 +685,7 @@ def initialize_rounds():
 
 initialize_rounds()
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
-celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
+celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
 
 
 @shared_task
