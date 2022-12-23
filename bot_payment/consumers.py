@@ -231,7 +231,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     url_request_create += f"&balance={new_request.balance}"
                 if not new_request.game_id is None:
                     url_request_create += f"&game_id={new_request.game_id}"
-                    
+
                 try:
                     resp = await session.get(url_request_create)
                     bot_response = await resp.json()
@@ -396,7 +396,7 @@ class WithdrawConsumer(RequestConsumer):
     async def check_conditions(self, text_data_json):
         user = self.scope['user']
         detail_user = await DetailUser.objects.aget(user=user)
-        if detail_user.balance < text_data_json.get('amount', 0):
+        if detail_user.balance < int(text_data_json.get('amount', 0)):
             return "Недостаточно кредитов."
         return "OK"
 
