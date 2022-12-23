@@ -35,8 +35,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (document.documentElement.clientWidth > 540) {
                 document
-                    // .querySelector(".header__profile-info")
-                    // .append(document.querySelector(".header__profile-progressbar"));
+                // .querySelector(".header__profile-info")
+                // .append(document.querySelector(".header__profile-progressbar"));
                 document
                     .querySelector(".header__profile-info")
                     .append(document.querySelector(".header__btns"));
@@ -55,8 +55,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (document.documentElement.clientWidth < 540) {
             document
-                // .querySelector(".header__profile")
-                // .append(document.querySelector(".header__profile-progressbar"));
+            // .querySelector(".header__profile")
+            // .append(document.querySelector(".header__profile-progressbar"));
             document
                 .querySelector(".header__profile")
                 .append(document.querySelector(".header__btns"));
@@ -64,8 +64,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (document.documentElement.clientWidth > 540) {
             document
-                // .querySelector(".header__profile-info")
-                // .append(document.querySelector(".header__profile-progressbar"));
+            // .querySelector(".header__profile-info")
+            // .append(document.querySelector(".header__profile-progressbar"));
             document
                 .querySelector(".header__profile-info")
                 .append(document.querySelector(".header__btns"));
@@ -131,13 +131,13 @@ window.addEventListener("DOMContentLoaded", () => {
         if (document.documentElement.clientWidth > 541) {
             // document
             //     .querySelector(".profil__progressbar-lvl")
-                // .append(document.querySelector(".profil__progressbar-lvl-img"));
+            // .append(document.querySelector(".profil__progressbar-lvl-img"));
             // document
             //     .querySelector(".profil__progressbar-lvl")
-                // .append(document.querySelector(".profil__progressbar-lvl-num"));
+            // .append(document.querySelector(".profil__progressbar-lvl-num"));
             // document
             //     .querySelector(".profil__progressbar-lvl")
-                // .append(document.querySelector(".profil__progressbar-lvl-progress"));
+            // .append(document.querySelector(".profil__progressbar-lvl-progress"));
             document
                 .querySelector(".profil__info")
                 .append(document.querySelector(".profil__btns"));
@@ -1374,9 +1374,9 @@ const media_prefix = JSON.parse(document.getElementById('media_prefix').textCont
 const static_prefix = JSON.parse(document.getElementById('static_prefix').textContent);
 
 
-let UserBalancer=Number(document.querySelector('#userBal').textContent)
+let UserBalancer = Number(document.querySelector('#userBal').textContent)
 
-if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+if (UserBalancer / 1000 > 9 && UserBalancer / 1000 < 1000) {
     UserBalancerShow = `${UserBalancer / 1000}K`
 } else {
     if (UserBalancer / 1000000 > 0) {
@@ -1390,3 +1390,71 @@ if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
 
 document.querySelector('#userBal').innerHTML = `${UserBalancerShow}`
 document.querySelector('#userBalMob').innerHTML = `${UserBalancerShow}`
+
+
+
+
+
+/* Создание бонусного кода */
+
+const inviteBtn = document.querySelector('.invite__btn');
+
+inviteBtn.addEventListener('click', function (e) {
+    const inviteInput = document.querySelector('.invite__input');
+/// надо сделать проверку на авторизацию
+    // if (isAuthenticated === 'False') {
+    //     const modal = document.querySelector('#authorization')
+    //     modal.classList.add('open')
+    //     modal.addEventListener("click", function (e) {
+    //         if (!e.target.closest(".popup__content")) {
+    //             popupClose(e.target.closest(".popup"));
+    //         }
+    //     });
+    //
+    // } else {
+
+    /* злогика на фронте*/
+    const promoCode = inviteInput.value;
+    /* тут надо отправить promoCode на бэк */
+    /* тут должна быть логика  бэкенда*/
+
+    if (inviteInput.value !== '') {
+        inviteBtn.disabled = true;
+        inviteInput.disabled = true;
+        inviteInput.value = '';
+
+        // * при ответе с бэкенда
+        /* Вставить условие -  если ответ пришел то выпоняется если нет - Введённый промокод не доступен.*/
+        /* когда вставиться бэк setTimeout - убрать.*/
+        setTimeout(() => {
+            const textStatus = document.querySelectorAll('.form__msg');
+            textStatus[2].style.color = 'green';
+            textStatus[2].textContent = 'Введенный промокод доступен';
+
+            // alert(`Ответ (${promoCode}) с бэкенда пришел`);
+
+            inviteInput.style.color = 'green'
+            inviteInput.value = promoCode;
+            inviteBtn.innerHTML = "Копировать";
+            inviteBtn.disabled = false;
+
+        }, 1000);
+
+        inviteBtn.addEventListener('click', () => {
+
+            const inviteInputValue = promoCode;
+            console.log(inviteInputValue)
+            if (inviteInputValue) {
+                navigator.clipboard.writeText(inviteInputValue)
+                    .then(() => {
+                        inviteInput.style.color = 'white'
+                        inviteInput.value = 'Скопированно в буфер';
+                    })
+                    .catch(err => {
+                        console.log('Something went wrong', err);
+                    })
+            }
+        });
+    }
+    e.preventDefault();  // * чтобы страница не перезагружалась
+})
