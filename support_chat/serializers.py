@@ -18,6 +18,7 @@ class MessageGetSerializer(serializers.Serializer):
     message = serializers.CharField()
     file_message = serializers.FileField()
     date = serializers.DateTimeField()
+    is_sell_item = serializers.BooleanField()
 
 
 # class MessageFileCreateSerializer(serializers.ModelSerializer):

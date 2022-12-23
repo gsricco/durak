@@ -144,7 +144,7 @@ function case_click(e) {
 }
 
 function startCaseListRoll() {
-    // modalCase.innerHTML = ''
+    modalCase.innerHTML = ''
     // listCase.className = ''
     // listCase.style.left = ''
     // listCase.style.transform = ''
@@ -217,6 +217,7 @@ let sellItemPrice , sellItemName
 
 function newUserItem(data) {
     let profCaseItem = document.querySelector('.profil__items')
+    // profCaseItem.innerHTML = ''
     let allProfCaseItem = document.querySelectorAll('.profil__item')
     allProfCaseItem.forEach((e) => e.remove())
     data.forEach((e) => {

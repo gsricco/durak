@@ -87,9 +87,7 @@ function set_forward_items_params(name, image) {
 
 function forward_user_item() {
     let usernameInput = document.querySelector('#modal-forward-username-input')
-    console.log(usernameInput.value)
     chatSocket.send(JSON.stringify({
-        'chat_type':'support',
         'forward_user_item': {
             'durak_username': usernameInput.value,
             'item_name': forwarItemName,

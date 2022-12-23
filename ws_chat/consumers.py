@@ -73,11 +73,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             return ''
     @sync_to_async
-    def save_user_message(self, room, user, message, file_path=''):  # сохраняет сообщение в бд
+    def save_user_message(self, room, user, message, file_path='',is_sell_item=False):  # сохраняет сообщение в бд
         """Cохраняет сообщения из чата поддержки в БД"""
         if user:
             user = CustomUser.objects.get(username=user).pk
-            user_mess = Message(user_posted_id=user, message=message, file_message=file_path[6:])
+            user_mess = Message(user_posted_id=user, message=message,
+                                file_message=file_path[6:],is_sell_item=is_sell_item)
             # user_mess.full_clean()
             user_mess.save()
             room.message.add(user_mess, bulk=False)
@@ -388,15 +389,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if user.is_authenticated:
             if Item.objects.filter(name=data.get('item_name')).exists():
                 item = Item.objects.get(name=data.get('item_name'))
-                if ItemForUser.objects.filter(user_item=item, user=user).exists():
-                    user_item = ItemForUser.objects.filter(user_item=item, user=user).first()
-                    print(user_item)
-                    # user_item.is_used = True
-                    # user_item.save()
-                    # async_to_sync(self.get_user_items)()
+                if ItemForUser.objects.filter(user_item=item, user=user, is_used=False).exists():
+                    user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
+                    user_item.is_used = True
+                    user_item.save()
+                    async_to_sync(self.get_user_items)()
+                    durak_username = data.get('durak_username')
+                    item_name = data.get('item_name')
+                    svg_name = data.get('item_image')
                     message = {
-                        'type': 'send_forward_item',
-                        'forward_item': data }
+                        'type': 'support_chat_message',
+                        'chat_type':'support',
+                        'user':user.username,
+                        'message': f'{durak_username};{item_name};{svg_name}',
+                        'is_sell_item':True
+                        }
+
+                    room = async_to_sync(self.create_or_get_support_chat_room)(user)
+                    async_to_sync(self.save_user_message)(room, user,f'{durak_username};{item_name};{svg_name}'
+                                                 , is_sell_item=True)
                     async_to_sync(self.channel_layer.group_send)(f'{user.username}_room',message )
                     async_to_sync(self.channel_layer.group_send)('admin_group',message )
     async def connect(self):
@@ -590,6 +601,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def support_chat_message(self, event):
         list_message = event.get('list_message')
         user = event.get('user')
+        is_sell_item=event.get('is_sell_item')
         message = event.get("message")
         file_path = event.get('file_path')
         chat_type = event.get('chat_type')
@@ -598,6 +610,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                               "chat_type": chat_type,
                                               "user": user,
                                               "file_path": file_path,
+                                              'is_sell_item': is_sell_item
                                               }))
 
     async def roulette_countdown_starter(self, event):
@@ -723,8 +736,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message["case_roll_result"] = event.get("case_roll_result")
         await self.send(json.dumps(message))
 
-    async def send_forward_item(self, event):
-        """Отправляет результат выпадения кейса"""
-        message = dict()
-        message["forward_item"] = event.get("forward_item")
-        await self.send(json.dumps(message))

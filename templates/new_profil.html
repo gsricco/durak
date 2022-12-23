@@ -583,7 +583,7 @@
                 Вывод предметов
             </h3>
 
-            <form action="" class="form choice-object">
+            <form action="{% url 'faq' %}" class="form choice-object">
                 <ul class="choice-object__list">
                     <li class="choice-object__item">
                         <div class="choice-object__number">#1</div>
@@ -610,7 +610,7 @@
                         </div>
                     </li>
                 </ul>
-                <button type="button" class="btn btn_danger choice-object__submit"
+                <button type="submit" class="btn btn_danger choice-object__submit"
                         onclick="forward_user_item()">Вывести предмет</button>
 
 
