@@ -149,6 +149,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     try:
                         resp = await session.get(url_get_free_bot)
                         bot_response = await resp.json()
+                        resp.close()
                     except (aiohttp.ClientConnectionError, aiohttp.ServerTimeoutError, asyncio.exceptions.TimeoutError) as err:
                         # при этих ошибках можно попробовать продолжить посылать запросы серверу
                         await self.send(json.dumps({"status": "process", "detail": f"Ошибка подключения к серверу ботов."}))
@@ -158,8 +159,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         await self.send(json.dumps({"status": "error", "detail": f"Ошибка подключения к серверу ботов."}))
                         print(f"{type(err)}: {err}")
                         return
-                    finally:
-                        resp.close()
 
                     if 'bot_id' not in bot_response:
                         message = {"status": "error", "detail": "Отсутствует bot_id."}
@@ -228,9 +227,11 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     print(f"request id may be lost for {new_request}, request_id = {new_request.request_id}")
 
                 url_request_create = f"{HOST_URL}{self.operation}/create?id={new_request.request_id}&bot_id={bot_id}&site_id={user.pk}&bet={new_request.amount}"
+                if self.operation == 'withdraw':
+                    url_request_create += f"&balance={new_request.balance}"
                 if not new_request.game_id is None:
                     url_request_create += f"&game_id={new_request.game_id}"
-                
+                    
                 try:
                     resp = await session.get(url_request_create)
                     bot_response = await resp.json()
@@ -396,7 +397,7 @@ class WithdrawConsumer(RequestConsumer):
         user = self.scope['user']
         detail_user = await DetailUser.objects.aget(user=user)
         if detail_user.balance < text_data_json.get('amount', 0):
-            return "Not enough credits."
+            return "Недостаточно кредитов."
         return "OK"
 
     async def process_balance(self, user_request, response):
@@ -405,5 +406,6 @@ class WithdrawConsumer(RequestConsumer):
             user_request.amount = response.get('withdraw')
             if user_request.amount > 0:
                 detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
-                detail_user.balance -= user_request.amount
+                new_balance = max(detail_user.balance - user_request.amount, 0)
+                detail_user.balance = new_balance
                 await sync_to_async(detail_user.save)()

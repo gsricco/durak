@@ -801,7 +801,7 @@
                     <div class="swiper select-amount__slider">
                         <div class="swiper-wrapper select-amount__wrapper">
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManual" class="select-amount__item popup-link"s>
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -819,7 +819,7 @@
                                 </a>
                             </div>
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManual" class="select-amount__item popup-link" credits="50000">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -887,7 +887,7 @@
 
         </div>
     </div>
-    <div class="popup modal-manual" id="modalManual">
+    <div class="popup modal-manual instruction" id="modalManual">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal-manual__modal">
                 <a href="#" class="popup__close close-popup close-popup_close">
@@ -917,8 +917,45 @@
                     </div>
 
                 </div>
-                <a href="#modalRefill" class="btn btn_danger modal-manual__btn popup-link" id="modalManualBtn">
-                    <div class="timer" id="timerOne">Начать</div>
+                <a href="#modalRefill" class="btn btn_danger modal-manual__btn popup-link btn_white" id="modalManualBtn">
+                    <div class="timer" id="timerOne">0:10</div>
+                </a>
+
+            </div>
+        </div>
+    </div>
+    <div class="popup modal-manual" id="modalManualWithdraw">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal-manual__modal">
+                <a href="#" class="popup__close close-popup close-popup_close">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <h3 class="modal__title">
+                    Инструкция
+                </h3>
+
+                <div class="modal-manual__text">
+                    <ul>
+                        <li>1. Общие положения</li>
+                        <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее –
+                            Пользователь) -
+                            использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее
+                            —
+                            «Соглашение», «ПС»).
+                            Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+                            Соглашение
+                            вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
+                        </li>
+                    </ul>
+                    <div class="modal-manual__footnote">
+                        *в случае неудачной попытки обыгрыша валюта не возвращается
+                    </div>
+
+                </div>
+                <a href="#modalWithdraw" class="btn btn_danger modal-manual__btn popup-link btn_white" id="modalManualBtn2">
+                    <div class="timer" id="timerPay">0:10</div>
                 </a>
 
             </div>
@@ -937,6 +974,29 @@
                 </a>
                 <h3 class="modal__title">
                     Пополнение баланса кредитами из игры
+                </h3>
+
+                <div class="modal-manual__text">
+                    <ul>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="popup modal-manual" id="modalWithdraw">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal-manual__modal">
+                <div class="modal-manual__queries">
+                    Заявка #
+                </div>
+                <a href="#" class="popup__close close-popup close-popup_close">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+                <h3 class="modal__title">
+                    Вывод кредитов в игру
                 </h3>
 
                 <div class="modal-manual__text">
@@ -984,7 +1044,7 @@
                     <div class="swiper select-amount__slider">
                         <div class="swiper-wrapper select-amount__wrapper">
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -992,7 +1052,7 @@
                                         50К
                                     </div>
                                 </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -1002,7 +1062,7 @@
                                 </a>
                             </div>
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -1010,7 +1070,7 @@
                                         250К
                                     </div>
                                 </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -1020,7 +1080,7 @@
                                 </a>
                             </div>
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -1028,7 +1088,7 @@
                                         1M
                                     </div>
                                 </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -1038,7 +1098,7 @@
                                 </a>
                             </div>
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
@@ -1046,7 +1106,7 @@
                                         5M
                                     </div>
                                 </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
