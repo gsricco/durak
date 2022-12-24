@@ -238,7 +238,7 @@ function newUserItem(data) {
             <div class="profil__item-wrapper">
                 <div class="profil__item-img">
                     <svg>
-                        <use xlink:href="${static_prefix}/img/icons/sprite.svg#${e.user_item.image}"></use>
+                        <use xlink:href="${static_prefix}img/icons/sprite.svg#${e.user_item.image}"></use>
                     </svg>
                 </div>
                 <h3 class="profil__item-title">${e.user_item.name}</h3>

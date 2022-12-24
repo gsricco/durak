@@ -25,9 +25,6 @@ const createBidItems = (data) => {
     document.querySelector(`.coin`).innerHTML = ''
     document.querySelector(`.spades`).innerHTML = ''
 
-    console.log(data, 'Datas')
-    console.log(username, 'USERNAME')
-
     let usersId = (Object.keys(data))
     let memberHeartsShow = '';
     let memberCoinShow = '';
@@ -175,7 +172,6 @@ const createBidItems = (data) => {
             usersBids.sort((a, b) => b.bidCount - a.bidCount)//сортировка по ставкам
         })
     })
-    console.log(usersBids, "USER_BIDS")
 
     usersBids.map(el => {
         // отрисовка  ставки одной масти одного пользователя
@@ -211,7 +207,6 @@ const createBidItems = (data) => {
         itemUserName.innerHTML = `${el.userName}`
         bidItemLeftBlock.appendChild(itemUserName)
     })
-    console.log(userCountHearts, 'USER_COUNT')
     switch (userCountHearts){
         case 1: {
             memberHeartsShow = 'участник';
@@ -305,7 +300,6 @@ const itemsClick = (bidCard) => {
 
 
         // let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
-        // console.log(cells)
         if (balanceUser + 1 >= Number(bidCount)) {
 
 

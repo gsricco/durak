@@ -20,7 +20,6 @@ const chatSocket = new WebSocket(
 );
 
 //вставка онлайн чата только на главную страницу
-console.log(window.location.pathname)
 if (window.location.pathname === '/') {
     let mobileChat = document.querySelector('#mobile-online-chat')
     let tempElem = document.querySelector('.profil-main')

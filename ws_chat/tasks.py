@@ -79,11 +79,13 @@ def sender():
 
 @shared_task
 def debug_task():
+    z = timezone.now()
     t = datetime.datetime.now()
+    print(t, z , 'DATETIME AND TIMEZONE!!!!!!!!!!!!!!!!!!!!!!!!!')
     sender.apply_async()
     # roll.apply_async(countdown=19.5)
     roll.apply_async(eta=t + datetime.timedelta(seconds=20))
-    generate_round_result.apply_async(countdown=24, args=(True,))
+    generate_round_result.apply_async(countdown=21, args=(True,))
     stop.apply_async(countdown=25)
     go_back.apply_async(countdown=28)
 
@@ -205,14 +207,14 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
     credits = 0
     for bet_card in user_bet:
         if bet_card == round_result:
-            if bet_card == ('spades' or 'hearts'):
+            if bet_card == 'spades' or bet_card == 'hearts':
                 credits += int(user_bet[bet_card])
             else:
                 credits += int(user_bet[bet_card]) * 13
         # Возможно списание средств надо оставить на момент самой ставки
         # и убрать отсюда
-        else:
-            credits += - int(user_bet[bet_card])
+        # else:
+        #     credits += - int(user_bet[bet_card])
     print(f'Кол-во кредитов к начислению : {credits}')
     return credits
 
@@ -273,10 +275,12 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     Args:
         keys_storage_name (str): name of the list in redis where bets keys are stored
         round_result_field_name (str): name of the field where round result is stored
-
     Returns:
         int: return code
     """
+    # время начала работы функции
+    z = timezone.now()
+    time_to_start = z + datetime.timedelta(seconds=4)
     # получение всех ключей - id юзеров, который делали ставки в этом раунде
     bets_keys = r.json().objkeys('round_bets')
     # получаем информацию о всех ставках на текущий раунд
@@ -326,7 +330,9 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                     'current_balance': user.detailuser.balance
                 }
             }
-            async_to_sync(channel_layer.send)(channel_name, message)
+            eval_balance_with_delay.apply_async(args=(channel_name, message),
+                                                eta=time_to_start)
+            # async_to_sync(channel_layer.send)(channel_name, message)
         # после получения опыта пробует начислить пользователю уровни
         rewards_for_level = user.give_level()
 
@@ -378,6 +384,11 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         print(f"Rewards granted:{granted}")
 
     return 0
+
+
+@shared_task()
+def eval_balance_with_delay(channel_name, message):
+    async_to_sync(channel_layer.send)(channel_name, message)
 
 
 def send_exp(user, channel_name):
@@ -494,7 +505,7 @@ def generate_round_result(process_after_generating: bool = False) -> int:
     # r.set(ROUND_RESULT_FIELD_NAME, result)
 
     if process_after_generating:
-        process_bets.apply_async(args=(KEYS_STORAGE_NAME, ROUND_RESULT_FIELD_NAME,))
+        process_bets.apply_async(args=(KEYS_STORAGE_NAME, ROUND_RESULT_FIELD_NAME))
 
     return 0
 
@@ -622,8 +633,11 @@ def send_balance(user_pk=None):
             }
         }
         async_to_sync(channel_layer.group_send)(f'{user.username}_room', message)
+
+
 def send_balance_delay(user_pk):
-    send_balance.apply_async(args=(user_pk,),countdown=5)
+    send_balance.apply_async(args=(user_pk,), countdown=5)
+
 
 def send_items_delay(user_pk):
     send_items.apply_async(args=(user_pk,),countdown=5)

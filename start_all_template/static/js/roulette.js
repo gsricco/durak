@@ -249,7 +249,6 @@ function super_new(f) {
             let signWinner, counts, countsShow;
             let lowerCard = cardWinner.toLowerCase();
             let nameWinnerCard = cardWinner[0].toUpperCase() + cardWinner.slice(1);
-            console.log(lowerCard, nameWinnerCard)
             let bidsNumber = document.querySelectorAll(`.${lowerCard} .roulette__item-money`)
             bidsNumber.forEach(el => {
                 el.style.color = '#5DD887'
@@ -293,7 +292,6 @@ function super_new(f) {
                     if (counts * bidIncrease / 1000 > 0 && counts * bidIncrease / 1000 < 10) {
                         countsShow = `${counts * bidIncrease}`
                     }
-                    console.log(countsShow)
                     document.querySelector(`#spanCard${nameWinnerCard}`).innerHTML = `+${countsShow}`;
                     document.querySelector(`#title${nameWinnerCard}`).innerHTML = `Победа:`;
                     document.querySelector(`#signWinner${lowerCard}`).innerHTML = ' +';
@@ -323,40 +321,32 @@ function super_new(f) {
                 let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
                 timerCounter(remainTime)
             }
-            if (data.init.state === 'rolling') {
-                startRoll(data.init.winner)
+            else if (data.init.state === 'rolling') {
+                startRoll(data.init.w)
+            }
+            else if (data.init.state === 'stop'){
+                let winnerCard = data.init.w
+                winnerCheckInitialSettings();
+                if (winnerCard === 'hearts') {
+                    checkWinner('hearts', 2)
+                } else if (winnerCard === 'coin') {
+                    checkWinner('coin', 14)
+                } else if (winnerCard === 'spades') {
+                    checkWinner('spades', 2)
+                }
+            }
+            else if (data.init.state === 'go_back'){
+                previous_rolls(data.init.previous_rolls)
+                returnToStartPosition()
             }
         }
-        console.log(document.querySelector('#userBal').textContent, 'BALANCE_FRONT_FOREVER')
         if (data.current_balance) {
-            console.log(data.current_balance,"BALANCE_BACK")
-            console.log(document.querySelector('#userBal').textContent, 'BALANCE_FRONT')
-            UserBalancer = Number(data.current_balance)
-            // // Отображать надо уже преобразованное число, а использовать пришедшее
-            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
-                UserBalancerShow = `${UserBalancer / 1000}K`
-            } else {
-                if (UserBalancer / 1000000 > 0) {
-                    UserBalancerShow = `${UserBalancer / 1000000}M`
-                } else
-                    UserBalancerShow = `${UserBalancer}`
-            }
-            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
-                UserBalancerShow = `${UserBalancer}`
-            }
-
-
-            //
-            UserBalance.innerHTML = `${UserBalancerShow}`
-            UserBalanceMob.innerHTML = `${UserBalancerShow}`
-            // UserBalance.innerHTML = `${data.current_balance}`
+            update_balance(data.current_balance)
         }
-
         if (data.round_bets) {
             createBidItems(data.round_bets)
         }
         if (data.roll) {
-            console.log(data, 'new data for BIDS')
             startRoll(data.winner, data.c, data.p)
         }
 
@@ -386,7 +376,6 @@ function super_new(f) {
 
 // Отрисовка предыдущих победителей
 function previous_rolls(rolls) {
-    console.log('eto prev roll', rolls)
     let rollWinnerOld = document.querySelector('.roulette__previous-items');
     rollWinnerOld.innerHTML = ``
     rolls.map(roll => {
@@ -398,4 +387,22 @@ function previous_rolls(rolls) {
             </div>
             `
     })
+}
+// Обновление баланса пользователя от бэка
+function update_balance(current_balance){
+    UserBalancer = Number(current_balance)
+            // // Отображать надо уже преобразованное число, а использовать пришедшее
+            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+                UserBalancerShow = `${UserBalancer / 1000}K`
+            } else {
+                if (UserBalancer / 1000000 > 0) {
+                    UserBalancerShow = `${UserBalancer / 1000000}M`
+                } else
+                    UserBalancerShow = `${UserBalancer}`
+            }
+            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+                UserBalancerShow = `${UserBalancer}`
+            }
+            UserBalance.innerHTML = `${UserBalancerShow}`
+            UserBalanceMob.innerHTML = `${UserBalancerShow}`
 }

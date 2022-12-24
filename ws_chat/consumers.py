@@ -441,13 +441,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 user_pk = user.pk
                 bet = text_data_json.get('bet')
                 print(f"receive method in consumers.py: Receiving bet from user({user_pk}): {bet}")
+                await self.change_balance(bet.get('bidCount'))
                 await self.save_bet(bet, user_pk)
-            await self.channel_layer.group_send(
-                self.room_group_name, {
-                    "type": "get_bid",
-                    "bid": text_data_json,
-                }
-            )
+                await self.channel_layer.group_send(
+                    self.room_group_name, {
+                        "type": "get_bid",
+                        "bid": text_data_json,
+                    }
+                )
         if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
             message = text_data_json.get("message")
             user = text_data_json["user"]
@@ -618,6 +619,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event.get('balance_update')
         await self.send(text_data=json.dumps(message))
 
+    @sync_to_async
+    def change_balance(self, amount_to_subtract=None):
+        print(amount_to_subtract, 'IN CHANGE BALANCE')
+        if amount_to_subtract:
+            self.scope['user'].detailuser.balance -= amount_to_subtract
+            self.scope['user'].save()
+        async_to_sync(self.channel_layer.send)(self.channel_name, {
+            'type': 'get_balance',
+            'balance_update': {
+                'current_balance': self.scope['user'].detailuser.balance
+            }
+        })
+
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
@@ -638,19 +652,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps(message))
 
     async def roulette_countdown_state(self, event):
-        """Отправляет новому клиенту состояние рулетки при уже начавшемся отсчёте"""
+        """Отправляет новому клиенту состояния рулетки"""
         state = r.get('state')
 
         t = r.get('start:time')
         bets = r.json().get('round_bets')
+
         message = {'init': {"state": state,
                             "t": str(t),
                             "previous_rolls": r.json().get('last_winners'),
                             }
                    }
-        if state == 'rolling':
+        if state == 'rolling' or state == 'stop':
             round_result = r.get(ROUND_RESULT_FIELD_NAME)
-            message['init']['winner'] = round_result
+            message['init']['w'] = round_result
         await self.send(json.dumps(message))
         if bets is not None:
             print(bets)
