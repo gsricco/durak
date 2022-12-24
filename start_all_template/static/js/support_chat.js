@@ -127,6 +127,27 @@ function newUserMessage(message, user, file_path) {
         }
     }
 
+function newSellItemMessage(message,user) {
+    let dataList = message.split(';')
+    console.log(dataList[0])
+    const li = document.createElement('li')
+     if (user !== username) {
+            li.className = 'support__chat-message'
+        } else {
+            li.className = 'support__chat-message support__chat-message_your'
+        }
+    const div = document.createElement('div')
+    div.className = 'support__chat-message-text'
+    div.innerHTML = `    
+              <span class="support__chat-name">${dataList[0]}</span>
+                <div class="support__chat-smile-img">
+                  <svg><use xlink:href="/static/img/icons/sprite.svg#${dataList[2]}"></use></svg>
+                </div>
+              <h3 class="support__chat-smile-title">${dataList[1]}</h3>
+`
+    chatBlock.appendChild(li)
+li.appendChild(div)
+}
 
 
 // function newUserMessage(message, user, file_path) {
@@ -222,17 +243,26 @@ function super_new(f) {
         if (data.chat_type === 'support') {
             if (data.list_message) {
                 data.list_message.forEach((mess) => {
-                    if (mess.file_message) {
-                        newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
-                    } else {
-                        newUserMessage(mess.message, mess.user_posted.username)
+                        if (mess.is_sell_item) {
+                            newSellItemMessage(mess.message,mess.user_posted.username)
+                        } else {
+                            if (mess.file_message) {
+                                newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
+                            } else {
+                                newUserMessage(mess.message, mess.user_posted.username)
+                            }
+                        }
                     }
-                })
+                )
             } else {
-                if (data.file_path !== '/') {
-                    newUserMessage(`${data.message}`, data.user, data.file_path)
+                if (data.is_sell_item) {
+                    newSellItemMessage(data.message,data.user)
                 } else {
-                    newUserMessage(`${data.message}`, data.user)
+                    if (data.file_path !== '/') {
+                        newUserMessage(`${data.message}`, data.user, data.file_path)
+                    } else {
+                        newUserMessage(`${data.message}`, data.user)
+                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ class Message(models.Model):
     file_message = models.FileField(upload_to=f'support_chat/%Y/%m/%d/', blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False, blank=True, null=True)
+    is_sell_item = models.BooleanField(default=False)
 
     def __str__(self):
         return self.message

@@ -547,7 +547,7 @@
                 Вывод предметов
             </h3>
 
-            <form action="" class="form choice-object">
+            <form action="{% url 'faq' %}" class="form choice-object">
                 <ul class="choice-object__list">
                     <li class="choice-object__item">
                         <div class="choice-object__number">#1</div>
@@ -569,11 +569,13 @@
                             Введите свой никнейм
                         </div>
                         <div class="choice-object__in-block">
-                            <input type="text" class="choice-object__input form__input" placeholder="Sellix224121">
+                            <input type="text" id="modal-forward-username-input"
+                                   class="choice-object__input form__input" placeholder="input Username">
                         </div>
                     </li>
                 </ul>
-                <button type="submit" class="btn btn_danger choice-object__submit">Вывести предмет</button>
+                <button type="submit" class="btn btn_danger choice-object__submit"
+                        onclick="forward_user_item()">Вывести предмет</button>
 
 
             </form>
