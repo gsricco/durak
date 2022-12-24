@@ -589,11 +589,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
-        online = event['get_online']
-        t = datetime.datetime.now()
+        online = event.get('get_online')
+        print(online, 'ETO ONLINE ')
         await self.send(text_data=json.dumps({
             "get_online": online,
-            "time": str(int(t.timestamp() * 1000))
         }))
 
     async def get_rooms(self, event):
