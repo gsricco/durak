@@ -102,11 +102,11 @@
                                         <button type="submit" class="btn btn_dark invite__btn">Создать</button>
 
 
-                                        <div class="invite__msg invite__msg_mob form__msg">Введённый промокод не
+                                        <div id="formMsgMob" class="invite__msg invite__msg_mob form__msg">Введённый промокод не
                                             доступен.
                                         </div>
                                     </div>
-                                    <div class="invite__msg form__msg">Введённый промокод не доступен.</div>
+                                    <div id="formMsg" class="invite__msg form__msg">Введённый промокод не доступен.</div>
                                 </form>
                                 <div class="invite__arrow invite__arrow_min">
                                     <svg class="icon">
@@ -145,6 +145,8 @@
                                     </div>
                                     {% for i in sitecontent %}
                                     <div class="invite__text">
+                                        Дай ему ссылку и свой бонусный код. После активации ты получишь 25к
+                                        кредитов и 0,5% от всех ставок приглашённого игрока.
                                         {{ i.info3|safe }}
                                     </div>
                                     {% endfor %}
