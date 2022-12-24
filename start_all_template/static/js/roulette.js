@@ -246,7 +246,7 @@ function super_new(f) {
         }
 
         function checkWinner(cardWinner, bidIncrease) {
-            let signWinner, counts, countsShow;
+            let signWinner, counts, countsShow, j;
             let lowerCard = cardWinner.toLowerCase();
             let nameWinnerCard = cardWinner[0].toUpperCase() + cardWinner.slice(1);
             let bidsNumber = document.querySelectorAll(`.${lowerCard} .roulette__item-money`)
@@ -258,18 +258,21 @@ function super_new(f) {
                         signWinner = signWinnerhearts;
                         counts = heartsCounts;
                         countsShow = heartsCountsShow;
+                        j=0;
                         break;
                     }
                     case 'coin': {
                         signWinner = signWinnercoin;
                         counts = coinCounts;
                         countsShow = coinCountsShow;
+                        j=1;
                         break;
                     }
                     case 'spades': {
                         signWinner = signWinnerspades;
                         counts = spadesCounts;
                         countsShow = spadesCountsShow;
+                        j=2;
                         break;
                     }
 
@@ -292,6 +295,7 @@ function super_new(f) {
                     if (counts * bidIncrease / 1000 > 0 && counts * bidIncrease / 1000 < 10) {
                         countsShow = `${counts * bidIncrease}`
                     }
+                    console.log(countsShow, "COUNTS_SHOW")
                     document.querySelector(`#spanCard${nameWinnerCard}`).innerHTML = `+${countsShow}`;
                     document.querySelector(`#title${nameWinnerCard}`).innerHTML = `Победа:`;
                     document.querySelector(`#signWinner${lowerCard}`).innerHTML = ' +';
@@ -305,7 +309,9 @@ function super_new(f) {
                     // }
                 }
                 document.querySelector(`.${lowerCard}`).style.opacity = '1'
-                bidsButtons[0].style.opacity = '1'
+
+
+                bidsButtons[j].style.opacity = '1'
             })
         }
 
