@@ -1,6 +1,9 @@
 import datetime
 import math
 import uuid
+from django.db import Error
+import requests
+import json
 from hashlib import sha256
 from caseapp.serializers import ItemForUserSerializer
 from configs import celery_app
@@ -16,6 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from accaunts.models import Level, ItemForUser
+from bot_payment.models import RefillRequest, WithdrawalRequest
 
 channel_layer = get_channel_layer()
 r = Redis(encoding="utf-8", decode_responses=True)
@@ -253,7 +257,6 @@ def save_round_results(bets_info):
         if bet_amount.get(round_result, 0) > 0:
             winners.append(user_pk)
     # сохраняет раунд в БД
-    round_number = int(r.get('round'))
     round_started = timezone.now()
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
@@ -567,11 +570,101 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
         models.RouletteRound.objects.bulk_update(existing_rounds, ['round_roll', 'day_hash'])
     # сохранение новых раундов в БД
     models.RouletteRound.objects.bulk_create(roulette_rounds)
+    # удаление дубликатов раундов
+    models.RouletteRound.objects.filter(round_number__gte=current_round).exclude(day_hash=day_hash).delete()
     # считает количество выпавших на сегодня результатов рулетки
     # print('Generated rounds for this day:')
     # for result in ROUND_RESULTS:
     #     amount = models.RouletteRound.objects.filter(round_number__gte=current_round, round_roll=result).count()
     #     print(f"{result} = {amount}")
+
+
+def setup_check_request_status(host_url, operation, id_shift, request_pk, delay):
+    """Запускает проверку статуса на сервере ботов через delay секунд"""
+    check_request_status.apply_async(
+        args=(host_url, operation, id_shift, request_pk),
+        countdown=delay
+    )
+
+@shared_task
+def check_request_status(host_url, operation, id_shift, request_pk):
+    """Проверяет статус заявки на сервере ботов"""
+    # создаёт url для получения статуса заявки
+    url_get_status = f"{host_url}{operation}/get?id={request_pk + id_shift}"
+    timeout = 2
+    # попытка соединения с сервером ботов
+    try:
+        resp = requests.get(url_get_status, timeout=timeout)
+        req_txt = resp.text
+        info = resp.json()
+    except (requests.ConnectionError, requests.Timeout):
+        # планирование следующей попытки обновления статуса заявки
+        setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
+        return
+    # проверяет статус заявки
+    if info.get('done'):
+        if operation == 'refill':
+            model = RefillRequest
+        elif operation == 'withdraw':
+            model = WithdrawalRequest
+        else:
+            print(f'Unknown request operation: {operation}')
+            return
+        # достаёт заявку из бд
+        try:
+            user_request = model.objects.get(pk=request_pk)
+        except model.DoesNotExist as err:
+            print(f'Request {request_pk} does not exist')
+            return
+        except Error:
+            setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
+            return
+        # проверяет, не была ли заявка закрыта ранее
+        if user_request.status != 'open' or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
+            print(f'Request {request_pk} already closed')
+            return
+        # закрывает заявку в БД
+        # отмечает заявку как закрытую
+        r.set(f'close_{request_pk}:{operation}:bool', "closed", ex=10*60)
+        # изменяет статус заявки
+        user_request.close_reason = info.get('close_reason')
+        user_request.note = info.get('note')       
+        user_request.game_id = info.get('game_id')         
+        user_request.date_closed = timezone.now()
+        if info.get('close_reason') == 'Success':
+            user_request.status = 'succ'
+        else:
+            user_request.status = 'fail'
+        # производит операции с балансом пользователя
+        try:
+            if operation == 'refill':
+                user_request.amount = info.get('refiil')
+                if user_request.amount > 0:
+                    detail_user = models.DetailUser.objects.get(user=user_request.user)
+                    detail_user.balance += user_request.amount
+                    detail_user.save()
+            elif operation == 'withdraw':
+                user_request.amount = info.get('withdraw')
+                if user_request.amount > 0:
+                    detail_user = models.DetailUser.objects.get(user=user_request.user)
+                    detail_user.balance -= user_request.amount
+                    detail_user.save()
+            else:
+                print(f'Unknown request operation: {operation}')
+                return
+            user_request.save()
+        except Error as err:
+            setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
+            return
+        # банит пользователя, если его забанил сервер
+        if info.get('ban'):
+            try:
+                ban = models.Ban.objects.get(user=user_request.user)
+                ban.ban_site = True
+                ban.save()
+            except Error as err:
+                print("Database error. Can't load a ban.")
+                return
 
 
 def check_round_number():
@@ -589,10 +682,7 @@ def check_rounds():
     try:
         day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
-        generate_daily(
-            day_hash_pk=day_hash.pk,
-            update_rounds=False
-        )
+        generate_daily(day_hash_pk=day_hash.pk)
     except ObjectDoesNotExist:
         generate_daily()
 
@@ -605,7 +695,7 @@ def initialize_rounds():
 
 initialize_rounds()
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
-celery_app.add_periodic_task(schedule=schedules.crontab(minute=1, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
+celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
 
 
 @shared_task
