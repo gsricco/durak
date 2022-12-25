@@ -21,6 +21,7 @@ from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
+
 # подключаемся к редису
 r = redis.Redis(encoding="utf-8", decode_responses=True)
 
@@ -36,14 +37,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def save_user_message_all_chat(self, all_chat_message):
         """Сохраняет последние 1-50 сообщений из общего чата в Редис"""
-        # if r.llen("all_chat_50") == 50:
-        #     r.lpop("all_chat_50")
-        # r.rpush("all_chat_50", json.dumps(all_chat_message))
         if not r.exists("all_chat_50"):
             r.json().set("all_chat_50", ".", [])
         r.json().arrappend("all_chat_50", ".", all_chat_message)
         if arr_len := r.json().arrlen("all_chat_50") > 50:
-            r.json().arrtrim("all_chat_50", ".", arr_len-50, -1)
+            r.json().arrtrim("all_chat_50", ".", arr_len - 50, -1)
+
     @sync_to_async()
     def base64_to_image(self, file):
         """Преобразование байт строки в файл и сохранение его"""
@@ -76,13 +75,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return save_name
         else:
             return ''
+
     @sync_to_async
-    def save_user_message(self, room, user, message, file_path='',is_sell_item=False):  # сохраняет сообщение в бд
+    def save_user_message(self, room, user, message, file_path='', is_sell_item=False):  # сохраняет сообщение в бд
         """Cохраняет сообщения из чата поддержки в БД"""
         if user:
             user = CustomUser.objects.get(username=user).pk
             user_mess = Message(user_posted_id=user, message=message,
-                                file_message=file_path[6:],is_sell_item=is_sell_item)
+                                file_message=file_path[6:], is_sell_item=is_sell_item)
             # user_mess.full_clean()
             user_mess.save()
             room.message.add(user_mess, bulk=False)
@@ -107,9 +107,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # else:
         #     print('error get_all_room')
 
-    async def send_online(self, num):
+    async def set_online(self, is_auth: bool, incr: bool = True):
         """Отправка онлайна при коннекте и дисконнекте пользователя"""
-        online = self.channel_layer.receive_count + num
+        if is_auth:
+            if incr:
+                r.sadd("online", self.scope["user"].id)
+                r.expire("online", 86400)
+            else:
+                r.srem("online", self.scope["user"].id)
+        online = r.scard("online")
         await self.channel_layer.group_send(self.room_group_name, {
             "type": "get_online",
             "get_online": online
@@ -133,8 +139,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             async_to_sync(self.channel_layer.send)(channel, {"type": "support_chat_message",
                                                              "chat_type": "support",
                                                              "list_message": serializer.data.get('message')})
-
-
 
     @sync_to_async()
     def get_ban_chat_user(self, user):
@@ -247,7 +251,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         case_count_for_name = {}
         for case_name in all_case_name:
             # case_item_series = ItemForCaseSerializer(case_name.itemforcase_set.all(), many=True)
-            case_count_for_name[case_name.name] = {'count': 0,
+            case_count_for_name[case_name.name] = {
+                                                   'count': 0,
                                                    'open_lvl': case_name.user_lvl_for_open,
                                                    # 'case_info': case_item_series.data
                                                    }
@@ -262,9 +267,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             case_time = serializer.data
         message = {'cases': {'open_time': case_time, 'user_cases': case_count_for_name}}
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "send_cases_info",
+            self.room_group_name, {
+                                   "type": "send_cases_info",
                                    "cases": message
-                                   })
+                                   }
+        )
 
     @sync_to_async()
     def get_items_for_cases(self):
@@ -272,26 +279,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
         serializer = CaseAndCaseItemSerializer(cases_items, many=True)
         message = dict()
         for case in serializer.data:
-            message[case['name']] = {'image': case['image'],
-                                     'items': case['itemforcase_set']
+            message[case['name']] = {
+                                     'image': case['image'],
+                                     'items': case['itemforcase_set'],
                                      }
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "send_cases_items",
-                                   "cases_items": message
-                                   })
+            self.unique_room_name, {
+                                    "type": "send_cases_items",
+                                    "cases_items": message,
+                                    }
+        )
 
     @sync_to_async()
     def get_user_items(self):
         """Шлёт кейсы пользователям"""
         user = self.scope['user']
         if user.is_authenticated:
-            user_items = ItemForUser.objects.filter(user=user,is_used=False)
+            user_items = ItemForUser.objects.filter(user=user, is_used=False)
             serializer = ItemForUserSerializer(user_items, many=True)
             message = {
                 'type': 'send_user_item',
                 'user_items': serializer.data
             }
-            async_to_sync(self.channel_layer.send)(self.channel_name, message)
+            async_to_sync(self.channel_layer.group_send)(self.unique_room_name, message)
 
     @sync_to_async()
     def open_case(self, case):
@@ -306,20 +316,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if owned_case:
                 if owned_case.owner.pk != user.pk:
                     print({"details": "Access forbidden"})
-
                 if owned_case.item is not None:
                     print({"details": "Case is already opened"})
-
                 last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
                     .exclude(date_opened=None) \
                     .order_by("-date_opened") \
                     .first()
-
                 if last_user_case is not None:
                     delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
                     if delta_time < datetime.timedelta(hours=1):
                         print({"details": "Wait before you can open next case"})
-
                 case = owned_case.case
                 case_items = ItemForCase.objects.filter(case=case)
                 weights = [float(item['chance']) for item in case_items.values('chance')]
@@ -334,13 +340,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3400)
                 owned_case.save()
                 # отправляет результат рандома открытия кейса
-                async_to_sync(self.channel_layer.send)(self.channel_name, {'type': 'case_roll',
+                async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
+                                                                           'type': 'case_roll',
                                                                            'case_roll_result': chosen_item.name
-                                                                           })
+                                                                           }
+                                                             )
                 # отправляет пользователю всё предметы
                 # async_to_sync(self.get_user_items)()
                 # проверка является ли выпавший предмет деньгами
-                # если да пополняет баланс , если нет добавляет предмет в инвентарь
+                # если да пополняет баланс, если нет добавляет предмет в инвентарь
                 if chosen_item.is_money:
                     user.detailuser.balance += chosen_item.selling_price
                     user.detailuser.save()
@@ -361,12 +369,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print('Нет такого кейса')
 
     @sync_to_async
-    def sell_item(self,data):
+    def sell_item(self, data):
         user = self.scope['user']
         if user.is_authenticated:
             if Item.objects.filter(name=data.get('name')).exists():
                 item = Item.objects.get(name=data.get('name'))
-                if ItemForUser.objects.filter(user_item=item,user=user,is_used=False).exists():
+                if ItemForUser.objects.filter(user_item=item, user=user, is_used=False).exists():
                     user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
                     user_item.is_used = True
                     user_item.save()
@@ -379,12 +387,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         }
                     }
                     async_to_sync(self.get_user_items)()
-                    if user.is_superuser or user.is_staff:
-                        async_to_sync(self.channel_layer.group_send)(f'admin_{user.username}_room', message)
+                    if user.is_staff:
+                        async_to_sync(self.channel_layer.group_send)(f'admin_group', message)
                     else:
-                        async_to_sync(self.channel_layer.group_send)(f'{user.username}_room', message)
-
-
+                        async_to_sync(self.channel_layer.group_send)(f'{user.id}_room', message)
 
     @sync_to_async
     def forward_item(self, data):
@@ -403,40 +409,45 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     svg_name = data.get('item_image')
                     message = {
                         'type': 'support_chat_message',
-                        'chat_type':'support',
-                        'user':user.username,
+                        'chat_type': 'support',
+                        'user': user.username,
                         'message': f'{durak_username};{item_name};{svg_name}',
-                        'is_sell_item':True
-                        }
+                        'is_sell_item': True
+                    }
 
                     room = async_to_sync(self.create_or_get_support_chat_room)(user)
-                    async_to_sync(self.save_user_message)(room, user,f'{durak_username};{item_name};{svg_name}'
-                                                 , is_sell_item=True)
-                    async_to_sync(self.channel_layer.group_send)(f'{user.username}_room',message )
-                    async_to_sync(self.channel_layer.group_send)('admin_group',message )
+                    async_to_sync(self.save_user_message)(room, user, f'{durak_username};{item_name};{svg_name}',
+                                                          is_sell_item=True)
+                    async_to_sync(self.channel_layer.group_send)(f'{user.id}_room', message)
+                    async_to_sync(self.channel_layer.group_send)('admin_group', message)
+
     async def connect(self):
         """Подключение пользователя"""
         recieve_user = str(self.scope["url_route"]["kwargs"][
                                "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = str(self.scope['user'])  # TODO получаем имя пользователя который подключился с фронта
-        if self.scope['user'].is_authenticated:
+        user_id = str(self.scope["user"].id)
+        if is_auth := self.scope['user'].is_authenticated:
             if self.scope['user'].is_staff:
                 await self.channel_layer.group_add('admin_group', self.channel_name)
-                await self.channel_layer.group_add(f'admin_{user}_room', self.channel_name)
+                # await self.channel_layer.group_add(f'admin_{user}_room', self.channel_name)
+                await self.channel_layer.group_add(f'{user_id}_room', self.channel_name)
             else:
-                await self.channel_layer.group_add(f'{user}_room', self.channel_name)  # TODO добавляем в группу юзеров
+                await self.channel_layer.group_add(f'{user_id}_room',
+                                                   self.channel_name)  # TODO добавляем в группу юзеров
         self.room_name = 'go'  # задаем статический румнейм для общего чата
-        self.room_group_name = "chat_%s" % self.room_name  # формируем рум груп нейм
+        self.room_group_name = f"chat_{self.room_name}"  # формируем рум груп нейм
+        self.unique_room_name = f"{user_id}_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
         await self.accept()
         await self.channel_layer.send(self.channel_name, {
             "type": 'roulette_countdown_state',
         })
-        # подтверждение
-        await self.send_online(0)  # TODO:отправляем количество вебсокет подключений на фронт
+        await self.set_online(is_auth)
         if recieve_user == 'go':  # проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
-            await self.init_support_chat(self.channel_name, user)  # TODO: должен выгружать только на странице чата поддержки, в суппорт чат
+            await self.init_support_chat(self.channel_name,
+                                         user)  # TODO: должен выгружать только на странице чата поддержки, в суппорт чат
             await self.init_users_chat(self.channel_name)
         else:
             await self.get_all_room()
@@ -447,9 +458,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, code):
         """Отключение пользователя"""
         await self.channel_layer.group_discard(f'{str(self.scope["user"])}_room', self.channel_name)
+        await self.channel_layer.group_discard(f'{str(self.scope["user"])}_admin_room', self.channel_name)
         await self.channel_layer.group_discard('admin_group', self.channel_name)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # убирает юзера из группы
-        await self.send_online(-1)  # отправляет онлайн
+        # r.zrem('asgi:group:chat_go', self.channel_name)
+        # r.delete(f'asgi:group:{str(self.scope["user"])}_room')
+        await self.set_online(self.scope["user"].is_authenticated, False)
 
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
@@ -459,11 +473,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if self.scope['user'].is_staff:
                 new_list_all_chat_50 = await self.all_chat_delete_message(message_to_delete)
                 await self.channel_layer.group_send(self.room_group_name, {
-                                                                    "type": "chat_message",
-                                                                    "chat_type": "all_chat_list",
-                                                                    "message": "list",
-                                                                    "list": new_list_all_chat_50
-                                                                    }
+                    "type": "chat_message",
+                    "chat_type": "all_chat_list",
+                    "message": "list",
+                    "list": new_list_all_chat_50
+                }
                                                     )
         if text_data_json.get('get_avatar'):
             await self.get_avatar(text_data_json)
@@ -489,36 +503,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # информация о кейсах
         if text_data_json.get('cases'):
             await self.get_cases_info()
-
-        if text_data_json.get('online') == "online":
-            online = self.channel_layer.receive_count
-            await self.channel_layer.group_send(
-                self.room_group_name, {"type": "get_online",
-                                       "get_online": online
-                                       }
-            )
         if text_data_json.get('bet') is not None:
             user = self.scope.get('user')
             if user and user.is_authenticated:
                 user_pk = user.pk
                 bet = text_data_json.get('bet')
                 print(f"receive method in consumers.py: Receiving bet from user({user_pk}): {bet}")
-                await self.change_balance(bet.get('bidCount'))
-                await self.save_bet(bet, user_pk)
+                bet_is_valid = await self.save_bet(bet, user_pk)
+                amount = None
+                if bet_is_valid:
+                    amount = bet.get('bidCount')
+                await self.change_balance(amount)
                 await self.channel_layer.group_send(
                     self.room_group_name, {
                         "type": "get_bid",
                         "bid": text_data_json,
                     }
                 )
-        if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
-            message = text_data_json.get("message")
-            user = text_data_json["user"]
-            avatar = text_data_json["avatar"]
-            rubin = text_data_json.get("rubin")
-            # online = self.channel_layer.receive_count
+        # if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
+        #     message = text_data_json.get("message")
+        #     user = text_data_json["user"]
+        #     avatar = text_data_json["avatar"]
+        #     rubin = text_data_json.get("rubin")
+        #     # online = self.channel_layer.receive_count
 
-        '''первичное получение и обработка сообщений'''
+        """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':  # сообщение из support чата
             if len(text_data_json.get("message")) > 500:
                 print("message all_chat more 500")
@@ -590,7 +599,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
         online = event.get('get_online')
-        print(online, 'ETO ONLINE ')
         await self.send(text_data=json.dumps({
             "get_online": online,
         }))
@@ -621,7 +629,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def support_chat_message(self, event):
         list_message = event.get('list_message')
         user = event.get('user')
-        is_sell_item=event.get('is_sell_item')
+        is_sell_item = event.get('is_sell_item')
         message = event.get("message")
         file_path = event.get('file_path')
         chat_type = event.get('chat_type')
@@ -683,11 +691,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def change_balance(self, amount_to_subtract=None):
-        print(amount_to_subtract, 'IN CHANGE BALANCE')
         if amount_to_subtract:
             self.scope['user'].detailuser.balance -= amount_to_subtract
-            self.scope['user'].save()
-        async_to_sync(self.channel_layer.send)(self.channel_name, {
+            self.scope['user'].detailuser.save()
+        async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
             'type': 'get_balance',
             'balance_update': {
                 'current_balance': self.scope['user'].detailuser.balance
@@ -697,8 +704,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
         print(f"Saving bet in {storage_name}")
-        bet["channel_name"] = self.channel_name
-        await tasks.save_as_nested(storage_name, user_pk, bet)
+        bet["channel_name"] = self.unique_room_name
+        is_valid = await tasks.save_as_nested(storage_name, user_pk, bet)
+        return is_valid
 
     async def send_new_level(self, event):
         """Отправляет по каналу сообщение о новом уровне"""
