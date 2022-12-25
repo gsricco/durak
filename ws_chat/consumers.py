@@ -6,7 +6,7 @@ from random import choices
 from caseapp.serializers import OwnedCaseTimeSerializer, ItemSerializer, ItemForUserSerializer, OwnedCaseSerializer, \
     ItemForCaseSerializer, CaseAndCaseItemSerializer
 from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
@@ -151,6 +151,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 return False
         except:
             return False
+
+    @sync_to_async()
+    def add_user_to_chat_ban(self, user_id):
+        """Устанавливает юзеру бан общего чата"""
+        user_to_ban, created = Ban.objects.get_or_create(user_id=user_id)
+        user_to_ban.ban_chat = True
+        user_to_ban.save()
 
     async def send_support_chat_message(self, channel_name, message, user, file_path=None):
         """Отправка сообщения в суппорт чат . Аргументы channel_name,message,user """
@@ -475,6 +482,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "list": new_list_all_chat_50
                 }
                                                     )
+        elif user_id_to_ban := text_data_json.get("ban_user_all_chat"):
+            await self.add_user_to_chat_ban(user_id_to_ban)
         if text_data_json.get('get_avatar'):
             await self.get_avatar(text_data_json)
         if text_data_json.get('set_avatar'):
@@ -516,14 +525,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "bid": text_data_json,
                     }
                 )
-        # if text_data_json.get("message") is not None and text_data_json.get("chat_type") is None:
-        #     message = text_data_json.get("message")
-        #     user = text_data_json["user"]
-        #     avatar = text_data_json["avatar"]
-        #     rubin = text_data_json.get("rubin")
-        #     # online = self.channel_layer.receive_count
         """Первичное получение и обработка сообщений"""
-        if text_data_json.get('chat_type') == 'support':  # сообщение из support чата
+        if text_data_json.get('chat_type') == 'support':
             if len(text_data_json.get("message")) > 500:
                 print("message all_chat more 500")
             else:
@@ -545,7 +548,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                     "user": user,
                                                                     "file_path": f'/{file_path}'
                                                                     })  # отправка сообщения пользователя админам
-
         elif text_data_json.get('chat_type') == 'support_admin':
             '''Получем сообщение от админа из админки'''
             file_path = ''
@@ -580,7 +582,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 "user": text_data_json["user"],
                                 "avatar": text_data_json["avatar"],
                                 "rubin": text_data_json.get("rubin"),
-                                "t": text_data_json.get("t")
+                                "t": text_data_json.get("t"),
+                                "id": text_data_json.get("id")
                                 }
             if len(all_chat_message["message"]) <= 250:
                 if await self.get_ban_chat_user(text_data_json["user"]):
@@ -593,75 +596,63 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
-        online = event.get('get_online')
         await self.send(text_data=json.dumps({
-            "get_online": online,
+            "get_online": event.get('get_online'),
         }))
 
     async def get_rooms(self, event):
-        room_name = event.get('room_name')
         await self.send(text_data=json.dumps({
-            "room_name": room_name
+            "room_name": event.get('room_name')
         }))
 
     async def chat_message(self, event):
         """Общий чат - обмен сообщениями"""
-        chat_type = event.get('chat_type')
-        user = event.get('user')
-        message = event.get("message")
-        avatar = event.get("avatar")
-        rubin = event.get("rubin")
-        list = event.get('list')
-        await self.send(text_data=json.dumps({"message": message,
-                                              "chat_type": chat_type,
-                                              "user": user,
-                                              "avatar": avatar,
-                                              "rubin": rubin,
-                                              "list": list,
-                                              "t": event.get('t')
-                                              }))
+        await self.send(text_data=json.dumps(
+            {
+                "chat_type": event.get('chat_type'),
+                "user": event.get('user'),
+                "message": event.get("message"),
+                "avatar": event.get("avatar"),
+                "rubin": event.get("rubin"),
+                "list": event.get('list'),
+                "t": event.get('t'),
+                "id": event.get("id"),
+                                            }
+        ))
 
     async def support_chat_message(self, event):
-        list_message = event.get('list_message')
-        user = event.get('user')
-        is_sell_item = event.get('is_sell_item')
-        message = event.get("message")
-        file_path = event.get('file_path')
-        chat_type = event.get('chat_type')
-        await self.send(text_data=json.dumps({"message": message,
-                                              "list_message": list_message,
-                                              "chat_type": chat_type,
-                                              "user": user,
-                                              "file_path": file_path,
-                                              'is_sell_item': is_sell_item
-                                              }))
+        await self.send(text_data=json.dumps(
+            {
+              "message": event.get("message"),
+              "list_message": event.get('list_message'),
+              "chat_type": event.get('chat_type'),
+              "user": event.get('user'),
+              "file_path": event.get('file_path'),
+              'is_sell_item': event.get('is_sell_item')
+                                              }
+        ))
 
     async def roulette_countdown_starter(self, event):
         """Начинает отсчёт рулетки"""
-        # curr_round = event.get('round')
         await self.send(text_data=json.dumps({
             "roulette": 20,
-            # "round": curr_round,
         }))
 
     # начинает крутиться рулетка
     async def rolling(self, event):
         """Начинает прокрутку рулетки"""
-        winner = event.get('winner')
-        print(winner)
         await self.send(text_data=json.dumps({
             "roll": 'rolling',
-            "winner": winner,
+            "winner": event.get('winner'),
             "c": event.get('c'),
             "p": event.get('p')
         }))
 
     async def stopper(self, event):
         """Сигнализирует об остановке прокрутки рулетки"""
-        winner = event.get('winner')
         await self.send(text_data=json.dumps({
             "stop": "stopping",
-            "w": winner,
+            "w": event.get('winner'),
         }))
 
     async def go_back(self, event):
@@ -673,9 +664,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_bid(self, event):
         """Обрабатывает ставки пользователей"""
-        data = event.get('bid')
         await self.send(text_data=json.dumps({
-            "bid": data,
+            "bid": event.get('bid'),
             "round_bets": r.json().get('round_bets')
         }))
 

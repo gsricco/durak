@@ -297,6 +297,7 @@
                     {{ room_name|json_script:"room-name" }}
                     {{ user.is_authenticated|json_script:"auth-user" }}
                     {{ user.is_staff|json_script:"staffed" }}
+                    {{ user.id|json_script:'current_user_id' }}
                     {{ user.username|json_script:"username" }}
                     {{ user.level.img_name|json_script:"kamen" }}
                     {% block maincontent %}

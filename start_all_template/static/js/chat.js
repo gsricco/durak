@@ -11,6 +11,7 @@ const UserBalance = document.querySelector('.header__profile-sum>span')
 const online = document.querySelector('#onlineChat')
 const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
+const current_user_id = JSON.parse(document.getElementById("current_user_id").textContent);
 // WS Connection
 
 const chatSocket = new WebSocket(
@@ -58,6 +59,7 @@ chatSocket.onmessage = function (e) {
     }
 
 if (data.message && data.chat_type === 'all_chat') {
+    console.log(data,'ETO DATA')
         const li = document.createElement('li')
         li.className = 'online-chat__li'
         messageBlock.appendChild(li)
@@ -112,7 +114,8 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnBan = document.createElement('button')
             btnBan.type = 'submit'
-            btnBan.onclick = () => onClickBanHandler()
+            btnBan.id = data.id
+            btnBan.onclick = () => onClickBanHandler(btnBan.id)
             btnBan.className = 'online__chat-img'
             divButtons.appendChild(btnBan)
 
@@ -122,6 +125,7 @@ if (data.message && data.chat_type === 'all_chat') {
         }
     }
     if (data.chat_type === 'all_chat_list') {
+        console.log(data,'ETO DATA')
         messageBlock.innerHTML = ''
         const set = new Set(data.list);
         for (let count of set) {
@@ -178,7 +182,8 @@ if (data.message && data.chat_type === 'all_chat') {
 
                 const btnBan = document.createElement('button')
                 btnBan.type = 'submit'
-                btnBan.onclick = () => onClickBanHandler()
+                btnBan.id = data.id
+                btnBan.onclick = () => onClickBanHandler(btnBan.id)
                 btnBan.className = 'online__chat-img'
                 divButtons.appendChild(btnBan)
 
@@ -216,7 +221,8 @@ buttonSend.onclick = function (e) {
             'user': username,
             'avatar': ava,
             'rubin': rubin,
-            't': Date.now()
+            't': Date.now(),
+            'id': current_user_id
         }));
     } else {
         ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
@@ -244,6 +250,8 @@ const onClickDeleteHandler=(li)=>{
             'delete_message': li,
         }));
 }
-const onClickBanHandler=()=>{
-    alert('ban message1')
+const onClickBanHandler=(id)=>{
+    chatSocket.send(JSON.stringify({
+            'ban_user_all_chat': id,
+        }));
 }
