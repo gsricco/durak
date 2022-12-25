@@ -22,7 +22,7 @@ btnTimerInstructin.addEventListener("click", function(e) {
         refillSocket.onmessage = refillSocketOnMessage;
 
         let request = {
-            "amount": 4000
+            "amount": refillAmount
         }
         refillSocket.addEventListener("open", function (e) {
             refillSocket.send(JSON.stringify({
