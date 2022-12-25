@@ -163,17 +163,17 @@ let timerCounter = (back_counter) => {
 
 //ставим функцию на каждые 29сек
 chatSocket.onmessage = super_new(chatSocket.onmessage);
+let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
+const UserBalanceMob = document.querySelector('.header__balance>span')
 
 function super_new(f) {
     return function () {
         let bidsNumber = document.querySelectorAll('.roulette__item-money')
-        let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
         const bidsButtons = document.querySelectorAll('.roulette__radio-item')
         let signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
         let signWinnercoin = document.querySelectorAll('#signWinnercoin');
         let signWinnerspades = document.querySelectorAll('#signWinnerspades');
         let userUser = document.querySelector('.header__profile-name>span').textContent
-        const UserBalanceMob = document.querySelector('.header__balance>span')
 
 
         function rouletteInitialSettings() {
@@ -412,3 +412,6 @@ function update_balance(current_balance){
             UserBalance.innerHTML = `${UserBalancerShow}`
             UserBalanceMob.innerHTML = `${UserBalancerShow}`
 }
+
+
+

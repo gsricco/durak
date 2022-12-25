@@ -1399,10 +1399,11 @@ document.querySelector('#userBalMob').innerHTML = `${UserBalancerShow}`
 
 const inviteBtn = document.querySelector('.invite__btn');
 
-if (inviteBtn !== null) {
+if(inviteBtn){
     inviteBtn.addEventListener('click', function (e) {
         const inviteInput = document.querySelector('.invite__input');
-    /// надо сделать проверку на авторизацию
+        const textStatus = document.querySelectorAll('.form__msg');
+/// надо сделать проверку на авторизацию
         // if (isAuthenticated === 'False') {
         //     const modal = document.querySelector('#authorization')
         //     modal.classList.add('open')
@@ -1413,36 +1414,38 @@ if (inviteBtn !== null) {
         //     });
         //
         // } else {
-    
+
         /* злогика на фронте*/
         const promoCode = inviteInput.value;
         /* тут надо отправить promoCode на бэк */
         /* тут должна быть логика  бэкенда*/
-    
+
         if (inviteInput.value !== '') {
             inviteBtn.disabled = true;
             inviteInput.disabled = true;
             inviteInput.value = '';
-    
+
             // * при ответе с бэкенда
             /* Вставить условие -  если ответ пришел то выпоняется если нет - Введённый промокод не доступен.*/
             /* когда вставиться бэк setTimeout - убрать.*/
             setTimeout(() => {
-                const textStatus = document.querySelectorAll('.form__msg');
+                // const textStatus = document.querySelectorAll('.form__msg');
+                textStatus[1].style.color = 'green';
+                textStatus[1].textContent = 'Введенный промокод доступен';
                 textStatus[2].style.color = 'green';
                 textStatus[2].textContent = 'Введенный промокод доступен';
-    
+
                 // alert(`Ответ (${promoCode}) с бэкенда пришел`);
-    
+
                 inviteInput.style.color = 'green'
                 inviteInput.value = promoCode;
                 inviteBtn.innerHTML = "Копировать";
                 inviteBtn.disabled = false;
-    
+
             }, 1000);
-    
+
             inviteBtn.addEventListener('click', () => {
-    
+
                 const inviteInputValue = promoCode;
                 console.log(inviteInputValue)
                 if (inviteInputValue) {
@@ -1450,6 +1453,8 @@ if (inviteBtn !== null) {
                         .then(() => {
                             inviteInput.style.color = 'white'
                             inviteInput.value = 'Скопированно в буфер';
+                            textStatus[1].textContent = 'Промокод скопирован в буфер обмена';
+                            textStatus[2].textContent = 'Промокод скопирован в буфер обмена';
                         })
                         .catch(err => {
                             console.log('Something went wrong', err);
@@ -1458,5 +1463,16 @@ if (inviteBtn !== null) {
             });
         }
         e.preventDefault();  // * чтобы страница не перезагружалась
-    });
+    })
 }
+
+//аккордион Промокода..
+const btnAccordionCode = document.querySelector(".accordion.invite__head")
+const panelCode=document.querySelector('.panel.invite__panel')
+if (btnAccordionCode){
+    btnAccordionCode.addEventListener('click',()=>{
+        panelCode.style.display = panelCode.style.display === 'block' ? 'none' : 'block'
+    })
+}
+
+

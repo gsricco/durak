@@ -581,6 +581,9 @@ h3 {
   line-height: 100%;
   color: #d42626;
 }
+#formMsgMob{
+  margin: auto;
+}
 
 .btn {
   border-radius: 10px;
@@ -5494,6 +5497,7 @@ margin-top: 36px;
 }
 
 .invite__panel {
+  display: none;
   background: unset;
   border-radius: unset;
 }
@@ -6054,7 +6058,7 @@ margin-top: 36px;
   }
 
   .bonus-currency__invite {
-    top: -31px;
+    top: 70px;
   }
 
   .invite__head {
@@ -7740,6 +7744,7 @@ margin-top: 36px;
 
   .panel {
     margin-bottom: 15px;
+    /*margin: 0 15px 15px 20px;*/
   }
 
   .form__input {
