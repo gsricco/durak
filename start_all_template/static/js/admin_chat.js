@@ -4,6 +4,7 @@ let inputFile = document.querySelector('#file-add')
 const chatBlock = document.querySelector('.support__chat-block')
 const username = JSON.parse(document.getElementById('username').textContent)
 let room_id = ''
+let room_name = ''
 let byteFile
 // let imageTypeList = ['jpg', 'jpeg', 'gif', 'pjpeg', 'svg', 'svg+xml', 'tiff', 'icon', 'wbmp', 'webp', 'png']
 let topBlock = document.querySelector('.support_chat_top_block')
@@ -45,7 +46,7 @@ function checkFileSize(elem) {
 }
 
 function newSellItemMessage(message, user) {
-    if (user === username || user === room_id) {
+    if (user === username || user === room_name) {
         let dataList = message.split(';')
         // console.log(dataList[0])
         const li = document.createElement('li')
@@ -82,7 +83,7 @@ const room_cleaner = () => {
 }
 
 function newUserMessage(message, user, file_path) {
-    if (user === username || user === room_id) {
+    if (user === username || user === room_name) {
         const li = document.createElement('li')
         li.className = 'support__chat-message support__chat-message_your'
         const div = document.createElement('div')
@@ -103,23 +104,11 @@ function newUserMessage(message, user, file_path) {
             spanUser.style.textAlign = 'left'
         }
         chatBlock.appendChild(li)
-        // li.appendChild(div)
-
         spanUser.innerHTML = user
         span.innerHTML = message
         div.appendChild(span)
         fullDiv.appendChild(spanUser)
         if (file_path) {
-            // const file_preview = document.querySelectorAll('.support__chat-message-text')
-            // const file_url = document.createElement('div')
-            // file_url.innerHTML = 'Файл'
-            // file_url.className = 'file_name'
-            // file_url.addEventListener('click', () => {
-            //
-            //     window.open(`http://${host_url}${file_path}`)
-            // })
-
-            // if (imageTypeList.includes(file_path.split('.').slice(-1)[0])) {
                 if (user !== username) {
                     let newDiv = document.createElement('div')
                     newDiv.innerHTML = `<div style="display: flex; flex-direction: column; padding-bottom: 10px">
@@ -128,12 +117,9 @@ function newUserMessage(message, user, file_path) {
                                             </div>                
                                         </div>`
                     div.style.alignItems = 'flex-start'
-                    // div.appendChild(span)
-                    // fullDiv.appendChild(spanUser)
                     fullDiv.appendChild(newDiv)
                     if(message){fullDiv.appendChild(div)
                         }
-                    // fullDiv.appendChild(div)
                     li.appendChild(fullDiv)
 
                 } else {
@@ -144,64 +130,46 @@ function newUserMessage(message, user, file_path) {
                                             </div>                
                                         </div>`
                     div.style.alignItems = 'flex-end'
-                    // div.appendChild(span)
-                    // fullDiv.appendChild(spanUser)
                     fullDiv.appendChild(newDiv)
                     if(message){fullDiv.appendChild(div)}
-                    // fullDiv.appendChild(div)
                     li.appendChild(fullDiv)
                 }
-            // } else {
-            //     if(message){
-            //         fullDiv.appendChild(div)
-            //         fullDiv.appendChild(file_url)
-            //     }else {
-            //         fullDiv.appendChild(file_url)
-            //     }
-            //     if (user !== username) {
-            //         file_url.style.flexDirection = 'flex-start'
-            //         li.appendChild(fullDiv)
-            //         // li.appendChild(file_url)
-            //     } else {
-            //         // li.appendChild(file_url)
-            //         li.appendChild(fullDiv)
-            //     }
-            // }
         } else {
-            // div.appendChild(span)
-            // fullDiv.appendChild(spanUser)
             fullDiv.appendChild(div)
             li.appendChild(fullDiv)
-
         }
     }
 }
 
 let text;
-const newRoom = (room_name) => {
-    if (room_name !== username) {
+const newRoom = (data) => {
+    if (data.user.username !== username) {
         const div = document.querySelector('.admin_support_chat_wrapper')
         const room = document.createElement('p')
+        let notRead = document.createElement('span')
+        notRead.innerHTML = `${data.not_read_counter} `
+        notRead.style.borderRadius = '50%'
+        notRead.style.border = '2px solid white'
         room.className = 'support__chat__room'
-        room.innerHTML = room_name
+        room.innerHTML = data.user.username+' '
+
         room.addEventListener('click', (e) => {
             let room_value = room.innerText
-            room_id = room_value
-            topBlock.innerHTML = `Чат поддержки с ${room_id}`
+            room_id = data.room_id
+            room_name = data.user.username
+            topBlock.innerHTML = `Чат поддержки с ${room_value}`
             chat_cleaner()
             room_cleaner()
             text = e.target.textContent
-
-            console.log(text)
             e.target.classList.toggle('active_room')
             chatS.send(JSON.stringify({
                 'chat_type': 'support_admin',
-                'receiver_user_room': room_value
+                'receiver_user_room': data.room_id
             }))
         })
         div.appendChild(room)
+        room.appendChild(notRead)
         let all_rooms = document.querySelectorAll('.support__chat__room')
-        // console.log(all_rooms)
         all_rooms.forEach(item => {
             if (item.textContent === text) {
                 item.classList.add('active_room')
@@ -222,9 +190,9 @@ chatS.onmessage = function (e) {
 
 
     const data = JSON.parse(e.data);
-    if (data.room_name) {
+    if (data.room_data) {
         room_cleaner()
-        data.room_name.forEach(e => newRoom(e))
+        data.room_data.forEach(e => newRoom(e))
 
     }
 

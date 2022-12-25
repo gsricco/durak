@@ -10,9 +10,8 @@ let nextLvlBar = document.querySelector('.progress-bar_next_svg')
 //кол-во кристалов на уровнях
 let curLvlBarCount = document.querySelector('.progress-bar_cur_count')
 let nextLvlBarCount = document.querySelector('.progress-bar_next_count')
-// let countdown = document.getElementById("timer"); // получить элемент тега
 let timerBlock = document.querySelector('#timerTwo')
-const usBalance = document.querySelector('#userBal')
+const UserBalanceMob = document.querySelector('.header__balance>span')
 const listCase = document.querySelector('.listCase');
 const modalCase = document.querySelector('.modal-cases__case');
 let profilProgressLine = document.querySelector('.profil_profil__progressbar-line')
@@ -26,6 +25,24 @@ chatSocket.addEventListener('open', (event) => {
         'get_cases_items': 'get_cases_items'
     }))
 });
+
+function update_balance(current_balance){
+    UserBalancer = Number(current_balance)
+            // // Отображать надо уже преобразованное число, а использовать пришедшее
+            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+                UserBalancerShow = `${UserBalancer / 1000}K`
+            } else {
+                if (UserBalancer / 1000000 > 0) {
+                    UserBalancerShow = `${UserBalancer / 1000000}M`
+                } else
+                    UserBalancerShow = `${UserBalancer}`
+            }
+            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+                UserBalancerShow = `${UserBalancer}`
+            }
+            UserBalance.innerHTML = `${UserBalancerShow}`
+            UserBalanceMob.innerHTML = `${UserBalancerShow}`
+}
 
 chatSocket.onmessage = super_new(chatSocket.onmessage);
 
@@ -56,7 +73,7 @@ function super_new(f) {
 
         }
         if (data.current_balance) {
-            usBalance.innerHTML = `${data.current_balance}`
+            update_balance(data.current_balance)
         }
         if (data.cases_items) {
             caseItems = data.cases_items
@@ -145,10 +162,6 @@ function case_click(e) {
 
 function startCaseListRoll() {
     modalCase.innerHTML = ''
-    // listCase.className = ''
-    // listCase.style.left = ''
-    // listCase.style.transform = ''
-    // listCase.style.transition = ''
     caseItems[profileCaseTitle].items.map((e) => {
         modalCase.innerHTML += `<div class="modal-case-overflow__item">
                                      <div class="modal-case__wrapper">
@@ -171,8 +184,6 @@ let butClick = () => {
     chatSocket.send(JSON.stringify({
         'open_case': profileCaseTitle
     }))
-    // modalCase.innerHTML = '';
-    ;
 }
 
 //! Таймер
@@ -213,7 +224,7 @@ function timerSecond(caseData) {
         }
     }, 1000);
 }
-let sellItemPrice , sellItemName
+
 
 function newUserItem(data) {
     let profCaseItem = document.querySelector('.profil__items')

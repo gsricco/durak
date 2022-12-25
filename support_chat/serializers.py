@@ -52,6 +52,11 @@ class RoomSerializer(serializers.ModelSerializer):
         model = UserChatRoom
         fields = ('room_id','message')
 
+class UserFromRoomSerializer(serializers.Serializer):
+    username = serializers.CharField()
 class OnlyRoomSerializer(serializers.Serializer):
+    user = UserFromRoomSerializer()
     room_id = serializers.CharField()
+    not_read_counter = serializers.IntegerField()
+    not_read_owner_counter = serializers.IntegerField()
 
