@@ -23,7 +23,7 @@ def give_bonus(request, ref_code):
         if created:
             referal_user.user_with_bonus = referal.user
             detail_user = get_object_or_404(DetailUser, user=referal.user)
-            detail_user.balance += 25000
+            detail_user.balance += referal_user.bonus_sum
             referal_user.save()
             detail_user.save()
             return Response(data='{detail: "Код активирован"}', status=status.HTTP_200_OK)

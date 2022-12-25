@@ -202,7 +202,8 @@ class ReferalUser(models.Model):
                                         verbose_name="Пользователь который пригласил", null=True, blank=True)
     invited_user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name="invited_users",
                                         verbose_name="Приглашенный пользователь", null=True, blank=True)
-    date = models.DateTimeField(verbose_name="Дата входа в систему", auto_now_add=True)
+    bonus_sum = models.PositiveBigIntegerField(verbose_name='Сумма бонуса', default=25000)
+    date = models.DateTimeField(verbose_name="Дата получения бонуса", auto_now_add=True)
 
     class Meta:
         verbose_name = 'Приглашенный пользователь'
