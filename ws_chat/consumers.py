@@ -522,7 +522,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         #     avatar = text_data_json["avatar"]
         #     rubin = text_data_json.get("rubin")
         #     # online = self.channel_layer.receive_count
-
         """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':  # сообщение из support чата
             if len(text_data_json.get("message")) > 500:

@@ -284,11 +284,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
         async with aiohttp.ClientSession(timeout=timeout, raise_for_status=True) as session:
             while retries < max_retries:
                 retries += 1
-                
+                req_txt = None
                 try:
                     resp = await session.get(url_get_status)
                     req_txt = await resp.text()
                     info = await resp.json()
+                    resp.close()
                 except (aiohttp.ClientConnectionError, aiohttp.ServerTimeoutError, asyncio.exceptions.TimeoutError) as err:
                     await self.send(json.dumps({"status": "process", "detail": f"{type(err)}"}))
                     await asyncio.sleep(delay)
@@ -296,10 +297,13 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 except aiohttp.ClientError as err:
                     await self.send(json.dumps({"status": "process", "detail": f"Error while fetching request status from bot server. {type(err)}"}))
                     print(f"Error while fetching request status from bot server. {type(err)}: {err}")
-                finally:
-                    resp.close()
                 # пересылает ответ сервера на фронт для обработки
-                await self.send(req_txt)
+                if req_txt:
+                    await self.send(req_txt)
+                else:
+                    await self.send(json.dumps({"status": "process", "detail": f"{type(err)}"}))
+                    await asyncio.sleep(delay)
+                    continue
 
                 # проверяет статус заявки
                 if info.get('done'):
