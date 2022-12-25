@@ -431,3 +431,15 @@ window.addEventListener('load', function(e) {
         });
     }
 });
+
+const modal_payment = document.querySelector("#close_withdraw")
+modal_payment.addEventListener('click', function(e) {
+    console.log('eto event for closing')
+    console.log(withdrawSocket, withdrawSocket.readyState)
+    if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
+        console.log('privet iz close ws')
+        withdrawSocket.close(1000);
+
+    }
+    console.log(withdrawSocket.readyState)
+})
