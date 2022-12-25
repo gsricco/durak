@@ -440,7 +440,7 @@
                                         {% if transaction.tr_plus %}
                                             <span class="transactions__item-text">+{{ transaction.pay|div:"1000" }}k</span>
                                         {% else %}
-                                            <span class="transactions__item-text transactions__item-text_red">-{{ transaction.pay|div:"1000" }}k</span>
+                                            <span class="transactions__item-text transactions__item-text_red">-{{ transaction.sum|div:"1000" }}k</span>
                                         {% endif %}
                                     </div>
                                     <div class="transactions__item-type transactions__item-info">

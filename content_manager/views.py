@@ -181,10 +181,10 @@ def profil(request):
         else:
             social_vk = False
         # логика для отображения транзикций
-        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True).annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True)).values('date', 'pay', 'tr_type', 'tr_plus')
-        user_bets = UserBet.objects.filter(user=request.user).annotate(tr_type=Value('Ставка'), tr_plus=F('win')).values('date', 'sum_win', 'tr_type', 'tr_plus')
-        refill = RefillRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True)).values('date_closed', 'amount', 'tr_type', 'tr_plus')
-        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'amount', 'tr_type', 'tr_plus')
+        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True).annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True)).values('date', 'pay', 'tr_type', 'tr_plus', 'sum')
+        user_bets = UserBet.objects.filter(user=request.user).annotate(tr_type=Value('Ставка'), tr_plus=F('win')).values('date', 'sum_win', 'tr_type', 'tr_plus', 'sum')
+        refill = RefillRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True)).values('date_closed', 'amount', 'tr_type', 'tr_plus', 'balance')
+        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount')
         transactions = popoln.union(user_bets, refill, withdraw).order_by('-date')
 
         paginator = Paginator(transactions, 8)
