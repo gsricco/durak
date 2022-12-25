@@ -657,7 +657,7 @@
                             ваш айди с сайта ({{ user.username }}, Ваш ID: {{ user.pk }}), примите приглашение
                              на 1м от нашего аккаунта и проиграйте <span id="number-of-games">X</span> игр. Если вы не успели 
                              зайти/нажать готов - повторите этот пункт с начала, пока ваша заявка открыта.</li>
-                        
+                        <li id="bot_message_refill" style="visibility: hidden;" class="modal-manual__footnote"></li>
                     </ul>
                     <div class="modal-manual__footnote" style="color: #e95656;">
                         *в случае неудачной попытки обыгрыша валюта не возвращается
@@ -690,7 +690,7 @@
     <div class="popup modal-manual" id="modalManualWithdraw">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal-manual__modal">
-                <div class="modal-manual__queries" id="withdraw_query" style="display: none;">
+                <div class="modal-manual__queries" id="withdraw_query" style="visibility: hidden;">
                     Заявка #
                 </div>
                 <a href="#" class="popup__close close-popup close-popup_close">
@@ -704,25 +704,17 @@
 
                 <div class="modal-manual__text">
                     <ul>
-                        <li>1. Добавьте наш аккаунт в друзья, никнейм - (отобразится после начала).
+                        <li>1. Добавьте наш аккаунт в друзья, никнейм - <span id="withdraw_nickname">(отобразится после начала)</span>.
                              Заявка принимается в течение 5-10 секунд.</li>
-                        <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее –
-                            Пользователь) -
-                            использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее
-                            —
-                            «Соглашение», «ПС»).
-                            Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
-                            Соглашение
-                            вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
-                        </li>
+                        <li>2. Отправьте нам в личные сообщения в игре ваш айди с сайта. ({{ user.username }}, Ваш ID: {{ user.pk }}). 
+                            Мы будем приглашать вас в игру и проигрывать, пока общая сумма проигрышей 
+                            не будет равна сумме вывода (игровую комиссию мы не доплачиваем).  Выходить из лобби нужно 
+                            только после нас!</li>
+                        <li id="bot_message" style="visibility: hidden;" class="modal-manual__footnote"></li>
                     </ul>
-                    <div class="modal-manual__footnote">
-                        *в случае неудачной попытки обыгрыша валюта не возвращается
-                    </div>
-
                 </div>
-                <a href="#modalWithdraw" class="btn btn_danger modal-manual__btn popup-link btn_white" id="modalManualBtn2">
-                    <div class="timer" id="timerPay">0:10</div>
+                <a href="#" class="btn btn_danger modal-manual__btn" id="modalManualBtn2">
+                    <div class="timer" id="timerPay">Начать</div>
                 </a>
 
             </div>

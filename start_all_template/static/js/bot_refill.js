@@ -22,7 +22,7 @@ btnTimerInstructin.addEventListener("click", function(e) {
         refillSocket.onmessage = refillSocketOnMessage;
 
         let request = {
-            "amount": refillAmount
+            "amount": 4000
         }
         refillSocket.addEventListener("open", function (e) {
             refillSocket.send(JSON.stringify({
@@ -41,11 +41,14 @@ function hideForm() {
     li1.style.display = "block";
     let li2 = document.querySelector("#li-p2-ge-2M");
     li2.style.display = "none";
+    let li = document.querySelector("#bot_message_refill");
+    li.textContent = '';
+    li.style.visibility = "hidden";
     let spanNumber = document.querySelector("#number-of-games");
     spanNumber.textContent = "X";
     btnTimerInstructin.classList.remove("btn_white");
     btnTimerInstructin.innerHTML = "Начать";
-    if (refillSocket !== null && refillSocket.readyState == "OPEN") {
+    if (refillSocket !== null && refillSocket.readyState === "OPEN") {
         refillSocket.close(1000);
     }
 };
@@ -148,9 +151,11 @@ function refillSocketOnMessage(e) {
         let serverMessage = data.message;
         if (serverMessage != lastServerMessage) {
             lastServerMessage = serverMessage;
+            let li = document.querySelector("#bot_message_refill");
+            li.textContent = `Сообщение от бота: ${serverMessage}`;
+            li.style.visibility = "visible";
         };
         if (data.done) {
-            console.log(data.close_reason);
             let message = 'Заявка закрыта.';
             if (data.close_reason === 'Success') {
                 message = `Баланс успешно пополнен на<br>${data.refiil}`;
@@ -159,7 +164,7 @@ function refillSocketOnMessage(e) {
             } else if (data.close_reason === 'ClientScoreLessThanMinimum') {
                 message = 'Ошибка. Пополнение в данный момент не доступно. Пожалуйста, попробуйте позже.';
             } else if (data.close_reason === 'ClientBanned') {
-                message = 'Ошибка. Приносим извинения. На сервере ведутся технические работы, попробуйте чуть позже';
+                message = 'Ошибка. Приносим извинения. На сервере ведутся технические работы, попробуйте чуть позже.';
             } else if (data.close_reason === 'ClientDontJoined') {
                 message = 'Ошибка. Вы не присоединились к игре.';
             } else if (data.close_reason === 'ClientDontReady') {
@@ -177,60 +182,137 @@ function refillSocketOnMessage(e) {
 
 
 let withdrawSocket = null;
-new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/withdraw_payment/create/'
-);
+
+let btnTimerWithdraw = document.querySelector("#modalManualBtn2");
+hideFormWithdraw();
+
+// создание заявки по нажатию на кнопку
 // вывод
+btnTimerWithdraw.addEventListener("click", function(e) {
+    if(is_auth && btnTimerWithdraw.textContent == "Начать") {
+        // кнопка ожидайте
+        btnTimerWithdraw.innerHTML = "<span>Ожидайте...</span>";
+        btnTimerWithdraw.classList.add("btn_white");
+
+        withdrawSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/withdraw_payment/create/'
+        );
+
+        withdrawSocket.onmessage = withdrawSocketOnMessage;
+
+        let request = {
+            "amount": refillAmount,
+            "balance": userBalance
+        }
+        withdrawSocket.addEventListener("open", function (e) {
+            withdrawSocket.send(JSON.stringify({
+                'create': request
+            }));
+        });
+    }});
+// обновление формы
+function hideFormWithdraw() {
+    let query = document.querySelector("#withdraw_query");
+    query.style.visibility =  "hidden";
+    query.textContent = "Заявка #";
+    let li = document.querySelector("#bot_message");
+    li.style.visibility =  "hidden";
+    li.textContent = "";
+    let span = document.querySelector("#withdraw_nickname");
+    span.innerHTML = "(отобразится после начала)";
+    btnTimerWithdraw.classList.remove("btn_white");
+    btnTimerWithdraw.innerHTML = "Начать";
+    if (withdrawSocket !== null && withdrawSocket.readyState === "OPEN") {
+        withdrawSocket.close(1000);
+    }
+};
+
+function closeAndOpenWindowWithdraw(message) {
+    const popupOk = document.getElementById("refillOk");
+    let message_box = document.querySelector("#refill_message_ok");
+    message_box.innerHTML = message;
+    popupOpen(popupOk);
+    hideFormWithdraw();
+    withdrawSocket.close(1000);
+    requestOpened = false;
+};
+
+let botNameW = '';
 let lastServerMessageW = '';
-let requestOpenedW = false;
-withdrawSocket.onmessage = function(e) {
+// обработка ответов сервера в заявке на пополнение
+function withdrawSocketOnMessage(e) {
     const data = JSON.parse(e.data);
-    let modalWithdraw = document.getElementById('modalWithdraw');
 
     if (data.hasOwnProperty('request_id') && data.status === 'open') {
         // {"id": 4, "user": {"id": 1}, "request_id": 4, "status": "open", "amount": 1000, "balance": 0, "date_opened": "2022-12-22T21:16:20.118312Z", "date_closed": null, "note": null, "close_reason": null, "game_id": null}
-        requestOpenedW = true;
-        let divModalQueries = modalWithdraw.querySelector("div.modal-manual__queries");
-        divModalQueries.innerHTML = `Заявка #${data.request_id}`;
-        let divModalTextul = modalWithdraw.querySelector("div.modal-manual__text>ul");
-        divModalTextul.innerHTML = '';
-        let li = document.createElement('li')
-        li.innerHTML = `Создана заявка на вывод кредитов из игры. Сумма вывода равна ${data.amount}.`;
-        divModalTextul.appendChild(li);
+        // сервер прислал созданную заявку
+        let query = document.querySelector("#withdraw_query");
+        query.style.visibility =  "visible";
+        query.textContent = "Заявка #" + data.request_id;
+        requestOpened = true;
+        let span = document.querySelector("#withdraw_nickname");
+        span.innerHTML = `<b>${botNameW}</b>`;
+        setTimeout(setCountdown, 0, "#modalManualBtn2", "10:00", function () {
+            closeAndOpenWindowWithdraw('Время заявки вышло.');
+        });
     } else if (data.hasOwnProperty('status')) {
 
         let dataStatus = data['status'];
 
         if (dataStatus === 'error') {
-            let divModalTextul = modalWithdraw.querySelector("div.modal-manual__text>ul");
-            let li = document.createElement('li')
-            li.innerHTML = `${data.detail}`;
-            divModalTextul.appendChild(li);
+            // {"status": "error", "detail": "\u041d\u0435\u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0431\u0430\u0437\u0435 \u0434\u0430\u043d\u043d\u044b\u0445."}
+            // ошибка сервера, заявка не обрабатывается
+            let query = document.querySelector("#withdraw_query");
+            query.style.visibility =  "visible";
+            query.textContent = "Произошла ошибка";
+            setTimeout(hideFormWithdraw, 3000);
+            withdrawSocket.close(1000);
+            requestOpened = false;
         } else if (dataStatus === 'process') {
+            // на сервере ошибка, ничего серьёзного))
 
         } else if (dataStatus === 'continue') {
             // {"status": "continue", "detail": 4}
+            // произошёл реконнект на обработку старой заявки
         } else if (dataStatus === 'get_name') {
             // {"status": "get_name", "detail": "\u041c\u0430\u0440\u0438\u043d\u0430 \u0412\u043e\u043b\u043a\u043e\u0432\u0430"}
+            // стало известно имя бота
+            botNameW = data['detail'];
         }
     } else if (data.hasOwnProperty('message')) {
         // {"closed":false,"done":false,"progress":"None","close_reason":"None","message":"","note":"","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // {"closed":true,"done":true,"progress":"WaitingMessage","close_reason":"NoMessage","message":"ÐÑ Ð½Ðµ Ð½Ð°Ð¿Ð¸ÑÐ°Ð»Ð¸ Ð±Ð¾ÑÑ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ Ð·Ð°Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ð²ÑÐµÐ¼ÐµÐ½Ð¸, Ð¿Ð¾Ð¿ÑÐ¾Ð±ÑÐ¹ÑÐµ ÐµÑÑ ÑÐ°Ð·.","note":"Ð¡Ð¾Ð¾Ð±ÑÐµÐ½Ð¸Ðµ Ð¾Ñ Ð¸Ð³ÑÐ¾ÐºÐ° Ð½Ðµ Ð¿ÑÐ¸ÑÐ»Ð¾ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ 331 ÑÐµÐºÑÐ½Ð´","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
+        // пересылается ответ от сервера ботов
         let serverMessage = data.message;
-        let divModalTextul = modalWithdraw.querySelector("div.modal-manual__text>ul");
         if (serverMessage != lastServerMessageW) {
             lastServerMessageW = serverMessage;
-            let li = document.createElement('li')
-            li.innerHTML = `${serverMessage}.`;
-            divModalTextul.appendChild(li);
+            let li = document.querySelector("#bot_message");
+            li.textContent = `Сообщение от бота: ${serverMessage}`;
+            li.style.visibility = "visible";
         };
         if (data.done) {
-            let li = document.createElement('li');
-            li.innerHTML = `Заявка закрыта. Статус: ${data.close_reason === 'Success' ? 'успешно' : 'не успешно'}. Сумма вывода: ${data.withdraw}`;
-            divModalTextul.appendChild(li);
-            requestOpenedW = false;
+            let message = 'Заявка закрыта.';
+            if (data.close_reason === 'Success') {
+                message = `Успешный вывод на сумму<br>${data.withdraw}`;
+            } else if (data.close_reason === 'NoMessage') {
+                message = 'Ошибка. Вы не написали боту.';
+            } else if (data.close_reason === 'ClientScoreLessThanMinimum') {
+                message = 'Отклонено. Мы не производим вывод на пустой аккаунт. Пожалуйста, войдите с более старого аккаунта.';
+            } else if (data.close_reason === 'ClientBanned') {
+                message = 'Ошибка. Приносим извинения. На сервере ведутся технические работы, попробуйте чуть позже.';
+            } else if (data.close_reason === 'ClientDontJoined') {
+                message = 'Ошибка. Вы не присоединились к игре.';
+            } else if (data.close_reason === 'ClientDontReady') {
+                message = 'Ошибка. Вы не нажали готов.';
+            } else if (data.close_reason === 'Error') {
+                message = 'Ошибка. На сервере ведутся работы.';
+            } else {
+                message = 'Время на выполнение вышло.'
+            }
+            closeAndOpenWindowWithdraw(message);
+            requestOpened = false;
         };
     };
 };
@@ -238,22 +320,12 @@ withdrawSocket.onmessage = function(e) {
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {
     userBalance = parseInt(document.querySelector('input.s-am-input__input').value);
-    if (userBalance >= 100) {
-        let repeateOneW = 0;
-        
-        if (repeateOneW < 1) {
-            timerSecond("#timerPay", function () {
-                let btnTimerInstructin =
-                    document.querySelector("#modalManualBtn2");
-                btnTimerInstructin.classList.remove("btn_white");
-                btnTimerInstructin.innerHTML = "Начать";
-            });
-            repeateOneW++;
-        }
-    } else {
+    if (!userBalance || userBalance < 100) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
         const curentPopup = document.getElementById("selectAmountInput");
         popupOpen(curentPopup);
-    }
+    };
 });
 
 // возобновление показа окна с заявкой при его закрытии
