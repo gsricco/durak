@@ -48,7 +48,7 @@ function hideForm() {
     spanNumber.textContent = "X";
     btnTimerInstructin.classList.remove("btn_white");
     btnTimerInstructin.innerHTML = "Начать";
-    if (refillSocket !== null && refillSocket.readyState === "OPEN") {
+    if (refillSocket !== null && refillSocket.readyState === 1) {
         refillSocket.close(1000);
     }
 };
@@ -224,7 +224,7 @@ function hideFormWithdraw() {
     span.innerHTML = "(отобразится после начала)";
     btnTimerWithdraw.classList.remove("btn_white");
     btnTimerWithdraw.innerHTML = "Начать";
-    if (withdrawSocket !== null && withdrawSocket.readyState === "OPEN") {
+    if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
         withdrawSocket.close(1000);
     }
 };
@@ -434,12 +434,13 @@ window.addEventListener('load', function(e) {
 
 const modal_payment = document.querySelector("#close_withdraw")
 modal_payment.addEventListener('click', function(e) {
-    console.log('eto event for closing')
-    console.log(withdrawSocket, withdrawSocket.readyState)
     if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
-        console.log('privet iz close ws')
-        withdrawSocket.close(1000);
-
+        hideFormWithdraw();
     }
-    console.log(withdrawSocket.readyState)
+})
+
+document.querySelector("#close_refill").addEventListener('click', function(e) {
+    if (refillSocket !== null && refillSocket.readyState === 1) {
+        hideForm();
+    }
 })
