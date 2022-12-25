@@ -199,9 +199,9 @@ class ReferalCode(models.Model):
 class ReferalUser(models.Model):
     """Модель пользователей приглашённых на сайт"""
     user_with_bonus = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name="users_with_bonus",
-                                        verbose_name="Пользователь который пригласил")
+                                        verbose_name="Пользователь который пригласил", null=True, blank=True)
     invited_user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name="invited_users",
-                                        verbose_name="Приглашенный пользователь")
+                                        verbose_name="Приглашенный пользователь", null=True, blank=True)
     date = models.DateTimeField(verbose_name="Дата входа в систему", auto_now_add=True)
 
     class Meta:

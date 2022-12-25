@@ -21,9 +21,9 @@
                         </div>
                         <div class="promo-code__input-block">
                             <input type="text" class="form__input promo-code__input">
-                            <button class="btn btn_danger promo-code__btn">Активировать</button>
+                            <button class="btn btn_danger promo-code__btn" id="promo_btn">Активировать</button>
                         </div>
-                        <div class="promo-code__msg form__msg">Вы уже активировали промо-код.</div>
+                        <div class="promo-code__msg form__msg" id="promo_message">Вы уже активировали промо-код.</div>
                     </form>
                 </div>
                 <div class="bonus-currency__item add-bonus">
@@ -95,6 +95,7 @@
                                 <div class="invite__num">#1</div>
                                 <div class="invite__step-title">Придумай свой бонусный код</div>
                                 <form action="" class="form invite__form">
+                                    {% csrf_token %}
                                     <div class="invite__input-block">
                                         <input type="text" class="form__input invite__input" placeholder="Введите код">
 
@@ -175,4 +176,6 @@
     </section>
 </div>
     <script src="{% static 'js/chat.js' %}"></script>
+    <script src="{% static 'js/free.js' %}"></script>
+
 {% endblock %}

@@ -299,6 +299,7 @@
                     {{ user.is_staff|json_script:"staffed" }}
                     {{ user.username|json_script:"username" }}
                     {{ user.level.img_name|json_script:"kamen" }}
+                    {{ user.pk|json_script:"user_pk" }}
                     {% block maincontent %}
                     {% endblock %}
                 </div>
@@ -726,7 +727,7 @@
 
                 <a href="#" class="popup__close close-popup">
                     <svg class="close-popup__icon ">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close" id="unblock_close"></use>
                     </svg>
                 </a>
                 <div class="select-amount__s-am-input s-am-input">
