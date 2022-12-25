@@ -50,6 +50,9 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                 print(f"Database error. {type(err)}: {err}.")
                 return
+            # отправляет имя бота на фронт
+            message = {"status": "get_name","detail": user_request.bot_name}
+            await self.send(json.dumps(message))
             # посылает заявку на фронт
             serializer = self.model_serializer(user_request)
             serializer_data = await sync_to_async(getattr)(serializer, 'data')
@@ -60,7 +63,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         """Отключение пользователя"""
-        r.delete(f"{self.operation}:{self.scope['user'].pk}")  # удаляет запись об юзере из редиса при отключении
+        # r.delete(f"{self.operation}:{self.scope['user'].pk}")  # удаляет запись об юзере из редиса при отключении
+        pass
 
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
@@ -218,6 +222,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 # создаёт заявку на сервере ботов
                 # ID_SHIFT используется для сдвига значений id запросов на сервере ботов, т.к. первые id уже могут быть заняты
                 new_request.request_id = new_request.pk + ID_SHIFT
+                new_request.bot_name = bot_name
                 try:
                     await sync_to_async(new_request.save)()
                 except Error as err:
@@ -350,7 +355,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     serializer = self.model_serializer(user_request)
                     serializer_data = await sync_to_async(getattr)(serializer, 'data')
                     await self.send(json.dumps(serializer_data))
-
+                    # закрываем соединение
+                    await self.close(1000);
                     return
                 # задержка перед следующим опросом сервера
                 await asyncio.sleep(delay)

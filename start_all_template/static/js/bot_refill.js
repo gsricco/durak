@@ -10,7 +10,7 @@ hideForm();
 btnTimerInstructin.addEventListener("click", function(e) {
     if(is_auth && btnTimerInstructin.textContent == "Начать") {
         // кнопка ожидайте
-        btnTimerInstructin.innerHTML = "<span>Ожидайте..</span>";
+        btnTimerInstructin.innerHTML = "<span>Ожидайте...</span>";
         btnTimerInstructin.classList.add("btn_white");
 
         refillSocket = new WebSocket(
@@ -38,7 +38,7 @@ function hideForm() {
     let span = document.querySelector("#bot-nickname-r");
     span.innerHTML = "(отобразится после начала)";
     let li1 = document.querySelector("#li-p2-less-2M");
-    li1.style.visibility = "visible";
+    li1.style.display = "block";
     let li2 = document.querySelector("#li-p2-ge-2M");
     li2.style.display = "none";
     let spanNumber = document.querySelector("#number-of-games");
@@ -50,8 +50,11 @@ function hideForm() {
     }
 };
 // отсчёт на кнопке
-function setCountdown(timerContainerId, startTime) {
+function setCountdown(timerContainerId, startTime, callAfter) {
     let timerContainer = document.querySelector(timerContainerId);
+    if (!timerContainer.classList.contains("btn_white")) {
+        return;
+    };
     timerContainer.innerHTML = `<div class="timer"></div>`;
     let timerBlock = timerContainer.firstChild;
     timerBlock.textContent = startTime.trim();
@@ -59,6 +62,10 @@ function setCountdown(timerContainerId, startTime) {
     let [minuteTime, secTime] = valueTimer;
 
     let timer = setInterval(function () {
+        if (!timerContainer.classList.contains("btn_white")) {
+            clearInterval(timer);
+            timerContainer.innerHTML = "Начать";
+        }
         if (secTime < 60) {
             secTime -= 1;
         }
@@ -70,7 +77,7 @@ function setCountdown(timerContainerId, startTime) {
 
         if (minuteTime < 1 && secTime < 1) {
             clearInterval(timer);
-            // setTimeout(functionTimer, 0);
+            setTimeout(callAfter, 0);
         }
 
         if (secTime >= 10) {
@@ -82,6 +89,16 @@ function setCountdown(timerContainerId, startTime) {
         }
     }, 1000);
 };
+
+function closeAndOpenWindow(message) {
+    const popupOk = document.getElementById("refillOk");
+    let message_box = document.querySelector("#refill_message_ok");
+    message_box.innerHTML = message;
+    popupOpen(popupOk);
+    hideForm();
+    refillSocket.close(1000);
+    requestOpened = false;
+};
 // обработка ответов сервера в заявке на пополнение
 let lastServerMessage = '';
 let requestOpened = false;
@@ -90,60 +107,77 @@ function refillSocketOnMessage(e) {
 
     if (data.hasOwnProperty('request_id') && data.status === 'open') {
         // {"id": 4, "user": {"id": 1}, "request_id": 4, "status": "open", "amount": 1000, "balance": 0, "date_opened": "2022-12-22T21:16:20.118312Z", "date_closed": null, "note": null, "close_reason": null, "game_id": null}
+        // сервер прислал созданную заявку
+        let query = document.querySelector("#manual_queries_r");
+        query.style.visibility =  "visible";
+        query.textContent = "Заявка #" + data.request_id;
         requestOpened = true;
-        // let divModalQueries = modalRefill.querySelector("div.modal-manual__queries");
-        // divModalQueries.innerHTML = `Заявка #${data.request_id}`;
-        // let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
-        // divModalTextul.innerHTML = '';
-        // let li = document.createElement('li')
-        // li.innerHTML = `Создана заявка на пополнение кредитами из игры. Сумма пополнения равна ${data.amount}.`;
-        // divModalTextul.appendChild(li);
+        let span = document.querySelector("#bot-nickname-r");
+        span.innerHTML = `<b>${botNameR}</b>`;
+        setTimeout(setCountdown, 0, "#modalManualBtn", "6:00", function () {
+            closeAndOpenWindow('Время заявки вышло.');
+        });
     } else if (data.hasOwnProperty('status')) {
 
         let dataStatus = data['status'];
 
         if (dataStatus === 'error') {
-            // let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
-            // let li = document.createElement('li')
-            // li.innerHTML = `${data.detail}`;
-            // divModalTextul.appendChild(li);
-            hideForm();
+            // {"status": "error", "detail": "\u041d\u0435\u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e \u0441\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u0431\u0430\u0437\u0435 \u0434\u0430\u043d\u043d\u044b\u0445."}
+            // ошибка сервера, заявка не обрабатывается
+            let query = document.querySelector("#manual_queries_r");
+            query.style.visibility =  "visible";
+            query.textContent = "Произошла ошибка";
+            setTimeout(hideForm, 3000);
             refillSocket.close(1000);
+            requestOpened = false;
         } else if (dataStatus === 'process') {
+            // на сервере ошибка, ничего серьёзного))
 
         } else if (dataStatus === 'continue') {
             // {"status": "continue", "detail": 4}
+            // произошёл реконнект на обработку старой заявки
         } else if (dataStatus === 'get_name') {
             // {"status": "get_name", "detail": "\u041c\u0430\u0440\u0438\u043d\u0430 \u0412\u043e\u043b\u043a\u043e\u0432\u0430"}
+            // стало известно имя бота
             botNameR = data['detail'];
-            setTimeout(setCountdown, 0, "#modalManualBtn", "6:00");
-            let span = document.querySelector("#bot-nickname-r");
-            span.innerHTML = `<b>${botNameR}</b>`;
         }
     } else if (data.hasOwnProperty('message')) {
         // {"closed":false,"done":false,"progress":"None","close_reason":"None","message":"","note":"","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // {"closed":true,"done":true,"progress":"WaitingMessage","close_reason":"NoMessage","message":"ÐÑ Ð½Ðµ Ð½Ð°Ð¿Ð¸ÑÐ°Ð»Ð¸ Ð±Ð¾ÑÑ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ Ð·Ð°Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ð²ÑÐµÐ¼ÐµÐ½Ð¸, Ð¿Ð¾Ð¿ÑÐ¾Ð±ÑÐ¹ÑÐµ ÐµÑÑ ÑÐ°Ð·.","note":"Ð¡Ð¾Ð¾Ð±ÑÐµÐ½Ð¸Ðµ Ð¾Ñ Ð¸Ð³ÑÐ¾ÐºÐ° Ð½Ðµ Ð¿ÑÐ¸ÑÐ»Ð¾ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ 331 ÑÐµÐºÑÐ½Ð´","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
+        // пересылается ответ от сервера ботов
         let serverMessage = data.message;
-        // let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
         if (serverMessage != lastServerMessage) {
             lastServerMessage = serverMessage;
-        //     let li = document.createElement('li')
-        //     li.innerHTML = `${serverMessage}.`;
-        //     divModalTextul.appendChild(li);
         };
         if (data.done) {
-            // let li = document.createElement('li');
-            // li.innerHTML = `Заявка закрыта. Статус: ${data.close_reason === 'Success' ? 'успешно' : 'не успешно'}. Сумма пополнения: ${data.refiil}`;
-            // divModalTextul.appendChild(li);
+            console.log(data.close_reason);
+            let message = 'Заявка закрыта.';
+            if (data.close_reason === 'Success') {
+                message = `Баланс успешно пополнен на<br>${data.refiil}`;
+            } else if (data.close_reason === 'NoMessage') {
+                message = 'Ошибка. Вы не написали боту.';
+            } else if (data.close_reason === 'ClientScoreLessThanMinimum') {
+                message = 'Ошибка. Пополнение в данный момент не доступно. Пожалуйста, попробуйте позже.';
+            } else if (data.close_reason === 'ClientBanned') {
+                message = 'Ошибка. Приносим извинения. На сервере ведутся технические работы, попробуйте чуть позже';
+            } else if (data.close_reason === 'ClientDontJoined') {
+                message = 'Ошибка. Вы не присоединились к игре.';
+            } else if (data.close_reason === 'ClientDontReady') {
+                message = 'Ошибка. Вы не нажали готов.';
+            } else if (data.close_reason === 'Error') {
+                message = 'Ошибка. На сервере ведутся работы.';
+            } else {
+                message = 'Время на выполнение вышло.'
+            }
+            closeAndOpenWindow(message);
             requestOpened = false;
         };
     };
 };
 
 
-
-
-const withdrawSocket = new WebSocket(
+let withdrawSocket = null;
+new WebSocket(
     'ws://'
     + window.location.host
     + '/ws/withdraw_payment/create/'
@@ -200,19 +234,6 @@ withdrawSocket.onmessage = function(e) {
         };
     };
 };
-
-// вывод
-document.querySelector('#modalManualBtn2').addEventListener("click", function(e) {
-    if(is_auth) {
-        let request = {
-            "amount": refillAmount,
-            "balance": userBalance
-        }
-        withdrawSocket.send(JSON.stringify({
-            'create': request,
-            'user': username,
-        }));
-    }});
 
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {
@@ -299,15 +320,7 @@ function popupOpen(curentPopup) {
     });
 }
 
-document.querySelectorAll('a.modal-payment__block.popup-link')[1].addEventListener("click", function(e) {
-    if (requestOpened) {
-        const curentPopup = document.getElementById("modalRefill");
-        popupOpen(curentPopup);
-        e.preventDefault();
-        e.stopImmediatePropagation();
-    }
-});
-
+// вешает на кнопки выбора размера пополнения атрибуты со стоимостью
 window.addEventListener('load', function(e) {
     let divs = this.document.querySelectorAll("div.select-amount__value");
     for (let div of divs) {
@@ -328,6 +341,21 @@ window.addEventListener('load', function(e) {
                 refillAmount = a.getAttribute("credits");
             };
             e.preventDefault();
+            if (refillAmount !== null && parseInt(refillAmount) >= 2000000) {
+                let li1 = document.querySelector("#li-p2-less-2M");
+                li1.style.display = "none";
+                let li2 = document.querySelector("#li-p2-ge-2M");
+                li2.style.display = "block";
+                let numberOfGames = document.querySelector('#number-of-games');
+                numberOfGames.textContent = Math.ceil(parseInt(refillAmount) / 1000000);
+            } else {
+                let li1 = document.querySelector("#li-p2-less-2M");
+                li1.style.display = "block";
+                let li2 = document.querySelector("#li-p2-ge-2M");
+                li2.style.display = "none";
+                let numberOfGames = document.querySelector('#number-of-games');
+                numberOfGames.textContent = 'X';
+            }
         });
     }
 });

@@ -33,10 +33,10 @@ class Level(models.Model):
     def get_default_lvl(cls):
         if cls.objects.all().exists():
             return cls.objects.first().pk
-        # else:
-        #     level_0 = Level(level=0, experience_range=NumericRange(0, 600))
-        #     level_0.save()
-        #     return cls.objects.first().pk
+        else:
+            level_0 = Level(level=0, experience_range=NumericRange(0, 600))
+            level_0.save()
+            return cls.objects.first().pk
 
     class Meta:
         # constraints = [
