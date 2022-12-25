@@ -84,10 +84,9 @@ class CustomUser(AbstractUser):
         if not DetailUser.objects.filter(user=self).exists():
             detail = DetailUser(user=self)
             detail.save()
-        # if not Ban.objects.filter(user=self):    # создание бана при регистрации пользователя
-        #     ban = Ban(user=self)
-        #     Ban.objects.get_or_create()
-        #     ban.save()
+        if not Ban.objects.filter(user=self).exists():    # создание бана при регистрации пользователя
+            ban = Ban(user=self)
+            ban.save()
 
     class Meta:
         verbose_name = 'Пользователь'
