@@ -430,7 +430,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if is_auth := self.scope['user'].is_authenticated:
             if self.scope['user'].is_staff:
                 await self.channel_layer.group_add('admin_group', self.channel_name)
-                # await self.channel_layer.group_add(f'admin_{user}_room', self.channel_name)
                 await self.channel_layer.group_add(f'{user_id}_room', self.channel_name)
             else:
                 await self.channel_layer.group_add(f'{user_id}_room',
@@ -457,12 +456,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         """Отключение пользователя"""
-        await self.channel_layer.group_discard(f'{str(self.scope["user"])}_room', self.channel_name)
-        await self.channel_layer.group_discard(f'{str(self.scope["user"])}_admin_room', self.channel_name)
+        await self.channel_layer.group_discard(f'{str(self.scope["user"].id)}_room', self.channel_name)
         await self.channel_layer.group_discard('admin_group', self.channel_name)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # убирает юзера из группы
-        # r.zrem('asgi:group:chat_go', self.channel_name)
-        # r.delete(f'asgi:group:{str(self.scope["user"])}_room')
         await self.set_online(self.scope["user"].is_authenticated, False)
 
     async def receive(self, text_data=None, bytes_data=None):
