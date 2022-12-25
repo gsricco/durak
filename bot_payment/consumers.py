@@ -9,14 +9,11 @@ from . import models, serializers
 from django.utils import timezone
 from django.db.utils import Error
 from ws_chat.tasks import setup_check_request_status
-
+from configs.settings import HOST_URL, ID_SHIFT
 from .models import WithdrawalRequest
 
 r = redis.Redis()  # подключаемся к редису
 
-# url сервера с ботами
-HOST_URL = "http://195.3.220.151:8888/"
-ID_SHIFT = 0
 
 class RequestConsumer(AsyncWebsocketConsumer):
     """Базовый класс для создания заявок"""
@@ -35,7 +32,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """Подключение юзеров"""
         user_pk = str(self.scope['user'].pk)  # получаем pk пользователя который подключился с фронта
-        r.set(f"{self.operation}:{user_pk}", self.channel_name, ex=10*60)  # записываем в редис channel_name подключенного юзера
+        # r.set(f"{self.operation}:{user_pk}", self.channel_name, ex=10*60)  # записываем в редис channel_name подключенного юзера
         await self.accept()  # подтверждение
 
         # продолжение обработки заявки при разрыве соединения
@@ -260,7 +257,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             # удаляет из redis запись о занятии пользователем бота
             r.delete(f"bot:{bot_id}")
             # отложенное задание - проверить статус заявки через 15 минут
-            setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, 15*60)
+            setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, self.scope['user'].pk, 11*60)
             # запускает процесс мониторинга состояния заявки
             await self.send_request_status(new_request.pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user.pk}")

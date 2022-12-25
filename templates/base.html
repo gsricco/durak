@@ -633,6 +633,9 @@
     <div class="popup modal-manual instruction" id="modalManual">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal-manual__modal">
+                <div class="modal-manual__queries" id="manual_queries_r" style="visibility: hidden;">
+                    Заявка #
+                </div>
                 <a href="#" class="popup__close close-popup close-popup_close">
                     <svg class="close-popup__icon ">
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
@@ -644,24 +647,24 @@
 
                 <div class="modal-manual__text">
                     <ul>
-                        <li>1. Общие положения</li>
-                        <li>1.1. ООО «ЯНДЕКС» (далее — «Яндекс») предлагает пользователю сети Интернет (далее –
-                            Пользователь) -
-                            использовать сервисы на условиях, изложенных в настоящем Пользовательском соглашении (далее
-                            —
-                            «Соглашение», «ПС»).
-                            Соглашение вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
-                            Соглашение
-                            вступает в силу с моментользовательском соглашении (далее — «Соглашение», «ПС»).
-                        </li>
+                        <li>1. Добавьте наш аккаунт в друзья, никнейм - <span id="bot-nickname-r">(отобразится после начала)</span>. 
+                            Заявка принимается в течении 5-10 секунд.</li>
+                        <li id="li-p2-less-2M">2. Отправьте нам в личные сообщения в игре ваш айди с сайта 
+                            ({{ user.username }}, Ваш ID: {{ user.pk }}), примите приглашение
+                             от нашего аккаунта и сразу проиграйте игру. Если вы не успели зайти/нажать готов
+                              - повторите этот пункт с начала, пока ваша заявка открыта.</li>
+                        <li id="li-p2-ge-2M" style="visibility: hidden;">Отправьте нам в личные сообщения в игре 
+                            ваш айди с сайта ({{ user.username }}, Ваш ID: {{ user.pk }}), примите приглашение
+                             на 1м от нашего аккаунта и проиграйте <span id="number-of-games">X</span> игр. Если вы не успели 
+                             зайти/нажать готов - повторите этот пункт с начала, пока ваша заявка открыта.</li>
+                        
                     </ul>
-                    <div class="modal-manual__footnote">
+                    <div class="modal-manual__footnote" style="color: #e95656;">
                         *в случае неудачной попытки обыгрыша валюта не возвращается
                     </div>
-
                 </div>
-                <a href="#modalRefill" class="btn btn_danger modal-manual__btn popup-link btn_white" id="modalManualBtn">
-                    <div class="timer" id="timerOne">0:10</div>
+                <a href="#" class="btn btn_danger modal-manual__btn" id="modalManualBtn">
+                    <div class="timer" id="timerOne">Начать</div>
                 </a>
 
             </div>
@@ -670,6 +673,9 @@
     <div class="popup modal-manual" id="modalManualWithdraw">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal-manual__modal">
+                <div class="modal-manual__queries">
+                    Заявка #
+                </div>
                 <a href="#" class="popup__close close-popup close-popup_close">
                     <svg class="close-popup__icon ">
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
@@ -704,52 +710,7 @@
             </div>
         </div>
     </div>
-    <div class="popup modal-manual" id="modalRefill">
-        <div class="popup__body">
-            <div class="popup__content modal modal_popup modal-manual__modal">
-                <div class="modal-manual__queries">
-                    Заявка #
-                </div>
-                <a href="#" class="popup__close close-popup close-popup_close">
-                    <svg class="close-popup__icon ">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
-                    </svg>
-                </a>
-                <h3 class="modal__title">
-                    Пополнение баланса кредитами из игры
-                </h3>
-
-                <div class="modal-manual__text">
-                    <ul>
-                        
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="popup modal-manual" id="modalWithdraw">
-        <div class="popup__body">
-            <div class="popup__content modal modal_popup modal-manual__modal">
-                <div class="modal-manual__queries">
-                    Заявка #
-                </div>
-                <a href="#" class="popup__close close-popup close-popup_close">
-                    <svg class="close-popup__icon ">
-                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
-                    </svg>
-                </a>
-                <h3 class="modal__title">
-                    Вывод кредитов в игру
-                </h3>
-
-                <div class="modal-manual__text">
-                    <ul>
-                        
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+  
     <div class="popup select-amount" id="selectAmountInput">
         <div class="popup__body">
             <div class="popup__content modal modal_select-amount modal_select-amount_input">

@@ -219,3 +219,7 @@ CELERY_IGNORE_RESULT = True
 """freekassa"""
 MERCHANT_ID = os.getenv('MERCHANT_ID')  # ID Вашего магазина
 SECRET_WORD = os.getenv('SECRET_WORD')  # Секретное слово
+
+# bot payment
+HOST_URL = os.getenv('HOST_URL')
+ID_SHIFT = int(os.getenv('ID_SHIFT'))

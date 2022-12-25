@@ -33,6 +33,7 @@ class RefillRequest(models.Model):
 
     user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
+    bot_name = models.CharField(verbose_name='Имя бота', max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"Заявка {self.request_id} <статус:{self.status}> сумма: {self.amount}"
@@ -74,6 +75,7 @@ class WithdrawalRequest(models.Model):
 
     user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
+    bot_name = models.CharField(verbose_name='Имя бота', max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f"Заявка {self.request_id} <статус:{self.status}> сумма: {self.amount}"

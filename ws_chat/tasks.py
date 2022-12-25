@@ -579,16 +579,18 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     #     print(f"{result} = {amount}")
 
 
-def setup_check_request_status(host_url, operation, id_shift, request_pk, delay):
+def setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, delay):
     """Запускает проверку статуса на сервере ботов через delay секунд"""
     check_request_status.apply_async(
-        args=(host_url, operation, id_shift, request_pk),
+        args=(host_url, operation, id_shift, request_pk, user_pk),
         countdown=delay
     )
 
 @shared_task
-def check_request_status(host_url, operation, id_shift, request_pk):
+def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
     """Проверяет статус заявки на сервере ботов"""
+    # удаляет из redis запись о заявке
+    r.delete(f"user_{operation}:{user_pk}")
     # создаёт url для получения статуса заявки
     url_get_status = f"{host_url}{operation}/get?id={request_pk + id_shift}"
     timeout = 2

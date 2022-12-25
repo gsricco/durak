@@ -1,70 +1,153 @@
-// подключение к ws для вывода кредитов в дурака
 let refillAmount = 0;
 let userBalance = 0;
-const refillSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/refill_payment/create/'
-);
-const withdrawSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/withdraw_payment/create/'
-);
+let refillSocket = null;
+let botNameR = '';
+let btnTimerInstructin = document.querySelector("#modalManualBtn");
+hideForm();
 
-// обработка ответов сервера
+// создание заявки по нажатию на кнопку
 // пополнение
+btnTimerInstructin.addEventListener("click", function(e) {
+    if(is_auth && btnTimerInstructin.textContent == "Начать") {
+        // кнопка ожидайте
+        btnTimerInstructin.innerHTML = "<span>Ожидайте..</span>";
+        btnTimerInstructin.classList.add("btn_white");
+
+        refillSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/refill_payment/create/'
+        );
+
+        refillSocket.onmessage = refillSocketOnMessage;
+
+        let request = {
+            "amount": refillAmount
+        }
+        refillSocket.addEventListener("open", function (e) {
+            refillSocket.send(JSON.stringify({
+                'create': request
+            }));
+        });
+    }});
+// обновление формы
+function hideForm() {
+    let query = document.querySelector("#manual_queries_r");
+    query.style.visibility =  "hidden";
+    query.textContent = "Заявка #";
+    let span = document.querySelector("#bot-nickname-r");
+    span.innerHTML = "(отобразится после начала)";
+    let li1 = document.querySelector("#li-p2-less-2M");
+    li1.style.visibility = "visible";
+    let li2 = document.querySelector("#li-p2-ge-2M");
+    li2.style.display = "none";
+    let spanNumber = document.querySelector("#number-of-games");
+    spanNumber.textContent = "X";
+    btnTimerInstructin.classList.remove("btn_white");
+    btnTimerInstructin.innerHTML = "Начать";
+    if (refillSocket !== null && refillSocket.readyState == "OPEN") {
+        refillSocket.close(1000);
+    }
+};
+// отсчёт на кнопке
+function setCountdown(timerContainerId, startTime) {
+    let timerContainer = document.querySelector(timerContainerId);
+    timerContainer.innerHTML = `<div class="timer"></div>`;
+    let timerBlock = timerContainer.firstChild;
+    timerBlock.textContent = startTime.trim();
+    let valueTimer = timerBlock.textContent.split(":");
+    let [minuteTime, secTime] = valueTimer;
+
+    let timer = setInterval(function () {
+        if (secTime < 60) {
+            secTime -= 1;
+        }
+
+        if (secTime < 0) {
+            minuteTime -= 1;
+            secTime = 59;
+        }
+
+        if (minuteTime < 1 && secTime < 1) {
+            clearInterval(timer);
+            // setTimeout(functionTimer, 0);
+        }
+
+        if (secTime >= 10) {
+            timerBlock.innerHTML = `${minuteTime}:${secTime}`;
+        }
+
+        if (secTime < 10 && secTime >= 0) {
+            timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
+        }
+    }, 1000);
+};
+// обработка ответов сервера в заявке на пополнение
 let lastServerMessage = '';
 let requestOpened = false;
-refillSocket.onmessage = function(e) {
+function refillSocketOnMessage(e) {
     const data = JSON.parse(e.data);
-    let modalRefill = document.getElementById('modalRefill');
 
     if (data.hasOwnProperty('request_id') && data.status === 'open') {
         // {"id": 4, "user": {"id": 1}, "request_id": 4, "status": "open", "amount": 1000, "balance": 0, "date_opened": "2022-12-22T21:16:20.118312Z", "date_closed": null, "note": null, "close_reason": null, "game_id": null}
         requestOpened = true;
-        let divModalQueries = modalRefill.querySelector("div.modal-manual__queries");
-        divModalQueries.innerHTML = `Заявка #${data.request_id}`;
-        let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
-        divModalTextul.innerHTML = '';
-        let li = document.createElement('li')
-        li.innerHTML = `Создана заявка на пополнение кредитами из игры. Сумма пополнения равна ${data.amount}.`;
-        divModalTextul.appendChild(li);
+        // let divModalQueries = modalRefill.querySelector("div.modal-manual__queries");
+        // divModalQueries.innerHTML = `Заявка #${data.request_id}`;
+        // let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
+        // divModalTextul.innerHTML = '';
+        // let li = document.createElement('li')
+        // li.innerHTML = `Создана заявка на пополнение кредитами из игры. Сумма пополнения равна ${data.amount}.`;
+        // divModalTextul.appendChild(li);
     } else if (data.hasOwnProperty('status')) {
 
         let dataStatus = data['status'];
 
         if (dataStatus === 'error') {
-            let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
-            let li = document.createElement('li')
-            li.innerHTML = `${data.detail}`;
-            divModalTextul.appendChild(li);
+            // let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
+            // let li = document.createElement('li')
+            // li.innerHTML = `${data.detail}`;
+            // divModalTextul.appendChild(li);
+            hideForm();
+            refillSocket.close(1000);
         } else if (dataStatus === 'process') {
 
         } else if (dataStatus === 'continue') {
             // {"status": "continue", "detail": 4}
         } else if (dataStatus === 'get_name') {
             // {"status": "get_name", "detail": "\u041c\u0430\u0440\u0438\u043d\u0430 \u0412\u043e\u043b\u043a\u043e\u0432\u0430"}
+            botNameR = data['detail'];
+            setTimeout(setCountdown, 0, "#modalManualBtn", "6:00");
+            let span = document.querySelector("#bot-nickname-r");
+            span.innerHTML = `<b>${botNameR}</b>`;
         }
     } else if (data.hasOwnProperty('message')) {
         // {"closed":false,"done":false,"progress":"None","close_reason":"None","message":"","note":"","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // {"closed":true,"done":true,"progress":"WaitingMessage","close_reason":"NoMessage","message":"ÐÑ Ð½Ðµ Ð½Ð°Ð¿Ð¸ÑÐ°Ð»Ð¸ Ð±Ð¾ÑÑ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ Ð·Ð°Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ð²ÑÐµÐ¼ÐµÐ½Ð¸, Ð¿Ð¾Ð¿ÑÐ¾Ð±ÑÐ¹ÑÐµ ÐµÑÑ ÑÐ°Ð·.","note":"Ð¡Ð¾Ð¾Ð±ÑÐµÐ½Ð¸Ðµ Ð¾Ñ Ð¸Ð³ÑÐ¾ÐºÐ° Ð½Ðµ Ð¿ÑÐ¸ÑÐ»Ð¾ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ 331 ÑÐµÐºÑÐ½Ð´","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         let serverMessage = data.message;
-        let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
+        // let divModalTextul = modalRefill.querySelector("div.modal-manual__text>ul");
         if (serverMessage != lastServerMessage) {
             lastServerMessage = serverMessage;
-            let li = document.createElement('li')
-            li.innerHTML = `${serverMessage}.`;
-            divModalTextul.appendChild(li);
+        //     let li = document.createElement('li')
+        //     li.innerHTML = `${serverMessage}.`;
+        //     divModalTextul.appendChild(li);
         };
         if (data.done) {
-            let li = document.createElement('li');
-            li.innerHTML = `Заявка закрыта. Статус: ${data.close_reason === 'Success' ? 'успешно' : 'не успешно'}. Сумма пополнения: ${data.refiil}`;
-            divModalTextul.appendChild(li);
+            // let li = document.createElement('li');
+            // li.innerHTML = `Заявка закрыта. Статус: ${data.close_reason === 'Success' ? 'успешно' : 'не успешно'}. Сумма пополнения: ${data.refiil}`;
+            // divModalTextul.appendChild(li);
             requestOpened = false;
         };
     };
 };
+
+
+
+
+const withdrawSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/withdraw_payment/create/'
+);
 // вывод
 let lastServerMessageW = '';
 let requestOpenedW = false;
@@ -118,19 +201,6 @@ withdrawSocket.onmessage = function(e) {
     };
 };
 
-
-// создание заявки по нажатию на кнопку
-// пополнение
-document.querySelector('#modalManualBtn').addEventListener("click", function(e) {
-    if(is_auth) {
-        let request = {
-            "amount": refillAmount
-        }
-        refillSocket.send(JSON.stringify({
-            'create': request,
-            'user': username,
-        }));
-    }});
 // вывод
 document.querySelector('#modalManualBtn2').addEventListener("click", function(e) {
     if(is_auth) {
@@ -238,62 +308,6 @@ document.querySelectorAll('a.modal-payment__block.popup-link')[1].addEventListen
     }
 });
 
-//! Таймер
-if (document.querySelector(".timer")) {
-    function timerSecond(timerSpan, functionTimer) {
-        let timerBlock = document.querySelector(timerSpan);
-        let valueTimer = timerBlock.textContent.split(":");
-        [minuteTime, secTime] = valueTimer;
-
-        let timer = setInterval(function () {
-            if (secTime < 60) {
-                secTime -= 1;
-            }
-
-            if (secTime < 0) {
-                minuteTime -= 1;
-                secTime = 59;
-            }
-
-            if (minuteTime < 1 && secTime < 1) {
-                clearInterval(timer);
-                setTimeout(functionTimer, 0);
-            }
-
-            if (secTime >= 10) {
-                timerBlock.innerHTML = `${minuteTime}:${secTime}`;
-            }
-
-            if (secTime < 10 && secTime >= 0) {
-                timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
-            }
-        }, 1000);
-    }
-
-    if (document.querySelector(".instruction")) {
-        let repeateOne = 0;
-        document
-            .querySelector(".popup__content.modal.modal_select-amount")
-            .addEventListener("click", function () {
-                if (repeateOne < 1) {
-                    timerSecond("#timerOne", function () {
-                        let btnTimerInstructin =
-                            document.querySelector("#modalManualBtn");
-                        btnTimerInstructin.classList.remove("btn_white");
-                        btnTimerInstructin.innerHTML = "Начать";
-                        btnTimerInstructin.addEventListener("click", function (event) {
-                            if (event.target.textContent == "Начать") {
-                                event.target.innerHTML = "<span>Ожидайте..</span>";
-                                event.target.classList.add("btn_white");
-                            }
-                        });
-                    });
-                    repeateOne++;
-                }
-            });
-    }
-}
-
 window.addEventListener('load', function(e) {
     let divs = this.document.querySelectorAll("div.select-amount__value");
     for (let div of divs) {
@@ -306,7 +320,6 @@ window.addEventListener('load', function(e) {
         }
         div.parentElement.setAttribute('credits', credits);
     }
-
 
     let links = document.querySelectorAll("a.select-amount__item.popup-link");
     for (let a of links) {
