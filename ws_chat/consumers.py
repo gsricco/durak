@@ -518,7 +518,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 amount = None
                 if bet_is_valid:
                     amount = bet.get('bidCount')
-                await self.change_balance(amount)
+                await self.change_balance(user, amount)
                 await self.channel_layer.group_send(
                     self.room_group_name, {
                         "type": "get_bid",
@@ -675,14 +675,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(message))
 
     @sync_to_async
-    def change_balance(self, amount_to_subtract=None):
+    def change_balance(self, user, amount_to_subtract=None):
+        user_to_change = CustomUser.objects.get(id=user.id)
         if amount_to_subtract:
-            self.scope['user'].detailuser.balance -= amount_to_subtract
-            self.scope['user'].detailuser.save()
+            user_to_change.detailuser.balance -= amount_to_subtract
+            user_to_change.detailuser.save()
         async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
             'type': 'get_balance',
             'balance_update': {
-                'current_balance': self.scope['user'].detailuser.balance
+                'current_balance': user_to_change.detailuser.balance
             }
         })
 

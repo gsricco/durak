@@ -207,9 +207,9 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
     for bet_card in user_bet:
         if bet_card == round_result:
             if bet_card == 'spades' or bet_card == 'hearts':
-                credits = int(user_bet[bet_card])
+                credits = int(user_bet[bet_card]) * 2
             else:
-                credits = int(user_bet[bet_card]) * 13
+                credits = int(user_bet[bet_card]) * 14
     print(f'Кол-во кредитов к начислению : {credits}')
     return credits
 
