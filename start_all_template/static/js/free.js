@@ -3,16 +3,15 @@
 const inviteBtn = document.querySelector('.invite__btn');
 const textStatus = document.querySelectorAll('.form__msg');
 const inviteInput = document.querySelector('.invite__input');
-const user_pk = JSON.parse(document.getElementById('user_pk').textContent);
 textStatus[1].textContent = '';
 textStatus[2].textContent = '';
 
-fetch(`/api/v1/referal_code/${user_pk}/`)
+fetch(`/api/v1/referal_code/${current_user_id}/`)
     .then(response => response.json())
     .then(function(data) {
         if (data.hasOwnProperty('ref_code')) {
             checkReferal(data);
-        };
+        }
     });
 
 function checkReferal(refJson) {
@@ -71,11 +70,11 @@ if (inviteBtn) {
 
             if (inviteInput.value !== '') {
                 inviteInput.disabled = true;                
-                var csrf_token = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+                let csrf_token = document.querySelector('[name="csrfmiddlewaretoken"]').value;
 
                 let ref_code = {
                     "ref_code": inviteInput.value,
-                    "user": user_pk
+                    "user": current_user_id
                 };
                 let result = fetch('/api/v1/referal_code/', {
                     method: 'POST',

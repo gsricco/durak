@@ -1484,7 +1484,7 @@ document.querySelector('#userBalMob').innerHTML = `${UserBalancerShow}`
 //     })
 // }
 //аккордион Вопросов..
-const btnAccordionQuestion = document.querySelectorAll(".accordion")
+const btnAccordionQuestion = document.querySelectorAll(".accordion-wrapper.faq__wrapper>button")
 const panelQuestion=document.querySelectorAll('.faq__text-wrapper')
 btnAccordionQuestion.forEach((btn,index)=>{
     if (btn){
