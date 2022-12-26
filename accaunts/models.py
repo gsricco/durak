@@ -84,10 +84,9 @@ class CustomUser(AbstractUser):
         if not DetailUser.objects.filter(user=self).exists():
             detail = DetailUser(user=self)
             detail.save()
-        # if not Ban.objects.filter(user=self):    # создание бана при регистрации пользователя
-        #     ban = Ban(user=self)
-        #     Ban.objects.get_or_create()
-        #     ban.save()
+        if not Ban.objects.filter(user=self).exists():    # создание бана при регистрации пользователя
+            ban = Ban(user=self)
+            ban.save()
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -200,10 +199,11 @@ class ReferalCode(models.Model):
 class ReferalUser(models.Model):
     """Модель пользователей приглашённых на сайт"""
     user_with_bonus = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name="users_with_bonus",
-                                        verbose_name="Пользователь который пригласил")
+                                        verbose_name="Пользователь который пригласил", null=True, blank=True)
     invited_user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name="invited_users",
-                                        verbose_name="Приглашенный пользователь")
-    date = models.DateTimeField(verbose_name="Дата входа в систему", auto_now_add=True)
+                                        verbose_name="Приглашенный пользователь", null=True, blank=True)
+    bonus_sum = models.PositiveBigIntegerField(verbose_name='Сумма бонуса', default=25000)
+    date = models.DateTimeField(verbose_name="Дата получения бонуса", auto_now_add=True)
 
     class Meta:
         verbose_name = 'Приглашенный пользователь'

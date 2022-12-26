@@ -73,7 +73,7 @@ class WithdrawalRequest(models.Model):
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
     close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
-    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.PROTECT)
+    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.DO_NOTHING)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
     bot_name = models.CharField(verbose_name='Имя бота', max_length=100, null=True, blank=True)
 

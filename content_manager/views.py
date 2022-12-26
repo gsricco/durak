@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db.models import Value, F
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet
+from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser
 from pay.models import Popoln
 from bot_payment.models import RefillRequest, WithdrawalRequest
 from .models import FAQ, SiteContent
@@ -185,8 +185,8 @@ def profil(request):
         user_bets = UserBet.objects.filter(user=request.user).annotate(tr_type=Value('Ставка'), tr_plus=F('win')).values('date', 'sum_win', 'tr_type', 'tr_plus', 'sum')
         refill = RefillRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True)).values('date_closed', 'amount', 'tr_type', 'tr_plus', 'balance')
         withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount')
-        transactions = popoln.union(user_bets, refill, withdraw).order_by('-date')
-
+        referal = ReferalUser.objects.filter(user_with_bonus=request.user).annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True)).values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus')
+        transactions = popoln.union(user_bets, refill, withdraw, referal).order_by('-date')
         paginator = Paginator(transactions, 8)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)

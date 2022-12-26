@@ -48,7 +48,7 @@ function hideForm() {
     spanNumber.textContent = "X";
     btnTimerInstructin.classList.remove("btn_white");
     btnTimerInstructin.innerHTML = "Начать";
-    if (refillSocket !== null && refillSocket.readyState === "OPEN") {
+    if (refillSocket !== null && refillSocket.readyState === 1) {
         refillSocket.close(1000);
     }
 };
@@ -224,7 +224,7 @@ function hideFormWithdraw() {
     span.innerHTML = "(отобразится после начала)";
     btnTimerWithdraw.classList.remove("btn_white");
     btnTimerWithdraw.innerHTML = "Начать";
-    if (withdrawSocket !== null && withdrawSocket.readyState === "OPEN") {
+    if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
         withdrawSocket.close(1000);
     }
 };
@@ -320,6 +320,7 @@ function withdrawSocketOnMessage(e) {
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {
     userBalance = parseInt(document.querySelector('input.s-am-input__input').value);
+    if (e.target == document.querySelector("#unblock_close")) return;
     if (!userBalance || userBalance < 100) {
         e.stopImmediatePropagation();
         e.preventDefault();
@@ -331,17 +332,18 @@ document.querySelector('#selectAmountInput').addEventListener('click', function 
 // возобновление показа окна с заявкой при его закрытии
 let unlockR = true;
 const timeoutR = 800;
-
+const lockPaddingR = document.querySelectorAll(".lock-padding");
+const bodyR = document.querySelector("body");
 function bodyUnLock() {
     setTimeout(function () {
-        if (lockPadding.length > 0) {
-            for (let index = 0; index < lockPadding.length; index++) {
-                const el = lockPadding[index];
+        if (lockPaddingR.length > 0) {
+            for (let index = 0; index < lockPaddingR.length; index++) {
+                const el = lockPaddingR[index];
                 el.style.paddingRight = "0px";
             }
         }
-        body.style.paddingRight = "0px";
-        body.classList.remove("lock");
+        bodyR.style.paddingRight = "0px";
+        bodyR.classList.remove("lock");
     }, timeoutR);
 
     unlockR = false;
@@ -354,13 +356,13 @@ function bodyLock() {
     const lockPaddingValue =
         window.innerWidth - document.querySelector(".wrapper").offsetWidth + "px";
     if (lockPaddingValue.length > 0) {
-        for (let index = 0; index < lockPadding.length; index++) {
-            const el = lockPadding[index];
-            el.style.paddingRight = lockPaddingValue;
+        for (let index = 0; index < lockPaddingR.length; index++) {
+            const el = lockPaddingR[index];
+            el.style.paddingRight = lockPaddingRValue;
         }
     }
-    body.style.paddingRight = lockPaddingValue;
-    body.classList.add("lock");
+    bodyR.style.paddingRight = lockPaddingValue;
+    bodyR.classList.add("lock");
 
     unlockR = false;
     setTimeout(function () {
@@ -434,12 +436,13 @@ window.addEventListener('load', function(e) {
 
 const modal_payment = document.querySelector("#close_withdraw")
 modal_payment.addEventListener('click', function(e) {
-    console.log('eto event for closing')
-    console.log(withdrawSocket, withdrawSocket.readyState)
     if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
-        console.log('privet iz close ws')
-        withdrawSocket.close(1000);
-
+        hideFormWithdraw();
     }
-    console.log(withdrawSocket.readyState)
+})
+
+document.querySelector("#close_refill").addEventListener('click', function(e) {
+    if (refillSocket !== null && refillSocket.readyState === 1) {
+        hideForm();
+    }
 })
