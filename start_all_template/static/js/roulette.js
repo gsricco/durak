@@ -177,6 +177,9 @@ function super_new(f) {
 
 
         function rouletteInitialSettings() {
+            if(document.querySelector('#audio')){
+                document.querySelector('#audio').remove();
+            }
             document.querySelector('#spanCardHearts').innerHTML = ``
             document.querySelector('#spanCardHeartsMob').innerHTML = ``
             document.querySelector('#spanCardCoin').innerHTML = ``
@@ -246,6 +249,23 @@ function super_new(f) {
         }
 
         function checkWinner(cardWinner, bidIncrease) {
+            // sessionStorage.clear()
+            // sessionStorage.setItem('bids','new')
+
+
+            //звук останова рулетки//////
+            const sound = document.querySelector(".sound");
+            // let attribute = sessionStorage.getItem("data-value")
+            let attribute = sound.getAttribute("data-value")
+            const audio = document.createElement('audio')
+            audio.setAttribute("id", "audio");
+            if(attribute ==="soundOff"){
+                audio.setAttribute("src", "static/sound/soundBid.mp3");
+                audio.setAttribute("autoplay", "autoplay");
+                sound.appendChild(audio)
+            }
+            //////////////////////////////////////////
+
             let signWinner, counts, countsShow, j;
             let lowerCard = cardWinner.toLowerCase();
             let nameWinnerCard = cardWinner[0].toUpperCase() + cardWinner.slice(1);
@@ -295,7 +315,6 @@ function super_new(f) {
                     if (counts * bidIncrease / 1000 > 0 && counts * bidIncrease / 1000 < 10) {
                         countsShow = `${counts * bidIncrease}`
                     }
-                    console.log(countsShow, "COUNTS_SHOW")
                     document.querySelector(`#spanCard${nameWinnerCard}`).innerHTML = `+${countsShow}`;
                     document.querySelector(`#title${nameWinnerCard}`).innerHTML = `Победа:`;
                     document.querySelector(`#signWinner${lowerCard}`).innerHTML = ' +';
@@ -367,7 +386,6 @@ function super_new(f) {
                 checkWinner('spades', 2)
             }
         }
-
         if (data.back) {
             previous_rolls(data.previous_rolls)
             returnToStartPosition()

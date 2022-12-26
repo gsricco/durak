@@ -115,7 +115,8 @@ const createBidItems = (data) => {
                 document.querySelector('#titleHearts').innerHTML = `Черви: `;
                 document.querySelector('#spanCardHearts').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
                 // document.querySelector('#spanCardHeartsMob').innerHTML = `<span id="signWinnerhearts"></span>${heartsCountsShow}`
-
+                bidsButtons[2].style.opacity = '0.3'
+                items[2].style.pointerEvents = 'none';
             }
             if (data[user]['amount']['coin']) {
                 coinCounts += data[user]['amount']['coin']
@@ -151,6 +152,8 @@ const createBidItems = (data) => {
                 document.querySelector('#spanCardSpades').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`;
                 document.querySelector('#titleSpades').innerHTML = `Пики: `;
                 // document.querySelector('#spanCardSpadesMob').innerHTML = `<span id="signWinnerspades"></span>${spadesCountsShow}`
+                bidsButtons[0].style.opacity = '0.3'
+                items[0].style.pointerEvents = 'none';
             }
         }
 
@@ -312,11 +315,15 @@ const itemsClick = (bidCard) => {
                     'bidCard': bidCard
                 }
             }));
+
             if (bidCard === 'hearts') {
+                bidsButtons[2].style.opacity = '0.3'
                 items[2].style.pointerEvents = 'none';
             } else if (bidCard === 'spades') {
+                bidsButtons[0].style.opacity = '0.3'
                 items[0].style.pointerEvents = 'none';
             }
+
 
             ///////////////////////////////////////////////
             //логика БЭК отнимания ставки от баланса/////////
