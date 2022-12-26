@@ -177,13 +177,12 @@ window.addEventListener("DOMContentLoaded", () => {
         function clickChat() {
             let block = document.querySelector(".support__overflow");
             block.style.opacity = "0";
-
             setTimeout(function () {
                 block.style.display = "none";
             }, 1000);
         }
 
-        setTimeout(clickChat, 590);
+        setTimeout(clickChat, 10000);
     }
 
     //!Modal sliders
