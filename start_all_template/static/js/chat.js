@@ -52,6 +52,9 @@ if (document.querySelector(".scrollbar-overflow")) {
 }
 chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
+    if(data.modal_lvl_data){
+        open_modal_lvl(data.modal_lvl_data)
+    }
     if (data.get_online > 0) {
         online.innerHTML = `${data.get_online}`
         onlineMob.innerHTML = `${data.get_online}`
@@ -246,4 +249,12 @@ const onClickDeleteHandler=(li)=>{
 }
 const onClickBanHandler=()=>{
     alert('ban message1')
+}
+function open_modal_lvl(data) {
+    let modalLvlText = document.querySelector('.modal_lvl_text')
+    let modalLvlImg = document.querySelector('.icon-lvl-up')
+    modalLvlText.innerHTML = `Уровень повышен! <br> Вам доступно “${data.case_name} ”${data.case_count}шт.</div>`
+    modalLvlImg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.lvl_img}"></use>`
+    let dd = document.querySelector('#lvl-up')
+    setTimeout(()=>{popupOpen(dd)},300)
 }
