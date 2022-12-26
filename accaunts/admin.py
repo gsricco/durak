@@ -156,7 +156,8 @@ class BanUserAdmin(admin.ModelAdmin):
 
 @admin.register(RouletteRound)
 class RouletteRoundAdmin(admin.ModelAdmin):
-    list_display = 'round_number', 'round_roll', 'rolled',
+    list_display = 'round_number', 'round_roll', 'rolled', 'round_started'
+    list_filter = 'rolled', 'round_started',
     list_editable = 'round_roll',
     search_fields = '=round_number',
 

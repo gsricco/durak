@@ -77,8 +77,8 @@ def debug_task():
     z = timezone.now()
     t = datetime.datetime.now()
     sender.apply_async()
-    # roll.apply_async(countdown=19.5)
-    roll.apply_async(eta=t + datetime.timedelta(seconds=20))
+    # roll.apply_async(countdown=20)
+    roll.apply_async(eta=z + datetime.timedelta(seconds=20))
     generate_round_result.apply_async(countdown=21, args=(True,))
     stop.apply_async(countdown=25)
     go_back.apply_async(countdown=28)
@@ -87,13 +87,14 @@ def debug_task():
 @shared_task
 def roll():
     t = datetime.datetime.now()
+    print('start of ROLL', t)
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
     round_number = int(r.get('round'))
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
-    except ObjectDoesNotExist:
+    except models.RouletteRound.DoesNotExist:
         # если раунда нет в БД, то произойдёт проверка текущего
         # и следующих раундов на день - если их нет, они создадутся
         check_rounds()
@@ -120,7 +121,7 @@ def roll():
     if arr_len := r.json().arrlen('last_winners') > 8:
         r.json().arrtrim('last_winners', '.', arr_len - 9, -1)
 
-
+    print('END OF ROLL', datetime.datetime.now() - t)
 @shared_task
 def go_back():
     t = datetime.datetime.now()
