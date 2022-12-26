@@ -8,6 +8,7 @@ const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
 const UserBalance = document.querySelector('.header__profile-sum>span')
+const UserBalanceMob = document.querySelector('.header__balance>span')
 const online = document.querySelector('#onlineChat')
 const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
@@ -50,6 +51,23 @@ if (document.querySelector(".scrollbar-overflow")) {
             }, 1000);
         });
     });
+}
+function update_balance(current_balance){
+    UserBalancer = Number(current_balance)
+            // // Отображать надо уже преобразованное число, а использовать пришедшее
+            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+                UserBalancerShow = `${UserBalancer / 1000}K`
+            } else {
+                if (UserBalancer / 1000000 > 0) {
+                    UserBalancerShow = `${UserBalancer / 1000000}M`
+                } else
+                    UserBalancerShow = `${UserBalancer}`
+            }
+            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+                UserBalancerShow = `${UserBalancer}`
+            }
+            UserBalance.innerHTML = `${UserBalancerShow}`
+            UserBalanceMob.innerHTML = `${UserBalancerShow}`
 }
 chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
@@ -203,6 +221,9 @@ if (data.message && data.chat_type === 'all_chat') {
         level_line = document.querySelector('.header__profile-line_span')
         level_line.style.width = data.expr.percent + '%'
     }
+    if (data.current_balance) {
+            update_balance(data.current_balance)
+        }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };

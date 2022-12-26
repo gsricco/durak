@@ -2970,6 +2970,7 @@ h3 {
   font-weight: 400;
   color: #fff;
   text-transform: uppercase;
+  padding-left: 5px;
 }
 
 .profil__progressbar-lvl span {

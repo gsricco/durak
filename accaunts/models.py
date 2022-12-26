@@ -173,7 +173,7 @@ class UserIP(models.Model):
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    balance = models.IntegerField(verbose_name="Баланс", default=0)
+    balance = models.PositiveIntegerField(verbose_name="Баланс", default=0)
 
     class Meta:
         verbose_name = 'Данные пользователя'

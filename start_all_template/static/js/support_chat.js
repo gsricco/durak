@@ -62,7 +62,7 @@ function newUserMessage(message, user, file_path) {
         fullDiv.style.flexDirection = 'column'
         spanUser.style.textAlign = 'right'
         if (user !== username) {
-            spanUser.innerHTML = user
+            // spanUser.innerHTML = user
             li.style.flexDirection = ''
             li.style.justifyContent = 'flex-start'
             li.style.paddingLeft = '0%'

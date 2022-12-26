@@ -11,7 +11,7 @@ let nextLvlBar = document.querySelector('.progress-bar_next_svg')
 let curLvlBarCount = document.querySelector('.progress-bar_cur_count')
 let nextLvlBarCount = document.querySelector('.progress-bar_next_count')
 let timerBlock = document.querySelector('#timerTwo')
-const UserBalanceMob = document.querySelector('.header__balance>span')
+// const UserBalanceMob = document.querySelector('.header__balance>span')
 const listCase = document.querySelector('.listCase');
 const modalCase = document.querySelector('.modal-cases__case');
 let profilProgressLine = document.querySelector('.profil_profil__progressbar-line')
@@ -26,23 +26,23 @@ chatSocket.addEventListener('open', (event) => {
     }))
 });
 
-function update_balance(current_balance){
-    UserBalancer = Number(current_balance)
-            // // Отображать надо уже преобразованное число, а использовать пришедшее
-            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
-                UserBalancerShow = `${UserBalancer / 1000}K`
-            } else {
-                if (UserBalancer / 1000000 > 0) {
-                    UserBalancerShow = `${UserBalancer / 1000000}M`
-                } else
-                    UserBalancerShow = `${UserBalancer}`
-            }
-            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
-                UserBalancerShow = `${UserBalancer}`
-            }
-            UserBalance.innerHTML = `${UserBalancerShow}`
-            UserBalanceMob.innerHTML = `${UserBalancerShow}`
-}
+// function update_balance(current_balance){
+//     UserBalancer = Number(current_balance)
+//             // // Отображать надо уже преобразованное число, а использовать пришедшее
+//             if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+//                 UserBalancerShow = `${UserBalancer / 1000}K`
+//             } else {
+//                 if (UserBalancer / 1000000 > 0) {
+//                     UserBalancerShow = `${UserBalancer / 1000000}M`
+//                 } else
+//                     UserBalancerShow = `${UserBalancer}`
+//             }
+//             if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+//                 UserBalancerShow = `${UserBalancer}`
+//             }
+//             UserBalance.innerHTML = `${UserBalancerShow}`
+//             UserBalanceMob.innerHTML = `${UserBalancerShow}`
+// }
 
 chatSocket.onmessage = super_new(chatSocket.onmessage);
 
@@ -71,9 +71,9 @@ function super_new(f) {
             setModalConst(data.cases)
 
         }
-        if (data.current_balance) {
-            update_balance(data.current_balance)
-        }
+        // if (data.current_balance) {
+        //     update_balance(data.current_balance)
+        // }
         if (data.cases_items) {
             caseItems = data.cases_items
         }

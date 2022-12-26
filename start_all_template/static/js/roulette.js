@@ -164,7 +164,7 @@ let timerCounter = (back_counter) => {
 //ставим функцию на каждые 29сек
 chatSocket.onmessage = super_new(chatSocket.onmessage);
 let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
-const UserBalanceMob = document.querySelector('.header__balance>span')
+// const UserBalanceMob = document.querySelector('.header__balance>span')
 
 function super_new(f) {
     return function () {
@@ -346,9 +346,9 @@ function super_new(f) {
                 returnToStartPosition()
             }
         }
-        if (data.current_balance) {
-            update_balance(data.current_balance)
-        }
+        // if (data.current_balance) {
+        //     update_balance(data.current_balance)
+        // }
         if (data.round_bets) {
             createBidItems(data.round_bets)
         }
@@ -397,23 +397,23 @@ function previous_rolls(rolls) {
 }
 }
 // Обновление баланса пользователя от бэка
-function update_balance(current_balance){
-    UserBalancer = Number(current_balance)
-            // // Отображать надо уже преобразованное число, а использовать пришедшее
-            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
-                UserBalancerShow = `${UserBalancer / 1000}K`
-            } else {
-                if (UserBalancer / 1000000 > 0) {
-                    UserBalancerShow = `${UserBalancer / 1000000}M`
-                } else
-                    UserBalancerShow = `${UserBalancer}`
-            }
-            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
-                UserBalancerShow = `${UserBalancer}`
-            }
-            UserBalance.innerHTML = `${UserBalancerShow}`
-            UserBalanceMob.innerHTML = `${UserBalancerShow}`
-}
+// function update_balance(current_balance){
+//     UserBalancer = Number(current_balance)
+//             // // Отображать надо уже преобразованное число, а использовать пришедшее
+//             if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+//                 UserBalancerShow = `${UserBalancer / 1000}K`
+//             } else {
+//                 if (UserBalancer / 1000000 > 0) {
+//                     UserBalancerShow = `${UserBalancer / 1000000}M`
+//                 } else
+//                     UserBalancerShow = `${UserBalancer}`
+//             }
+//             if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+//                 UserBalancerShow = `${UserBalancer}`
+//             }
+//             UserBalance.innerHTML = `${UserBalancerShow}`
+//             UserBalanceMob.innerHTML = `${UserBalancerShow}`
+// }
 
 
 
