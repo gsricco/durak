@@ -40,11 +40,21 @@ class Message(models.Model):
                 {'message': "message support_chat more 500"},
             )
 class UserChatRoom(models.Model):
+    user  = models.ForeignKey('accaunts.CustomUser',on_delete=models.CASCADE,null=True,blank=True)
     room_id = models.CharField(max_length=255, unique=True)
     updated = models.DateTimeField(auto_now=True,null=True,blank=True)
+    not_read_owner_counter = models.PositiveIntegerField(default=0,null=True,blank=True)
+    not_read_counter = models.PositiveIntegerField(default=0,null=True,blank=True)
 
     def __str__(self):
         return self.room_id
+
+    def save(self,*args,**kwargs):
+        self.not_read_owner_counter = Message.objects.filter(chat_room=self,is_read=False).\
+            exclude(user_posted=self.user).count()
+        self.not_read_counter = Message.objects.filter(chat_room=self, is_read=False). \
+            filter(user_posted=self.user).count()
+        super().save(*args,**kwargs)
 
     class Meta:
         verbose_name = 'Админ чат'

@@ -384,6 +384,7 @@ function super_new(f) {
 function previous_rolls(rolls) {
     let rollWinnerOld = document.querySelector('.roulette__previous-items');
     rollWinnerOld.innerHTML = ``
+    if (rolls){
     rolls.map(roll => {
         rollWinnerOld.innerHTML += `
             <div class="roulette__previous-item">
@@ -393,6 +394,7 @@ function previous_rolls(rolls) {
             </div>
             `
     })
+}
 }
 // Обновление баланса пользователя от бэка
 function update_balance(current_balance){
