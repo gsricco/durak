@@ -33,8 +33,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async
     def create_or_get_support_chat_room(self, user_pk):
         if CustomUser.objects.filter(pk=user_pk).exists():
-            user_pk = CustomUser.objects.get(pk=user_pk).pk
-            chat_room, created = UserChatRoom.objects.get_or_create(user=user_pk,room_id=user_pk)
+            user= CustomUser.objects.get(pk=user_pk)
+            chat_room, created = UserChatRoom.objects.get_or_create(user=user,room_id=user.pk)
             return chat_room
 
     async def save_user_message_all_chat(self, all_chat_message):
@@ -325,37 +325,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 case = owned_case.case
                 case_items = ItemForCase.objects.filter(case=case)
                 weights = [float(item['chance']) for item in case_items.values('chance')]
-                print(weights, 'веса итема')
                 chosen_item_in_case = choices(case_items, weights=weights, k=1)[0]
-                print(chosen_item_in_case)
                 chosen_item = Item.objects.get(pk=chosen_item_in_case.item.pk)
                 owned_case.item = chosen_item
                 # сохраняет время открытия кейса
-                # owned_case.date_opened = datetime.datetime.now()
-                # время открытия для тестов - 1ч
-                owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3585)
+                owned_case.date_opened = datetime.datetime.now()
+                # owned_case.date_opened = datetime.datetime.now() - datetime.timedelta(seconds=3585)
                 owned_case.save()
-                # отправляет результат рандома открытия кейса
                 async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
                                                                            'type': 'case_roll',
                                                                            'case_roll_result': chosen_item.name
                                                                            }
                                                              )
-                # отправляет пользователю всё предметы
-                # async_to_sync(self.get_user_items)()
                 # проверка является ли выпавший предмет деньгами
                 # если да пополняет баланс, если нет добавляет предмет в инвентарь
                 if chosen_item.is_money:
                     user.detailuser.balance += chosen_item.selling_price
                     user.detailuser.save()
-                    print('это бабки')
                     tasks.send_balance_delay(user.pk)
-                    # async_to_sync(self.channel_layer.send)(self.channel_name, {
-                    #     'type': 'get_balance',
-                    #     'balance_update': {
-                    #         'current_balance': user.detailuser.balance
-                    #     }
-                    # })
                 else:
                     ItemForUser.objects.create(user=user, user_item=chosen_item)
                     tasks.send_items_delay(user.pk)
@@ -390,7 +377,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def forward_item(self, data):
-        print(data)
         user = self.scope['user']
         if user.is_authenticated:
             if Item.objects.filter(name=data.get('item_name')).exists():
@@ -418,8 +404,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     async_to_sync(self.channel_layer.group_send)('admin_group', message)
     @sync_to_async
     def read_all_message_from_room(self,room_id):
-        print('dsds')
-        room = UserChatRoom.objects.get(room_id=room_id)
+        room = async_to_sync(self.create_or_get_support_chat_room)(int(room_id))
+        # room = UserChatRoom.objects.get(room_id=room_id)
         user_pk = self.scope.get('user').pk
         if room_id != user_pk:
             room.message.filter(is_read=False).filter(user_posted=room_id).update(is_read=True)

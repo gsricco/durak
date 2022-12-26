@@ -52,7 +52,6 @@ function super_new(f) {
         let data = JSON.parse(arguments[0].data)
         if (data.user_items) {
             newUserItem(data.user_items)
-            // newModalUserItem(data.user_items)
         }
 
         if (data.lvl_info) {

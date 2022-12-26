@@ -40,7 +40,7 @@ class Message(models.Model):
                 {'message': "message support_chat more 500"},
             )
 class UserChatRoom(models.Model):
-    user  = models.ForeignKey('accaunts.CustomUser',on_delete=models.DO_NOTHING,null=True,blank=True)
+    user  = models.ForeignKey('accaunts.CustomUser',on_delete=models.CASCADE,null=True,blank=True)
     room_id = models.CharField(max_length=255, unique=True)
     updated = models.DateTimeField(auto_now=True,null=True,blank=True)
     not_read_owner_counter = models.PositiveIntegerField(default=0,null=True,blank=True)

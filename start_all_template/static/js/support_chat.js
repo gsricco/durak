@@ -2,15 +2,11 @@ chatSocket.onmessage = super_new(chatSocket.onmessage);
 const sendBtn = document.querySelector('.support__input-block-arrow')
 let inputValue = document.querySelector('.support__chat-input')
 const chatBlock = document.querySelector('.support__chat-block')
-// const username = JSON.parse(document.getElementById('username').textContent)
 const showFile = document.querySelector('#showFile')
-// let imageTypeList = ['jpg', 'jpeg', 'gif', 'pjpeg', 'svg', 'svg+xml', 'tiff', 'icon', 'wbmp', 'webp', 'png']
 let inputFile = document.querySelector('#file-add')
 let host_url = window.location.host
 let room_id = ''
 let byteFile
-
-let topBlock = document.querySelector('.support_chat_top_block')
 
 chatSocket.addEventListener('open', (event) => {
     chatSocket.send(JSON.stringify({
@@ -50,8 +46,6 @@ function checkFileSize(elem) {
                 , 2000)
         }
     }
-
-
 }
 
 
@@ -82,15 +76,6 @@ function newUserMessage(message, user, file_path) {
         div.appendChild(span)
         fullDiv.appendChild(spanUser)
         if (file_path) {
-            const file_preview = document.querySelectorAll('.support__chat-message-text')
-            const file_url = document.createElement('div')
-            file_url.innerHTML = 'Файл'
-            file_url.className = 'file_name'
-            file_url.addEventListener('click', () => {
-
-                window.open(`http://${host_url}${file_path}`)
-            })
-
                 if (user !== username) {
                     let newDiv = document.createElement('div')
                     newDiv.innerHTML = `<div style="display: flex; flex-direction: column; padding-bottom: 10px">
@@ -125,7 +110,6 @@ function newUserMessage(message, user, file_path) {
 
 function newSellItemMessage(message,user) {
     let dataList = message.split(';')
-    console.log(dataList[0])
     const li = document.createElement('li')
      if (user !== username) {
             li.className = 'support__chat-message'

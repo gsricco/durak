@@ -6,7 +6,6 @@ const username = JSON.parse(document.getElementById('username').textContent)
 let room_id = ''
 let room_name = ''
 let byteFile
-// let imageTypeList = ['jpg', 'jpeg', 'gif', 'pjpeg', 'svg', 'svg+xml', 'tiff', 'icon', 'wbmp', 'webp', 'png']
 let topBlock = document.querySelector('.support_chat_top_block')
 let host_url = window.location.host
 
@@ -48,7 +47,6 @@ function checkFileSize(elem) {
 function newSellItemMessage(message, user) {
     if (user === username || user === room_name) {
         let dataList = message.split(';')
-        // console.log(dataList[0])
         const li = document.createElement('li')
         if (user !== username) {
             li.className = 'support__chat-message'
@@ -72,8 +70,6 @@ function newSellItemMessage(message, user) {
 
 
 const chat_cleaner = () => {
-    // const clear_chat_block = document.querySelectorAll('.support__chat-message_your')
-    // clear_chat_block.forEach(item => item.remove())
     chatBlock.innerHTML = ''
 }
 
@@ -187,15 +183,11 @@ const chatS = new WebSocket(
 )
 
 chatS.onmessage = function (e) {
-
-
     const data = JSON.parse(e.data);
     if (data.room_data) {
         room_cleaner()
         data.room_data.forEach(e => newRoom(e))
-
     }
-
     if (data.chat_type === 'support') {
         if (data.list_message) {
             data.list_message.forEach((mess) => {
