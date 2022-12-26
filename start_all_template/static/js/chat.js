@@ -8,9 +8,11 @@ const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
 const UserBalance = document.querySelector('.header__profile-sum>span')
+const UserBalanceMob = document.querySelector('.header__balance>span')
 const online = document.querySelector('#onlineChat')
 const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
+const current_user_id = JSON.parse(document.getElementById("current_user_id").textContent);
 // WS Connection
 
 const chatSocket = new WebSocket(
@@ -49,6 +51,23 @@ if (document.querySelector(".scrollbar-overflow")) {
             }, 1000);
         });
     });
+}
+function update_balance(current_balance){
+    UserBalancer = Number(current_balance)
+            // // Отображать надо уже преобразованное число, а использовать пришедшее
+            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
+                UserBalancerShow = `${UserBalancer / 1000}K`
+            } else {
+                if (UserBalancer / 1000000 > 0) {
+                    UserBalancerShow = `${UserBalancer / 1000000}M`
+                } else
+                    UserBalancerShow = `${UserBalancer}`
+            }
+            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
+                UserBalancerShow = `${UserBalancer}`
+            }
+            UserBalance.innerHTML = `${UserBalancerShow}`
+            UserBalanceMob.innerHTML = `${UserBalancerShow}`
 }
 chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
@@ -115,7 +134,8 @@ if (data.message && data.chat_type === 'all_chat') {
 
             const btnBan = document.createElement('button')
             btnBan.type = 'submit'
-            btnBan.onclick = () => onClickBanHandler()
+            btnBan.id = data.id
+            btnBan.onclick = () => onClickBanHandler(btnBan.id)
             btnBan.className = 'online__chat-img'
             divButtons.appendChild(btnBan)
 
@@ -181,7 +201,8 @@ if (data.message && data.chat_type === 'all_chat') {
 
                 const btnBan = document.createElement('button')
                 btnBan.type = 'submit'
-                btnBan.onclick = () => onClickBanHandler()
+                btnBan.id = data.id
+                btnBan.onclick = () => onClickBanHandler(btnBan.id)
                 btnBan.className = 'online__chat-img'
                 divButtons.appendChild(btnBan)
 
@@ -201,6 +222,9 @@ if (data.message && data.chat_type === 'all_chat') {
         level_line = document.querySelector('.header__profile-line_span')
         level_line.style.width = data.expr.percent + '%'
     }
+    if (data.current_balance) {
+            update_balance(data.current_balance)
+        }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
@@ -219,7 +243,8 @@ buttonSend.onclick = function (e) {
             'user': username,
             'avatar': ava,
             'rubin': rubin,
-            't': Date.now()
+            't': Date.now(),
+            'id': current_user_id
         }));
     } else {
         ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
@@ -247,8 +272,10 @@ const onClickDeleteHandler=(li)=>{
             'delete_message': li,
         }));
 }
-const onClickBanHandler=()=>{
-    alert('ban message1')
+const onClickBanHandler=(id)=>{
+    chatSocket.send(JSON.stringify({
+            'ban_user_all_chat': id,
+        }));
 }
 function open_modal_lvl(data) {
     let modalLvlText = document.querySelector('.modal_lvl_text')
