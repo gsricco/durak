@@ -332,6 +332,12 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
 
         # если уровень пользователя изменился
         if prev_level != user.level.level:
+            async_to_sync(channel_layer.group_send)(f'{user.pk}_room', {"type": "send_from_mod_lvl",
+                                                             'modal_lvl_data':{
+                                                                 'case_name':user.level.case.name,
+                                                                 'lvl_img': user.level.img_name,
+                                                                 'case_count': user.level.amount
+                                                             }})
             # if channel_name := bets_info[str(bet_key)]['channel_name']:
             #     level = user.level.level
             #     new_level = level + 1
