@@ -658,19 +658,29 @@ window.addEventListener("DOMContentLoaded", () => {
     // от 1275 кол-во кредов = (введенное число руб.)*2353
 
 
-    //!звук
+    //!звук - это надо!!!!!!!!!!!!!!!!!!!!
     if (document.querySelector(".sound")) {
         let sound = document.querySelector(".sound");
         let soundImg = document.querySelector(".sound svg use");
+        // if (sessionStorage.getItem("data-value")==="soundOff") {
+        //     soundImg.setAttribute("xlink:href", `static/img/icons/sprite.svg#sound_on`);
+        //     sound.setAttribute("data-value", "soundOff");
+        //     sessionStorage.setItem("data-value",sound.getAttribute("data-value"))
+        // } else if (sessionStorage.getItem("data-value")==="soundOn"){
+        //     soundImg.setAttribute("xlink:href", `static/img/icons/sprite.svg#sound_off`);
+        //     sound.setAttribute("data-value", "soundOn");
+        //     sessionStorage.setItem("data-value", sound.getAttribute("data-value"))
+        // }
 
         sound.addEventListener("click", () => {
             if (sound.getAttribute("data-value") == "soundOn") {
-                soundImg.setAttribute("xlink:href", `img/icons/sprite.svg#sound_on`);
+                soundImg.setAttribute("xlink:href", `static/img/icons/sprite.svg#sound_on`);
                 sound.setAttribute("data-value", "soundOff");
             } else if (sound.getAttribute("data-value") == "soundOff") {
-                soundImg.setAttribute("xlink:href", `img/icons/sprite.svg#sound_off`);
+                soundImg.setAttribute("xlink:href", `static/img/icons/sprite.svg#sound_off`);
                 sound.setAttribute("data-value", "soundOn");
             }
+            // sessionStorage.setItem("data-value", sound.getAttribute("data-value"))
         });
     }
 
@@ -1447,7 +1457,6 @@ if(inviteBtn){
             inviteBtn.addEventListener('click', () => {
 
                 const inviteInputValue = promoCode;
-                console.log(inviteInputValue)
                 if (inviteInputValue) {
                     navigator.clipboard.writeText(inviteInputValue)
                         .then(() => {
@@ -1474,5 +1483,16 @@ if (btnAccordionCode){
         panelCode.style.display = panelCode.style.display === 'block' ? 'none' : 'block'
     })
 }
+//аккордион Вопросов..
+const btnAccordionQuestion = document.querySelectorAll(".accordion")
+const panelQuestion=document.querySelectorAll('.faq__text-wrapper')
+btnAccordionQuestion.forEach((btn,index)=>{
+    if (btn){
+        btn.addEventListener('click',()=>{
+            panelQuestion[index].style.display = panelQuestion[index].style.display === 'block' ? 'none' : 'block'
+        })
+    }
+})
+
 
 

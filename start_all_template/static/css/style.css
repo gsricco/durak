@@ -387,7 +387,8 @@ body.lock {
   -webkit-transition: 0.3s;
   -o-transition: 0.3s;
   transition: 0.3s;
-  width: 20px;
+  max-width: 20px;
+  min-width: 20px;
   height: 20px;
   fill: #404040;
   -webkit-transform: rotate(-180deg);
@@ -3356,7 +3357,7 @@ h3 {
   height: 100%;
   overflow: hidden;
   overflow-y: auto;
-  height: 822px;
+  /*height: 822px;*/
 }
 
 .transactions__titles {
@@ -3515,12 +3516,19 @@ h3 {
 }
 
 .faq__text-wrapper {
+  display: none;
   padding: 16px 20px;
 }
 
 .faq__text {
   font-size: 1em;
   line-height: 137.5%;
+}
+.faq__text pre {
+  word-wrap: break-word;
+  white-space: break-spaces;
+  text-align: justify;
+  font-family: Inter, normal;
 }
 
 .faq__text p {
@@ -3690,7 +3698,11 @@ h3 {
   padding-right: 0;
   padding-left: 16%;
 }
-
+.support__chat-message-text{
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
 .support__chat-message_your .support__chat-message-text {
   background: #c4364e;
   border-radius: 15px 15px 0px 15px;
@@ -4190,6 +4202,15 @@ h3 {
   text-align: justify;
   margin-bottom: 20px;
 }
+.honesty__how-text pre {
+  word-wrap: break-word;
+  white-space: break-spaces;
+  text-align: justify;
+  font-size: 0.8125em;
+  line-height: 176.9230769231%;
+  font-family: Inter, normal;
+}
+
 
 .honesty__how-text p:last-child {
   margin-bottom: 0;
@@ -8266,6 +8287,7 @@ margin-top: 36px;
   }
 
   .faq__text-wrapper {
+    display: none;
     padding: 16px 15px 16px 15px;
   }
 
@@ -8347,11 +8369,14 @@ margin-top: 36px;
     max-height: unset;
   }
 
-  .support-content-block .support__chat {
-    height: 84vh;
+  .support-content-block {
+    /*height: 84vh;*/
     max-height: unset;
   }
 
+  .support__chat {
+    max-height: 56vh;
+  }
   .contact__title {
     display: none;
   }

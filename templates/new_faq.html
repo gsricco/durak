@@ -21,7 +21,9 @@
                         <div class="accordion-wrapper faq__wrapper">
                             {% for i in faq %}
                             <button class="accordion">
-                                {{ i.name }}
+                               <span>
+                                   {{ i.name }}
+                               </span>
                                 <svg class="accordion-icon">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#arrow-slider"></use>
                                 </svg>
@@ -29,7 +31,7 @@
                             <div class="panel">
                                 <div class="faq__text-wrapper">
                                     <div class="faq__text">
-                                        {{ i.description|safe }}
+                                       {{ i.description|safe }}
                                     </div>
                                 </div>
                             </div>
