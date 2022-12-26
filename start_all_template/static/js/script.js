@@ -1,4 +1,4 @@
-//'use strict';
+// 'use strict';
 window.addEventListener("DOMContentLoaded", () => {
     const BODY = document.querySelector("body");
     const MAIN = document.querySelector("main");
@@ -1407,82 +1407,82 @@ document.querySelector('#userBalMob').innerHTML = `${UserBalancerShow}`
 
 /* Создание бонусного кода */
 
-const inviteBtn = document.querySelector('.invite__btn');
-
-if(inviteBtn){
-    inviteBtn.addEventListener('click', function (e) {
-        const inviteInput = document.querySelector('.invite__input');
-        const textStatus = document.querySelectorAll('.form__msg');
-/// надо сделать проверку на авторизацию
-        // if (isAuthenticated === 'False') {
-        //     const modal = document.querySelector('#authorization')
-        //     modal.classList.add('open')
-        //     modal.addEventListener("click", function (e) {
-        //         if (!e.target.closest(".popup__content")) {
-        //             popupClose(e.target.closest(".popup"));
-        //         }
-        //     });
-        //
-        // } else {
-
-        /* злогика на фронте*/
-        const promoCode = inviteInput.value;
-        /* тут надо отправить promoCode на бэк */
-        /* тут должна быть логика  бэкенда*/
-
-        if (inviteInput.value !== '') {
-            inviteBtn.disabled = true;
-            inviteInput.disabled = true;
-            inviteInput.value = '';
-
-            // * при ответе с бэкенда
-            /* Вставить условие -  если ответ пришел то выпоняется если нет - Введённый промокод не доступен.*/
-            /* когда вставиться бэк setTimeout - убрать.*/
-            setTimeout(() => {
-                // const textStatus = document.querySelectorAll('.form__msg');
-                textStatus[1].style.color = 'green';
-                textStatus[1].textContent = 'Введенный промокод доступен';
-                textStatus[2].style.color = 'green';
-                textStatus[2].textContent = 'Введенный промокод доступен';
-
-                // alert(`Ответ (${promoCode}) с бэкенда пришел`);
-
-                inviteInput.style.color = 'green'
-                inviteInput.value = promoCode;
-                inviteBtn.innerHTML = "Копировать";
-                inviteBtn.disabled = false;
-
-            }, 1000);
-
-            inviteBtn.addEventListener('click', () => {
-
-                const inviteInputValue = promoCode;
-                if (inviteInputValue) {
-                    navigator.clipboard.writeText(inviteInputValue)
-                        .then(() => {
-                            inviteInput.style.color = 'white'
-                            inviteInput.value = 'Скопированно в буфер';
-                            textStatus[1].textContent = 'Промокод скопирован в буфер обмена';
-                            textStatus[2].textContent = 'Промокод скопирован в буфер обмена';
-                        })
-                        .catch(err => {
-                            console.log('Something went wrong', err);
-                        })
-                }
-            });
-        }
-        e.preventDefault();  // * чтобы страница не перезагружалась
-    })
-}
+// const inviteBtn = document.querySelector('.invite__btn');
+//
+// if(inviteBtn){
+//     inviteBtn.addEventListener('click', function (e) {
+//         const inviteInput = document.querySelector('.invite__input');
+//         const textStatus = document.querySelectorAll('.form__msg');
+// /// надо сделать проверку на авторизацию
+//         // if (isAuthenticated === 'False') {
+//         //     const modal = document.querySelector('#authorization')
+//         //     modal.classList.add('open')
+//         //     modal.addEventListener("click", function (e) {
+//         //         if (!e.target.closest(".popup__content")) {
+//         //             popupClose(e.target.closest(".popup"));
+//         //         }
+//         //     });
+//         //
+//         // } else {
+//
+//         /* злогика на фронте*/
+//         const promoCode = inviteInput.value;
+//         /* тут надо отправить promoCode на бэк */
+//         /* тут должна быть логика  бэкенда*/
+//
+//         if (inviteInput.value !== '') {
+//             inviteBtn.disabled = true;
+//             inviteInput.disabled = true;
+//             inviteInput.value = '';
+//
+//             // * при ответе с бэкенда
+//             /* Вставить условие -  если ответ пришел то выпоняется если нет - Введённый промокод не доступен.*/
+//             /* когда вставиться бэк setTimeout - убрать.*/
+//             setTimeout(() => {
+//                 // const textStatus = document.querySelectorAll('.form__msg');
+//                 textStatus[1].style.color = 'green';
+//                 textStatus[1].textContent = 'Введенный промокод доступен';
+//                 textStatus[2].style.color = 'green';
+//                 textStatus[2].textContent = 'Введенный промокод доступен';
+//
+//                 // alert(`Ответ (${promoCode}) с бэкенда пришел`);
+//
+//                 inviteInput.style.color = 'green'
+//                 inviteInput.value = promoCode;
+//                 inviteBtn.innerHTML = "Копировать";
+//                 inviteBtn.disabled = false;
+//
+//             }, 1000);
+//
+//             inviteBtn.addEventListener('click', () => {
+//
+//                 const inviteInputValue = promoCode;
+//                 if (inviteInputValue) {
+//                     navigator.clipboard.writeText(inviteInputValue)
+//                         .then(() => {
+//                             inviteInput.style.color = 'white'
+//                             inviteInput.value = 'Скопированно в буфер';
+//                             textStatus[1].textContent = 'Промокод скопирован в буфер обмена';
+//                             textStatus[2].textContent = 'Промокод скопирован в буфер обмена';
+//                         })
+//                         .catch(err => {
+//                             console.log('Something went wrong', err);
+//                         })
+//                 }
+//             });
+//         }
+//         e.preventDefault();  // * чтобы страница не перезагружалась
+//     })
+// }
 
 //аккордион Промокода..
-const btnAccordionCode = document.querySelector(".accordion.invite__head")
-const panelCode=document.querySelector('.panel.invite__panel')
-if (btnAccordionCode){
-    btnAccordionCode.addEventListener('click',()=>{
-        panelCode.style.display = panelCode.style.display === 'block' ? 'none' : 'block'
-    })
-}
+// const btnAccordionCode = document.querySelector(".accordion.invite__head")
+// const panelCode=document.querySelector('.panel.invite__panel')
+// if (btnAccordionCode){
+//     btnAccordionCode.addEventListener('click',()=>{
+//         panelCode.style.display = panelCode.style.display === 'block' ? 'none' : 'block'
+//     })
+// }
 //аккордион Вопросов..
 const btnAccordionQuestion = document.querySelectorAll(".accordion")
 const panelQuestion=document.querySelectorAll('.faq__text-wrapper')
