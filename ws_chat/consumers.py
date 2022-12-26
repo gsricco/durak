@@ -265,7 +265,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             case_count_for_name[str(case.case)]['count'] += 1
         last_open_owned_case = owned_cases_for_user.exclude(date_opened=None).order_by("-date_opened").first()
         case_time = {'date_opened': '', 'seconds_since_prev_open': 3600, 'can_be_opened': True}
-        if last_open_owned_case:
+        if owned_cases_for_user.exclude(date_opened=None).order_by("-date_opened").exists():
             serializer = OwnedCaseTimeSerializer(last_open_owned_case)
             case_time = serializer.data
         message = {'cases': {'open_time': case_time, 'user_cases': case_count_for_name}}
@@ -828,4 +828,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def not_read(self,event):
         message = {'not_read_count':event.get('not_read')}
+        await self.send(json.dumps(message))
+
+    async def send_from_mod_lvl(self,event):
+        message = {'modal_lvl_data':event.get('modal_lvl_data')}
         await self.send(json.dumps(message))
