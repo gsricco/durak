@@ -8,7 +8,7 @@ class AdminMessage(admin.ModelAdmin):
     list_display = 'user_posted', 'chat_room',  'file_message', 'date', 'is_read', 'is_sell_item',
     readonly_fields = 'date', 'is_read', 'is_sell_item'
     fields = 'user_posted', 'chat_room', 'message', 'file_message', 'date', 'is_read', 'is_sell_item',
-    list_filter = 'date', 'is_read', 'is_sell_item', 'file_message', 'chat_room', 'user_posted'
+    list_filter = 'date', 'is_read', 'is_sell_item'#, 'file_message', 'chat_room', 'user_posted'
     search_fields = ['user_posted__username','chat_room__room_id']
 
 

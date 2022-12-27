@@ -5,10 +5,10 @@ from django.utils.safestring import mark_safe
 @admin.register(OwnedCase)
 class OwndedCaseAdmin(admin.ModelAdmin):
     list_display = ('case', 'owner', 'date_owned', 'date_opened','item')
-    ordering = ['owner']
+    ordering = ['date_opened']
+    list_filter = ['date_opened']
     search_fields = ['owner__username','owner__pk']
-# admin.site.register(Item)
-# admin.site.register(ItemForCase)
+
 @admin.register(ItemForCase)
 class ItemForCaseCaseAdmin(admin.ModelAdmin):
     list_display = ('case', 'item', 'chance')
@@ -38,9 +38,7 @@ class CaseAdmin(admin.ModelAdmin):
     inlines = [ItemForCaseInline,]
     readonly_fields = 'preview',
     ordering = ['user_lvl_for_open']
-# admin.site.register(Grade)
-# admin.site.register(Reward)
-# admin.site.register(GivenReward)
+
     def preview(self, obj):
         if obj.image:
             return mark_safe(f'<svg style="width: 50px; height: 50px;"><use xlink:href="/static/img/icons/sprite.svg#{obj.image}"></use></svg>')

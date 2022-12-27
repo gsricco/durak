@@ -159,9 +159,11 @@ function case_click(e) {
 
 }
 
+let startListN = 0
 function startCaseListRoll() {
     modalCase.innerHTML = ''
-    caseItems[profileCaseTitle].items.map((e) => {
+    for (let i = 0; i < 7; i++) {
+        let e = caseItems[profileCaseTitle].items[startListN]
         modalCase.innerHTML += `<div class="modal-case-overflow__item">
                                      <div class="modal-case__wrapper">
                                     <div class="modal-case__img">
@@ -174,9 +176,9 @@ function startCaseListRoll() {
                                     </div>
                                 </div>
                                    </div>`
-
-    })
-
+        startListN++
+        if (startListN === caseItems[profileCaseTitle].items.length) startListN = 0;
+    }
 }
 
 let butClick = () => {

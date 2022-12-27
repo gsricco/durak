@@ -54,18 +54,26 @@ if (document.querySelector(".scrollbar-overflow")) {
 }
 function update_balance(current_balance){
     UserBalancer = Number(current_balance)
-            // // Отображать надо уже преобразованное число, а использовать пришедшее
-            if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
-                UserBalancerShow = `${UserBalancer / 1000}K`
-            } else {
-                if (UserBalancer / 1000000 > 0) {
-                    UserBalancerShow = `${UserBalancer / 1000000}M`
-                } else
-                    UserBalancerShow = `${UserBalancer}`
-            }
-            if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
-                UserBalancerShow = `${UserBalancer}`
-            }
+            if (UserBalancer < 1000000) {
+    let nal = UserBalancer / 1000
+    if (UserBalancer % 1000 === 0){
+        UserBalancerShow = nal+'K'
+    }else{
+        let strList = String(nal).split('.')
+        UserBalancerShow = `${strList[0]}.${strList[1].slice(0,1)}K`
+}}else {
+    //если больше 1млн
+    let nal = UserBalancer / 1000000
+    let strList = String(nal).split('.')
+    if (UserBalancer % 1000000 === 0) {
+        UserBalancerShow = nal+'М'
+    }else if(UserBalancer < 10000000){
+        UserBalancerShow = `${strList[0]}.${strList[1].slice(0,2)}M`
+    }else if(UserBalancer >= 10000000 && UserBalancer < 100000000){
+        UserBalancerShow = `${strList[0]}.${strList[1].slice(0,1)}M`
+    }else if(UserBalancer > 100000000 ) {
+        UserBalancerShow = `${strList[0]}M`
+}}
             UserBalance.innerHTML = `${UserBalancerShow}`
             UserBalanceMob.innerHTML = `${UserBalancerShow}`
 }

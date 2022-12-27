@@ -7,7 +7,10 @@ let room_id = ''
 let room_name = ''
 let byteFile
 let topBlock = document.querySelector('.support_chat_top_block')
+let onlineAdmin = document.querySelector('#onlineAdmin')
 let host_url = window.location.host
+
+
 
 function checkFileSize(elem) {
     //проверка размера файла
@@ -153,7 +156,7 @@ const newRoom = (data) => {
             let room_value = room.innerText
             room_id = data.room_id
             room_name = data.user.username
-            topBlock.innerHTML = `Чат поддержки с ${room_value}`
+            topBlock.innerHTML = `Чат поддержки с ${data.user.username}`
             chat_cleaner()
             room_cleaner()
             text = e.target.textContent
@@ -184,6 +187,11 @@ const chatS = new WebSocket(
 
 chatS.onmessage = function (e) {
     const data = JSON.parse(e.data);
+    if (data.get_online){
+        console.log(data.get_online)
+        onlineAdmin.innerHTML = ` ${data.get_online}`
+    }
+
     if (data.room_data) {
         room_cleaner()
         data.room_data.forEach(e => newRoom(e))
