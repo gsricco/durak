@@ -173,17 +173,17 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (document.querySelector(".support__chat")) {
-        function clickChat() {
-            let block = document.querySelector(".support__overflow");
-            block.style.opacity = "0";
-            setTimeout(function () {
-                block.style.display = "none";
-            }, 1000);
-        }
-
-        setTimeout(clickChat, 10000);
-    }
+    // if (document.querySelector(".support__chat")) {
+    //     function clickChat() {
+    //         let block = document.querySelector(".support__overflow");
+    //         block.style.opacity = "0";
+    //         setTimeout(function () {
+    //             block.style.display = "none";
+    //         }, 1000);
+    //     }
+    //
+    //     setTimeout(clickChat, 10000);
+    // }
 
     //!Modal sliders
     if (document.querySelector(".amount-selection__checkbox")) {

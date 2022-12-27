@@ -9,6 +9,7 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
 
+
 class Level(models.Model):
     """Модель уровня игрока"""
     RUBIN_CHOICES = (

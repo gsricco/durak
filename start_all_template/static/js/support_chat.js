@@ -164,6 +164,9 @@ function super_new(f) {
         if (data.not_read_count){
             document.title = `Помощь (${data.not_read_count})`
         }else{document.title = 'Помощь'}
+        if (0<=data.last_visit<=1){
+            disableChat(data.last_visit)
+        }
         setTimeout(()=>{chatBlock.scrollTop = chatBlock.scrollHeight},100)
     }
 }
@@ -198,4 +201,26 @@ sendBtn.addEventListener('click', () => {
     byteFile = ''
     inputFile.value = ''
 })
+chatSocket.onopen = function (e) {
+    chatSocket.send(JSON.stringify({
+        'last_visit': current_user_id
+    }));
 
+};
+function disableChat(foo) {
+    let timer = 60000
+    if (foo === 1){
+        timer = 0
+    }
+    // if (document.querySelector(".support__chat")) {
+        function clickChat() {
+            let block = document.querySelector(".support__overflow");
+            block.style.opacity = "0";
+            setTimeout(function () {
+                block.style.display = "none";
+            }, 1000);
+        }
+
+        setTimeout(clickChat, timer);
+    // }
+}

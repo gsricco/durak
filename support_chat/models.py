@@ -17,7 +17,7 @@ class Message(models.Model):
     # message = models.TextField(validators=[MaxLengthValidator(50)], blank=True, null=True)
     file_message = models.FileField(upload_to=f'support_chat/%Y/%m/%d/', blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False, blank=True, null=True)
+    is_read = models.BooleanField(default=False)
     is_sell_item = models.BooleanField(default=False)
 
     def __str__(self):
@@ -39,22 +39,24 @@ class Message(models.Model):
             raise ValidationError(
                 {'message': "message support_chat more 500"},
             )
+
+
 class UserChatRoom(models.Model):
-    user  = models.ForeignKey('accaunts.CustomUser',on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey('accaunts.CustomUser', on_delete=models.CASCADE, null=True, blank=True)
     room_id = models.CharField(max_length=255, unique=True)
-    updated = models.DateTimeField(auto_now=True,null=True,blank=True)
-    not_read_owner_counter = models.PositiveIntegerField(default=0,null=True,blank=True)
-    not_read_counter = models.PositiveIntegerField(default=0,null=True,blank=True)
+    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
+    not_read_owner_counter = models.PositiveIntegerField(default=0, null=True, blank=True)
+    not_read_counter = models.PositiveIntegerField(default=0, null=True, blank=True)
 
     def __str__(self):
         return self.room_id
 
-    def save(self,*args,**kwargs):
-        self.not_read_owner_counter = Message.objects.filter(chat_room=self,is_read=False).\
+    def save(self, *args, **kwargs):
+        self.not_read_owner_counter = Message.objects.filter(chat_room=self, is_read=False).\
             exclude(user_posted=self.user).count()
         self.not_read_counter = Message.objects.filter(chat_room=self, is_read=False). \
             filter(user_posted=self.user).count()
-        super().save(*args,**kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Админ чат'

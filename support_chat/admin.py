@@ -2,9 +2,14 @@ from django.contrib import admin
 
 from .models import Message, UserChatRoom
 
-# class MessageInLine(admin.TabularInline):
-#     model = Message
-admin.site.register(Message)
+
+@admin.register(Message)
+class AdminMessage(admin.ModelAdmin):
+    list_display = 'user_posted', 'chat_room',  'file_message', 'date', 'is_read', 'is_sell_item',
+    readonly_fields = 'date', 'is_read', 'is_sell_item'
+    fields = 'user_posted', 'chat_room', 'message', 'file_message', 'date', 'is_read', 'is_sell_item',
+    list_filter = 'date', 'is_read', 'is_sell_item', 'file_message', 'chat_room', 'user_posted'
+
 
 @admin.register(UserChatRoom)
 class UserChatRoomAdmin(admin.ModelAdmin):
