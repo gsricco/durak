@@ -11,14 +11,16 @@ def admin():
 
 class Message(models.Model):
     """Модель сообщений чата поддержки"""
-    user_posted = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='user_send', null=True)
-    chat_room = models.ForeignKey('UserChatRoom', on_delete=models.CASCADE, related_name='message', null=True)
-    message = models.TextField(blank=True, null=True)
+    user_posted = models.ForeignKey(CustomUser, verbose_name='Пользователь', on_delete=models.CASCADE,
+                                    related_name='user_send', null=True)
+    chat_room = models.ForeignKey('UserChatRoom',verbose_name='Комната чата', on_delete=models.CASCADE,
+                                  related_name='message', null=True)
+    message = models.TextField(verbose_name='Сообщение', blank=True, null=True)
     # message = models.TextField(validators=[MaxLengthValidator(50)], blank=True, null=True)
-    file_message = models.FileField(upload_to=f'support_chat/%Y/%m/%d/', blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-    is_sell_item = models.BooleanField(default=False)
+    file_message = models.FileField(verbose_name='Файл', upload_to=f'support_chat/%Y/%m/%d/', blank=True, null=True)
+    date = models.DateTimeField(verbose_name='Дата', auto_now_add=True)
+    is_read = models.BooleanField(verbose_name='Прочитано', default=False)
+    is_sell_item = models.BooleanField(verbose_name='Продажа предмета',default=False)
 
     def __str__(self):
         return self.message
@@ -42,16 +44,19 @@ class Message(models.Model):
 
 
 class UserChatRoom(models.Model):
-    user = models.ForeignKey('accaunts.CustomUser', on_delete=models.CASCADE, null=True, blank=True)
-    room_id = models.CharField(max_length=255, unique=True)
-    updated = models.DateTimeField(auto_now=True, null=True, blank=True)
-    not_read_owner_counter = models.PositiveIntegerField(default=0, null=True, blank=True)
-    not_read_counter = models.PositiveIntegerField(default=0, null=True, blank=True)
+    user = models.ForeignKey('accaunts.CustomUser',verbose_name='Пользователь', on_delete=models.CASCADE,
+                             null=True, blank=True)
+    room_id = models.CharField(verbose_name='ID комнаты', max_length=255, unique=True)
+    updated = models.DateTimeField(verbose_name='Дата последнего изменения', auto_now=True, null=True, blank=True)
+    not_read_owner_counter = models.PositiveIntegerField(verbose_name='Не прочитал пользователь', default=0,
+                                                         null=True, blank=True)
+    not_read_counter = models.PositiveIntegerField(verbose_name='Не прочитал админ', default=0, null=True, blank=True)
 
     def __str__(self):
-        return self.room_id
+        return f'Комната {self.room_id}'
 
     def save(self, *args, **kwargs):
+        # при изменении пересчитывает количество непрочитанных писем
         self.not_read_owner_counter = Message.objects.filter(chat_room=self, is_read=False).\
             exclude(user_posted=self.user).count()
         self.not_read_counter = Message.objects.filter(chat_room=self, is_read=False). \

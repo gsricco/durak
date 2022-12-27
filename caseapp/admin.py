@@ -2,10 +2,19 @@ from django.contrib import admin
 from .models import Case, OwnedCase, Item, ItemForCase
 from django.utils.safestring import mark_safe
 
-# admin.site.register(Case)
-admin.site.register(OwnedCase)
+@admin.register(OwnedCase)
+class OwndedCaseAdmin(admin.ModelAdmin):
+    list_display = ('case', 'owner', 'date_owned', 'date_opened','item')
+    ordering = ['owner']
+    search_fields = ['owner__username','owner__pk']
 # admin.site.register(Item)
-admin.site.register(ItemForCase)
+# admin.site.register(ItemForCase)
+@admin.register(ItemForCase)
+class ItemForCaseCaseAdmin(admin.ModelAdmin):
+    list_display = ('case', 'item', 'chance')
+    list_editable = ['chance']
+    ordering = ['case']
+
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
 
