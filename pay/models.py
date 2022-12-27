@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import BigIntegerRangeField
 from django.db import models
 from django.utils import timezone
 from accaunts.models import CustomUser
@@ -21,3 +22,17 @@ class Popoln(models.Model):
 
     def __str__(self):
         return f''
+
+
+class BalPay(models.Model):
+    """Кредиты за реальные деньги"""
+    credit_range = models.IntegerField(verbose_name='Сумма кредитов на пополнение', unique=True)
+    pay_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях', null=True)
+
+    class Meta:
+        verbose_name = "Кредиты за реальные деньги"
+        verbose_name_plural = "Кредиты за реальные деньги"
+        ordering = 'id',
+
+    def __str__(self):
+        return f'{self.pay_sum}'
