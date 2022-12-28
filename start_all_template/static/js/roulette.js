@@ -305,7 +305,7 @@ function super_new(f) {
                 }
                 if (username === userUser && document.querySelector(`#spanCard${nameWinnerCard}`).textContent != '') {
                     if (counts * bidIncrease / 1000 > 9 && counts * bidIncrease / 1000 < 1000) {
-                        countsShow = `${counts * 2 / 1000}K`
+                        countsShow = `${counts * bidIncrease / 1000}K`
                     } else {
                         if (counts * bidIncrease / 1000000 > 0) {
                             countsShow = `${counts * bidIncrease / 1000000}M`

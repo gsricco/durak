@@ -1,4 +1,3 @@
-const ava = document.getElementById('ava').getAttribute('src');
 const list = document.querySelector('.list');
 const rubin = JSON.parse(document.getElementById('kamen').textContent);
 const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
@@ -16,7 +15,9 @@ const current_user_id = JSON.parse(document.getElementById("current_user_id").te
 const freeSpan = document.querySelector('#free_amount');
 
 // WS Connection
-
+if (is_auth) {
+    const ava = document.getElementById('ava').getAttribute('src');
+}
 const chatSocket = new WebSocket(
     'ws://'
     + window.location.host
@@ -259,15 +260,18 @@ messageInput.onkeyup = function (e) {
 buttonSend.onclick = function (e) {
     const message = messageInput.value;
     if (is_auth === true) {
-        chatSocket.send(JSON.stringify({
-            "chat_type": "all_chat",
-            'message': message,
-            'user': username,
-            'avatar': ava,
-            'rubin': rubin,
-            't': Date.now(),
-            'id': current_user_id
-        }));
+        if(message.trim() !== ''){
+            chatSocket.send(JSON.stringify({
+                "chat_type": "all_chat",
+                'message': message,
+                'user': username,
+                'avatar': ava,
+                'rubin': rubin,
+                't': Date.now(),
+                'id': current_user_id
+            }));
+        }
+
     } else {
         ///////////вывод модалки НЕ_АВТОРИЗОВАН///////////////////
         let modalAuth = document.querySelector('#authorization')
@@ -275,7 +279,9 @@ buttonSend.onclick = function (e) {
         // document.querySelector('.modal__balance').innerHTML = ` Ваш баланс: ${balanceUser}`
         modalAuth.addEventListener("click", function (e) {
             if (!e.target.closest(".popup__content")) {
-                document.querySelector('.popup.open').classList.remove("open");
+                if(document.querySelector('.popup.open')){
+                    document.querySelector('.popup.open').classList.remove("open");
+                }
             }
         });
 ///////////////////////////////////////////////////////////////////////////////////

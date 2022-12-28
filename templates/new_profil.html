@@ -8,28 +8,34 @@
 
 {% block maincontent %}
 
+{% if user.is_authenticated == False %}
+<!--надо перенаправить на другую страницу-->
+<script>
+    window.location.href = "/";
+</script>
+    {% else %}
 
-<div class="profil-main__content">
-    <div class="tabs profil-main__tabs">
-        <div class="tabs__nav profil-main__nav">
-            <a class="tabs__link profil-main__tabs-link tabs__link_active" href="#content-1">ПРОФИЛЬ</a>
-            <a class="tabs__link profil-main__tabs-link" href="#content-2">ТРАНЗАКЦИИ</a>
-        </div>
-        <div class="tabs__content">
-            <div class="tabs__pane tabs__pane_show" id="content-1">
-                <section class="profil">
-                    <div class="profil__row">
-                        <div class="profil__left">
-                            <div class="profil__avatar">
-                                {% if user.is_authenticated %}
+    <div class="profil-main__content">
+        <div class="tabs profil-main__tabs">
+            <div class="tabs__nav profil-main__nav">
+                <a class="tabs__link profil-main__tabs-link tabs__link_active" href="#content-1">ПРОФИЛЬ</a>
+                <a class="tabs__link profil-main__tabs-link" href="#content-2">ТРАНЗАКЦИИ</a>
+            </div>
+            <div class="tabs__content">
+                <div class="tabs__pane tabs__pane_show" id="content-1">
+                    <section class="profil">
+                        <div class="profil__row">
+                            <div class="profil__left">
+                                <div class="profil__avatar">
+                                    {% if user.is_authenticated %}
                                     {% if user.use_avatar %}
-                                        <img src="{{ user.avatar_default.avatar_img.url }}" alt="">
+                                    <img id="ava" src="{{ user.avatar_default.avatar_img.url }}" alt="">
                                     {% else %}
-                                        <img src="{{ user.avatar.url }}" alt="">
+                                    <img id="ava1" src="{{ user.avatar.url }}" alt="">
                                     {% endif %}
-                                {% else %}
-                                <img src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
-                                {% endif %}
+                                    {% else %}
+                                    <img id="avaNotAuth" src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
+                                    {% endif %}
                             </div>
                             <div class="profil__info">
                                 <div class="profil__name-wrapper">
@@ -37,10 +43,17 @@
                                         <div class="profil__name">
 
                                             <div class="profil__name-text">
+                                                <svg class="profil__progressbar-lvl-img-mob">
+                                                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
+                                                </svg>
+
                                                 {% if user.is_authenticated %}
                                                 <span>{{ user.username }}</span>
+                                                <p class="profil__progressbar-lvl-num-mob">{{ level_data.level }} LVL</p>
+
                                                 {% else %}
                                                 <span>Anonymous</span>
+                                                <span class="profil__progressbar-lvl-progress-mob">0 / {{ level_data.experience_range.upper }} XP</span>
                                                 {% endif %}
 
                                             </div>
@@ -99,6 +112,7 @@
 {#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>#}
                                     </svg>
                                     <p class="progress-bar_cur_count"><span> шт.</span></p>
+                                    <span class="profil__progressbar-lvl-progress-mob">0 / {{ level_data.experience_range.upper }} XP</span>
                                 </div>
 
                                 <div class="profil__progressbar-line">
@@ -107,10 +121,11 @@
 
                                 <div class="profil__progressbar-current">
 {#                                    #}
+                                    <p class="progress-bar_next_count"><span> шт.</span></p>
                                     <svg class="progress-bar_next_svg">
 {#                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>#}
                                     </svg>
-                                    <p class="progress-bar_next_count"><span> шт.</span></p>
+
                                 </div>
                             </div>
                         </div>
@@ -687,4 +702,5 @@
     <script defer src="{% static 'js/transactions.js' %}"></script>
 {% endif %}
 
+{% endif %}
 {% endblock %}

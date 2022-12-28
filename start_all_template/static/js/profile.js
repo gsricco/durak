@@ -5,6 +5,7 @@ let minuteTime, secTime, open_time; // переменные для единиц 
 //значки кристалов по уровням
 let bigProfLvl = document.querySelector('.profil__progressbar-lvl-num')
 let curLvlImage = document.querySelector('.profil__progressbar-lvl-img')
+let curLvlImageMob = document.querySelector('.profil__progressbar-lvl-img-mob')
 let curLvlBar = document.querySelector('.progress-bar_cur_svg')
 let nextLvlBar = document.querySelector('.progress-bar_next_svg')
 //кол-во кристалов на уровнях
@@ -16,6 +17,7 @@ const listCase = document.querySelector('.listCase');
 const modalCase = document.querySelector('.modal-cases__case');
 let profilProgressLine = document.querySelector('.profil_profil__progressbar-line')
 let profilProgressExp = document.querySelector('.profil__progressbar-lvl-progress')
+let profilProgressExpMob = document.querySelector('.profil__progressbar-lvl-progress-mob')
 let profileCaseTitle
 let caseItems
 
@@ -86,14 +88,17 @@ function super_new(f) {
 function setExp(data) {
     profilProgressLine.style.width = data.percent + '%'
     profilProgressExp.innerHTML = data.current_exp+'/'+data.max_current_lvl_exp
+    profilProgressExpMob.innerHTML = data.current_exp+'/'+data.max_current_lvl_exp
 }
 
 //отрисовывает лвл и кристалы
 function set_lvl_info(data) {
     if (data.max_lvl) {
         curLvlImage.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.next_lvl_img}"></use>`
+        curLvlImageMob.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.next_lvl_img}"></use>`
     } else {
         curLvlImage.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
+        curLvlImageMob.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`
     }
 
     curLvlBar.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.cur_lvl_img}"></use>`

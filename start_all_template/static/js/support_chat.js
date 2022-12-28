@@ -179,11 +179,11 @@ inputValue.onkeyup = function (e) {
 };
 sendBtn.addEventListener('click', () => {
     if (is_auth === true) {
-        if(byteFile || inputValue.value){
+        if(byteFile || inputValue.value.trim()){
         chatSocket.send(JSON.stringify({
             'file': byteFile,
             "chat_type": "support",
-            'message': inputValue.value,
+            'message': inputValue.value.trim(),
             'init_faq': 'init_faq'
         }));
         }

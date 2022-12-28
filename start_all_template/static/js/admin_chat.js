@@ -233,10 +233,10 @@ inputValue.onkeyup = function (e) {
     }
 };
 sendBtn.addEventListener('click', () => {
-    if(byteFile || inputValue.value) {
+    if(byteFile || inputValue.value.trim()) {
         chatS.send(JSON.stringify({
             'chat_type': 'support_admin',
-            'message': inputValue.value,
+            'message': inputValue.value.trim(),
             'receive': room_id,
             'file': byteFile,
         }));

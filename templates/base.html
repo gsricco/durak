@@ -107,26 +107,32 @@
                     </nav>
 
                     <div class="header__profile">
-                        <a href="{% url 'profil' %}" class="header__avatar">
-                            {% if user.is_authenticated == False %}
-                            <img id="ava" src="{% static 'img/avatar/user/avatar.svg' %}" alt="Аватар">
+                        {% if user.is_authenticated == False %}
+                        <a href="#" class="header__avatar">
+                            <button class="btnAvatarNoAuth" onclick="modalAuth()">
+                                <img id="avaNotAuth" src="{% static 'img/avatar/user/avatar.svg' %}" style="border-radius: 0px" alt="Аватар">
+                            </button>
                             {% elif user.use_avatar %}
+                            <a href="{% url 'profil' %}" class="header__avatar">
                                 <img id="ava" src="{{ user.avatar_default.avatar_img.url }}" alt="Аватар">
-                            {% else %}
-                            <img id="ava" src="{{ user.avatar.url }}" alt="Аватар">
-                            {% endif %}
-                        </a>
+                                {% else %}
+                                <a href="{% url 'profil' %}" class="header__avatar">
+                                    <img id="ava" src="{{ user.avatar.url }}" alt="Аватар">
+                                    {% endif %}
+                                </a>
 
-                        <div class="header__profile-info">
+
+                                <div class="header__profile-info">
                             <a href="{% url 'profil' %}" class="header__profile-name">
                                 {% if user.is_authenticated == False %}
                                 <span>Anonymous</span>
                                 {% else %}
                                 <span>{{ request.user.username }}</span>
-                                {% endif %}
                                 <svg class="header__profile-settings">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                 </svg>
+                                {% endif %}
+
                             </a>
 
                             <div class="header__profile-row">
@@ -169,18 +175,18 @@
 <!--                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#login"></use>-->
 <!--                                    </svg>-->
 <!--                                </a>-->
-                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-btn"
-                                   style="">
-                                    <svg>
-                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>
-                                    </svg>
-                                </a>
-                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-btn"
-                                   style="">
-                                    <svg>
-                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>
-                                    </svg>
-                                </a>
+<!--                                <a href="{% url 'social:begin' 'vk-oauth2' %}" class="header__login-btn"-->
+<!--                                   style="">-->
+<!--                                    <svg>-->
+<!--                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#vk_login"></use>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
+<!--                                <a href="{% url 'social:begin' 'google-oauth2' %}" class="header__login-btn"-->
+<!--                                   style="">-->
+<!--                                    <svg>-->
+<!--                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#google_login"></use>-->
+<!--                                    </svg>-->
+<!--                                </a>-->
                                 {% endif %}
                             </div>
 

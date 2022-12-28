@@ -190,7 +190,19 @@ const createBidItems = (data) => {
 
         const itemMoney = document.createElement('div')
         itemMoney.className = 'roulette__item-money'
-        itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${el.bidCount}`
+        let elCountsShow;
+        if (el.bidCount / 1000 > 9 && el.bidCount / 1000 < 1000) {
+            elCountsShow = `${el.bidCount / 1000}K`
+        } else {
+            if (el.bidCount / 1000000 > 0) {
+                elCountsShow = `${el.bidCount / 1000000}M`
+            } else
+                elCountsShow = `${el.bidCount}`
+        }
+        if (el.bidCount / 1000 > 0 && el.bidCount / 1000 < 10) {
+            elCountsShow = `${el.bidCount}`
+        }
+        itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${elCountsShow}`
         bidItem.appendChild(itemMoney)
 
         const itemAvatar = document.createElement('div')
@@ -282,7 +294,9 @@ const itemsClick = (bidCard) => {
         modalAuth.classList.add("open");
         modalAuth.addEventListener("click", function (e) {
             if (!e.target.closest(".popup__content")) {
-                document.querySelector('.popup.open').classList.remove("open");
+                if(document.querySelector('.popup.open')){
+                    document.querySelector('.popup.open').classList.remove("open");
+                }
             }
         });
     } else if (bidCount) {
