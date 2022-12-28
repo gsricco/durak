@@ -236,18 +236,18 @@ if (data.message && data.chat_type === 'all_chat') {
     if (data.current_balance) {
             update_balance(data.current_balance)
         }
-    if (data.hasOwnProperty('free_balance')) {
-        if (freeSpan) {
-            freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
-        }
-    }
-    if (data.hasOwnProperty('credits')) {
-        credits = data.credits;
-        let sumCurrent = document.querySelector(".num-game-currency__span-curent");
-        sumCurrent.value = `${parseFloat(
-            credits / 1000,
-        ).toFixed(0)}`;
-    }
+    // if (data.hasOwnProperty('free_balance')) {
+    //     if (freeSpan) {
+    //         freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
+    //     }
+    // }
+    // if (data.hasOwnProperty('credits')) {
+    //     credits = data.credits;
+    //     let sumCurrent = document.querySelector(".num-game-currency__span-curent");
+    //     sumCurrent.value = `${parseFloat(
+    //         credits / 1000,
+    //     ).toFixed(0)}`;
+    // }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };

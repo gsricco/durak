@@ -476,9 +476,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.send(self.channel_name, {
             "type": "send_lvl_and_exp"
         })
-        if is_auth:
-            # отправляет бонусный счёт
-            await self.send_free_balance()
 
     async def disconnect(self, code):
         """Отключение пользователя"""
@@ -559,6 +556,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }
                 )
         # получение запроса на зачисление бонусных средств
+        if text_data_json.get("get_free_balance") == 'g':
+            await self.send_free_balance()
         if text_data_json.get('free_balance') == 'get':
             await self.get_free_balance()
         if text_data_json.get('rub'):
@@ -605,7 +604,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 room = await self.create_or_get_support_chat_room(receive)
                 await self.save_user_message(room, sender_user.username,
                                              text_data_json["message"], file_path)  # сохранении сообщение админа в бд
-                not_read = await self.get_not_read(room)
                 await self.send_support_chat_message(self.channel_name, text_data_json["message"],
                                                      sender_user.username,
                                                      file_path)  # отправка сообщения самому себе в админку
@@ -883,7 +881,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def send_free_balance(self):
         detail_user = await DetailUser.objects.aget(user=self.scope['user'])
-        await self.send(f'{"{"}"free_balance":{detail_user.free_balance}{"}"}')
+        await self.send(json.dumps({"free_balance": detail_user.free_balance}))
 
     async def get_free_balance(self):
         detail_user = await DetailUser.objects.aget(user=self.scope['user'])
@@ -891,7 +889,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             detail_user.balance += detail_user.free_balance
             detail_user.free_balance = 0
             await sync_to_async(detail_user.save)()
-        await self.send(f'{"{"}"free_balance":{detail_user.free_balance}{"}"}')
+        await self.send(json.dumps({"free_balance": detail_user.free_balance}))
         message = {'current_balance': detail_user.balance}
         await self.send(json.dumps(message))
 

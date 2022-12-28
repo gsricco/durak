@@ -149,3 +149,27 @@ activatePromoButton.onclick = function (e) {
     activatePromoButton.disabled = false;
     e.preventDefault();  // * чтобы страница не перезагружалась
 }
+chatSocket.onmessage = super_new(chatSocket.onmessage);
+function super_new(f) {
+    return function () {
+        let ws_connect = f.apply(this, arguments);
+        let data = JSON.parse(arguments[0].data)
+        if (data.hasOwnProperty('free_balance')) {
+        if (freeSpan) {
+            freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
+        }
+    }
+    if (data.hasOwnProperty('credits')) {
+        credits = data.credits;
+        let sumCurrent = document.querySelector(".num-game-currency__span-curent");
+        sumCurrent.value = `${parseFloat(
+            credits / 1000,
+        ).toFixed(0)}`;
+    }
+    }}
+chatSocket.onopen = function (e) {
+    chatSocket.send(JSON.stringify({
+        'get_free_balance': 'g'
+    }));
+
+};
