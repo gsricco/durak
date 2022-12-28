@@ -11,7 +11,10 @@ from psycopg2.extras import NumericRange
 # Cоздается форма платежа
 def rub_to_pay(rub):
     """Креды, полученные за реальные деньг"""
-    c_r = BalPay.objects.get(pay_sum__contains=NumericRange(rub, rub + 1))
+    try:
+        c_r = BalPay.objects.get(pay_sum__contains=NumericRange(rub, rub + 1))
+    except BalPay.DoesNotExist:
+        return 0
     return rub * c_r.credit_range
 
 

@@ -14,6 +14,7 @@ const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
 const current_user_id = JSON.parse(document.getElementById("current_user_id").textContent);
 const freeSpan = document.querySelector('#free_amount');
+
 // WS Connection
 
 const chatSocket = new WebSocket(
@@ -231,6 +232,13 @@ if (data.message && data.chat_type === 'all_chat') {
             freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
         }
     }
+    if (data.hasOwnProperty('credits')) {
+        credits = data.credits;
+        let sumCurrent = document.querySelector(".num-game-currency__span-curent");
+        sumCurrent.value = `${parseFloat(
+            credits / 1000,
+        ).toFixed(0)}`;
+    }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
@@ -303,122 +311,83 @@ if (freeButton) {
 }
 
     //! Формула перевода рублей в валюту и обратно
+window.addEventListener('load', function (e) {
     if (document.querySelector(".amount-selection__form")) {
+        // достаём инпуты и вешаем на них события
         var inputForm = document.querySelector(".amount-selection__input");
         var sumCurrent = document.querySelector(".num-game-currency__span-curent");
         var btnForm = document.querySelector(".amount-selection__btn");
-        console.log('OLEGOLEG')
         inputForm.addEventListener("input", sumScore);
         sumCurrent.addEventListener("input", sumValute);
-
+    
         function sumScore() {
-            console.log('ТОЛЯТОЛЯ')
             let inputValueDinamic = inputForm.value.split(/[^0-9]/g);
             if (inputValueDinamic.length > 1) {
                 inputForm.value = "";
-            } else {
-            chatSocket.send(JSON.stringify({
-            "rub": inputForm.value,
-            }));
-
-                if (inputForm.value < 69) {
-                    sumCurrent.value = `${inputForm.value * 0}`;
-                    btnForm.classList.add("btn-disable-sum");
-                }
-
-                if (inputForm.value >= 69) {
-                    btnForm.classList.remove("btn-disable-sum");
-                }
-
-                if (inputForm.value >= 69 && inputForm.value <= 109) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 725) / 1000,
-                    ).toFixed(0)}`;
-                }
-
-                if (inputForm.value >= 110 && inputForm.value <= 179) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 910) / 1000,
-                    ).toFixed(0)}`;
-                }
-
-                if (inputForm.value >= 180 && inputForm.value <= 239) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 1389) / 1000,
-                    ).toFixed(0)}`;
-                }
-
-                if (inputForm.value >= 240 && inputForm.value <= 459) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 2084) / 1000,
-                    ).toFixed(0)}`;
-                }
-
-                if (inputForm.value >= 460 && inputForm.value <= 1274) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 2174) / 1000,
-                    ).toFixed(0)}`;
-                }
-
-                if (inputForm.value >= 1275) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 2353) / 1000,
-                    ).toFixed(0)}`;
-                }
+                } else {
+                    chatSocket.send(JSON.stringify({
+                        "rub": inputForm.value,
+                    }));
+                    if (inputForm.value < 69) {
+                        sumCurrent.value = `${inputForm.value * 0}`;
+                        btnForm.classList.add("btn-disable-sum");
+                    } else if (inputForm.value >= 69) {
+                        btnForm.classList.remove("btn-disable-sum");
+                    }
             }
         }
-
+    
         function sumValute() {
             let inputValueDinamic = sumCurrent.value.split(/[^0-9]/g);
             if (inputValueDinamic.length > 1) {
                 sumCurrent.value = "";
             } else {
                 let currentCredint = (sumCurrent.value / 50000) * 1000;
-
+    
                 if (currentCredint >= 1) {
                     btnForm.classList.remove("btn-disable-sum");
                 } else {
                     btnForm.classList.add("btn-disable-sum");
                 }
-
+    
                 if (currentCredint < 1) {
                     inputForm.value = "";
                 }
                 if (currentCredint <= 2 && currentCredint >= 1) {
                     inputForm.value = `${(currentCredint * 69).toFixed(1)}`;
                 }
-
+    
                 if (currentCredint <= 5 && currentCredint >= 2) {
                     inputForm.value = `${(currentCredint * 55).toFixed(1)}`;
                 }
-
+    
                 if (currentCredint <= 10 && currentCredint >= 5) {
                     inputForm.value = `${(currentCredint * 36).toFixed(1)}`;
                 }
-
+    
                 if (currentCredint <= 20 && currentCredint >= 10) {
                     inputForm.value = `${(currentCredint * 27.5).toFixed(1)}`;
                 }
-
+    
                 if (currentCredint <= 40 && currentCredint >= 20) {
                     inputForm.value = `${(currentCredint * 23).toFixed(1)}`;
                 }
-
+    
                 if (currentCredint <= 60 && currentCredint >= 40) {
                     inputForm.value = `${(currentCredint * 21.25).toFixed(1)}`;
                 }
-
+    
                 if (currentCredint >= 60) {
                     inputForm.value = `${(currentCredint * 20).toFixed(1)}`;
                 }
-
+    
                 if (sumCurrent.value == "" && sumCurrent.value == 0) {
                     inputForm.value = "";
                 }
             }
         }
     }
-
+    
     // ===============================================================
     // Расчёт по кол-ву руб:
     // от 69 до 109р кол-во кредов = (введенное число руб.)*725
@@ -427,3 +396,4 @@ if (freeButton) {
     // от 240 до 459р кол-во кредов = (введенное число руб.)*2084
     // от 460 до 1274р кол-во кредов = (введенное число руб.)*2174
     // от 1275 кол-во кредов = (введенное число руб.)*2353
+});

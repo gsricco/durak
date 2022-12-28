@@ -21,6 +21,7 @@ from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
+from pay.views import rub_to_pay
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
@@ -551,6 +552,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # получение запроса на зачисление бонусных средств
         if text_data_json.get('free_balance') == 'get':
             await self.get_free_balance()
+        if text_data_json.get('rub'):
+            await self.send_credits_from_rubs(text_data_json['rub'])
+            
         """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':
             if len(text_data_json.get("message")) > 500:
@@ -880,3 +884,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(f'{"{"}"free_balance":{detail_user.free_balance}{"}"}')
         message = {'current_balance': detail_user.balance}
         await self.send(json.dumps(message))
+
+    async def send_credits_from_rubs(self, rub):
+        """Переводит рубли в кредиты и возвращает пользователю"""
+        try:
+            sum_rub = int(rub)
+        except (TypeError, ValueError) as err:
+            sum_rub = 0
+        sum_credits = await sync_to_async(rub_to_pay)(sum_rub)
+        await self.send(json.dumps({
+            "credits": sum_credits
+        }))

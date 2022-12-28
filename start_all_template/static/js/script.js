@@ -387,116 +387,116 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     //! Формула перевода рублей в валюту и обратно
-    if (document.querySelector(".amount-selection__form")) {
-        var inputForm = document.querySelector(".amount-selection__input");
-        var sumCurrent = document.querySelector(".num-game-currency__span-curent");
-        var btnForm = document.querySelector(".amount-selection__btn");
+    // if (document.querySelector(".amount-selection__form")) {
+    //     var inputForm = document.querySelector(".amount-selection__input");
+    //     var sumCurrent = document.querySelector(".num-game-currency__span-curent");
+    //     var btnForm = document.querySelector(".amount-selection__btn");
 
-        inputForm.addEventListener("input", sumScore);
-        sumCurrent.addEventListener("input", sumValute);
+    //     inputForm.addEventListener("input", sumScore);
+    //     sumCurrent.addEventListener("input", sumValute);
 
-        function sumScore() {
-            let inputValueDinamic = inputForm.value.split(/[^0-9]/g);
-            if (inputValueDinamic.length > 1) {
-                inputForm.value = "";
-            } else {
-                if (inputForm.value < 69) {
-                    sumCurrent.value = `${inputForm.value * 0}`;
-                    btnForm.classList.add("btn-disable-sum");
-                }
+    //     function sumScore() {
+    //         let inputValueDinamic = inputForm.value.split(/[^0-9]/g);
+    //         if (inputValueDinamic.length > 1) {
+    //             inputForm.value = "";
+    //         } else {
+    //             if (inputForm.value < 69) {
+    //                 sumCurrent.value = `${inputForm.value * 0}`;
+    //                 btnForm.classList.add("btn-disable-sum");
+    //             }
 
-                if (inputForm.value >= 69) {
-                    btnForm.classList.remove("btn-disable-sum");
-                }
+    //             if (inputForm.value >= 69) {
+    //                 btnForm.classList.remove("btn-disable-sum");
+    //             }
 
-                if (inputForm.value >= 69 && inputForm.value <= 109) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 725) / 1000,
-                    ).toFixed(0)}`;
-                }
+    //             if (inputForm.value >= 69 && inputForm.value <= 109) {
+    //                 sumCurrent.value = `${parseFloat(
+    //                     (inputForm.value * 725) / 1000,
+    //                 ).toFixed(0)}`;
+    //             }
 
-                if (inputForm.value >= 110 && inputForm.value <= 179) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 910) / 1000,
-                    ).toFixed(0)}`;
-                }
+    //             if (inputForm.value >= 110 && inputForm.value <= 179) {
+    //                 sumCurrent.value = `${parseFloat(
+    //                     (inputForm.value * 910) / 1000,
+    //                 ).toFixed(0)}`;
+    //             }
 
-                if (inputForm.value >= 180 && inputForm.value <= 239) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 1389) / 1000,
-                    ).toFixed(0)}`;
-                }
+    //             if (inputForm.value >= 180 && inputForm.value <= 239) {
+    //                 sumCurrent.value = `${parseFloat(
+    //                     (inputForm.value * 1389) / 1000,
+    //                 ).toFixed(0)}`;
+    //             }
 
-                if (inputForm.value >= 240 && inputForm.value <= 459) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 2084) / 1000,
-                    ).toFixed(0)}`;
-                }
+    //             if (inputForm.value >= 240 && inputForm.value <= 459) {
+    //                 sumCurrent.value = `${parseFloat(
+    //                     (inputForm.value * 2084) / 1000,
+    //                 ).toFixed(0)}`;
+    //             }
 
-                if (inputForm.value >= 460 && inputForm.value <= 1274) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 2174) / 1000,
-                    ).toFixed(0)}`;
-                }
+    //             if (inputForm.value >= 460 && inputForm.value <= 1274) {
+    //                 sumCurrent.value = `${parseFloat(
+    //                     (inputForm.value * 2174) / 1000,
+    //                 ).toFixed(0)}`;
+    //             }
 
-                if (inputForm.value >= 1275) {
-                    sumCurrent.value = `${parseFloat(
-                        (inputForm.value * 2353) / 1000,
-                    ).toFixed(0)}`;
-                }
-            }
-        }
+    //             if (inputForm.value >= 1275) {
+    //                 sumCurrent.value = `${parseFloat(
+    //                     (inputForm.value * 2353) / 1000,
+    //                 ).toFixed(0)}`;
+    //             }
+    //         }
+    //     }
 
-        function sumValute() {
-            let inputValueDinamic = sumCurrent.value.split(/[^0-9]/g);
-            if (inputValueDinamic.length > 1) {
-                sumCurrent.value = "";
-            } else {
-                let currentCredint = (sumCurrent.value / 50000) * 1000;
+    //     function sumValute() {
+    //         let inputValueDinamic = sumCurrent.value.split(/[^0-9]/g);
+    //         if (inputValueDinamic.length > 1) {
+    //             sumCurrent.value = "";
+    //         } else {
+    //             let currentCredint = (sumCurrent.value / 50000) * 1000;
 
-                if (currentCredint >= 1) {
-                    btnForm.classList.remove("btn-disable-sum");
-                } else {
-                    btnForm.classList.add("btn-disable-sum");
-                }
+    //             if (currentCredint >= 1) {
+    //                 btnForm.classList.remove("btn-disable-sum");
+    //             } else {
+    //                 btnForm.classList.add("btn-disable-sum");
+    //             }
 
-                if (currentCredint < 1) {
-                    inputForm.value = "";
-                }
-                if (currentCredint <= 2 && currentCredint >= 1) {
-                    inputForm.value = `${(currentCredint * 69).toFixed(1)}`;
-                }
+    //             if (currentCredint < 1) {
+    //                 inputForm.value = "";
+    //             }
+    //             if (currentCredint <= 2 && currentCredint >= 1) {
+    //                 inputForm.value = `${(currentCredint * 69).toFixed(1)}`;
+    //             }
 
-                if (currentCredint <= 5 && currentCredint >= 2) {
-                    inputForm.value = `${(currentCredint * 55).toFixed(1)}`;
-                }
+    //             if (currentCredint <= 5 && currentCredint >= 2) {
+    //                 inputForm.value = `${(currentCredint * 55).toFixed(1)}`;
+    //             }
 
-                if (currentCredint <= 10 && currentCredint >= 5) {
-                    inputForm.value = `${(currentCredint * 36).toFixed(1)}`;
-                }
+    //             if (currentCredint <= 10 && currentCredint >= 5) {
+    //                 inputForm.value = `${(currentCredint * 36).toFixed(1)}`;
+    //             }
 
-                if (currentCredint <= 20 && currentCredint >= 10) {
-                    inputForm.value = `${(currentCredint * 27.5).toFixed(1)}`;
-                }
+    //             if (currentCredint <= 20 && currentCredint >= 10) {
+    //                 inputForm.value = `${(currentCredint * 27.5).toFixed(1)}`;
+    //             }
 
-                if (currentCredint <= 40 && currentCredint >= 20) {
-                    inputForm.value = `${(currentCredint * 23).toFixed(1)}`;
-                }
+    //             if (currentCredint <= 40 && currentCredint >= 20) {
+    //                 inputForm.value = `${(currentCredint * 23).toFixed(1)}`;
+    //             }
 
-                if (currentCredint <= 60 && currentCredint >= 40) {
-                    inputForm.value = `${(currentCredint * 21.25).toFixed(1)}`;
-                }
+    //             if (currentCredint <= 60 && currentCredint >= 40) {
+    //                 inputForm.value = `${(currentCredint * 21.25).toFixed(1)}`;
+    //             }
 
-                if (currentCredint >= 60) {
-                    inputForm.value = `${(currentCredint * 20).toFixed(1)}`;
-                }
+    //             if (currentCredint >= 60) {
+    //                 inputForm.value = `${(currentCredint * 20).toFixed(1)}`;
+    //             }
 
-                if (sumCurrent.value == "" && sumCurrent.value == 0) {
-                    inputForm.value = "";
-                }
-            }
-        }
-    }
+    //             if (sumCurrent.value == "" && sumCurrent.value == 0) {
+    //                 inputForm.value = "";
+    //             }
+    //         }
+    //     }
+    // }
 
     // ===============================================================
     // Расчёт по кол-ву руб:
