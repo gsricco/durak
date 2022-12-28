@@ -16,7 +16,7 @@ const freeSpan = document.querySelector('#free_amount');
 let ava;
 // WS Connection
 if (is_auth) {
-    const ava = document.getElementById('ava').getAttribute('src');
+    ava = document.getElementById('ava').getAttribute('src');
 }
 const chatSocket = new WebSocket(
     'ws://'
