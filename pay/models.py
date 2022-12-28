@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import BigIntegerRangeField
 from django.db import models
 from django.utils import timezone
 from accaunts.models import CustomUser
@@ -21,3 +22,45 @@ class Popoln(models.Model):
 
     def __str__(self):
         return f''
+
+
+class BalPay(models.Model):
+    """Кредиты за реальные деньги"""
+    credit_range = models.IntegerField(verbose_name='Сумма кредитов на пополнение', unique=True)
+    pay_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях', null=True)
+
+    class Meta:
+        verbose_name = "Кредиты за реальные деньги"
+        verbose_name_plural = "Кредиты за реальные деньги"
+        ordering = 'id',
+
+    def __str__(self):
+        return f'{self.pay_sum}'
+
+
+class RefillBotSum(models.Model):
+    """Кнопки с суммами для пополнения кредитов через бота"""
+    credits = models.PositiveBigIntegerField(verbose_name="Сумма кредитов", default=0)
+    text = models.CharField(verbose_name="Текст на кнопке", max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.text}, сумма: {self.credits}"
+
+    class Meta:
+        verbose_name = "Сумма для пополнения через бота"
+        verbose_name_plural = "Суммы для пополнения через бота"
+        ordering = ['credits']
+
+
+class WithdrawBotSum(models.Model):
+    """Кнопки с суммами для вывода кредитов через бота"""
+    credits = models.PositiveBigIntegerField(verbose_name="Сумма кредитов", default=0)
+    text = models.CharField(verbose_name="Текст на кнопке", max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.text}, сумма: {self.credits}"
+
+    class Meta:
+        verbose_name = "Сумма для вывода через бота"
+        verbose_name_plural = "Суммы для вывода через бота"
+        ordering = ['credits']

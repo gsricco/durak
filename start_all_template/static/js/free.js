@@ -25,6 +25,7 @@ function checkReferal(refJson) {
         inviteInput.value = refJson.ref_code;
         inviteBtn.innerHTML = "Копировать";
         inviteBtn.disabled = false;
+        inviteInput.disabled = true
 
         inviteBtn.onclick = (e) => {
             const inviteInputValue = refJson.ref_code;

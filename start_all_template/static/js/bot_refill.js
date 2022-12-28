@@ -396,18 +396,6 @@ function popupOpen(curentPopup) {
 
 // вешает на кнопки выбора размера пополнения атрибуты со стоимостью
 window.addEventListener('load', function(e) {
-    let divs = this.document.querySelectorAll("div.select-amount__value");
-    for (let div of divs) {
-        let inner_text = div.textContent;
-        let credits = '0';
-        if (inner_text.includes('K') || inner_text.includes('К') || inner_text.includes('k') || inner_text.includes('к')) {
-            credits = inner_text.trim().slice(0, -1) + '000';
-        } else if (inner_text.includes('m') || inner_text.includes('M') || inner_text.includes('М') || inner_text.includes('м')) {
-            credits = inner_text.trim().slice(0, -1) + '000000';
-        }
-        div.parentElement.setAttribute('credits', credits);
-    }
-
     let links = document.querySelectorAll("a.select-amount__item.popup-link");
     for (let a of links) {
         a.addEventListener("click", function (e) {

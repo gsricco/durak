@@ -4,24 +4,18 @@ from rest_framework import response, status
 from rest_framework.decorators import api_view
 from accaunts.models import DetailUser
 from configs.settings import MERCHANT_ID, SECRET_WORD
-from pay.models import Popoln
+from pay.models import Popoln, BalPay
+from psycopg2.extras import NumericRange
 
 
 # Cоздается форма платежа
 def rub_to_pay(rub):
     """Креды, полученные за реальные деньг"""
-    if 0 <= rub <= 109:
-        return rub * 725
-    if 110 <= rub <= 179:
-        return rub * 910
-    if 180 <= rub <= 239:
-        return rub * 1389
-    if 240 <= rub <= 459:
-        return rub * 2084
-    if 460 <= rub <= 1274:
-        return rub * 2174
-    if 1275 <= rub:
-        return rub * 2353
+    try:
+        c_r = BalPay.objects.get(pay_sum__contains=NumericRange(rub, rub + 1))
+    except BalPay.DoesNotExist:
+        return 0
+    return rub * c_r.credit_range
 
 
 def balance(request):
@@ -70,5 +64,3 @@ def pay_user(request):
     print(det_user)
     det_user.save()
     return response.Response(status=status.HTTP_200_OK, data={})
-
-

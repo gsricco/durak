@@ -7,9 +7,20 @@ from django.db.models import Value, F
 
 from accaunts.forms import UserEditName
 from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser
-from pay.models import Popoln
+from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 from bot_payment.models import RefillRequest, WithdrawalRequest
 from .models import FAQ, SiteContent
+
+
+def add_pay_buttons(context):
+    """
+    Добавляет в контекст данные для создания кнопок для ввода/вывода
+    кредитов через бота
+    """
+    context['refill_buttons'] = RefillBotSum.objects.all()
+    context['withdraw_buttons'] = WithdrawBotSum.objects.all()
+    context['range_refill'] = [f"{i}:{i+2}" for i in range(0,len(context['refill_buttons']),2)]
+    context['range_withdraw'] = [f"{i}:{i+2}" for i in range(0,len(context['withdraw_buttons']),2)]
 
 
 def index(request):
@@ -41,6 +52,7 @@ def index(request):
             'title': 'Рулетка',
         }
     context['show_modal'] = show_modal
+    add_pay_buttons(context)
     if show_modal:
         context['pay_modal'] = pay
     return render(request, 'new_index.html', context)
@@ -63,6 +75,7 @@ def bonus_currency(request):
             'sitecontent': sitecontent,
             'title': 'Free',
         }
+    add_pay_buttons(context)
     return render(request, 'new_bonus-currency.html', context)
 
 
@@ -83,6 +96,7 @@ def contact(request):
             'sitecontent': sitecontent,
             'title': 'Контакты',
         }
+    add_pay_buttons(context)
     return render(request, 'new_contact.html', context)
 
 
@@ -106,6 +120,7 @@ def faq(request):
             "faq": faq,
             'title': 'Помощь',
         }
+    add_pay_buttons(context)
     return render(request, 'new_faq.html', context)
 
 
@@ -144,6 +159,8 @@ def honesty(request):
     context['paginator'] = paginator
     context['today'] = timezone.now().date()
     context['page_range'] = page_range
+
+    add_pay_buttons(context)
 
     return render(request, 'new_honesty_fairness.html', context)
 
@@ -212,4 +229,5 @@ def profil(request):
             'level_data': level_data,
             'title': 'Профиль',
         }
+    add_pay_buttons(context)
     return render(request, 'new_profil.html', context)

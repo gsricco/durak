@@ -15,12 +15,13 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
 
-from accaunts.models import CustomUser, Ban, AvatarProfile
+from accaunts.models import CustomUser, Ban, AvatarProfile, DetailUser
 from configs.settings import BASE_DIR
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
+from pay.views import rub_to_pay
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
@@ -470,6 +471,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.send(self.channel_name, {
             "type": "send_lvl_and_exp"
         })
+        if is_auth:
+            # отправляет бонусный счёт
+            await self.send_free_balance()
 
     async def disconnect(self, code):
         """Отключение пользователя"""
@@ -549,6 +553,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "bid": text_data_json,
                     }
                 )
+        # получение запроса на зачисление бонусных средств
+        if text_data_json.get('free_balance') == 'get':
+            await self.get_free_balance()
+        if text_data_json.get('rub'):
+            await self.send_credits_from_rubs(text_data_json['rub'])
+            
         """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':
             if len(text_data_json.get("message")) > 500:
@@ -864,3 +874,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def send_approving_for_support_chat(self, event):
         await self.send(json.dumps({"last_visit": event.get("last_visit")}))
+
+    async def send_free_balance(self):
+        detail_user = await DetailUser.objects.aget(user=self.scope['user'])
+        await self.send(f'{"{"}"free_balance":{detail_user.free_balance}{"}"}')
+
+    async def get_free_balance(self):
+        detail_user = await DetailUser.objects.aget(user=self.scope['user'])
+        if detail_user.free_balance > 0:
+            detail_user.balance += detail_user.free_balance
+            detail_user.free_balance = 0
+            await sync_to_async(detail_user.save)()
+        await self.send(f'{"{"}"free_balance":{detail_user.free_balance}{"}"}')
+        message = {'current_balance': detail_user.balance}
+        await self.send(json.dumps(message))
+
+    async def send_credits_from_rubs(self, rub):
+        """Переводит рубли в кредиты и возвращает пользователю"""
+        try:
+            sum_rub = int(rub)
+        except (TypeError, ValueError) as err:
+            sum_rub = 0
+        sum_credits = await sync_to_async(rub_to_pay)(sum_rub)
+        await self.send(json.dumps({
+            "credits": sum_credits
+        }))
