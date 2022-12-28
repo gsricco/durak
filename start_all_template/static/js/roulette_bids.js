@@ -204,7 +204,7 @@ const createBidItems = (data) => {
         }
         itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${elCountsShow}`
         bidItem.appendChild(itemMoney)
-
+        console.log(el)
         const itemAvatar = document.createElement('div')
         itemAvatar.className = 'roulette__item-avatar'
         itemAvatar.innerHTML = `<img src="${el.avatar}" alt="">`
@@ -307,19 +307,14 @@ const itemsClick = (bidCard) => {
         let lastSymbol = userBal[userBal.length-1];
         let balanceUser;
 
-
         if(lastSymbol === 'M'){
             balanceUser=Number(userBal.slice(0,userBal.length-1))*1000000
         } else if(lastSymbol === 'K'){
             balanceUser=Number(userBal.slice(0,userBal.length-1))*1000
         }else balanceUser=Number(userBal)
 
-
-
-        // let balanceUser = Number(document.querySelector('.header__profile-sum>span').textContent)
         if (balanceUser + 1 >= Number(bidCount)) {
-
-
+            console.log(ava)
             chatSocket.send(JSON.stringify({
                 'bet': {
                     'bidCount': bidCount,
@@ -338,12 +333,10 @@ const itemsClick = (bidCard) => {
                 items[0].style.pointerEvents = 'none';
             }
 
-
             ///////////////////////////////////////////////
             //логика БЭК отнимания ставки от баланса/////////
             /////пока на фронте//////////////////////////////
             balanceUser = balanceUser - Number(bidCount)
-
 
             if (balanceUser / 1000 > 9 && balanceUser / 1000 < 1000) {
                 balanceUserShow = `${balanceUser / 1000}K`

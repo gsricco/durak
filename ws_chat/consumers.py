@@ -35,6 +35,11 @@ from django.contrib.auth.decorators import user_passes_test
 class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
+    def get_not_read(self,room):
+        room.notread.save()
+        return room.notread.not_read_owner_counter
+
+    @sync_to_async
     def create_or_get_support_chat_room(self, user_pk):
         if CustomUser.objects.filter(pk=user_pk).exists():
             user = CustomUser.objects.get(pk=user_pk)
@@ -437,7 +442,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             room.message.filter(is_read=False).filter(user_posted=room_id).update(is_read=True)
         else:
             room.message.filter(is_read=False).exclude(user_posted=room_id).update(is_read=True)
-        room.save()
+        room.notread.save()
 
     async def connect(self):
         """Подключение пользователя"""
@@ -600,6 +605,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 room = await self.create_or_get_support_chat_room(receive)
                 await self.save_user_message(room, sender_user.username,
                                              text_data_json["message"], file_path)  # сохранении сообщение админа в бд
+                not_read = await self.get_not_read(room)
                 await self.send_support_chat_message(self.channel_name, text_data_json["message"],
                                                      sender_user.username,
                                                      file_path)  # отправка сообщения самому себе в админку
@@ -609,7 +615,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                         "file_path": f'/{file_path}',
                                                                         "user": sender_user.username, })  # отправка сообщения пользователю в рум
                 await self.channel_layer.group_send(f'{receive}_room', {"type": "not_read",
-                                                                        'not_read': room.not_read_owner_counter,
+                                                                        'not_read': not_read,
                                                                         })
         elif text_data_json.get('chat_type') == 'all_chat':
             '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.

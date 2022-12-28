@@ -48,22 +48,31 @@ class UserChatRoom(models.Model):
                              null=True, blank=True)
     room_id = models.CharField(verbose_name='ID комнаты', max_length=255, unique=True)
     updated = models.DateTimeField(verbose_name='Дата последнего изменения', auto_now=True, null=True, blank=True)
-    not_read_owner_counter = models.PositiveIntegerField(verbose_name='Не прочитал пользователь', default=0,
-                                                         null=True, blank=True)
-    not_read_counter = models.PositiveIntegerField(verbose_name='Не прочитал админ', default=0, null=True, blank=True)
 
     def __str__(self):
         return f'Комната {self.room_id}'
 
     def save(self, *args, **kwargs):
-        # при изменении пересчитывает количество непрочитанных писем
-        self.not_read_owner_counter = Message.objects.filter(chat_room=self, is_read=False).\
-            exclude(user_posted=self.user).count()
-        self.not_read_counter = Message.objects.filter(chat_room=self, is_read=False). \
-            filter(user_posted=self.user).count()
         super().save(*args, **kwargs)
-
+        if not NotRead.objects.filter(room=self).exists():
+            noread = NotRead(room=self)
+            noread.save()
     class Meta:
         verbose_name = 'Админ чат'
         verbose_name_plural = "Админ чат"
         ordering = ('-updated',)
+
+
+class NotRead(models.Model):
+    room = models.OneToOneField('UserChatRoom',on_delete=models.CASCADE)
+    not_read_owner_counter = models.PositiveIntegerField(verbose_name='Не прочитал пользователь', default=0,
+                                                         null=True, blank=True)
+    not_read_counter = models.PositiveIntegerField(verbose_name='Не прочитал админ', default=0, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # при изменении пересчитывает количество непрочитанных писем
+        self.not_read_owner_counter = Message.objects.filter(chat_room=self.room, is_read=False). \
+            exclude(user_posted=self.room.user).count()
+        self.not_read_counter = Message.objects.filter(chat_room=self.room, is_read=False). \
+            filter(user_posted=self.room.user).count()
+        super().save(*args, **kwargs)

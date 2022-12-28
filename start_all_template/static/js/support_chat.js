@@ -8,7 +8,7 @@ let host_url = window.location.host
 let room_id = ''
 let byteFile
 
-chatSocket.addEventListener('open', (event) => {
+chatBlock.addEventListener('mouseup', (event) => {
     chatSocket.send(JSON.stringify({
             'init_faq': 'init_faq',
         }));

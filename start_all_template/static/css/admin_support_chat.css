@@ -5,6 +5,7 @@
 }
 .admin_support_chat_wrapper{
    width: 15vw;
+    min-width: 120px;
    display: flex ;
    flex-direction: column;
    align-items: stretch;
@@ -16,10 +17,11 @@
    text-align: center;
    margin-top: 5px;
    background: #c4364e;
+    font-family: "Roboto", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif
 
 }
 .active_room{
-   background: white !important;
+   background: #c8c8c8 !important;
    color: black;
 }
 /*.admin_support_chat_wrapper p:active{*/
@@ -28,6 +30,7 @@
 .admin_support_chat_wrapper p:hover{
    /*opacity: 0.5;*/
    cursor: pointer;
+    background: rgb(239, 73, 73);
 
 }
 
@@ -45,7 +48,7 @@
    border-radius: 4px;
 }
 .online-chat__header-rigth{
-   padding-left: 8vw;
+   margin-left: 4vw;
 }
 .online-chat__current{
    padding-left: 5px;

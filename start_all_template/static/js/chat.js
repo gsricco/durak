@@ -13,10 +13,10 @@ const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
 const current_user_id = JSON.parse(document.getElementById("current_user_id").textContent);
 const freeSpan = document.querySelector('#free_amount');
-
+let ava;
 // WS Connection
 if (is_auth) {
-    const ava = document.getElementById('ava').getAttribute('src');
+    ava = document.getElementById('ava').getAttribute('src');
 }
 const chatSocket = new WebSocket(
     'ws://'

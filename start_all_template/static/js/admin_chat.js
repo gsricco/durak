@@ -11,7 +11,7 @@ let onlineAdmin = document.querySelector('#onlineAdmin')
 let host_url = window.location.host
 
 
-
+document.querySelector('#content h1').innerHTML = 'Выберите ЧАТ'
 function checkFileSize(elem) {
     //проверка размера файла
     const maxSize = 10000000;
@@ -150,13 +150,17 @@ const newRoom = (data) => {
 
 
             room.className = 'support__chat__room'
+                      if(data.user.username === room_name){
+                          console.log(room_name)
+                room.classList.add('active_room')
+            }
             room.innerHTML = data.user.username
 
             room.addEventListener('click', (e) => {
                 let room_value = room.innerText
                 room_id = data.room_id
                 room_name = data.user.username
-                topBlock.innerHTML = `Чат поддержки с ${data.user.username}`
+                topBlock.innerHTML = `Чат поддержки`
                 chat_cleaner()
                 room_cleaner()
                 text = e.target.textContent
@@ -167,18 +171,19 @@ const newRoom = (data) => {
                 }))
             })
             div.appendChild(room)
-            if (data.not_read_counter !== 0){
+            if (data.notread.not_read_counter !== 0){
                 let notRead = document.createElement('span')
-                notRead.innerHTML = `${data.not_read_counter} `
+                notRead.innerHTML = `${data.notread.not_read_counter} `
                 notRead.className = 'not_read'
                 room.appendChild(notRead)
             }
-            let all_rooms = document.querySelectorAll('.support__chat__room')
-            all_rooms.forEach(item => {
-                if (item.textContent === text) {
-                    item.classList.add('active_room')
-                }
-            })
+            // let all_rooms = document.querySelectorAll('.support__chat__room')
+            // all_rooms.forEach(item => {
+            //     if (item.textContent === text) {
+            //         item.classList.add('active_room')
+            //     }
+            // }
+            // )
         }
     }
 };
