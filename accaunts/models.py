@@ -177,7 +177,7 @@ class UserIP(models.Model):
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    balance = models.PositiveIntegerField(verbose_name="Баланс", default=0)
+    balance = models.PositiveBigIntegerField(verbose_name="Баланс", default=0)
     free_balance = models.PositiveBigIntegerField(verbose_name="Бонусный счёт", default=0)
 
     class Meta:
