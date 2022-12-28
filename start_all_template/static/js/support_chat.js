@@ -171,7 +171,7 @@ function super_new(f) {
     }
 }
 
-inputValue.focus();
+
 inputValue.onkeyup = function (e) {
     if (e.keyCode === 13) {  // enter, return
         sendBtn.click();
@@ -212,15 +212,18 @@ function disableChat(foo) {
     if (foo === 1){
         timer = 0
     }
-    // if (document.querySelector(".support__chat")) {
+    if (document.querySelector(".support__chat")) {
         function clickChat() {
             let block = document.querySelector(".support__overflow");
             block.style.opacity = "0";
             setTimeout(function () {
                 block.style.display = "none";
             }, 1000);
+            inputValue.focus();
         }
 
         setTimeout(clickChat, timer);
-    // }
+
+    }
+
 }
