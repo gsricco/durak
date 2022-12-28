@@ -142,38 +142,44 @@ function newUserMessage(message, user, file_path) {
 
 let text;
 const newRoom = (data) => {
-    if (data.user.username !== username) {
-        const div = document.querySelector('.admin_support_chat_wrapper')
-        const room = document.createElement('p')
-        let notRead = document.createElement('span')
-        notRead.innerHTML = `${data.not_read_counter} `
-        notRead.style.borderRadius = '50%'
-        notRead.style.border = '2px solid white'
-        room.className = 'support__chat__room'
-        room.innerHTML = data.user.username+' '
+    if (data.user.username && username) {
+        if (data.user.username !== username) {
+            const div = document.querySelector('.admin_support_chat_wrapper')
+            const room = document.createElement('p')
 
-        room.addEventListener('click', (e) => {
-            let room_value = room.innerText
-            room_id = data.room_id
-            room_name = data.user.username
-            topBlock.innerHTML = `Чат поддержки с ${data.user.username}`
-            chat_cleaner()
-            room_cleaner()
-            text = e.target.textContent
-            e.target.classList.toggle('active_room')
-            chatS.send(JSON.stringify({
-                'chat_type': 'support_admin',
-                'receiver_user_room': data.room_id
-            }))
-        })
-        div.appendChild(room)
-        room.appendChild(notRead)
-        let all_rooms = document.querySelectorAll('.support__chat__room')
-        all_rooms.forEach(item => {
-            if (item.textContent === text) {
-                item.classList.add('active_room')
+
+
+            room.className = 'support__chat__room'
+            room.innerHTML = data.user.username
+
+            room.addEventListener('click', (e) => {
+                let room_value = room.innerText
+                room_id = data.room_id
+                room_name = data.user.username
+                topBlock.innerHTML = `Чат поддержки с ${data.user.username}`
+                chat_cleaner()
+                room_cleaner()
+                text = e.target.textContent
+                e.target.classList.toggle('active_room')
+                chatS.send(JSON.stringify({
+                    'chat_type': 'support_admin',
+                    'receiver_user_room': data.room_id
+                }))
+            })
+            div.appendChild(room)
+            if (data.not_read_counter !== 0){
+                let notRead = document.createElement('span')
+                notRead.innerHTML = `${data.not_read_counter} `
+                notRead.className = 'not_read'
+                room.appendChild(notRead)
             }
-        })
+            let all_rooms = document.querySelectorAll('.support__chat__room')
+            all_rooms.forEach(item => {
+                if (item.textContent === text) {
+                    item.classList.add('active_room')
+                }
+            })
+        }
     }
 };
 

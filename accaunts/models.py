@@ -8,6 +8,11 @@ from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
 from django.contrib.postgres.constraints import ExclusionConstraint
 from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
+import sys
+
+def is_migrate():
+    # проверка выполняются ли миграции
+    return 'makemigrations' in sys.argv or 'migrate' in sys.argv
 
 
 class Level(models.Model):
@@ -32,11 +37,10 @@ class Level(models.Model):
 
     @classmethod
     def get_default_lvl(cls):
-        try:
-            if cls.objects.all().exists():
-                return cls.objects.first().pk
-        except Exception:
-            print('Нет таблицы в БД')
+        if is_migrate():
+            return
+        if cls.objects.all().exists():
+            return cls.objects.first().pk
 
     class Meta:
         # constraints = [

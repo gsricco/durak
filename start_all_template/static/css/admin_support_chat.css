@@ -11,7 +11,8 @@
 }
 
 .admin_support_chat_wrapper p{
-   border-radius: 2px;
+    line-height: 2;
+   border-radius: 4px;
    text-align: center;
    margin-top: 5px;
    background: #c4364e;
@@ -42,4 +43,22 @@
    background: white;
    cursor: pointer;
    border-radius: 4px;
+}
+.online-chat__header-rigth{
+   padding-left: 8vw;
+}
+.online-chat__current{
+   padding-left: 5px;
+}
+
+.not_read{
+   margin-left: 10px;
+   padding: 2px;
+width: 1em;
+  height: 1em;
+  border: 2px solid white;
+  border-radius: 0.5em;
+  line-height: 2em;  /* подробнее про line-height */
+  text-align: center;  /* выравнять текст по середине по горизонтали */
+  background: #c4364e;
 }
