@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Popoln, BalPay
+from .models import Popoln, BalPay, RefillBotSum, WithdrawBotSum
 
 
 @admin.register(Popoln)
@@ -14,3 +14,15 @@ class PopolnAdmin(admin.ModelAdmin):
 class BalPayAdmin(admin.ModelAdmin):
     list_display = 'id', 'pay_sum', 'credit_range'
     list_editable = 'pay_sum', 'credit_range'
+
+
+@admin.register(RefillBotSum)
+class RefillBotSumAdmin(admin.ModelAdmin):
+    list_display = 'id', 'credits', 'text'
+    list_editable = 'credits', 'text'
+
+
+@admin.register(WithdrawBotSum)
+class WithdrawBotSumAdmin(admin.ModelAdmin):
+    list_display = 'id', 'credits', 'text'
+    list_editable = 'credits', 'text'

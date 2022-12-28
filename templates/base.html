@@ -567,79 +567,20 @@
                     </div>
                     <div class="swiper select-amount__slider">
                         <div class="swiper-wrapper select-amount__wrapper">
+                            {% for slice_range in range_refill %}
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link"s>
+                                {% for button in refill_buttons|slice:slice_range %}
+                                <a href="#modalManual" class="select-amount__item popup-link" credits="{{ button.credits }}">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
                                     <div class="select-amount__value">
-                                        50К
+                                        {{ button.text }}
                                     </div>
                                 </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        100К
-                                    </div>
-                                </a>
+                                {% endfor %}
                             </div>
-                            <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link" credits="50000">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        250К
-                                    </div>
-                                </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        500К
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        1M
-                                    </div>
-                                </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        2M
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManual" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        5M
-                                    </div>
-                                </a>
-                                <a href="#modalManual" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        10M
-                                    </div>
-                                </a>
-                            </div>
-
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="mod-arrow select-amount__down">
@@ -780,24 +721,20 @@
                     </div>
                     <div class="swiper select-amount__slider">
                         <div class="swiper-wrapper select-amount__wrapper">
+                            {% for slice_range in range_withdraw %}
                             <div class="swiper-slide select-amount__slide">
-                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
+                                {% for button in withdraw_buttons|slice:slice_range %}
+                                <a href="#modalManualWithdraw" class="select-amount__item popup-link" credits="{{ button.credits }}">
                                     <div class="select-amount__img">
                                         <img src="{% static 'img/gallery/card.png' %}" alt="">
                                     </div>
                                     <div class="select-amount__value">
-                                        50К
+                                        {{ button.text }}
                                     </div>
                                 </a>
-                                <a href="#modalManualWithdraw" class="select-amount__item popup-link">
-                                    <div class="select-amount__img">
-                                        <img src="{% static 'img/gallery/card.png' %}" alt="">
-                                    </div>
-                                    <div class="select-amount__value">
-                                        100К
-                                    </div>
-                                </a>
+                                {% endfor %}
                             </div>
+                            {% endfor %}
                             <div class="swiper-slide select-amount__slide">
                                 <a href="#modalManualWithdraw" class="select-amount__item popup-link">
                                     <div class="select-amount__img">
@@ -852,7 +789,6 @@
                                     </div>
                                 </a>
                             </div>
-
                         </div>
                     </div>
                     <div class="mod-arrow select-amount__down">
