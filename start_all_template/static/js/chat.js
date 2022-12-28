@@ -13,6 +13,7 @@ const online = document.querySelector('#onlineChat')
 const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
 const current_user_id = JSON.parse(document.getElementById("current_user_id").textContent);
+const freeSpan = document.querySelector('#free_amount');
 // WS Connection
 
 const chatSocket = new WebSocket(
@@ -225,6 +226,11 @@ if (data.message && data.chat_type === 'all_chat') {
     if (data.current_balance) {
             update_balance(data.current_balance)
         }
+    if (data.hasOwnProperty('free_balance')) {
+        if (freeSpan) {
+            freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
+        }
+    }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
@@ -284,6 +290,16 @@ function open_modal_lvl(data) {
     modalLvlImg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.lvl_img}"></use>`
     let dd = document.querySelector('#lvl-up')
     setTimeout(()=>{popupOpen(dd)},300)
+}
+
+const freeButton = document.querySelector(".conclusion__btn");
+
+if (freeButton) {
+    freeButton.addEventListener("click", function () {
+        freeButton.disabled = true;
+        chatSocket.send('{"free_balance":"get"}');
+        freeButton.disabled = false;
+    });
 }
 
     //! Формула перевода рублей в валюту и обратно
