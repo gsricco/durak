@@ -322,18 +322,18 @@ window.addEventListener('load', function (e) {
     
         function sumScore() {
             let inputValueDinamic = inputForm.value.split(/[^0-9]/g);
-            if (inputValueDinamic.length > 1) {
+            if (inputValueDinamic.length > 1 || inputForm.value.length == 0) {
                 inputForm.value = "";
-                } else {
-                    chatSocket.send(JSON.stringify({
-                        "rub": inputForm.value,
-                    }));
-                    if (inputForm.value < 69) {
-                        sumCurrent.value = `${inputForm.value * 0}`;
-                        btnForm.classList.add("btn-disable-sum");
-                    } else if (inputForm.value >= 69) {
-                        btnForm.classList.remove("btn-disable-sum");
-                    }
+            } else {
+                chatSocket.send(JSON.stringify({
+                    "rub": inputForm.value,
+                }));
+                if (inputForm.value < 69) {
+                    sumCurrent.value = `${inputForm.value * 0}`;
+                    btnForm.classList.add("btn-disable-sum");
+                } else if (inputForm.value >= 69) {
+                    btnForm.classList.remove("btn-disable-sum");
+                }
             }
         }
     
