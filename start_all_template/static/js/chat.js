@@ -289,12 +289,12 @@ buttonSend.onclick = function (e) {
     messageInput.value = '';
 
 }
-chatSocket.onopen = function (e) {
-    chatSocket.send(JSON.stringify({
-        'online': 'online'
-    }));
-
-};
+// chatSocket.onopen = function (e) {
+//     chatSocket.send(JSON.stringify({
+//         'online': 'online'
+//     }));
+//
+// };
 const onClickDeleteHandler=(li)=>{
            chatSocket.send(JSON.stringify({
             'delete_message': li,

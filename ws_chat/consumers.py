@@ -604,6 +604,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 room = await self.create_or_get_support_chat_room(receive)
                 await self.save_user_message(room, sender_user.username,
                                              text_data_json["message"], file_path)  # сохранении сообщение админа в бд
+                not_read = await self.get_not_read(room)
                 await self.send_support_chat_message(self.channel_name, text_data_json["message"],
                                                      sender_user.username,
                                                      file_path)  # отправка сообщения самому себе в админку
