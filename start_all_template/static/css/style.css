@@ -2966,7 +2966,7 @@ h3 {
   width: 60px;
   height: 60px;
   position: relative;
-  left: 6px;
+  /*left: 6px;*/
 }
 .profil__progressbar-lvl-img-mob, .profil__progressbar-lvl-num-mob, .profil__progressbar-lvl-progress-mob {
   display: none;
@@ -2974,6 +2974,7 @@ h3 {
 
 .profil__progressbar-lvl {
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .profil__progressbar-lvl p {
