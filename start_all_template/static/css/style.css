@@ -5140,7 +5140,6 @@ margin-top: 36px;
   transition: 0.5s;
   -ms-flex-wrap: initial;
   flex-wrap: initial;
-  overflow-x: auto;
 }
 
 .roulette__rull-wrapper_blur {
