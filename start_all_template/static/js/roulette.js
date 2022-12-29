@@ -317,33 +317,50 @@ function super_new(f) {
                 let timeNow = Date.now();
                 let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
                 timerCounter(remainTime);
-                createBidItems(data.init.bets)
+                if (data.init.bets) {
+                    createBidItems(data.init.bets)
+                }
             }
             else if (data.init.state === 'rolling') {
                 startRoll(data.init.w, data.init.c, data.init.p, data.init.t)
-                createBidItems(data.init.bets)
+                 if (data.init.bets) {
+                    createBidItems(data.init.bets)
+                }
             }
             else if (data.init.state === 'stop'){
                 let winnerCard = data.init.w
-                createBidItems(data.init.bets)
+                 if (data.init.bets) {
+                     items[0].style.pointerEvents = 'none';
+                     items[1].style.pointerEvents = 'none';
+                     items[2].style.pointerEvents = 'none';
+                     bidsButtons.forEach(el => {
+        el.style.opacity = '0.3'
+    })
+    bidsBlock.forEach(el => {
+        el.style.opacity = '0.3'
+    })
+                     createBidItems(data.init.bets)
+                     bidsNumber = document.querySelectorAll('.roulette__item-money')
+                     signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
+                     signWinnercoin = document.querySelectorAll('#signWinnercoin');
+                     signWinnerspades = document.querySelectorAll('#signWinnerspades');
+                     userUser = document.querySelector('.header__profile-name>span').textContent
+                 }
 
-                    bidsNumber = document.querySelectorAll('.roulette__item-money')
-                    signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
-                    signWinnercoin = document.querySelectorAll('#signWinnercoin');
-                    signWinnerspades = document.querySelectorAll('#signWinnerspades');
-                    userUser = document.querySelector('.header__profile-name>span').textContent
+                     function suka() {
+                         winnerCheckInitialSettings();
+                         if (winnerCard === 'hearts') {
+                             checkWinner('hearts', 2)
+                         } else if (winnerCard === 'coin') {
+                             checkWinner('coin', 14)
+                         } else if (winnerCard === 'spades') {
+                             checkWinner('spades', 2)
+                         }
+                     }
 
-                function suka() {
-                    winnerCheckInitialSettings();
-                    if (winnerCard === 'hearts') {
-                        checkWinner('hearts', 2)
-                    } else if (winnerCard === 'coin') {
-                        checkWinner('coin', 14)
-                    } else if (winnerCard === 'spades') {
-                        checkWinner('spades', 2)
-                    }
-                }
-                setTimeout(suka, 100)
+                     // suka()
+                     setTimeout(suka, 100)
+
             }
             else if (data.init.state === 'go_back'){
                 previous_rolls(data.init.previous_rolls)
