@@ -12,7 +12,7 @@ from psycopg2.extras import NumericRange
 def rub_to_pay(rub):
     """Креды, полученные за реальные деньги"""
     try:
-        c_r = BalPay.objects.get(pay_sum__contains=NumericRange(rub, rub + 1))
+        c_r = BalPay.objects.get(range_sum__contains=NumericRange(rub, rub + 1))
     except BalPay.DoesNotExist or BalPay.MultipleObjectsReturned:
         return 0
     return int(rub * (c_r.conversion_coef/100))
