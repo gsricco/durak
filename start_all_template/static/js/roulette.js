@@ -328,6 +328,7 @@ function super_new(f) {
                 }
             }
             else if (data.init.state === 'stop'){
+                startRoll(data.init.w, data.init.c, data.init.p, 5000)
                 let winnerCard = data.init.w
                  if (data.init.bets) {
                      items[0].style.pointerEvents = 'none';

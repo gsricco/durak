@@ -113,14 +113,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
             else:
                 r.srem("online", self.scope["user"].id)
         online = r.scard("online")
-        await self.channel_layer.group_send(self.room_group_name, {
-            "type": "get_online",
-            "get_online": online
-        })
-        await self.channel_layer.group_send('admin_group', {
-            "type": "get_online",
-            "get_online": online
-        })
+        if self.scope["user"].is_staff:
+            await self.channel_layer.group_send('admin_group', {
+                "type": "get_online",
+                "get_online": online
+            })
+        else:
+            await self.channel_layer.group_send(self.room_group_name, {
+                "type": "get_online",
+                "get_online": online
+            })
+
 
     async def init_users_chat(self, channel):
         """Отправляет историю сообщений(до 50шт) общего чата, выгружая её из Редиса"""
