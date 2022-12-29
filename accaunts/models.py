@@ -1,12 +1,9 @@
 from tempfile import NamedTemporaryFile
 from urllib.request import urlopen
-from caseapp.models import Item
 from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
-from django.contrib.postgres.constraints import ExclusionConstraint
-from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
 import sys
 
@@ -30,11 +27,12 @@ class Level(models.Model):
     level = models.PositiveBigIntegerField(verbose_name='Номер уровня', unique=True)
     experience_range = BigIntegerRangeField(verbose_name='Диапазон опыта для уровня', null=True)
     img_name = models.CharField('Камень для уровня', max_length=50, default='amber_case', choices=RUBIN_CHOICES)
-    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT, null=True, blank=True)
+    case = models.ForeignKey('caseapp.Case', verbose_name='Кейс в награду за уровень', on_delete=models.PROTECT,
+                             null=True, blank=True)
     amount = models.PositiveIntegerField(verbose_name='Количество кейсов', default=0)
 
     def __str__(self):
-        return f"Уровень {self.level}, опыт на уровне: {self.experience_range}"
+        return f"{self.level}"
 
     @classmethod
     def get_default_lvl(cls):
@@ -59,9 +57,10 @@ class CustomUser(AbstractUser):
                                        on_delete=models.CASCADE, null=True, blank=True)
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
-    level = models.ForeignKey('Level', verbose_name="Уровень",default=Level.get_default_lvl,
-                              on_delete=models.PROTECT, blank=True, null=True)
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, default=Level.get_default_lvl,
+                              blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
+    note = models.CharField(verbose_name='Заметка', max_length=100, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
@@ -91,7 +90,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def give_level(self, save_immediately: bool=False) -> list:
+    def give_level(self, save_immediately: bool = False) -> list:
         """Проверяет, можно ли выдать пользователю уровень и выдаёт его, начисляя награды.
 
         Args:
@@ -173,8 +172,8 @@ class DetailUser(models.Model):
     free_balance = models.PositiveBigIntegerField(verbose_name="Бонусный счёт", default=0)
 
     class Meta:
-        verbose_name = 'Данные пользователя'
-        verbose_name_plural = 'Данные пользователя'
+        verbose_name = 'Баланс пользователя в игре'
+        verbose_name_plural = 'Баланс пользователя в игре'
 
     def __str__(self):
         return f'{self.user}'
@@ -242,7 +241,8 @@ class DayHash(models.Model):
     """Модель для хранения сгенерированных public_key и private_key"""
     public_key = models.CharField(verbose_name='Публичный ключ', max_length=16, null=True, blank=True)
     private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True, blank=True)
-    private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True, blank=True)
+    private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True,
+                                          blank=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
     show_hash = models.BooleanField(verbose_name='Показывать в честности (текущий день)', default=False)
 
@@ -265,7 +265,8 @@ class RouletteRound(models.Model):
 
     round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
-    round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES, default='hearts')
+    round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES,
+                                  default='hearts')
     rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
     show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
@@ -297,12 +298,12 @@ class ItemForUser(models.Model):
 class AvatarProfile(models.Model):
     """Модель Аватарки профиля"""
     name = models.CharField(verbose_name='Название аватарки профиля', max_length=50, blank=True, null=True)
-    avatar_img = models.ImageField(verbose_name='Аватарки профиля', help_text='Аватарки профиля (рандомные)',
+    avatar_img = models.ImageField(verbose_name='Аватарки профиля', help_text='Аватарки профиля',
                                    upload_to='img/avatar/default/')
 
     class Meta:
-        verbose_name = 'Аватарки профиля (рандомные)'
-        verbose_name_plural = 'Аватарки профиля (рандомные)'
+        verbose_name = 'Стандартные аватарки'
+        verbose_name_plural = 'Стандартные аватарки'
         ordering = 'id',
 
     def __str__(self):

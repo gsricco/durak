@@ -103,8 +103,8 @@ class OwnedCase(models.Model):
     item = models.ForeignKey('Item', verbose_name='Выпавший предмет', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.case.name}<{self.pk}> для {self.owner} выдан {self.date_owned}"
-
+        # return f"{self.case.name}<{self.pk}> для {self.owner} выдан {self.date_owned}"
+        return ''
     class Meta:
         verbose_name = 'Выданный кейс'
         verbose_name_plural = 'Выданные кейсы'

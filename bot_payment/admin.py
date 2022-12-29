@@ -34,13 +34,17 @@ class WithdrawStatusListFilter(StatusListFilter):
 
 @admin.register(models.RefillRequest)
 class RefillRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'request_id', 'user', 'amount', 'note', 'status')
-    list_editable = ('note', 'status')
-    list_filter = (RefillStatusListFilter,)
+    list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status'
+    list_editable = 'note', 'status'
+    search_fields = 'user__username', 'amount'
+    search_help_text = 'Поиск по имени пользователя и сумме пополнения'
+    list_filter = RefillStatusListFilter, 'date_closed'
 
 
 @admin.register(models.WithdrawalRequest)
 class WithdrawalRequestAdmin(admin.ModelAdmin):
-    list_display = ('id', 'request_id', 'user', 'amount', 'balance', 'note', 'status')
-    list_editable = ('note', 'status')
-    list_filter = (WithdrawStatusListFilter,)
+    list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status'
+    list_editable = 'note', 'status'
+    search_fields = 'user__username', 'amount'
+    search_help_text = 'Поиск по имени пользователя и сумме пополнения'
+    list_filter = WithdrawStatusListFilter, 'date_closed'
