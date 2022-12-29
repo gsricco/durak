@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+
+ <title>{% block title %} Ошибка {% endblock %}</title>
+ {% block messages %}
+ <h2>{{ mess }}</h2>
+ <style>
+ h2 {
+     font-size: 16pt;
+     text-align: center;
+     color: red;
+    }
+ </style>
+ <style>
+    .fig {
+     text-align: center;
+    }
+ </style>
+
+
+ <div class="breadcrumbs"><a href="{{ site_url }}">Вернуться назад</a></div>
+ {% endblock messages %}
