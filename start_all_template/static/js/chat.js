@@ -69,7 +69,7 @@ function update_balance(current_balance){
     let nal = UserBalancer / 1000000
     let strList = String(nal).split('.')
     if (UserBalancer % 1000000 === 0) {
-        UserBalancerShow = nal+'М'
+        UserBalancerShow = nal+'M'
     }else if(UserBalancer < 10000000){
         UserBalancerShow = `${strList[0]}.${strList[1].slice(0,2)}M`
     }else if(UserBalancer >= 10000000 && UserBalancer < 100000000){
@@ -82,8 +82,8 @@ function update_balance(current_balance){
 }
 chatSocket.onmessage = function (e) {
     const data = JSON.parse(e.data);
-    if(data.modal_lvl_data){
-        open_modal_lvl(data.modal_lvl_data)
+    if(data.modal_lvl_data) {
+        setTimeout(open_modal_lvl,5000,data.modal_lvl_data)
     }
     if (data.get_online > 0) {
         online.innerHTML = `${data.get_online}`

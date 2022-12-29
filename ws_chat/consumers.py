@@ -27,7 +27,7 @@ r = redis.Redis(encoding="utf-8", decode_responses=True)
 class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
-    def get_not_read(self,room):
+    def get_not_read(self, room):
         room.notread.save()
         return room.notread.not_read_owner_counter
 
@@ -90,6 +90,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user_mess.save()
             room.message.add(user_mess, bulk=False)
             room.save()
+            room.notread.save()
             async_to_sync(self.get_all_room)()
             return user_mess
 

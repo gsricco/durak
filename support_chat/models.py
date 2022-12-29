@@ -58,8 +58,8 @@ class UserChatRoom(models.Model):
             noread = NotRead(room=self)
             noread.save()
     class Meta:
-        verbose_name = 'Админ чат'
-        verbose_name_plural = "Админ чат"
+        verbose_name = f'Комната'
+        verbose_name_plural = "Комнаты чата"
         ordering = ('-updated',)
 
 
@@ -68,6 +68,10 @@ class NotRead(models.Model):
     not_read_owner_counter = models.PositiveIntegerField(verbose_name='Не прочитал пользователь', default=0,
                                                          null=True, blank=True)
     not_read_counter = models.PositiveIntegerField(verbose_name='Не прочитал админ', default=0, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Админ чат'
+        verbose_name_plural = "Админ чат"
 
     def save(self, *args, **kwargs):
         # при изменении пересчитывает количество непрочитанных писем

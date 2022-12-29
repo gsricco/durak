@@ -9,7 +9,8 @@ let byteFile
 let topBlock = document.querySelector('.support_chat_top_block')
 let onlineAdmin = document.querySelector('#onlineAdmin')
 let host_url = window.location.host
-
+let notReadAllCount = 0
+document.title = 'Админ ЧАТ'
 
 document.querySelector('#content h1').innerHTML = 'Выберите ЧАТ'
 function checkFileSize(elem) {
@@ -77,6 +78,7 @@ const chat_cleaner = () => {
 }
 
 const room_cleaner = () => {
+    notReadAllCount = 0
     const clear_room = document.querySelectorAll('.support__chat__room')
     clear_room.forEach(item => item.remove())
 }
@@ -93,7 +95,11 @@ function newUserMessage(message, user, file_path) {
         fullDiv.style.display = 'flex'
         fullDiv.style.flexDirection = 'column'
         spanUser.style.textAlign = 'right'
+        spanUser.style.color = '#c8c8c8'
         if (user !== username) {
+            url = `http://${host_url}/admin/accaunts/customuser/${room_id}/change/`
+            spanUser.onclick = ()=>{ window.open(url,'_blank')}
+            spanUser.classList.add('username_active')
             li.style.flexDirection = ''
             li.style.justifyContent = 'flex-start'
             li.style.paddingLeft = '0%'
@@ -146,9 +152,6 @@ const newRoom = (data) => {
         if (data.user.username !== username) {
             const div = document.querySelector('.admin_support_chat_wrapper')
             const room = document.createElement('p')
-
-
-
             room.className = 'support__chat__room'
                       if(data.user.username === room_name){
                 room.classList.add('active_room')
@@ -171,18 +174,12 @@ const newRoom = (data) => {
             })
             div.appendChild(room)
             if (data.notread.not_read_counter !== 0){
+                notReadAllCount += data.notread.not_read_counter
                 let notRead = document.createElement('span')
                 notRead.innerHTML = `${data.notread.not_read_counter} `
                 notRead.className = 'not_read'
                 room.appendChild(notRead)
             }
-            // let all_rooms = document.querySelectorAll('.support__chat__room')
-            // all_rooms.forEach(item => {
-            //     if (item.textContent === text) {
-            //         item.classList.add('active_room')
-            //     }
-            // }
-            // )
         }
     }
 };
@@ -205,6 +202,11 @@ chatS.onmessage = function (e) {
         room_cleaner()
         data.room_data.forEach(e => newRoom(e))
     }
+        if(notReadAllCount>0){
+        document.title = `Сообщения (${notReadAllCount})`
+        }else {
+          document.title = 'Админ ЧАТ'
+               }
     if (data.chat_type === 'support') {
         if (data.list_message) {
             data.list_message.forEach((mess) => {

@@ -1249,7 +1249,7 @@ if (is_auth) {
         let nal = UserBalancer / 1000000
         let strList = String(nal).split('.')
         if (UserBalancer % 1000000 === 0) {
-            UserBalancerShow = nal + 'М'
+            UserBalancerShow = nal + 'M'
         } else if (UserBalancer < 10000000) {
             UserBalancerShow = `${strList[0]}.${strList[1].slice(0, 2)}M`
         } else if (UserBalancer >= 10000000 && UserBalancer < 100000000) {
