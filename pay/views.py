@@ -8,14 +8,14 @@ from pay.models import Popoln, BalPay
 from psycopg2.extras import NumericRange
 
 
-# Cоздается форма платежа
+# Создается форма платежа
 def rub_to_pay(rub):
-    """Креды, полученные за реальные деньг"""
+    """Креды, полученные за реальные деньги"""
     try:
         c_r = BalPay.objects.get(pay_sum__contains=NumericRange(rub, rub + 1))
     except BalPay.DoesNotExist:
         return 0
-    return rub * c_r.credit_range
+    return int(rub * (c_r.conversion_coef/100))
 
 
 def balance(request):

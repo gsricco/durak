@@ -12,7 +12,7 @@ function popupOpen(curentPopup) {
 
 const popupPay = document.getElementById("balanceOk");
 popupOpen(popupPay);
-console.log(popupPay);
+
 
 
 

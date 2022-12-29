@@ -3,19 +3,13 @@ import datetime
 import json
 import os
 from random import choices
-
 from django.utils import timezone
-
-from caseapp.serializers import OwnedCaseTimeSerializer, ItemSerializer, ItemForUserSerializer, OwnedCaseSerializer, \
-    ItemForCaseSerializer, CaseAndCaseItemSerializer
-from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from caseapp.serializers import OwnedCaseTimeSerializer, ItemForUserSerializer, CaseAndCaseItemSerializer
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
-
-from accaunts.models import CustomUser, Ban, AvatarProfile, DetailUser
+from accaunts.models import Ban, AvatarProfile, DetailUser
 from configs.settings import BASE_DIR
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
@@ -28,8 +22,6 @@ from . import tasks
 
 # подключаемся к редису
 r = redis.Redis(encoding="utf-8", decode_responses=True)
-
-from django.contrib.auth.decorators import user_passes_test
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -755,22 +747,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def roulette_countdown_state(self, event):
         """Отправляет новому клиенту состояния рулетки"""
         state = r.get('state')
-
         t = r.get('start:time')
         bets = r.json().get('round_bets')
-        message = {'init': {"state": state,
+        message = {'init': {
+                            "state": state,
                             "t": str(t),
                             "previous_rolls": r.json().get('last_winners'),
+                            "bets": bets
                             }
                    }
         if state == 'rolling' or state == 'stop':
+            rap = r.json().get("RAP")
             round_result = r.get(ROUND_RESULT_FIELD_NAME)
             message['init']['w'] = round_result
+            message["init"].update(rap)
         await self.send(json.dumps(message))
-        if bets is not None:
-            print(bets)
-            init_bets = {'bets': bets}
-            await self.send(json.dumps(init_bets))
 
     async def send_cases_info(self, event):
         """Отправляет по каналу сообщение о кейсах"""

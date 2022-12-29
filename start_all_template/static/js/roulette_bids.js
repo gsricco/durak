@@ -21,6 +21,7 @@ var userCountSpades;
 
 
 const createBidItems = (data) => {
+
     document.querySelector(`.hearts`).innerHTML = ''
     document.querySelector(`.coin`).innerHTML = ''
     document.querySelector(`.spades`).innerHTML = ''
@@ -177,7 +178,7 @@ const createBidItems = (data) => {
     })
 
     usersBids.map(el => {
-        // отрисовка  ставки одной масти одного пользователя
+        // отрисовка ставки одной масти одного пользователя
         const bidItemBlock = document.querySelector(`.${el.bidCard}`)
 
         const bidItem = document.createElement('div')
@@ -204,7 +205,7 @@ const createBidItems = (data) => {
         }
         itemMoney.innerHTML = `<span id="signWinner${el.bidCard}"></span>${elCountsShow}`
         bidItem.appendChild(itemMoney)
-        console.log(el)
+
         const itemAvatar = document.createElement('div')
         itemAvatar.className = 'roulette__item-avatar'
         itemAvatar.innerHTML = `<img src="${el.avatar}" alt="">`
@@ -280,8 +281,6 @@ switch (userCountSpades){
     document.querySelector('#memberSpades').innerHTML = `${userCountSpades} ${memberSpadesShow}`
 }
 
-
-// const items = document.querySelectorAll('.roulette__radio-item > label')
 const itemsClick = (bidCard) => {
 
 
@@ -302,7 +301,6 @@ const itemsClick = (bidCard) => {
     } else if (bidCount) {
 
         let userBalFront = document.querySelector('.header__profile-sum>span')
-        // let userBalFront = Number(document.querySelector('.header__profile-sum>span').textContent)
         let userBal = userBalFront.textContent;
         let lastSymbol = userBal[userBal.length-1];
         let balanceUser;
@@ -314,7 +312,6 @@ const itemsClick = (bidCard) => {
         }else balanceUser=Number(userBal)
 
         if (balanceUser + 1 >= Number(bidCount)) {
-            console.log(ava)
             chatSocket.send(JSON.stringify({
                 'bet': {
                     'bidCount': bidCount,

@@ -3,7 +3,6 @@ import math
 import uuid
 from django.db import Error
 import requests
-import json
 from hashlib import sha256
 from caseapp.serializers import ItemForUserSerializer
 from configs import celery_app
@@ -106,6 +105,7 @@ def roll():
     # result = random.choice(ROUND_RESULTS)
     result_c = random.choice(ROUND_NUMBERS[result])
     position = random.random()
+    r.json().set("RAP", ".", {"c": result_c, "p": position})
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'rolling',
@@ -121,7 +121,7 @@ def roll():
     if arr_len := r.json().arrlen('last_winners') > 8:
         r.json().arrtrim('last_winners', '.', arr_len - 9, -1)
 
-    print('END OF ROLL', datetime.datetime.now() - t)
+
 @shared_task
 def go_back():
     t = datetime.datetime.now()
@@ -158,6 +158,7 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         bet_info (dict): информация о конкретной ставке пользователя в текущем раунде;
     """
     current_round = r.get('round')
+    print(bet_info, '_+_+'*100)
     bet_to_redis_json = bet_info
     bet_to_redis_json['amount'] = {bet_info['bidCard']: bet_info['bidCount']}
     to_save = {dict_key: bet_to_redis_json}

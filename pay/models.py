@@ -26,16 +26,18 @@ class Popoln(models.Model):
 
 class BalPay(models.Model):
     """Кредиты за реальные деньги"""
-    credit_range = models.IntegerField(verbose_name='Сумма кредитов на пополнение', unique=True)
-    pay_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях', null=True)
+    conversion_coef = models.DecimalField(verbose_name='Коэффициент конверсии рубль/игровая валюта',
+                                          max_digits=3, decimal_places=1)
+    range_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях - на который применяется данный коэффициент',
+                                     null=True)
 
     class Meta:
-        verbose_name = "Кредиты за реальные деньги"
-        verbose_name_plural = "Кредиты за реальные деньги"
+        verbose_name = "Коэффициент конверсии рубль/игровая валюта"
+        verbose_name_plural = "Коэффициенты конверсии рубль/игровая валюта"
         ordering = 'id',
 
     def __str__(self):
-        return f'{self.pay_sum}'
+        return f'{self.range_sum}'
 
 
 class RefillBotSum(models.Model):

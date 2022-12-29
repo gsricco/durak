@@ -33,10 +33,11 @@ function generateItems(winnerCard, cardNumber) {
 
     }
 }
+
 // анимация прокрутки
-function startRoll(winnerCard, cardNumber, cardPosition) {
-    list.innerHTML = '';
+function startRoll(winnerCard, cardNumber, cardPosition, timer_for_roulette) {
     generateItems(winnerCard, cardNumber);
+    let time_to_roll= 5000;
 
     items[0].style.pointerEvents = 'none';
     items[1].style.pointerEvents = 'none';
@@ -62,10 +63,15 @@ function startRoll(winnerCard, cardNumber, cardPosition) {
     }
 
     let swingFinish = `translate3d(${randomInteger(-496, -504) / 10}%, 0, 0)`
-
+    if(timer_for_roulette>0){
+        time_to_roll -= Date.now() - timer_for_roulette
+    }
+    else if(timer_for_roulette === 0){
+        time_to_roll = 0
+    }
     list.style.left = '50%'
     list.style.transform = swingFinish
-    list.style.transition = '5s cubic-bezier(0.21, 0.53, 0.29, 0.99)'
+    list.style.transition = `${time_to_roll}ms cubic-bezier(0.21, 0.53, 0.29, 0.99)`
 }
 
 // анимация возврата после прокрутки
@@ -107,7 +113,6 @@ let rull_line = document.querySelector(".roulette__rull-line");
 let blurForTimer = () => {
     wrapperItems.classList.add("roulette__rull-wrapper_blur");
     timerWrapper.style.display = "flex";
-    // rull_line.style.display = "inline-block";
 }
 
 // логика счетчика таймера
@@ -133,9 +138,6 @@ let timerCounter = (back_counter) => {
     const rafStart = Date.now();
 
     let timerCounter1 = () => {
-        {
-            // blurForTimer()
-        }
         // стартовое значение таймера
         let rafSeconds = back_counter * 10;
         let num = back_counter
@@ -154,22 +156,16 @@ let timerCounter = (back_counter) => {
 
         }
     }
-    // blurForTimer()
     timerCounter1()
 }
 
-//дергаем ф-цию что бы все сработало 1 раз при загрузке, дальше по сет интервалу в 29сек
-// timerCounter()
-
-//ставим функцию на каждые 29сек
 chatSocket.onmessage = super_new(chatSocket.onmessage);
 let bidsNumberMob = document.querySelectorAll('.roulette__accardion-num')
-// const UserBalanceMob = document.querySelector('.header__balance>span')
 
 function super_new(f) {
     return function () {
         let bidsNumber = document.querySelectorAll('.roulette__item-money')
-        const bidsButtons = document.querySelectorAll('.roulette__radio-item')
+        let bidsButtons = document.querySelectorAll('.roulette__radio-item')
         let signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
         let signWinnercoin = document.querySelectorAll('#signWinnercoin');
         let signWinnerspades = document.querySelectorAll('#signWinnerspades');
@@ -232,30 +228,13 @@ function super_new(f) {
                 if (document.querySelector('#signWinnerhearts')) document.querySelector('#signWinnerhearts').innerHTML = '-';
                 if (document.querySelector('#signWinnercoin')) document.querySelector('#signWinnercoin').innerHTML = '-';
                 if (document.querySelector('#signWinnerspades')) document.querySelector('#signWinnerspades').innerHTML = '-';
-
             })
-            // bidsNumberMob.forEach(el => {
-            //     el.style.color = '#C4364E'
-            //     document.querySelector('#spanCardHeartsMob').style.color = '#C4364E';
-            //     document.querySelector('#spanCardCoinMob').style.color = '#C4364E';
-            //     document.querySelector('#spanCardSpadesMob').style.color = '#C4364E';
-            //
-            //
-            //     if (document.querySelector('#signWinnerheartsMob')) document.querySelector('#spanCardHeartsMob').innerHTML = `-${heartsCountsShow}`;
-            //     if (document.querySelector('#signWinnercoinMob')) document.querySelector('#spanCardCoinMob').innerHTML = `-${coinCountsShow}`;
-            //     if (document.querySelector('#signWinnerspadesMob')) document.querySelector('#spanCardSpadesMob').innerHTML = `-${spadesCountsShow}`;
-            //
-            // })
         }
 
         function checkWinner(cardWinner, bidIncrease) {
-            // sessionStorage.clear()
-            // sessionStorage.setItem('bids','new')
-
 
             //звук останова рулетки//////
             const sound = document.querySelector(".sound");
-            // let attribute = sessionStorage.getItem("data-value")
             let attribute = sound.getAttribute("data-value")
             const audio = document.createElement('audio')
             audio.setAttribute("id", "audio");
@@ -321,11 +300,6 @@ function super_new(f) {
                     document.querySelector(`#spanCard${nameWinnerCard}`).style.color = '#5DD887';
                     document.querySelector(`#roul${nameWinnerCard}`).style.border = '1px solid #5DD887';
                     document.querySelector(`#roul${nameWinnerCard}`).style.borderRadius = '5px';
-                    // if (window.screen.width < 768) {
-                    //     document.querySelector(`#spanCard${nameWinnerCard}Mob`).innerHTML = `+${countsShow}`;
-                    //     document.querySelector(`#spanCard${nameWinnerCard}Mob`).style.color = '#5DD887';
-                    //     document.querySelector(`#item${nameWinnerCard}Bid`).innerHTML = ``;
-                    // }
                 }
                 document.querySelector(`.${lowerCard}`).style.opacity = '1'
 
@@ -336,42 +310,51 @@ function super_new(f) {
 
         let ws_connect = f.apply(this, arguments);
         let data = JSON.parse(arguments[0].data);
-        if(data.bets){
-            createBidItems(data.bets)
-        }
         if (data.init) {
             previous_rolls(data.init.previous_rolls)
             if (data.init.state === 'countdown') {
-                let timeNow = Date.now()
+                rouletteInitialSettings();
+                let timeNow = Date.now();
                 let remainTime = (20 * 1000 - (timeNow - data.init.t)) / 1000
-                timerCounter(remainTime)
+                timerCounter(remainTime);
+                createBidItems(data.init.bets)
             }
             else if (data.init.state === 'rolling') {
-                startRoll(data.init.w)
+                startRoll(data.init.w, data.init.c, data.init.p, data.init.t)
+                createBidItems(data.init.bets)
             }
             else if (data.init.state === 'stop'){
                 let winnerCard = data.init.w
-                winnerCheckInitialSettings();
-                if (winnerCard === 'hearts') {
-                    checkWinner('hearts', 2)
-                } else if (winnerCard === 'coin') {
-                    checkWinner('coin', 14)
-                } else if (winnerCard === 'spades') {
-                    checkWinner('spades', 2)
+                createBidItems(data.init.bets)
+
+                    bidsNumber = document.querySelectorAll('.roulette__item-money')
+                    signWinnerhearts = document.querySelectorAll('#signWinnerhearts');
+                    signWinnercoin = document.querySelectorAll('#signWinnercoin');
+                    signWinnerspades = document.querySelectorAll('#signWinnerspades');
+                    userUser = document.querySelector('.header__profile-name>span').textContent
+
+                function suka() {
+                    winnerCheckInitialSettings();
+                    if (winnerCard === 'hearts') {
+                        checkWinner('hearts', 2)
+                    } else if (winnerCard === 'coin') {
+                        checkWinner('coin', 14)
+                    } else if (winnerCard === 'spades') {
+                        checkWinner('spades', 2)
+                    }
                 }
+                setTimeout(suka, 100)
             }
             else if (data.init.state === 'go_back'){
                 previous_rolls(data.init.previous_rolls)
                 returnToStartPosition()
             }
         }
-        // if (data.current_balance) {
-        //     update_balance(data.current_balance)
-        // }
         if (data.round_bets) {
             createBidItems(data.round_bets)
         }
         if (data.roll) {
+            list.innerHTML = '';
             startRoll(data.winner, data.c, data.p)
         }
 
@@ -414,24 +397,5 @@ function previous_rolls(rolls) {
     })
 }
 }
-// Обновление баланса пользователя от бэка
-// function update_balance(current_balance){
-//     UserBalancer = Number(current_balance)
-//             // // Отображать надо уже преобразованное число, а использовать пришедшее
-//             if ( UserBalancer/ 1000 > 9 && UserBalancer / 1000 < 1000) {
-//                 UserBalancerShow = `${UserBalancer / 1000}K`
-//             } else {
-//                 if (UserBalancer / 1000000 > 0) {
-//                     UserBalancerShow = `${UserBalancer / 1000000}M`
-//                 } else
-//                     UserBalancerShow = `${UserBalancer}`
-//             }
-//             if (UserBalancer / 1000 > 0 && UserBalancer / 1000 < 10) {
-//                 UserBalancerShow = `${UserBalancer}`
-//             }
-//             UserBalance.innerHTML = `${UserBalancerShow}`
-//             UserBalanceMob.innerHTML = `${UserBalancerShow}`
-// }
-
 
 

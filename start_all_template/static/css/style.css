@@ -2884,10 +2884,10 @@ h3 {
 
 .profil__icon-settings {
   display: block;
-  min-width: 30px;
-  min-height: 30px;
-  max-width: 30px;
-  max-height: 30px;
+  min-width: 18px;
+  min-height: 18px;
+  max-width: 18px;
+  max-height: 18px;
   fill: #575757;
   position: relative;
 }
@@ -7391,7 +7391,7 @@ margin-top: 36px;
   }
 
   .profil__name a svg {
-    margin: 0px 6px 6px 6px;
+    margin: 6px 6px 0px 6px;
   }
 
   .profil__btn {
@@ -10073,3 +10073,9 @@ ul.pagination li a.active {
 ul.pagination li a:hover:not(.active) {background-color: #2b2b2b;}
 
 div.center {text-align: center;}
+
+#avaBtnShow, #avaBtnHide {
+  width: 235px;
+  height: 48px;
+  padding: 12px;
+}

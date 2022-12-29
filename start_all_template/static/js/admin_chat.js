@@ -151,7 +151,6 @@ const newRoom = (data) => {
 
             room.className = 'support__chat__room'
                       if(data.user.username === room_name){
-                          console.log(room_name)
                 room.classList.add('active_room')
             }
             room.innerHTML = data.user.username
@@ -199,7 +198,6 @@ const chatS = new WebSocket(
 chatS.onmessage = function (e) {
     const data = JSON.parse(e.data);
     if (data.get_online){
-        console.log(data.get_online)
         onlineAdmin.innerHTML = ` ${data.get_online}`
     }
 

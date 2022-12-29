@@ -687,14 +687,14 @@ window.addEventListener("DOMContentLoaded", () => {
                         .querySelector(".online-chat")
                         .classList.add("online-chat-focus");
                     if (
-                        (document.documentElement.clientWidth <= 991) &
+                        (document.documentElement.clientWidth <= 991) &&
                         (document.documentElement.clientWidth >= 541)
                     ) {
                         document.querySelector(".online-chat").style.maxHeight = `unset`;
-                        document.querySelector(".online-chat").style.top = 77 + "px";
+                        // document.querySelector(".online-chat").style.top = 77 + "px";
                     } else if (document.documentElement.clientWidth < 541) {
                         document.querySelector(".online-chat").style.maxHeight = `unset`;
-                        document.querySelector(".online-chat").style.top = valueMax + "px";
+                        // document.querySelector(".online-chat").style.top = valueMax + "px";
                     }
                 });
 

@@ -12,8 +12,8 @@ class PopolnAdmin(admin.ModelAdmin):
 
 @admin.register(BalPay)
 class BalPayAdmin(admin.ModelAdmin):
-    list_display = 'id', 'pay_sum', 'credit_range'
-    list_editable = 'pay_sum', 'credit_range'
+    list_display = 'id', 'range_sum', 'conversion_coef'
+    list_editable = 'range_sum', 'conversion_coef'
 
 
 @admin.register(RefillBotSum)

@@ -10,8 +10,9 @@ from psycopg2.extras import NumericRange
 from caseapp.models import OwnedCase
 import sys
 
+
 def is_migrate():
-    # проверка выполняются ли миграции
+    """Проверяет - выполняются ли миграции"""
     return 'makemigrations' in sys.argv or 'migrate' in sys.argv
 
 
@@ -43,15 +44,6 @@ class Level(models.Model):
             return cls.objects.first().pk
 
     class Meta:
-        # constraints = [
-        #     ExclusionConstraint(
-        #         name='exclude_overlapped_levels',
-        #         expressions=[
-        #             ('experience_range', RangeOperators.OVERLAPS),
-        #         ],
-        #         violation_error_message='Диапазон опыта для уровня пересекается с другим уровнем.',
-        #     ),
-        # ]
         ordering = ['level']
         verbose_name = 'Уровень в игре'
         verbose_name_plural = 'Уровни в игре'
