@@ -73,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    "configs.middleware.BanIPandAgentMiddleware",
 ]
 
 ROOT_URLCONF = 'configs.urls'

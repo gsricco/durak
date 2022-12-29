@@ -159,12 +159,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_ban_chat_user(self, user):
         """Проверка бана пользователя в общем чате"""
         user = CustomUser.objects.get(username=user).pk
-        try:
-            if get_object_or_404(Ban, user=user).ban_chat:
-                return True
-            else:
-                return False
-        except:
+        if Ban.objects.get(user=user).ban_chat:
+            return True
+        else:
             return False
 
     @sync_to_async()

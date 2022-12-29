@@ -4593,6 +4593,7 @@ h3 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  height: 46px;
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
@@ -7706,6 +7707,7 @@ margin-top: 36px;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
+    height: 100px;
   }
 
   .roulette__item-name {
