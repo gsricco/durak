@@ -21,7 +21,7 @@ from accaunts.models import Level, ItemForUser
 from bot_payment.models import RefillRequest, WithdrawalRequest
 
 channel_layer = get_channel_layer()
-r = Redis(encoding="utf-8", decode_responses=True)
+r = Redis(encoding="utf-8", decode_responses=True, host="durak_redis_stack")
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_NUMBERS = {
@@ -158,7 +158,6 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         bet_info (dict): информация о конкретной ставке пользователя в текущем раунде;
     """
     current_round = r.get('round')
-    print(bet_info, '_+_+'*100)
     bet_to_redis_json = bet_info
     bet_to_redis_json['amount'] = {bet_info['bidCard']: bet_info['bidCount']}
     to_save = {dict_key: bet_to_redis_json}
