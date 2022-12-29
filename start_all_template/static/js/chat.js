@@ -241,13 +241,13 @@ if (data.message && data.chat_type === 'all_chat') {
     //         freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
     //     }
     // }
-    // if (data.hasOwnProperty('credits')) {
-    //     credits = data.credits;
-    //     let sumCurrent = document.querySelector(".num-game-currency__span-curent");
-    //     sumCurrent.value = `${parseFloat(
-    //         credits / 1000,
-    //     ).toFixed(0)}`;
-    // }
+    if (data.hasOwnProperty('credits')) {
+        credits = data.credits;
+        let sumCurrent = document.querySelector(".num-game-currency__span-curent");
+        sumCurrent.value = `${parseFloat(
+            credits / 1000,
+        ).toFixed(0)}`;
+    }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
@@ -331,8 +331,8 @@ window.addEventListener('load', function (e) {
         var inputForm = document.querySelector(".amount-selection__input");
         var sumCurrent = document.querySelector(".num-game-currency__span-curent");
         var btnForm = document.querySelector(".amount-selection__btn");
-        inputForm.addEventListener("input", sumScore);
-        sumCurrent.addEventListener("input", sumValute);
+        inputForm.addEventListener("input", sumScore); // инпут рублей
+        sumCurrent.addEventListener("input", sumValute); // инпут кредитов
     
         function sumScore() {
             let inputValueDinamic = inputForm.value.split(/[^0-9]/g);

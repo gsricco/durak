@@ -22,8 +22,9 @@ class BalPayAdmin(admin.ModelAdmin):
 
     def add_view(self, request, form_url="", extra_context=None):
         if request.POST:
-            start = int(request.POST.get('range_sum_0')[0])
-            end = int(request.POST.get('range_sum_1')[0])
+            start = int(request.POST.get('range_sum_0'))
+            end = int(request.POST.get('range_sum_1'))
+            print(start, end)
             if BalPay.objects.filter(range_sum__contains=NumericRange(start, end)).exists():
                 mess = 'Такой диапазон уже существует, выберите другой'
                 context = {"mess": mess}
@@ -32,9 +33,9 @@ class BalPayAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         if request.POST:
-            start = int(request.POST.get('range_sum_0')[0])
-            end = int(request.POST.get('range_sum_1')[0])
-            if BalPay.objects.filter(range_sum__contains=NumericRange(start, end)).exists():
+            start = int(request.POST.get('range_sum_0'))
+            end = int(request.POST.get('range_sum_1'))
+            if BalPay.objects.filter(range_sum__contains=NumericRange(start, end)).exclude(id=object_id).exists():
                 mess = 'Такой диапазон уже существует, выберите другой'
                 context = {"mess": mess}
                 return render(request, 'admin/baypal.html', context)

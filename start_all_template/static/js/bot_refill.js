@@ -227,7 +227,7 @@ function hideFormWithdraw() {
     if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
         withdrawSocket.close(1000);
     }
-};
+}
 
 function closeAndOpenWindowWithdraw(message) {
     const popupOk = document.getElementById("refillOk");
@@ -237,7 +237,7 @@ function closeAndOpenWindowWithdraw(message) {
     hideFormWithdraw();
     withdrawSocket.close(1000);
     requestOpened = false;
-};
+}
 
 let botNameW = '';
 let lastServerMessageW = '';
@@ -291,7 +291,7 @@ function withdrawSocketOnMessage(e) {
             let li = document.querySelector("#bot_message");
             li.textContent = `Сообщение от бота: ${serverMessage}`;
             li.style.visibility = "visible";
-        };
+        }
         if (data.done) {
             let message = 'Заявка закрыта.';
             if (data.close_reason === 'Success') {
@@ -313,9 +313,9 @@ function withdrawSocketOnMessage(e) {
             }
             closeAndOpenWindowWithdraw(message);
             requestOpened = false;
-        };
-    };
-};
+        }
+    }
+}
 
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {

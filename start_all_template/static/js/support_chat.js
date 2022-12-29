@@ -208,7 +208,7 @@ chatSocket.onopen = function (e) {
 
 };
 function disableChat(foo) {
-    let timer = 10000
+    let timer = 60000
     if (foo === 1){
         timer = 0
     }
