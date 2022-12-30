@@ -112,28 +112,32 @@
                             <button class="btnAvatarNoAuth" onclick="modalAuth()">
                                 <img id="avaNotAuth" src="{% static 'img/avatar/user/avatar.svg' %}" style="border-radius: 0px" alt="Аватар">
                             </button>
-                            {% elif user.use_avatar %}
+                        </a>
+                        {% elif user.use_avatar %}
                             <a href="{% url 'profil' %}" class="header__avatar">
                                 <img id="ava" src="{{ user.avatar_default.avatar_img.url }}" alt="Аватар">
-                                {% else %}
+                            </a>
+                        {% else %}
                                 <a href="{% url 'profil' %}" class="header__avatar">
                                     <img id="ava" src="{{ user.avatar.url }}" alt="Аватар">
-                                    {% endif %}
                                 </a>
+                        {% endif %}
 
 
-                                <div class="header__profile-info">
-                            <a href="{% url 'profil' %}" class="header__profile-name">
-                                {% if user.is_authenticated == False %}
+                    <div class="header__profile-info">
+                        {% if user.is_authenticated == False %}
+                        <a href="#" class="header__profile-name" onclick="modalAuth()">
                                 <span>Anonymous</span>
-                                {% else %}
+                        </a>
+                        {% elif user %}
+                        <a href="{% url 'profil' %}" class="header__profile-name" >
                                 <span>{{ request.user.username }}</span>
                                 <svg class="header__profile-settings">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                 </svg>
-                                {% endif %}
+                        </a>
+                        {% endif %}
 
-                            </a>
 
                             <div class="header__profile-row">
                                 {% if user.is_authenticated %}

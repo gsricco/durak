@@ -66,7 +66,9 @@
                     </form>
                 </div>
                 <div class="bonus-currency__item add-bonus">
+{% if user.social_auth.first.provider == 'google-oauth2' %}
                     <div class="add-bonus__item">
+
                         <div class="add-bonus__title-block">
                             <div class="add-bonus__logo">
                                 <svg class="icon icon_yt">
@@ -78,20 +80,21 @@
                             </div>
                         </div>
                         <hr>
-                        {% for i in sitecontent %}
+{#                        {% for i in sitecontent %}#}
                         <div class="add-bonus__value-block">
                             <div class="add-bonus__value">
-                                +{{ i.bonus_youtube }}K
+                                +{{ sitecontent2.bonus_youtube }}K
                             </div>
-
                             <svg>
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                             </svg>
                         </div>
+                        <a href="{{ sitecontent2.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn">Подписаться на
+                            {{ user.social_auth.provider }}</a>
 
-                        <a href="{{ i.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn">Подписаться на
-                            Youtube</a>
                     </div>
+{% endif %}
+                {% if user.social_auth.first.provider == 'vk-oauth2' %}
                     <div class="add-bonus__item">
                         <div class="add-bonus__title-block">
                             <div class="add-bonus__logo">
@@ -106,16 +109,17 @@
                         <hr>
                         <div class="add-bonus__value-block">
                             <div class="add-bonus__value">
-                                +{{ i.bonus_vk }}K
+                                +{{ sitecontent2.bonus_vk }}K
                             </div>
                             <svg>
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                             </svg>
                         </div>
-                        <a href="{{ i.url_vk }}" target="_blank" class="btns btns_vk add-bonus__btn">Подписаться во
+                        <a href="{{ sitecontent2.url_vk }}" target="_blank" class="btns btns_vk add-bonus__btn">Подписаться во
                             Вконтакте</a>
-                        {% endfor %}
+{#                        {% endfor %}#}
                     </div>
+                {% endif %}
                 </div>
             </div>
             <div class="bonus-currency__invite invite">
@@ -163,11 +167,11 @@
                                     <div class="invite__img">
                                         <img src="{% static 'img/gallery/bulb.png' %}" alt="">
                                     </div>
-                                    {% for i in sitecontent %}
+{#                                    {% for i in sitecontent %}#}
                                     <div class="invite__text">
-                                        {{ i.info2|safe }}
+                                        {{ sitecontent2.info2|safe }}
                                     </div>
-                                    {% endfor %}
+{#                                    {% endfor %}#}
                                 </div>
                                 <div class="invite__arrow invite__arrow_max">
                                     <svg class="icon">
@@ -183,11 +187,11 @@
                                     <div class="invite__img">
                                         <img src="{% static 'img/gallery/handshake.png' %}" alt="">
                                     </div>
-                                    {% for i in sitecontent %}
+{#                                    {% for i in sitecontent %}#}
                                     <div class="invite__text">
-                                        {{ i.info3|safe }}
+                                        {{ sitecontent2.info3|safe }}
                                     </div>
-                                    {% endfor %}
+{#                                    {% endfor %}#}
                                 </div>
                             </div>
                         </li>

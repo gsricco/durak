@@ -75,13 +75,13 @@
     {#                                       class="profil__btn profil__btn_google">Подключить аккаунт Google</a>#}
     {#                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить#}
     {#                                        аккаунт VK</a>#}
-                                        {% elif not social_vk %}
-                                            <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
-                                            аккаунт VK</a>
+{#                                        {% elif not social_vk %}#}
+{#                                            <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить#}
+{#                                            аккаунт VK</a>#}
 {#                                        <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_vk">Подключить#}
 {#                                            аккаунт VK</a>#}
-                                        {% elif not social_google %}
-                                       <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+{#                                        {% elif not social_google %}#}
+{#                                       <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>#}
 {#                                        <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>#}
                                         {% endif %}
                                         <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>

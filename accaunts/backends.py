@@ -9,7 +9,9 @@ class CustomGoogleOAuth2(GoogleOAuth2):
             email = response['email']
         else:
             email = ''
-
+        print(response, 'ETO RESPONSE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        print(self.__dict__)
+        print(self.__dict__.get('strategy').__dict__)
         name, given_name, family_name, picture = (
             response.get('name', ''),
             response.get('given_name', ''),
@@ -35,6 +37,8 @@ class CustomVKOAuth2(VKOAuth2):
             first_name=response.get('first_name'),
             last_name=response.get('last_name')
         )
+        print(response, 'ETO RESPONSE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        print(self.__dict__)
         photo = (response.get('photo', ''))
         screen_name = (response.get('screen_name', ''))
         return {

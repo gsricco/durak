@@ -61,11 +61,13 @@ def index(request):
 def bonus_currency(request):
     """FREE"""
     sitecontent = SiteContent.objects.all()
+    sitecontent2 = sitecontent.first()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
+            'sitecontent2': sitecontent2,
             'detail_user': detail_user,
             'level_data': level_data,
             'title': 'Free',
@@ -73,6 +75,7 @@ def bonus_currency(request):
     else:
         context = {
             'sitecontent': sitecontent,
+            'sitecontent2': sitecontent2,
             'title': 'Free',
         }
     add_pay_buttons(context)
