@@ -37,60 +37,62 @@
                                     <img id="avaNotAuth" src="{% static 'img/avatar/user/avatar.svg' %}" alt="">
                                     {% endif %}
                             </div>
-                            <div class="profil__info">
-                                <div class="profil__name-wrapper">
-                                    <div class="profil__name-block">
-                                        <div class="profil__name">
+                                <div class="profil__info">
+                                    <div class="profil__name-wrapper">
+                                        <div class="profil__name-block">
+                                            <div class="profil__name">
 
-                                            <div class="profil__name-text">
-                                                <svg class="profil__progressbar-lvl-img-mob">
-                                                  <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
-                                                </svg>
+                                                <div class="profil__name-text">
+                                                    <svg class="profil__progressbar-lvl-img-mob">
+                                                      <use xlink:href="{% static 'img/icons/sprite.svg' %}#rubin_green"></use>
+                                                    </svg>
 
+                                                    {% if user.is_authenticated %}
+                                                    <span>{{ user.username }}</span>
+                                                    <p class="profil__progressbar-lvl-num-mob">{{ level_data.level }} LVL</p>
+
+                                                    {% else %}
+                                                    <span>Anonymous</span>
+                                                    <span class="profil__progressbar-lvl-progress-mob">0 / {{ level_data.experience_range.upper }} XP</span>
+                                                    {% endif %}
+
+                                                </div>
                                                 {% if user.is_authenticated %}
-                                                <span>{{ user.username }}</span>
-                                                <p class="profil__progressbar-lvl-num-mob">{{ level_data.level }} LVL</p>
-
-                                                {% else %}
-                                                <span>Anonymous</span>
-                                                <span class="profil__progressbar-lvl-progress-mob">0 / {{ level_data.experience_range.upper }} XP</span>
+                                                <a href="#profileSettings" class="popup-link">
+                                                    <svg class="profil__icon-settings">
+                                                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
+                                                    </svg>
+                                                </a>
                                                 {% endif %}
-
                                             </div>
-                                            {% if user.is_authenticated %}
-                                            <a href="#profileSettings" class="popup-link">
-                                                <svg class="profil__icon-settings">
-                                                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
-                                                </svg>
-                                            </a>
-                                            {% endif %}
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="profil__btns">
-                                    {% if user.is_authenticated %}
-                                    {% if not social_google and not social_vk %}
-                                    <a href="{% url 'social:begin' 'google-oauth2' %}"
-                                       class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
-                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
-                                        аккаунт VK</a>
-                                    {% elif not social_vk %}
-                                    <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_vk">Подключить
-                                        аккаунт VK</a>
-                                    {% elif not social_google %}
-<!--                                    <a href="{% url 'social:begin' 'google-oauth2' %}"-->
-                                    <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
-                                    {% endif %}
-                                    <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
-                                    {% else %}
-                                    <a href="{% url 'social:begin' 'google-oauth2' %}"
-                                       class="profil__btn profil__btn_google">Войти с помощью Google</a>
-                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти
-                                        с помощью VK</a>
-                                    {% endif %}
+                                    <div class="profil__btns">
+                                        {% if user.is_authenticated %}
+                                        {% if not social_google and not social_vk %}
+    {#                                    <a href="{% url 'social:begin' 'google-oauth2' %}"#}
+    {#                                       class="profil__btn profil__btn_google">Подключить аккаунт Google</a>#}
+    {#                                    <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить#}
+    {#                                        аккаунт VK</a>#}
+                                        {% elif not social_vk %}
+                                            <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Подключить
+                                            аккаунт VK</a>
+{#                                        <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_vk">Подключить#}
+{#                                            аккаунт VK</a>#}
+                                        {% elif not social_google %}
+                                       <a href="{% url 'social:begin' 'google-oauth2' %}" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>
+{#                                        <a href="#modalAccountSocial" id="qqq" class="profil__btn profil__btn_google">Подключить аккаунт Google</a>#}
+                                        {% endif %}
+                                        <a href="/logout" class="profil__btn profil__btn_google">Выйти</a>
+                                        {% else %}
+                                        <a href="{% url 'social:begin' 'google-oauth2' %}"
+                                           class="profil__btn profil__btn_google">Войти с помощью Google</a>
+                                        <a href="{% url 'social:begin' 'vk-oauth2' %}" class="profil__btn profil__btn_vk">Войти
+                                            с помощью VK</a>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>
                         </div>
                         {% if user.is_authenticated %}
                         <div class="profil__progressbar">

@@ -1163,51 +1163,6 @@ window.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    //Валидатор форм  //!Сниппет "!accordion" html
-
-    // if (document.querySelector(".tel")) {
-    //     //@//@include('../../../_module/JS/_maskPhone.js', {}) //Маска номера телефона (библиотека)
-    //     //maskPhone('.tel');//Вызов функции маски номера телефона
-    // }
-
-
-    /*
-    Отправка суммы для вывода на бэкенд
-     */
-
-    // const selectAmountItems = document.querySelectorAll(".select-amount__item");
-    // if (selectAmountItems.length > 0) {
-    //     for (let index = 0; index < selectAmountItems.length; index++) {
-    //         const el = selectAmountItems[index];
-    //         el.addEventListener("click", async function (e) {
-    //             const elAmount = el.querySelector('.select-amount__value');
-    //             // if (elAmount != null) {
-    //             //     // const amount = parseInt(elAmount.innerText.trim());
-    //             //
-    //             //     // На бэкенд придет запрос в JSON-строке. Пример тела запроса: {"amount":50}
-    //             //     // const body = {amount: amount};
-    //             //
-    //             //     // /out-amount - поменяйте на url,нужный бэкендерам
-    //             //     // const r = await fetch('/out-amount', {
-    //             //     //     method: 'POST',
-    //             //     //     headers: {
-    //             //     //         'Content-Type': 'application/json;charset=utf-8'
-    //             //     //     },
-    //             //     //     body: JSON.stringify(body)
-    //             //     // });
-    //             //
-    //             //     if (r.ok) {
-    //             //         // всё прошло удачно
-    //             //     } else {
-    //             //         // Ошибка запроса
-    //             //     }
-    //             //
-    //             // }
-    //             e.preventDefault();
-    //         });
-    //     }
-    // }
-
 /////////Аккаунт уже привязан////////////////
     if (document.querySelector('#qqq')) {
         const vkBtn = document.querySelector('#qqq');

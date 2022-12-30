@@ -873,18 +873,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({"last_visit": event.get("last_visit")}))
 
     async def send_free_balance(self):
-        detail_user = await DetailUser.objects.aget(user=self.scope['user'])
-        await self.send(json.dumps({"free_balance": detail_user.free_balance}))
+        if self.scope['user'].id:
+            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+            await self.send(json.dumps({"free_balance": detail_user.free_balance}))
 
     async def get_free_balance(self):
-        detail_user = await DetailUser.objects.aget(user=self.scope['user'])
-        if detail_user.free_balance > 0:
-            detail_user.balance += detail_user.free_balance
-            detail_user.free_balance = 0
-            await sync_to_async(detail_user.save)()
-        await self.send(json.dumps({"free_balance": detail_user.free_balance}))
-        message = {'current_balance': detail_user.balance}
-        await self.send(json.dumps(message))
+        if self.scope['user'].id:
+            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+            if detail_user.free_balance > 0:
+                detail_user.balance += detail_user.free_balance
+                detail_user.free_balance = 0
+                await sync_to_async(detail_user.save)()
+            await self.send(json.dumps({"free_balance": detail_user.free_balance}))
+            message = {'current_balance': detail_user.balance}
+            await self.send(json.dumps(message))
 
     async def send_credits_from_rubs(self, rub):
         """Переводит рубли в кредиты и возвращает пользователю"""
