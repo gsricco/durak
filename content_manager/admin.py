@@ -1,5 +1,9 @@
+import redis
 from django.contrib import admin
-from .models import SiteContent, FAQ, BadSlang
+
+from configs.settings import REDIS_URL_STACK
+from .models import SiteContent, FAQ, BadSlang, FakeOnline
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 
 
 @admin.register(SiteContent)
@@ -47,3 +51,23 @@ class FAQAdmin(admin.ModelAdmin):
 class BadSlangAdmin(admin.ModelAdmin):
     """Помощь"""
     list_display = 'name',
+
+
+@admin.register(FakeOnline)
+class AdminFakeOnline(admin.ModelAdmin):
+    """Фейковый онлайн чата"""
+    list_display = "count", "is_active"
+    fields = "count", "is_active"
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        if obj.is_active is True:
+            r.set("fake_online", obj.count)
+        else:
+            r.delete("fake_online")
+        obj.save()

@@ -27,7 +27,6 @@ class SiteContent(models.Model):
         verbose_name = 'Контент сайта'
         verbose_name_plural = 'Контент сайта'
 
-
     def __str__(self):
         return f'Контент сайта'
 
@@ -50,6 +49,7 @@ class FAQ(models.Model):
 
     body_description.short_description = 'Описание вопроса'
 
+
 class BadSlang(models.Model):
     """Запрещенные слова"""
     name = models.CharField(verbose_name='Запрещенное слово', max_length=100)
@@ -60,3 +60,17 @@ class BadSlang(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class FakeOnline(models.Model):
+    """Фейковый онлайн чата"""
+    count = models.PositiveIntegerField(verbose_name="Фейк онлайн в чате", default=0)
+    is_active = models.BooleanField(default=False, verbose_name="Активно")
+
+    class Meta:
+        verbose_name = "Фейковый онлайн"
+        verbose_name_plural = "Фейковый онлайн"
+
+    def __str__(self):
+        return f'Онлайн: {self.count}'
+
