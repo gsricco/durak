@@ -99,7 +99,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'configs.wsgi.application'
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -194,15 +193,13 @@ CHANNEL_LAYERS = {
         },
     },
 }
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels.layers.InMemoryChannelLayer"
-#     }
-# }
+
+# REDIS
+REDIS_URL_STACK = os.getenv("REDIS_URL_STACK")
 # CELERY
-REDIS_URL = "redis://127.0.0.1:6379/1"
-BROKER_URL = REDIS_URL
-CELERY_BROKER_URL = REDIS_URL
+REDIS_URL_CEL = os.getenv("REDIS_URL_CEL")
+BROKER_URL = REDIS_URL_CEL
+CELERY_BROKER_URL = REDIS_URL_CEL
 # CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'

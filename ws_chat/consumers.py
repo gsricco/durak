@@ -10,7 +10,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
 from accaunts.models import Ban, AvatarProfile, DetailUser
-from configs.settings import BASE_DIR
+from configs.settings import BASE_DIR, REDIS_URL_STACK
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
@@ -21,7 +21,7 @@ from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True)
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):

@@ -19,9 +19,10 @@ from django.db.utils import IntegrityError
 from django.utils import timezone
 from accaunts.models import Level, ItemForUser
 from bot_payment.models import RefillRequest, WithdrawalRequest
+from configs.settings import REDIS_URL_STACK
 
 channel_layer = get_channel_layer()
-r = Redis(encoding="utf-8", decode_responses=True)
+r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_NUMBERS = {
@@ -86,7 +87,6 @@ def debug_task():
 @shared_task
 def roll():
     t = datetime.datetime.now()
-    print('start of ROLL', t)
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
@@ -158,7 +158,6 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         bet_info (dict): информация о конкретной ставке пользователя в текущем раунде;
     """
     current_round = r.get('round')
-    print(bet_info, '_+_+'*100)
     bet_to_redis_json = bet_info
     bet_to_redis_json['amount'] = {bet_info['bidCard']: bet_info['bidCount']}
     to_save = {dict_key: bet_to_redis_json}
@@ -590,7 +589,8 @@ def setup_check_request_status(host_url, operation, id_shift, request_pk, user_p
 def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
     """Проверяет статус заявки на сервере ботов"""
     # удаляет из redis запись о заявке
-    r.delete(f"user_{operation}:{user_pk}")
+    # r.delete(f"user_{operation}:{user_pk}")
+    # r.delete(f"user_{operation}:{user_pk}:start")
     # создаёт url для получения статуса заявки
     url_get_status = f"{host_url}{operation}/get?id={request_pk + id_shift}"
     timeout = 2

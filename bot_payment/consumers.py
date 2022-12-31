@@ -9,10 +9,11 @@ from . import models, serializers
 from django.utils import timezone
 from django.db.utils import Error
 from ws_chat.tasks import setup_check_request_status
-from configs.settings import HOST_URL, ID_SHIFT
+from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK
 from .models import WithdrawalRequest
+from django.utils import timezone
 
-r = redis.Redis()  # подключаемся к редису
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)  # подключаемся к редису
 
 
 class RequestConsumer(AsyncWebsocketConsumer):
@@ -38,7 +39,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
         # продолжение обработки заявки при разрыве соединения
         if r.get(f"user_{self.operation}:{user_pk}"):
             request_pk = int(r.getex(f"user_{self.operation}:{user_pk}", ex=10*60))
-            await self.send(json.dumps({"status": "continue", "detail": request_pk}))
+            start_time = int(r.getex(f"user_{self.operation}:{user_pk}:start", ex=10*60))
+            await self.send(json.dumps({"status": "continue", "detail": request_pk, "start": start_time}))
             # достаёт заявку из бд
             try:
                 user_request = await self.model.objects.aget(pk=request_pk)
@@ -60,6 +62,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             # начинает обрабатывать заявку
             await self.send_request_status(request_pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user_pk}")
+            r.delete(f"user_{self.operation}:{user_pk}:start")
 
     async def disconnect(self, code):
         """Отключение пользователя"""
@@ -239,12 +242,11 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 try:
                     resp = await session.get(url_request_create)
                     bot_response = await resp.json()
+                    resp.close()
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
                     await self.send(json.dumps({"status": "error", "detail": "Сервер ботов недоступен."}))
                     print(f"Can't create request on the bot server. {type(err)}: {err}")
                     return
-                finally:
-                    resp.close()
 
             # проверяет, создалась ли заявка на сервере
             if bot_response.get('ok') == False:
@@ -254,6 +256,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
             
             # запоминает в редис заявку пользователя для её обработки в случае перезагрузки страницы
             r.set(f"user_{self.operation}:{user.pk}", new_request.pk, ex=10*60)
+            start_time = round(timezone.now().timestamp())
+            r.set(f"user_{self.operation}:{user.pk}:start", start_time, ex=10*60)
             # если заявка на сервере создалась, то отправляет заявку на клиент
             response_serializer = self.model_serializer(new_request)
             serializer_data = await sync_to_async(getattr)(response_serializer, 'data')
@@ -266,6 +270,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             # запускает процесс мониторинга состояния заявки
             await self.send_request_status(new_request.pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user.pk}")
+            r.delete(f"user_{self.operation}:{user.pk}:start")
             return
         
         # отрабатывает если данные для создания заявки, полученные от клиента, были неправильными
