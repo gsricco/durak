@@ -114,14 +114,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             else:
                 r.srem("online", self.scope["user"].id)
         online = r.scard("online")
-        if r.exists("fake_online"):
-            online = r.get("fake_online")
         if self.scope["user"].is_staff:
             await self.channel_layer.group_send('admin_group', {
                 "type": "get_online",
                 "get_online": online
             })
         else:
+            if r.exists("fake_online"):
+                online = r.get("fake_online")
             await self.channel_layer.group_send(self.room_group_name, {
                 "type": "get_online",
                 "get_online": online
