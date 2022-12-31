@@ -1239,6 +1239,3 @@ function modalAuth(){
         }
     });
 }
-
-
-

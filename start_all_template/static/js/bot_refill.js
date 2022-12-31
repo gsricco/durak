@@ -51,13 +51,13 @@ function hideForm() {
     if (refillSocket !== null && refillSocket.readyState === 1) {
         refillSocket.close(1000);
     }
-};
+}
 // отсчёт на кнопке
 function setCountdown(timerContainerId, startTime, callAfter) {
     let timerContainer = document.querySelector(timerContainerId);
     if (!timerContainer.classList.contains("btn_white")) {
         return;
-    };
+    }
     timerContainer.innerHTML = `<div class="timer"></div>`;
     let timerBlock = timerContainer.firstChild;
     timerBlock.textContent = startTime.trim();
@@ -91,7 +91,7 @@ function setCountdown(timerContainerId, startTime, callAfter) {
             timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
         }
     }, 1000);
-};
+}
 
 function closeAndOpenWindow(message) {
     const popupOk = document.getElementById("refillOk");
@@ -101,7 +101,7 @@ function closeAndOpenWindow(message) {
     hideForm();
     refillSocket.close(1000);
     requestOpened = false;
-};
+}
 // обработка ответов сервера в заявке на пополнение
 let lastServerMessage = '';
 let requestOpened = false;
@@ -154,7 +154,7 @@ function refillSocketOnMessage(e) {
             let li = document.querySelector("#bot_message_refill");
             li.textContent = `Сообщение от бота: ${serverMessage}`;
             li.style.visibility = "visible";
-        };
+        }
         if (data.done) {
             let message = 'Заявка закрыта.';
             if (data.close_reason === 'Success') {
@@ -176,9 +176,9 @@ function refillSocketOnMessage(e) {
             }
             closeAndOpenWindow(message);
             requestOpened = false;
-        };
-    };
-};
+        }
+    }
+}
 
 
 let withdrawSocket = null;
@@ -319,14 +319,36 @@ function withdrawSocketOnMessage(e) {
 
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {
+    let redWrite = document.querySelector('.s-am-input__msg')
+    let inputWrite = document.querySelector(`input[name='add-sum']`)
+
+    inputWrite.addEventListener("input", validInput);
+    function validInput() {
+        let inputValueDinamic = inputWrite.value.split(/[^0-9]/g);
+        if (inputValueDinamic.length > 1 || inputWrite.value.length == 0) {
+            inputWrite.value = "";
+        } else {
+            if (inputWrite.value < 100) {
+                redWrite.style.display = "block"
+
+            } else if (inputWrite.value >= 100) {
+                redWrite.style.display = "none"
+
+            }
+        }
+    }
+
     userBalance = parseInt(document.querySelector('input.s-am-input__input').value);
-    if (e.target == document.querySelector("#unblock_close")) return;
+
+    if (e.target == document.querySelector("#unblock_close")) {
+        return
+    }
     if (!userBalance || userBalance < 100) {
         e.stopImmediatePropagation();
         e.preventDefault();
         const curentPopup = document.getElementById("selectAmountInput");
         popupOpen(curentPopup);
-    };
+    }
 });
 
 // возобновление показа окна с заявкой при его закрытии
@@ -401,7 +423,7 @@ window.addEventListener('load', function(e) {
         a.addEventListener("click", function (e) {
             if (a.hasAttribute("credits")) {
                 refillAmount = a.getAttribute("credits");
-            };
+            }
             e.preventDefault();
             if (refillAmount !== null && parseInt(refillAmount) >= 2000000) {
                 let li1 = document.querySelector("#li-p2-less-2M");

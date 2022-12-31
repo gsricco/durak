@@ -331,8 +331,10 @@ window.addEventListener('load', function (e) {
         var inputForm = document.querySelector(".amount-selection__input");
         var sumCurrent = document.querySelector(".num-game-currency__span-curent");
         var btnForm = document.querySelector(".amount-selection__btn");
-        inputForm.addEventListener("input", sumScore); // инпут рублей
-        sumCurrent.addEventListener("input", sumValute); // инпут кредитов
+        let redWrite = document.querySelector(".amount-selection__info");
+
+        inputForm.addEventListener("input", sumScore);
+        sumCurrent.addEventListener("input", sumValute);
     
         function sumScore() {
             let inputValueDinamic = inputForm.value.split(/[^0-9]/g);
@@ -343,9 +345,11 @@ window.addEventListener('load', function (e) {
                     "rub": inputForm.value,
                 }));
                 if (inputForm.value < 69) {
+                    redWrite.style.display = "block"
                     sumCurrent.value = `${inputForm.value * 0}`;
                     btnForm.classList.add("btn-disable-sum");
                 } else if (inputForm.value >= 69) {
+                    redWrite.style.display = "none"
                     btnForm.classList.remove("btn-disable-sum");
                 }
             }
