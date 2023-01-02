@@ -52,7 +52,7 @@ class FAQ(models.Model):
 
 class BadSlang(models.Model):
     """Запрещенные слова"""
-    name = models.CharField(verbose_name='Запрещенное слово', max_length=100)
+    name = models.CharField(verbose_name='Запрещенное слово', max_length=100, unique=True)
 
     class Meta:
         verbose_name = 'Запрещенные слова'

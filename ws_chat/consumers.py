@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from accaunts.models import Ban, AvatarProfile, DetailUser
 from configs.settings import BASE_DIR, REDIS_URL_STACK
 from accaunts.models import CustomUser, Level, ItemForUser
+from content_manager.admin import SET_BAD_SLAG
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
@@ -611,9 +612,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                         'not_read': not_read,
                                                                         })
         elif text_data_json.get('chat_type') == 'all_chat':
-            '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
+            """Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
             Проводим проверку на длину сообщения не более 250 символов.
-            Проводим проверку на бан пользователя.'''
+            Проводим проверку на бан пользователя."""
             all_chat_message = {"type": "chat_message",
                                 "chat_type": text_data_json.get('chat_type'),
                                 "message": text_data_json["message"],
@@ -625,9 +626,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 }
             if len(all_chat_message["message"]) <= 250:
                 if await self.get_ban_chat_user(text_data_json["user"]):
-                    print("user is banned ===", all_chat_message)
-                    await self.send(text_data=json.dumps(all_chat_message))
-
+                    await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
+                elif not await self.check_bad_slang(text_data_json["message"].lower()):
+                    await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
                 else:
                     await self.channel_layer.group_send(self.room_group_name, all_chat_message)
                     await self.save_user_message_all_chat(all_chat_message)
@@ -900,3 +901,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({
             "credits": sum_credits
         }))
+
+    @staticmethod
+    async def check_bad_slang(message: str) -> bool:
+        """Проверяет сообщение на наличие запрещённых слов"""
+        if r.exists("bad_slang"):
+            bad_words_set = r.smembers("bad_slang")
+            for word in bad_words_set:
+                if word in message:
+                    return False
+        return True

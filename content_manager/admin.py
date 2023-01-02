@@ -1,11 +1,14 @@
 import redis
 from django.contrib import admin
+from django.contrib.admin.utils import get_deleted_objects
+from django.db.models import QuerySet
 
+from .models import SiteContent, FAQ, BadSlang
 from configs.settings import REDIS_URL_STACK
 from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
-
+SET_BAD_SLAG = set()
 
 @admin.register(SiteContent)
 class SiteContentAdmin(admin.ModelAdmin):
@@ -50,8 +53,29 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(BadSlang)
 class BadSlangAdmin(admin.ModelAdmin):
-    """Помощь"""
+    """Фильтр нежелательных слов в чате"""
     list_display = 'name',
+
+    def save_model(self, request, obj, form, change):
+        if BadSlang.objects.filter(name=obj.name.lower()).exists():
+            return
+        obj.name = obj.name.lower()
+        if r.exists("bad_slang"):
+            r.sadd("bad_slang", obj.name)
+            obj.save()
+        else:
+            obj.save()
+            if words := BadSlang.objects.all().only("name").values_list("name", flat=True):
+                all_words = words
+                r.sadd("bad_slang", *set(all_words))
+
+    def get_deleted_objects(self, objs, request):
+        if type(objs) is QuerySet:
+            objs_words = set(objs.values_list("name", flat=True))
+            r.srem("bad_slang", *objs_words)
+        else:
+            r.srem("bad_slang", objs[0].name)
+        return get_deleted_objects(objs, request, self.admin_site)
 
 
 @admin.register(FakeOnline)
