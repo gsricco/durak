@@ -194,7 +194,7 @@ const chatS = new WebSocket(
 
 chatS.onmessage = function (e) {
     const data = JSON.parse(e.data);
-    if (data.get_online){
+    if (data.get_online && data.staff){
         onlineAdmin.innerHTML = ` ${data.get_online}`
     }
 

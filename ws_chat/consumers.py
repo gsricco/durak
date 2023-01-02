@@ -114,18 +114,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             else:
                 r.srem("online", self.scope["user"].id)
         online = r.scard("online")
-        if self.scope["user"].is_staff:
+        if staff := self.scope["user"].is_staff:
             await self.channel_layer.group_send('admin_group', {
                 "type": "get_online",
-                "get_online": online
+                "get_online": online,
+                "staff": staff
             })
-        else:
-            if r.exists("fake_online"):
-                online = r.get("fake_online")
-            await self.channel_layer.group_send(self.room_group_name, {
-                "type": "get_online",
-                "get_online": online
-            })
+        # else:
+        if r.exists("fake_online"):
+            online = r.get("fake_online")
+        await self.channel_layer.group_send(self.room_group_name, {
+            "type": "get_online",
+            "get_online": online
+        })
 
     async def init_users_chat(self, channel):
         """Отправляет историю сообщений(до 50шт) общего чата, выгружая её из Редиса"""
@@ -462,8 +463,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.set_online(is_auth)
         if recieve_user == 'go':  # проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
-            await self.init_support_chat(
-                user.pk)  # TODO: должен выгружать только на странице чата поддержки, в суппорт чат
+            await self.init_support_chat(user.pk)
             await self.init_users_chat(self.channel_name)
         else:
             await self.get_all_room()
@@ -634,9 +634,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
-        await self.send(text_data=json.dumps({
-            "get_online": event.get('get_online'),
-        }))
+        message = {'get_online': event.get('get_online')}
+        if s := event.get('staff'):
+            message['staff'] = s
+        await self.send(text_data=json.dumps(message))
 
     async def get_rooms(self, event):
         await self.send(text_data=json.dumps({
