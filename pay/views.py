@@ -15,7 +15,7 @@ def rub_to_pay(rub):
         c_r = BalPay.objects.get(range_sum__contains=NumericRange(rub, rub + 1))
     except BalPay.DoesNotExist or BalPay.MultipleObjectsReturned:
         return 0
-    return int(rub * (c_r.conversion_coef/100))
+    return rub * c_r.conversion_coef
 
 
 def balance(request):

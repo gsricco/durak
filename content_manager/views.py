@@ -9,7 +9,7 @@ from accaunts.forms import UserEditName
 from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 from bot_payment.models import RefillRequest, WithdrawalRequest
-from .models import FAQ, SiteContent
+from .models import FAQ, SiteContent, ShowRound
 
 
 def add_pay_buttons(context):
@@ -172,7 +172,7 @@ def profil(request):
     """ПРОФИЛЬ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-          # Смена имени для пользователя
+        # Смена имени для пользователя
         user_ed = CustomUser.objects.get(username=request.user)
         if request.method == 'POST':
             form_user = UserEditName(request.POST)
@@ -200,18 +200,28 @@ def profil(request):
             social_vk = True
         else:
             social_vk = False
-        # логика для отображения транзикций
-        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True).annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True)).values('date', 'pay', 'tr_type', 'tr_plus', 'sum')
-        user_bets = UserBet.objects.filter(user=request.user).annotate(tr_type=Value('Ставка'), tr_plus=F('win')).values('date', 'sum_win', 'tr_type', 'tr_plus', 'sum')
-        refill = RefillRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True)).values('date_closed', 'amount', 'tr_type', 'tr_plus', 'balance')
-        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount')
-        referal = ReferalUser.objects.filter(user_with_bonus=request.user).annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True)).values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus')
+        # логика для отображения транзакций
+        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True)\
+            .annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True), round_r=Value(0))\
+            .values('date', 'pay', 'tr_type', 'tr_plus', 'sum', 'round_r')
+        user_bets = UserBet.objects.filter(user=request.user)\
+            .annotate(tr_type=Value('Ставка'), tr_plus=F('win'), round_r=F('round_number'))\
+            .values('date', 'sum_win', 'tr_type', 'tr_plus', 'sum', 'round_r')
+        refill = RefillRequest.objects.filter(user=request.user, status='succ')\
+            .annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True), round_r=Value(0))\
+            .values('date_closed', 'amount', 'tr_type', 'tr_plus', 'balance', 'round_r')
+        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ')\
+            .annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False),  round_r=Value(0))\
+            .values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount', 'round_r')
+        referal = ReferalUser.objects.filter(user_with_bonus=request.user)\
+            .annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True), round_r=Value(0))\
+            .values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus', 'round_r')
         transactions = popoln.union(user_bets, refill, withdraw, referal).order_by('-date')
         paginator = Paginator(transactions, 8)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         page_paginated = True if page_number else False
-
+        show_round = ShowRound.objects.filter().only("show").first()
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -223,6 +233,7 @@ def profil(request):
             'title': 'Профиль',
             'page_obj': page_obj,
             'page_paginated': page_paginated,
+            'show_round': show_round.show
             # 'paginator': paginator,
         }
     else:

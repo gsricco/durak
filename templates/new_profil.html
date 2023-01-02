@@ -443,7 +443,11 @@
                         <div class="transactions__titles">
                             <h3 class="transactions__name">СУММА</h3>
                             <h3 class="transactions__name">ТИП</h3>
+                            {% if show_round %}
+                                <h3 class="transactions__name">РАУНД</h3>
+                            {% endif %}
                             <h3 class="transactions__name">ДАТА</h3>
+
                         </div>
 
                         <div class="transactions__items">
@@ -460,12 +464,19 @@
                                             <span class="transactions__item-text transactions__item-text_red">-{{ transaction.sum|div:"1000" }}k</span>
                                         {% endif %}
                                     </div>
+
                                     <div class="transactions__item-type transactions__item-info">
                                         <span>{{ transaction.tr_type }}</span>
 
                                     </div>
+                                {% if show_round %}
+                                    <div class="transactions__item-round transactions__item-info">
+                                        <span>{{ transaction.round_r }}</span>
+                                    </div>
+                                {% endif %}
                                     <div class="transactions__item-date transactions__item-info">
                                         <span>{{ transaction.date }}</span>
+
 
                                     </div>
                                 </div>

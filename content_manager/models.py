@@ -74,3 +74,14 @@ class FakeOnline(models.Model):
     def __str__(self):
         return f'Онлайн: {self.count}'
 
+
+class ShowRound(models.Model):
+    """Показывать раунды в транзакциях(профиле пользователя)"""
+    show = models.BooleanField(verbose_name="Показывать раунд в транзакциях", default=True)
+
+    def __str__(self):
+        return f'Показывать раунды в транзакциях'
+
+    class Meta:
+        verbose_name = "Показывать раунд в транзакциях"
+        verbose_name_plural = "Показывать раунды в транзакциях"

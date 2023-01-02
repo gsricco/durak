@@ -2,7 +2,8 @@ import redis
 from django.contrib import admin
 
 from configs.settings import REDIS_URL_STACK
-from .models import SiteContent, FAQ, BadSlang, FakeOnline
+from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
+
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 
 
@@ -71,3 +72,16 @@ class AdminFakeOnline(admin.ModelAdmin):
         else:
             r.delete("fake_online")
         obj.save()
+
+
+@admin.register(ShowRound)
+class ShowRoundAdmin(admin.ModelAdmin):
+    """Показывать раунды в транзакциях"""
+    list_display = "__str__", "show",
+    fields = "show",
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
