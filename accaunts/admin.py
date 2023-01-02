@@ -199,12 +199,13 @@ class BanUserAdmin(admin.ModelAdmin):
 
 @admin.register(RouletteRound)
 class RouletteRoundAdmin(admin.ModelAdmin):
-    list_display = 'round_number', 'round_roll', 'rolled', 'round_started', 'show_round',
-    list_editable = 'round_roll', 'show_round'
+    list_display = 'round_number', 'round_roll', 'rolled', 'round_started',
+    list_editable = 'round_roll',
     search_fields = '=round_number',
     search_help_text = 'Поиск по номеру раунда'
     list_filter = 'rolled', 'round_roll', 'round_started'
     readonly_fields = 'day_hash', 'round_number', 'round_started',  'rolled', 'total_bet_amount', 'winners',
+    ordering = '-rolled', '-round_started'
 
 
 @admin.register(DayHash)

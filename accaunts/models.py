@@ -270,8 +270,7 @@ class RouletteRound(models.Model):
                                   default='hearts')
     rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
-    show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
-
+    # show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
 
@@ -281,7 +280,7 @@ class RouletteRound(models.Model):
     class Meta:
         verbose_name = 'Раунд рулетки'
         verbose_name_plural = 'Раунды рулетки'
-        ordering = ['round_number']
+        ordering = ('-round_started', '-rolled')
 
 
 class ItemForUser(models.Model):
