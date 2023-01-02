@@ -45,7 +45,6 @@ def pay_user(request):
     order_id = request.GET.get('MERCHANT_ORDER_ID', '')
     intid = request.GET.get('intid', '')
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{order_id}'.encode('utf-8')).hexdigest()
-    print(sign, 'signsignsignsign')
     po = request.GET.get('SIGN')
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
@@ -61,6 +60,5 @@ def pay_user(request):
     order.save()
     det_user = DetailUser.objects.get(user=order.user_game)
     det_user.balance += order.pay
-    print(det_user)
     det_user.save()
     return response.Response(status=status.HTTP_200_OK, data={})
