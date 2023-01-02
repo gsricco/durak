@@ -170,6 +170,7 @@ class DetailUser(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.PositiveBigIntegerField(verbose_name="Баланс", default=0)
     free_balance = models.PositiveBigIntegerField(verbose_name="Бонусный счёт", default=0)
+    frozen_balance = models.PositiveBigIntegerField(verbose_name='Замороженные средства', default=0)
 
     class Meta:
         verbose_name = 'Баланс пользователя в игре'

@@ -5,6 +5,7 @@ from accaunts.models import CustomUser
 
 
 class Popoln(models.Model):
+    """История транзакций"""
     user_game = models.ForeignKey(CustomUser, verbose_name='Пользователь', on_delete=models.CASCADE,
                                   related_name='us_game')
     sum = models.IntegerField(verbose_name="Сумма пополнения в деньгах")
@@ -26,8 +27,8 @@ class Popoln(models.Model):
 
 class BalPay(models.Model):
     """Кредиты за реальные деньги"""
-    conversion_coef = models.DecimalField(verbose_name='Коэффициент конверсии рубль/игровая валюта',
-                                          max_digits=8, decimal_places=1, help_text="В процентах %")
+    conversion_coef = models.PositiveIntegerField(verbose_name='Коэффициент конверсии рубль/игровая валюта',
+                                                  help_text="В х раз")
     range_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях - на который применяется данный коэффициент',
                                      null=True)
 

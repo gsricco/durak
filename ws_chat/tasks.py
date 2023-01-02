@@ -647,10 +647,12 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                     detail_user.save()
             elif operation == 'withdraw':
                 user_request.amount = info.get('withdraw')
-                if user_request.amount > 0:
-                    detail_user = models.DetailUser.objects.get(user=user_request.user)
-                    detail_user.balance -= user_request.amount
-                    detail_user.save()
+                detail_user = models.DetailUser.objects.get(user=user_request.user)
+                frozen_balance_remain = detail_user.frozen_balance - user_request.amount
+                new_balance = max(0, detail_user.balance + frozen_balance_remain)
+                detail_user.balance = new_balance
+                detail_user.frozen_balance = 0
+                detail_user.save()
             else:
                 print(f'Unknown request operation: {operation}')
                 return
@@ -730,6 +732,19 @@ def send_balance(user_pk=None):
             async_to_sync(channel_layer.group_send)(f'admin_group', message)
         else:
             async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
+
+
+@shared_task
+def send_balance_to_single(user_pk=None):
+    if models.CustomUser.objects.filter(pk=user_pk).exists():
+        user =models.CustomUser.objects.get(pk=user_pk)
+        message = {
+            'type': 'get_balance',
+            'balance_update': {
+                'current_balance': user.detailuser.balance
+            }
+        }
+        async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
 
 
 def send_balance_delay(user_pk):
