@@ -4,6 +4,7 @@ from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
+from .validators import validate_referal
 from caseapp.models import OwnedCase
 import sys
 
@@ -183,7 +184,14 @@ class DetailUser(models.Model):
 class ReferalCode(models.Model):
     """Модель реферальных ссылок"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    ref_code = models.CharField(verbose_name="Реферальный код", unique=True, max_length=200, blank=True, null=True)
+    ref_code = models.CharField(
+        verbose_name="Реферальный код",
+        unique=True,
+        max_length=200,
+        validators=[validate_referal],
+        blank=True,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'Реферальный код'
