@@ -89,6 +89,7 @@ const returnToStartPosition = () => {
     if (window.screen.width === 640) trWidth = 590;
     if (window.screen.width === 414) trWidth = 850;
     if (window.screen.width === 412) trWidth = 860;
+    if (window.screen.width === 390) trWidth = 780;
     if (window.screen.width === 375) trWidth = 650;
     if (window.screen.width === 360) trWidth = 655;
 
