@@ -443,9 +443,6 @@
                         <div class="transactions__titles">
                             <h3 class="transactions__name">СУММА</h3>
                             <h3 class="transactions__name">ТИП</h3>
-{#                            {% if show_round %}#}
-{#                                <h3 class="transactions__name">РАУНД</h3>#}
-{#                            {% endif %}#}
                             <h3 class="transactions__name">ДАТА</h3>
 
                         </div>
@@ -466,16 +463,8 @@
                                     </div>
 
                                     <div class="transactions__item-type transactions__item-info">
-
                                         <span>{{ transaction.tr_type }}{% if show_round %} (раунд #{{ transaction.round_r }}) {% endif %}</span>
-
-
                                     </div>
-{#                                {% if show_round %}#}
-{#                                    <div class="transactions__item-round transactions__item-info">#}
-{#                                        <span>{{ transaction.round_r }}</span>#}
-{#                                    </div>#}
-{#                                {% endif %}#}
                                     <div class="transactions__item-date transactions__item-info">
                                         <span>{{ transaction.date }}</span>
 
@@ -588,7 +577,7 @@
                         <div class="choice-object__in-block">
                             <input type="text" class="choice-object__input choice-object__input_min form__input"
                                    disabled
-                                   value="Sellix224121">
+                                   value={{modal_nickname}}>
                             <div class="btn btn_dark choice-object__btn">Скопировать</div>
                         </div>
                     </li>

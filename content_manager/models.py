@@ -85,3 +85,15 @@ class ShowRound(models.Model):
     class Meta:
         verbose_name = "Показывать раунд в транзакциях"
         verbose_name_plural = "Показывать раунды в транзакциях"
+
+
+class DurakNickname(models.Model):
+    nickname = models.CharField(max_length=50, verbose_name='Ник для вывода')
+    date = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
+
+    def __str__(self):
+        return f'Текущий ник - {self.nickname}'
+
+    class Meta:
+        verbose_name = 'Никнейм для вывода'
+        verbose_name_plural = 'Никнейм для вывода'

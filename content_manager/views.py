@@ -9,7 +9,7 @@ from accaunts.forms import UserEditName
 from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 from bot_payment.models import RefillRequest, WithdrawalRequest
-from .models import FAQ, SiteContent, ShowRound
+from .models import FAQ, SiteContent, ShowRound, DurakNickname
 
 
 def add_pay_buttons(context):
@@ -222,6 +222,9 @@ def profil(request):
         page_obj = paginator.get_page(page_number)
         page_paginated = True if page_number else False
         show_round = ShowRound.objects.filter().only("show").first()
+        mod_nick = ''
+        if mod_nick := DurakNickname.objects.first():
+            mod_nick = mod_nick.nickname
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -233,6 +236,7 @@ def profil(request):
             'title': 'Профиль',
             'page_obj': page_obj,
             'page_paginated': page_paginated,
+            'modal_nickname': mod_nick,
             'show_round': show_round.show
             # 'paginator': paginator,
         }

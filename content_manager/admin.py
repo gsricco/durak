@@ -3,12 +3,13 @@ from django.contrib import admin
 from django.contrib.admin.utils import get_deleted_objects
 from django.db.models import QuerySet
 
-from .models import SiteContent, FAQ, BadSlang
+from .models import SiteContent, FAQ, BadSlang, DurakNickname
 from configs.settings import REDIS_URL_STACK
 from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 SET_BAD_SLAG = set()
+
 
 @admin.register(SiteContent)
 class SiteContentAdmin(admin.ModelAdmin):
@@ -109,3 +110,12 @@ class ShowRoundAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(DurakNickname)
+class DurakNicknameAdmin(admin.ModelAdmin):
+    list_display = 'nickname',
+    # def has_add_permission(self, request):
+    #     return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
