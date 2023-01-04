@@ -31,6 +31,7 @@ class BalPay(models.Model):
                                                   help_text="В х раз")
     range_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях - на который применяется данный коэффициент',
                                      null=True)
+    range_credits = BigIntegerRangeField(verbose_name="Диапазон в кредитах", null=True)
 
     class Meta:
         verbose_name = "Коэффициент конверсии рубль/игровая валюта"

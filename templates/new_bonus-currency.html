@@ -66,7 +66,7 @@
                     </form>
                 </div>
                 <div class="bonus-currency__item add-bonus">
-{% if user.social_auth.first.provider == 'google-oauth2' %}
+{#{% if user.social_auth.first.provider == 'google-oauth2' %}#}
                     <div class="add-bonus__item">
 
                         <div class="add-bonus__title-block">
@@ -93,8 +93,8 @@
                             {{ user.social_auth.provider }}</a>
 
                     </div>
-{% endif %}
-                {% if user.social_auth.first.provider == 'vk-oauth2' %}
+{#{% endif %}#}
+{#                {% if user.social_auth.first.provider == 'vk-oauth2' %}#}
                     <div class="add-bonus__item">
                         <div class="add-bonus__title-block">
                             <div class="add-bonus__logo">
@@ -119,7 +119,7 @@
                             Вконтакте</a>
 {#                        {% endfor %}#}
                     </div>
-                {% endif %}
+{#                {% endif %}#}
                 </div>
             </div>
             <div class="bonus-currency__invite invite">

@@ -1,5 +1,6 @@
 from social_core.backends.google import GoogleOAuth2
 from social_core.backends.vk import VKOAuth2
+from social_core.utils import module_member
 
 
 class CustomGoogleOAuth2(GoogleOAuth2):
@@ -9,9 +10,9 @@ class CustomGoogleOAuth2(GoogleOAuth2):
             email = response['email']
         else:
             email = ''
-        print(response, 'ETO RESPONSE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        print(self.__dict__)
-        print(self.__dict__.get('strategy').__dict__)
+        # print(response, 'ETO RESPONSE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        # print(self.__dict__)
+        # print(self.__dict__.get('strategy').__dict__)
         name, given_name, family_name, picture = (
             response.get('name', ''),
             response.get('given_name', ''),
@@ -28,6 +29,35 @@ class CustomGoogleOAuth2(GoogleOAuth2):
                 'first_name': first_name,
                 'last_name': last_name,
                 'photo': picture}
+
+    # def process_error(self, data):
+    #     print('!' * 100)
+    #     print(self)
+    #     print(data)
+    #     print('!' * 100)
+    def run_pipeline(self, pipeline, pipeline_index=0, *args, **kwargs):
+        out = kwargs.copy()
+        out.setdefault('strategy', self.strategy)
+        out.setdefault('backend', out.pop(self.name, None) or self)
+        out.setdefault('request', self.strategy.request_data())
+        out.setdefault('details', {})
+
+        if not isinstance(pipeline_index, int) or \
+                pipeline_index < 0 or \
+                pipeline_index >= len(pipeline):
+            pipeline_index = 0
+
+        for idx, name in enumerate(pipeline[pipeline_index:]):
+            out['pipeline_index'] = pipeline_index + idx
+            func = module_member(name)
+            print(func, "ETO FUNC")
+            print(out, '@'*100)
+            print(args, '#'*100)
+            result = func(*args, **out) or {}
+            if not isinstance(result, dict):
+                return result
+            out.update(result)
+        return out
 
 
 class CustomVKOAuth2(VKOAuth2):
@@ -49,3 +79,33 @@ class CustomVKOAuth2(VKOAuth2):
                 'last_name': last_name,
                 'photo': photo,
                 'vk_url': 'https://vk.com/' + screen_name}
+
+    # def process_error(self, data):
+    #     print('*' * 100)
+    #     print(self)
+    #     print(data)
+    #     print('*' * 100)
+
+    def run_pipeline(self, pipeline, pipeline_index=0, *args, **kwargs):
+        out = kwargs.copy()
+        out.setdefault('strategy', self.strategy)
+        out.setdefault('backend', out.pop(self.name, None) or self)
+        out.setdefault('request', self.strategy.request_data())
+        out.setdefault('details', {})
+
+        if not isinstance(pipeline_index, int) or \
+                pipeline_index < 0 or \
+                pipeline_index >= len(pipeline):
+            pipeline_index = 0
+
+        for idx, name in enumerate(pipeline[pipeline_index:]):
+            out['pipeline_index'] = pipeline_index + idx
+            func = module_member(name)
+            print(func, "ETO FUNC")
+            print(out, '@'*100)
+            print(args, '#'*100)
+            result = func(*args, **out) or {}
+            if not isinstance(result, dict):
+                return result
+            out.update(result)
+        return out

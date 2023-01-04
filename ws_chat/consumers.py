@@ -16,7 +16,7 @@ from content_manager.admin import SET_BAD_SLAG
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
-from pay.views import rub_to_pay
+from pay.views import rub_to_pay, virtual_money_to_rub
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
@@ -462,7 +462,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "type": 'roulette_countdown_state',
         })
         await self.set_online(is_auth)
-        if recieve_user == 'go':  # проверка подключение из админки или нет. 'go' - это не админка
+        if recieve_user == 'go':  # Проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
             await self.init_support_chat(user.pk)
             await self.init_users_chat(self.channel_name)
@@ -555,8 +555,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send_free_balance()
         if text_data_json.get('free_balance') == 'get':
             await self.get_free_balance()
-        if text_data_json.get('rub'):
-            await self.send_credits_from_rubs(text_data_json['rub'])
+        if rub := text_data_json.get("rub"):
+            if rub == "to_credits":
+                await self.send_rubs_from_credits(text_data_json.get("to_credits"))
+            else:
+                await self.send_credits_from_rubs(text_data_json["rub"])
             
         """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':
@@ -900,6 +903,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sum_credits = await sync_to_async(rub_to_pay)(sum_rub)
         await self.send(json.dumps({
             "credits": sum_credits
+        }))
+
+    async def send_rubs_from_credits(self, sum_credits):
+        print(sum_credits)
+        try:
+            int_credits = int(sum_credits)
+        except (TypeError, ValueError):
+            int_credits = 0
+        rubs = await sync_to_async(virtual_money_to_rub)(int_credits)
+        print(rubs, 'ETO BLAD RUBS!!!!!!!!!!!!!!!!!!!@#!@#$%!@$')
+        await self.send(json.dumps({
+            "creds_to_rubs": rubs
         }))
 
     @staticmethod

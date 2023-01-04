@@ -1733,7 +1733,7 @@ h3 {
 }
 
 .amount-selection__smooth {
-  margin: -25px 10px 0 10px;
+  margin: 12px 10px 0 10px;
   display: block;
   font-size: 1.625em;
   color: #525252;
@@ -7914,10 +7914,11 @@ margin-top: 36px;
 
   .amount-selection__item {
     width: 100%;
+    min-height: 10px;
   }
 
   .amount-selection__smooth {
-    margin: -10px auto 10px auto;
+    margin: 12px auto 10px auto;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;

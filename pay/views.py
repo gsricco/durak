@@ -1,4 +1,6 @@
 import hashlib
+import math
+
 from django.shortcuts import redirect, get_object_or_404
 from rest_framework import response, status
 from rest_framework.decorators import api_view
@@ -15,7 +17,20 @@ def rub_to_pay(rub):
         c_r = BalPay.objects.get(range_sum__contains=NumericRange(rub, rub + 1))
     except BalPay.DoesNotExist or BalPay.MultipleObjectsReturned:
         return 0
-    return rub * c_r.conversion_coef
+    return math.floor((rub * c_r.conversion_coef) / 1000) * 1000
+
+
+def virtual_money_to_rub(virtual_money):
+    """Расчёт денег за кредиты"""
+    try:
+        creds = BalPay.objects.get(range_credits__contains=NumericRange(virtual_money, virtual_money+1))
+    except (BalPay.DoesNotExist or BalPay.MultipleObjectsReturned) as error:
+        return 0
+    # print(res := math.ceil(virtual_money / creds.conversion_coef), 'eto blad resultat')
+    # if res not in NumericRange(creds.range_sum.lower, creds.range_sum.upper):
+    #     # new_creds = BalPay.objects.get(range_sum__contains=NumericRange)
+    #     print('SUKA'*100)
+    return math.ceil(virtual_money / creds.conversion_coef)
 
 
 def balance(request):
