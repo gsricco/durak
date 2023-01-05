@@ -64,7 +64,7 @@ class CustomUser(AbstractUser):
     note = models.CharField(verbose_name='Заметка', max_length=100, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
+        if self.photo and self.avatar == 'img/avatar/user/ava_S.svg':
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
