@@ -68,3 +68,14 @@ class WithdrawBotSum(models.Model):
         verbose_name = "Сумма для вывода через бота"
         verbose_name_plural = "Суммы для вывода через бота"
         ordering = ['credits']
+
+
+class PayOff(models.Model):
+    work = models.BooleanField(verbose_name='Оплаты только через FKWallet', default=False)
+
+    def __str__(self):
+        return f"{self.work}"
+
+    class Meta:
+        verbose_name = "Оплаты только через FKWallet"
+        verbose_name_plural = "Оплаты только через FKWallet"

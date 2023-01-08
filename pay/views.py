@@ -6,7 +6,7 @@ from rest_framework import response, status
 from rest_framework.decorators import api_view
 from accaunts.models import DetailUser
 from configs.settings import MERCHANT_ID, SECRET_WORD
-from pay.models import Popoln, BalPay
+from pay.models import Popoln, BalPay, PayOff
 from psycopg2.extras import NumericRange
 
 
@@ -37,13 +37,17 @@ def balance(request):
     order_amount = request.GET.get('sum_rub', '0')
     pay = rub_to_pay(int(order_amount))
     currency = 'RUB'  # RUB,USD,EUR,UAH,KZT
+    if PayOff.objects.filter(work=False):
+        i = request.GET.get('paymentSystem')
+    else:
+        i = 1
     user_pay = Popoln(sum=order_amount, pay=pay, user_game=request.user)
     user_pay.url_pay = request.META.get('HTTP_REFERER')
     user_pay.save()
     order_id = user_pay.pk
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{currency}:{order_id}'.encode('utf-8')).hexdigest()
     return redirect(
-        f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&pay=PAY&s={sign}')
+        f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&pay=PAY&s={sign}&i={i}')
 
 
 @api_view(['GET'])

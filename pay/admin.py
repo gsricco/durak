@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from psycopg2._range import NumericRange
 
-from .models import Popoln, BalPay, RefillBotSum, WithdrawBotSum
+from .models import Popoln, BalPay, RefillBotSum, WithdrawBotSum,  PayOff
 
 
 @admin.register(Popoln)
@@ -68,3 +68,14 @@ class RefillBotSumAdmin(admin.ModelAdmin):
 class WithdrawBotSumAdmin(admin.ModelAdmin):
     list_display = 'id', 'credits', 'text'
     list_editable = 'credits', 'text'
+
+
+@admin.register(PayOff)
+class PayOffAdmin(admin.ModelAdmin):
+    list_display = 'id', 'work',
+    list_editable = 'work',
+
+    def has_add_permission(self, request):  # позволяет создать только одну модель
+        if self.model.objects.count() >= 1:
+            return False
+        return super().has_add_permission(request)
