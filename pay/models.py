@@ -5,6 +5,7 @@ from accaunts.models import CustomUser
 
 
 class Popoln(models.Model):
+    """История транзакций"""
     user_game = models.ForeignKey(CustomUser, verbose_name='Пользователь', on_delete=models.CASCADE,
                                   related_name='us_game')
     sum = models.IntegerField(verbose_name="Сумма пополнения в деньгах")
@@ -26,10 +27,11 @@ class Popoln(models.Model):
 
 class BalPay(models.Model):
     """Кредиты за реальные деньги"""
-    conversion_coef = models.DecimalField(verbose_name='Коэффициент конверсии рубль/игровая валюта',
-                                          max_digits=4, decimal_places=1, help_text="В процентах %")
+    conversion_coef = models.PositiveIntegerField(verbose_name='Коэффициент конверсии рубль/игровая валюта',
+                                                  help_text="В х раз")
     range_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях - на который применяется данный коэффициент',
                                      null=True)
+    range_credits = BigIntegerRangeField(verbose_name="Диапазон в кредитах", null=True)
 
     class Meta:
         verbose_name = "Коэффициент конверсии рубль/игровая валюта"
@@ -66,3 +68,14 @@ class WithdrawBotSum(models.Model):
         verbose_name = "Сумма для вывода через бота"
         verbose_name_plural = "Суммы для вывода через бота"
         ordering = ['credits']
+
+
+class PayOff(models.Model):
+    work = models.BooleanField(verbose_name='Оплаты только через FKWallet', default=False)
+
+    def __str__(self):
+        return f"{self.work}"
+
+    class Meta:
+        verbose_name = "Оплаты только через FKWallet"
+        verbose_name_plural = "Оплаты только через FKWallet"

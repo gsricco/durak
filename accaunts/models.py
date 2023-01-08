@@ -4,6 +4,7 @@ from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
+from .validators import validate_referal
 from caseapp.models import OwnedCase
 import sys
 
@@ -50,7 +51,7 @@ class Level(models.Model):
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
-                              default='img/avatar/user/avatar.svg')
+                              default='img/avatar/user/ava_S.svg')
     use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
                                      help_text='Рандомная аватарка с галочкой, а стандартная без')
     avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
@@ -63,7 +64,7 @@ class CustomUser(AbstractUser):
     note = models.CharField(verbose_name='Заметка', max_length=100, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.photo and self.avatar == 'img/avatar/user/avatar.svg':
+        if self.photo and self.avatar == 'img/avatar/user/ava_S.svg':
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
@@ -170,6 +171,7 @@ class DetailUser(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
     balance = models.PositiveBigIntegerField(verbose_name="Баланс", default=0)
     free_balance = models.PositiveBigIntegerField(verbose_name="Бонусный счёт", default=0)
+    frozen_balance = models.PositiveBigIntegerField(verbose_name='Замороженные средства', default=0)
 
     class Meta:
         verbose_name = 'Баланс пользователя в игре'
@@ -182,7 +184,14 @@ class DetailUser(models.Model):
 class ReferalCode(models.Model):
     """Модель реферальных ссылок"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    ref_code = models.CharField(verbose_name="Реферальный код", unique=True, max_length=200, blank=True, null=True)
+    ref_code = models.CharField(
+        verbose_name="Реферальный код",
+        unique=True,
+        max_length=200,
+        validators=[validate_referal],
+        blank=True,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'Реферальный код'
@@ -269,8 +278,7 @@ class RouletteRound(models.Model):
                                   default='hearts')
     rolled = models.BooleanField(verbose_name='Раунд был сыгран', default=False)
     day_hash = models.ForeignKey('DayHash', verbose_name='Хеши раунда', on_delete=models.PROTECT, blank=True, null=True)
-    show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
-
+    # show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
 
@@ -280,7 +288,7 @@ class RouletteRound(models.Model):
     class Meta:
         verbose_name = 'Раунд рулетки'
         verbose_name_plural = 'Раунды рулетки'
-        ordering = ['round_number']
+        ordering = ('-round_started', '-rolled')
 
 
 class ItemForUser(models.Model):
@@ -289,10 +297,18 @@ class ItemForUser(models.Model):
                                   on_delete=models.CASCADE)
     user = models.ForeignKey('CustomUser', verbose_name='Пользователь', null=True, blank=True, on_delete=models.CASCADE)
     is_used = models.BooleanField(verbose_name='Использован', default=False)
+    # date = models.DateTimeField(verbose_name="Дата получения", null=True, auto_now_add=True)
+    date_modified = models.DateTimeField(verbose_name="Дата изменения", null=True, auto_now=True)
+    is_money = models.BooleanField(verbose_name="Деньги", default=False)
+    is_forwarded = models.BooleanField(verbose_name="Выведен", default=False)
 
     class Meta:
         verbose_name = 'Предмет пользователя'
         verbose_name_plural = 'Предметы пользователя'
+        ordering = "-date_modified",
+
+    def __str__(self):
+        return self.user_item.name
 
 
 class AvatarProfile(models.Model):
@@ -335,3 +351,4 @@ class UserBet(models.Model):
     class Meta:
         verbose_name = 'Ставка пользователя'
         verbose_name_plural = 'Ставки пользователей'
+

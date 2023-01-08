@@ -85,12 +85,12 @@ chatSocket.onmessage = function (e) {
     if(data.modal_lvl_data) {
         setTimeout(open_modal_lvl,5000,data.modal_lvl_data)
     }
-    if (data.get_online > 0) {
+    else if (data.get_online > 0) {
         online.innerHTML = `${data.get_online}`
         onlineMob.innerHTML = `${data.get_online}`
     }
 
-if (data.message && data.chat_type === 'all_chat') {
+    else if (data.message && data.chat_type === 'all_chat') {
         const li = document.createElement('li')
         li.className = 'online-chat__li'
         messageBlock.appendChild(li)
@@ -155,7 +155,7 @@ if (data.message && data.chat_type === 'all_chat') {
             btnBan.appendChild(svgBan)
         }
     }
-    if (data.chat_type === 'all_chat_list') {
+    else if (data.chat_type === 'all_chat_list') {
         messageBlock.innerHTML = ''
         const set = new Set(data.list);
         for (let count of set) {
@@ -223,31 +223,31 @@ if (data.message && data.chat_type === 'all_chat') {
             }
         }
     }
-    if (data.lvlup) {
+    else if (data.lvlup) {
             level_data_next = document.querySelector('.level_data_next')
             level_data_back = document.querySelector('.level_data_back')
             level_data_back.innerHTML = data.lvlup.levels + 'ур.'
             level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
-            }
-    if (data.expr){
-        level_line = document.querySelector('.header__profile-line_span')
-        level_line.style.width = data.expr.percent + '%'
+        if (data.expr){
+            level_line = document.querySelector('.header__profile-line_span')
+            level_line.style.width = data.expr.percent + '%'
+        }
     }
-    if (data.current_balance) {
+    else if (data.hasOwnProperty("current_balance")) {
             update_balance(data.current_balance)
         }
-    // if (data.hasOwnProperty('free_balance')) {
-    //     if (freeSpan) {
-    //         freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
-    //     }
-    // }
-    // if (data.hasOwnProperty('credits')) {
-    //     credits = data.credits;
-    //     let sumCurrent = document.querySelector(".num-game-currency__span-curent");
-    //     sumCurrent.value = `${parseFloat(
-    //         credits / 1000,
-    //     ).toFixed(0)}`;
-    // }
+    else if (data.hasOwnProperty('credits')) {
+        let credits = data.credits;
+        let sumCurrent = document.querySelector(".num-game-currency__span-curent");
+        sumCurrent.value = `${parseFloat(
+            credits / 1000,
+        ).toFixed(0)}`;
+    }
+    else if (data.creds_to_rubs){
+        let rubs = data.creds_to_rubs
+        let inputRubs = document.querySelector(".amount-selection__input");
+        inputRubs.value = `${rubs}`
+    }
     scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
@@ -328,9 +328,11 @@ if (freeButton) {
 window.addEventListener('load', function (e) {
     if (document.querySelector(".amount-selection__form")) {
         // достаём инпуты и вешаем на них события
-        var inputForm = document.querySelector(".amount-selection__input");
-        var sumCurrent = document.querySelector(".num-game-currency__span-curent");
-        var btnForm = document.querySelector(".amount-selection__btn");
+        let inputForm = document.querySelector(".amount-selection__input");
+        let sumCurrent = document.querySelector(".num-game-currency__span-curent");
+        let btnForm = document.querySelector(".amount-selection__btn");
+        let redWrite = document.querySelector(".amount-selection__info");
+
         inputForm.addEventListener("input", sumScore);
         sumCurrent.addEventListener("input", sumValute);
     
@@ -338,14 +340,20 @@ window.addEventListener('load', function (e) {
             let inputValueDinamic = inputForm.value.split(/[^0-9]/g);
             if (inputValueDinamic.length > 1 || inputForm.value.length == 0) {
                 inputForm.value = "";
+                sumCurrent.value = "";
+                redWrite.style.display = "none";
             } else {
-                chatSocket.send(JSON.stringify({
-                    "rub": inputForm.value,
-                }));
+
                 if (inputForm.value < 69) {
+                    redWrite.style.display = "block"
                     sumCurrent.value = `${inputForm.value * 0}`;
                     btnForm.classList.add("btn-disable-sum");
+
                 } else if (inputForm.value >= 69) {
+                    chatSocket.send(JSON.stringify({
+                    "rub": inputForm.value,
+                }));
+                    redWrite.style.display = "none"
                     btnForm.classList.remove("btn-disable-sum");
                 }
             }
@@ -353,61 +361,25 @@ window.addEventListener('load', function (e) {
     
         function sumValute() {
             let inputValueDinamic = sumCurrent.value.split(/[^0-9]/g);
-            if (inputValueDinamic.length > 1) {
+            if (inputValueDinamic.length > 1 || sumCurrent.value.length == 0) {
                 sumCurrent.value = "";
+                inputForm.value = "";
+                redWrite.style.display = "none"
             } else {
                 let currentCredint = (sumCurrent.value / 50000) * 1000;
-    
                 if (currentCredint >= 1) {
+                    redWrite.style.display = "none"
                     btnForm.classList.remove("btn-disable-sum");
+                    chatSocket.send(JSON.stringify({
+                        "rub": "to_credits",
+                        "to_credits": sumCurrent.value*1000,
+                }));
                 } else {
                     btnForm.classList.add("btn-disable-sum");
-                }
-    
-                if (currentCredint < 1) {
                     inputForm.value = "";
-                }
-                if (currentCredint <= 2 && currentCredint >= 1) {
-                    inputForm.value = `${(currentCredint * 69).toFixed(1)}`;
-                }
-    
-                if (currentCredint <= 5 && currentCredint >= 2) {
-                    inputForm.value = `${(currentCredint * 55).toFixed(1)}`;
-                }
-    
-                if (currentCredint <= 10 && currentCredint >= 5) {
-                    inputForm.value = `${(currentCredint * 36).toFixed(1)}`;
-                }
-    
-                if (currentCredint <= 20 && currentCredint >= 10) {
-                    inputForm.value = `${(currentCredint * 27.5).toFixed(1)}`;
-                }
-    
-                if (currentCredint <= 40 && currentCredint >= 20) {
-                    inputForm.value = `${(currentCredint * 23).toFixed(1)}`;
-                }
-    
-                if (currentCredint <= 60 && currentCredint >= 40) {
-                    inputForm.value = `${(currentCredint * 21.25).toFixed(1)}`;
-                }
-    
-                if (currentCredint >= 60) {
-                    inputForm.value = `${(currentCredint * 20).toFixed(1)}`;
-                }
-    
-                if (sumCurrent.value == "" && sumCurrent.value == 0) {
-                    inputForm.value = "";
+                    redWrite.style.display = "block"
                 }
             }
         }
     }
-    
-    // ===============================================================
-    // Расчёт по кол-ву руб:
-    // от 69 до 109р кол-во кредов = (введенное число руб.)*725
-    // от 110 до 179р кол-во кредов = (введенное число руб.)*910
-    // от 180 до 239р кол-во кредов = (введенное число руб.)*1389
-    // от 240 до 459р кол-во кредов = (введенное число руб.)*2084
-    // от 460 до 1274р кол-во кредов = (введенное число руб.)*2174
-    // от 1275 кол-во кредов = (введенное число руб.)*2353
 });

@@ -8,11 +8,12 @@ from accaunts.models import CustomUser, Ban, DetailUser
 from . import models, serializers
 from django.utils import timezone
 from django.db.utils import Error
-from ws_chat.tasks import setup_check_request_status
-from configs.settings import HOST_URL, ID_SHIFT
-from .models import WithdrawalRequest
+from ws_chat.tasks import setup_check_request_status, send_balance_to_single
+from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK
+from .models import WithdrawalRequest, BotWork, RefillRequest
+from django.utils import timezone
 
-r = redis.Redis()  # подключаемся к редису
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)  # подключаемся к редису
 
 
 class RequestConsumer(AsyncWebsocketConsumer):
@@ -38,7 +39,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
         # продолжение обработки заявки при разрыве соединения
         if r.get(f"user_{self.operation}:{user_pk}"):
             request_pk = int(r.getex(f"user_{self.operation}:{user_pk}", ex=10*60))
-            await self.send(json.dumps({"status": "continue", "detail": request_pk}))
+            start_time = int(r.getex(f"user_{self.operation}:{user_pk}:start", ex=10*60))
+            await self.send(json.dumps({"status": "continue", "detail": request_pk, "start": start_time}))
             # достаёт заявку из бд
             try:
                 user_request = await self.model.objects.aget(pk=request_pk)
@@ -60,6 +62,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             # начинает обрабатывать заявку
             await self.send_request_status(request_pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user_pk}")
+            r.delete(f"user_{self.operation}:{user_pk}:start")
 
     async def disconnect(self, code):
         """Отключение пользователя"""
@@ -94,8 +97,18 @@ class RequestConsumer(AsyncWebsocketConsumer):
             return response[0].get('name')
         return "Can't find name in server response."
 
+    async def freeze_balance(self, amount):
+        """Замораживает средства перед выводом"""
+        pass
+
     async def create_request(self, text_data_json):
         """Создаёт новую заявку"""
+        # отключение бота
+        s = await BotWork.objects.afirst()
+        if s.work:
+            message = {"status": "error", "detail": "Идут работы!!!"}
+            await self.send(json.dumps(message))
+            return
         # проверяет правильность полученных данных
         if text_data_json.get('user') is None:
             text_data_json['user'] = { "id": self.scope['user'].pk }
@@ -239,12 +252,11 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 try:
                     resp = await session.get(url_request_create)
                     bot_response = await resp.json()
+                    resp.close()
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
                     await self.send(json.dumps({"status": "error", "detail": "Сервер ботов недоступен."}))
                     print(f"Can't create request on the bot server. {type(err)}: {err}")
                     return
-                finally:
-                    resp.close()
 
             # проверяет, создалась ли заявка на сервере
             if bot_response.get('ok') == False:
@@ -254,6 +266,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
             
             # запоминает в редис заявку пользователя для её обработки в случае перезагрузки страницы
             r.set(f"user_{self.operation}:{user.pk}", new_request.pk, ex=10*60)
+            start_time = round(timezone.now().timestamp())
+            r.set(f"user_{self.operation}:{user.pk}:start", start_time, ex=10*60)
             # если заявка на сервере создалась, то отправляет заявку на клиент
             response_serializer = self.model_serializer(new_request)
             serializer_data = await sync_to_async(getattr)(response_serializer, 'data')
@@ -263,9 +277,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
             r.delete(f"bot:{bot_id}")
             # отложенное задание - проверить статус заявки через 15 минут
             setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, self.scope['user'].pk, 11*60)
+            # операции с балансом
+            await self.freeze_balance(amount)
             # запускает процесс мониторинга состояния заявки
             await self.send_request_status(new_request.pk, self.status_delay)
             r.delete(f"user_{self.operation}:{user.pk}")
+            r.delete(f"user_{self.operation}:{user.pk}:start")
             return
         
         # отрабатывает если данные для создания заявки, полученные от клиента, были неправильными
@@ -371,6 +388,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         serializer = self.model_serializer(user_request)
                         serializer_data = await sync_to_async(getattr)(serializer, 'data')
                         await self.send(json.dumps(serializer_data))
+                        send_balance_to_single.apply_async(args=(self.scope['user'].id,))
                         # закрываем соединение
                         await self.close(1000);
                         return
@@ -404,7 +422,7 @@ class RefillConsumer(RequestConsumer):
 
 
 class WithdrawConsumer(RequestConsumer):
-    """Consumer для создание заявок на вывод кредитов"""
+    """Consumer для создания заявок на вывод кредитов"""
     # название операции заявки
     operation = 'withdraw'
     # модель для хранения заявки в БД
@@ -422,11 +440,22 @@ class WithdrawConsumer(RequestConsumer):
         return "OK"
 
     async def process_balance(self, user_request, response):
-            """Производит операции с балансом пользователя"""
-            # начисление на баланс пользователя полученных кредитов
-            user_request.amount = response.get('withdraw')
-            if user_request.amount > 0:
-                detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
-                new_balance = max(detail_user.balance - user_request.amount, 0)
-                detail_user.balance = new_balance
-                await sync_to_async(detail_user.save)()
+        """Производит операции с балансом пользователя"""
+        # начисление на баланс пользователя полученных кредитов
+        user_request.amount = response.get('withdraw')
+        detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
+        frozen_balance_remain = detail_user.frozen_balance - user_request.amount
+        new_balance = max(0, detail_user.balance + frozen_balance_remain)
+        detail_user.balance = new_balance
+        detail_user.frozen_balance = 0
+        await sync_to_async(detail_user.save)()
+
+    async def freeze_balance(self, amount):
+        """Замораживает средства перед выводом"""
+        if amount > 0:
+            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+            new_balance = max(0, detail_user.balance - amount)
+            detail_user.frozen_balance = detail_user.balance - new_balance
+            detail_user.balance = new_balance
+            await sync_to_async(detail_user.save)()
+            send_balance_to_single.apply_async(args=(self.scope['user'].id,))

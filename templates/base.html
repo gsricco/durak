@@ -112,28 +112,32 @@
                             <button class="btnAvatarNoAuth" onclick="modalAuth()">
                                 <img id="avaNotAuth" src="{% static 'img/avatar/user/avatar.svg' %}" style="border-radius: 0px" alt="Аватар">
                             </button>
-                            {% elif user.use_avatar %}
+                        </a>
+                        {% elif user.use_avatar %}
                             <a href="{% url 'profil' %}" class="header__avatar">
                                 <img id="ava" src="{{ user.avatar_default.avatar_img.url }}" alt="Аватар">
-                                {% else %}
+                            </a>
+                        {% else %}
                                 <a href="{% url 'profil' %}" class="header__avatar">
                                     <img id="ava" src="{{ user.avatar.url }}" alt="Аватар">
-                                    {% endif %}
                                 </a>
+                        {% endif %}
 
 
-                                <div class="header__profile-info">
-                            <a href="{% url 'profil' %}" class="header__profile-name">
-                                {% if user.is_authenticated == False %}
+                    <div class="header__profile-info">
+                        {% if user.is_authenticated == False %}
+                        <a href="#" class="header__profile-name" onclick="modalAuth()">
                                 <span>Anonymous</span>
-                                {% else %}
+                        </a>
+                        {% elif user %}
+                        <a href="{% url 'profil' %}" class="header__profile-name" >
                                 <span>{{ request.user.username }}</span>
                                 <svg class="header__profile-settings">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                 </svg>
-                                {% endif %}
+                        </a>
+                        {% endif %}
 
-                            </a>
 
                             <div class="header__profile-row">
                                 {% if user.is_authenticated %}
@@ -463,7 +467,7 @@
                                 <input inputmode="numeric" step="1" type="tel"
                                        class="form__input amount-selection__input"
                                        placeholder="Введите сумму..." min="69" max="50000" name="sum_rub">
-                                <div class="amount-selection__info">Мин 69р. / 50 Тыс.</div>
+                                <div class="amount-selection__info" style="display: none;">Мин 69р. / 50 Тыс.</div>
                             </div>
                             <div class="amount-selection__item"><span class="amount-selection__smooth">=</span></div>
                             <div class="amount-selection__item">
@@ -495,7 +499,7 @@
                                 <div class="swiper-slide amount-selection__slide">
                                     <input type="radio" class="amount-selection__check" id="selectionCard"
                                            name="paymentSystem"
-                                           value="Visa/Master/Мир" checked>
+                                           value="4" checked>
                                     <label for="selectionCard" class="amount-selection__card payment-system">
                                         <div class="payment-system__img payment-system__img_big">
                                             <img src="{% static 'img/gallery/cards.png' %}" alt="Visa/Master/Мир">
@@ -508,7 +512,7 @@
                                 </div>
                                 <div class="swiper-slide amount-selection__slide">
                                     <input type="radio" class="amount-selection__check" id="Qiwi" name="paymentSystem"
-                                           value="Qiwi кошелёк">
+                                           value="10">
                                     <label for="Qiwi" class="amount-selection__card payment-system">
                                         <div class="payment-system__img">
                                             <img src="{% static 'img/gallery/qivi.png' %}" alt="Qiwi кошелёк">
@@ -520,7 +524,7 @@
                                 </div>
                                 <div class="swiper-slide amount-selection__slide">
                                     <input type="radio" class="amount-selection__check" id="yumani" name="paymentSystem"
-                                           value="ЮMoney">
+                                           value="6">
                                     <label for="yumani" class="amount-selection__card payment-system">
                                         <div class="payment-system__img">
                                             <img src="{% static 'img/gallery/yumani.png' %}" alt="ЮMoney">

@@ -6,10 +6,10 @@ from django.utils import timezone
 from django.db.models import Value, F
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser
+from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser, ItemForUser
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 from bot_payment.models import RefillRequest, WithdrawalRequest
-from .models import FAQ, SiteContent
+from .models import FAQ, SiteContent, ShowRound, DurakNickname, BalanceEditor
 
 
 def add_pay_buttons(context):
@@ -61,11 +61,13 @@ def index(request):
 def bonus_currency(request):
     """FREE"""
     sitecontent = SiteContent.objects.all()
+    sitecontent2 = sitecontent.first()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
+            'sitecontent2': sitecontent2,
             'detail_user': detail_user,
             'level_data': level_data,
             'title': 'Free',
@@ -73,6 +75,7 @@ def bonus_currency(request):
     else:
         context = {
             'sitecontent': sitecontent,
+            'sitecontent2': sitecontent2,
             'title': 'Free',
         }
     add_pay_buttons(context)
@@ -169,7 +172,7 @@ def profil(request):
     """ПРОФИЛЬ"""
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
-          # Смена имени для пользователя
+        # Смена имени для пользователя
         user_ed = CustomUser.objects.get(username=request.user)
         if request.method == 'POST':
             form_user = UserEditName(request.POST)
@@ -185,8 +188,6 @@ def profil(request):
         us = CustomUser.objects.get(username=request.user)
         user_agent, created = UserAgent.objects.get_or_create(user=us, useragent=agent)
         user_ip, created = UserIP.objects.get_or_create(user=us, userip=ip)
-        # print(user_agent, ' - USER AGENT')
-        # print(user_ip, ' - IP USER')
         detail_user = DetailUser.objects.get(user_id=request.user.id)
         level_data = Level.objects.get(pk=request.user.level.pk)
         if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
@@ -197,18 +198,39 @@ def profil(request):
             social_vk = True
         else:
             social_vk = False
-        # логика для отображения транзикций
-        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True).annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True)).values('date', 'pay', 'tr_type', 'tr_plus', 'sum')
-        user_bets = UserBet.objects.filter(user=request.user).annotate(tr_type=Value('Ставка'), tr_plus=F('win')).values('date', 'sum_win', 'tr_type', 'tr_plus', 'sum')
-        refill = RefillRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True)).values('date_closed', 'amount', 'tr_type', 'tr_plus', 'balance')
-        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ').annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False)).values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount')
-        referal = ReferalUser.objects.filter(user_with_bonus=request.user).annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True)).values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus')
-        transactions = popoln.union(user_bets, refill, withdraw, referal).order_by('-date')
+        # логика для отображения транзакций
+        popoln = Popoln.objects.filter(user_game=request.user, status_pay=True)\
+            .annotate(tr_type=Value('Пополнение деньгами'), tr_plus=Value(True), round_r=Value(0), name=Value(""))\
+            .values('date', 'pay', 'tr_type', 'tr_plus', 'sum', 'round_r', 'name')
+        user_bets = UserBet.objects.filter(user=request.user)\
+            .annotate(tr_type=Value('Ставка'), tr_plus=F('win'), round_r=F('round_number'), name=Value(""))\
+            .values('date', 'sum_win', 'tr_type', 'tr_plus', 'sum', 'round_r', 'name')
+        refill = RefillRequest.objects.filter(user=request.user, status='succ')\
+            .annotate(tr_type=Value('Пополнение кредитами из игры'), tr_plus=Value(True), round_r=Value(0), name=Value(""))\
+            .values('date_closed', 'amount', 'tr_type', 'tr_plus', 'balance', 'round_r', 'name')
+        withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ')\
+            .annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False),  round_r=Value(0), name=Value(""))\
+            .values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount', 'round_r', 'name')
+        referal = ReferalUser.objects.filter(user_with_bonus=request.user)\
+            .annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True), round_r=Value(0), name=Value(""))\
+            .values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus', 'round_r', 'name')
+        items_for_user = ItemForUser.objects.filter(user=request.user)\
+            .annotate(sum=F("user_item__selling_price"), amount=Value(0), tr_type=Value("Бонусный кейс"), tr_plus=F("is_used"), round_r=Value(0),
+                      name=F("user_item__name"), )\
+            .values("date_modified", "sum", "tr_type", "tr_plus", "amount", "round_r", "name")
+        balance_from_admin = BalanceEditor.objects.filter(to_user=request.user)\
+            .annotate(sum=F("amount"), amount_to=F("amount"), tr_type=Value("От Админа"), tr_plus=F("to_add"), round_r=Value(0),
+                      name=Value(""))\
+            .values("date", "sum", "tr_type", "tr_plus", "amount_to", "round_r", "name")
+        transactions = popoln.union(user_bets, refill, withdraw, referal, items_for_user, balance_from_admin).order_by('-date')
         paginator = Paginator(transactions, 8)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         page_paginated = True if page_number else False
-
+        show_round = ShowRound.objects.filter().only("show").first()
+        mod_nick = ''
+        if mod_nick := DurakNickname.objects.first():
+            mod_nick = mod_nick.nickname
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
@@ -220,6 +242,8 @@ def profil(request):
             'title': 'Профиль',
             'page_obj': page_obj,
             'page_paginated': page_paginated,
+            'modal_nickname': mod_nick,
+            'show_round': show_round.show
             # 'paginator': paginator,
         }
     else:

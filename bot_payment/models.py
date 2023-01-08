@@ -31,7 +31,7 @@ class RefillRequest(models.Model):
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
     close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
-    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.SET_NULL, null=True)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
     bot_name = models.CharField(verbose_name='Имя бота', max_length=100, null=True, blank=True)
 
@@ -73,7 +73,7 @@ class WithdrawalRequest(models.Model):
     note = models.CharField(verbose_name='Заметка заявки', max_length=255, null=True, blank=True)
     close_reason = models.CharField(verbose_name='Причина закрытия заявки', max_length=50, null=True, blank=True)
 
-    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(to='accaunts.CustomUser', verbose_name='пользователь на сайте', on_delete=models.SET_NULL, null=True)
     game_id = models.BigIntegerField(verbose_name='id пользователя в игре', null=True, blank=True)
     bot_name = models.CharField(verbose_name='Имя бота', max_length=100, null=True, blank=True)
 
@@ -83,3 +83,11 @@ class WithdrawalRequest(models.Model):
     class Meta:
         verbose_name = "Заявка на вывод"
         verbose_name_plural = "Заявки на вывод"
+
+
+class BotWork(models.Model):
+    work = models.BooleanField(verbose_name='Отключить работу бота', default=False)
+
+    class Meta:
+        verbose_name = "Отключеиние бота"
+        verbose_name_plural = "Отключеиние бота"

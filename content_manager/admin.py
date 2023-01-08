@@ -1,5 +1,16 @@
+import redis
+from django import forms
 from django.contrib import admin
-from .models import SiteContent, FAQ, BadSlang
+from django.contrib.admin.utils import get_deleted_objects
+from django.db.models import QuerySet
+from django.forms import RadioSelect
+
+from .models import SiteContent, FAQ, BadSlang, DurakNickname, BalanceEditor
+from configs.settings import REDIS_URL_STACK
+from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
+
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
+SET_BAD_SLAG = set()
 
 
 @admin.register(SiteContent)
@@ -45,5 +56,90 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(BadSlang)
 class BadSlangAdmin(admin.ModelAdmin):
-    """Помощь"""
+    """Фильтр нежелательных слов в чате"""
     list_display = 'name',
+
+    def save_model(self, request, obj, form, change):
+        if BadSlang.objects.filter(name=obj.name.lower()).exists():
+            return
+        obj.name = obj.name.lower()
+        if r.exists("bad_slang"):
+            r.sadd("bad_slang", obj.name)
+            obj.save()
+        else:
+            obj.save()
+            if words := BadSlang.objects.all().only("name").values_list("name", flat=True):
+                all_words = words
+                r.sadd("bad_slang", *set(all_words))
+
+    def get_deleted_objects(self, objs, request):
+        if type(objs) is QuerySet:
+            objs_words = set(objs.values_list("name", flat=True))
+            r.srem("bad_slang", *objs_words)
+        else:
+            r.srem("bad_slang", objs[0].name)
+        return get_deleted_objects(objs, request, self.admin_site)
+
+
+@admin.register(FakeOnline)
+class AdminFakeOnline(admin.ModelAdmin):
+    """Фейковый онлайн чата"""
+    list_display = "count", "is_active"
+    fields = "count", "is_active"
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        if obj.is_active is True:
+            r.set("fake_online", obj.count)
+        else:
+            r.delete("fake_online")
+        obj.save()
+
+
+@admin.register(ShowRound)
+class ShowRoundAdmin(admin.ModelAdmin):
+    """Показывать раунды в транзакциях"""
+    list_display = "__str__", "show",
+    fields = "show",
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(DurakNickname)
+class DurakNicknameAdmin(admin.ModelAdmin):
+    list_display = 'nickname',
+    # def has_add_permission(self, request):
+    #     return False
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
+
+
+class AdminBalanceEditorForm(forms.ModelForm):
+    SELECT_CHOICES = (
+        (True, "Добавить"),
+        (False, "Отнять"),
+    )
+    to_add = forms.ChoiceField(label="Опции", choices=SELECT_CHOICES, initial=True, widget=RadioSelect)
+
+    class Meta:
+        model = BalanceEditor
+        fields = '__all__'
+
+
+class AdminBalanceEditor(admin.TabularInline):
+    model = BalanceEditor
+    readonly_fields = "date",
+    form = AdminBalanceEditorForm
+    extra = 0
+
+    def has_change_permission(self, request, obj=None):
+        return False

@@ -13,6 +13,10 @@ btnTimerInstructin.addEventListener("click", function(e) {
         btnTimerInstructin.innerHTML = "<span>Ожидайте...</span>";
         btnTimerInstructin.classList.add("btn_white");
 
+        if (refillSocket !== null && refillSocket.readyState === 1) {
+            refillSocket.close(1000);
+        }
+
         refillSocket = new WebSocket(
             'ws://'
             + window.location.host
@@ -37,10 +41,21 @@ function hideForm() {
     query.textContent = "Заявка #";
     let span = document.querySelector("#bot-nickname-r");
     span.innerHTML = "(отобразится после начала)";
-    let li1 = document.querySelector("#li-p2-less-2M");
-    li1.style.display = "block";
-    let li2 = document.querySelector("#li-p2-ge-2M");
-    li2.style.display = "none";
+    if (refillAmount !== null && parseInt(refillAmount) >= 2000000) {
+        let li1 = document.querySelector("#li-p2-less-2M");
+        li1.style.display = "none";
+        let li2 = document.querySelector("#li-p2-ge-2M");
+        li2.style.display = "block";
+        let numberOfGames = document.querySelector('#number-of-games');
+        numberOfGames.textContent = Math.ceil(parseInt(refillAmount) / 1000000);
+    } else {
+        let li1 = document.querySelector("#li-p2-less-2M");
+        li1.style.display = "block";
+        let li2 = document.querySelector("#li-p2-ge-2M");
+        li2.style.display = "none";
+        let numberOfGames = document.querySelector('#number-of-games');
+        numberOfGames.textContent = 'X';
+    }
     let li = document.querySelector("#bot_message_refill");
     li.textContent = '';
     li.style.visibility = "hidden";
@@ -51,13 +66,13 @@ function hideForm() {
     if (refillSocket !== null && refillSocket.readyState === 1) {
         refillSocket.close(1000);
     }
-};
+}
 // отсчёт на кнопке
 function setCountdown(timerContainerId, startTime, callAfter) {
     let timerContainer = document.querySelector(timerContainerId);
     if (!timerContainer.classList.contains("btn_white")) {
         return;
-    };
+    }
     timerContainer.innerHTML = `<div class="timer"></div>`;
     let timerBlock = timerContainer.firstChild;
     timerBlock.textContent = startTime.trim();
@@ -91,7 +106,7 @@ function setCountdown(timerContainerId, startTime, callAfter) {
             timerBlock.innerHTML = `${minuteTime}:0${secTime}`;
         }
     }, 1000);
-};
+}
 
 function closeAndOpenWindow(message) {
     const popupOk = document.getElementById("refillOk");
@@ -101,10 +116,11 @@ function closeAndOpenWindow(message) {
     hideForm();
     refillSocket.close(1000);
     requestOpened = false;
-};
+}
 // обработка ответов сервера в заявке на пополнение
 let lastServerMessage = '';
 let requestOpened = false;
+let timerStarted = false;
 function refillSocketOnMessage(e) {
     const data = JSON.parse(e.data);
 
@@ -117,9 +133,21 @@ function refillSocketOnMessage(e) {
         requestOpened = true;
         let span = document.querySelector("#bot-nickname-r");
         span.innerHTML = `<b>${botNameR}</b>`;
-        setTimeout(setCountdown, 0, "#modalManualBtn", "6:00", function () {
-            closeAndOpenWindow('Время заявки вышло.');
-        });
+        refillAmount = parseInt(data.amount);
+        if (refillAmount !== null && parseInt(refillAmount) >= 2000000) {
+            let li1 = document.querySelector("#li-p2-less-2M");
+            li1.style.display = "none";
+            let li2 = document.querySelector("#li-p2-ge-2M");
+            li2.style.display = "block";
+            let numberOfGames = document.querySelector('#number-of-games');
+            numberOfGames.textContent = Math.ceil(parseInt(refillAmount) / 1000000);
+        }
+        if (!timerStarted) {
+            setTimeout(setCountdown, 0, "#modalManualBtn", "6:00", function () {
+                closeAndOpenWindow('Время заявки вышло.');
+            });
+        }
+        timerStarted = false;
     } else if (data.hasOwnProperty('status')) {
 
         let dataStatus = data['status'];
@@ -139,6 +167,27 @@ function refillSocketOnMessage(e) {
         } else if (dataStatus === 'continue') {
             // {"status": "continue", "detail": 4}
             // произошёл реконнект на обработку старой заявки
+            let modalManual = document.querySelector('#modalManual');
+            if (modalManual !== null) {
+                // кнопка ожидайте
+                timerStarted = true;
+                btnTimerInstructin.innerHTML = "<span>Ожидайте...</span>";
+                btnTimerInstructin.classList.add("btn_white");
+                // таймер
+                let startTime = parseInt(data.start);
+                let timeToStop = 6*60 + startTime - Math.floor(Date.now() / 1000);
+                if (timeToStop < 0) {
+                    timeToStop = 0;
+                }
+                let minutes = Math.floor(timeToStop / 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
+                let seconds = (timeToStop % 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
+                let timerText = `${minutes}:${seconds}`
+                setTimeout(setCountdown, 0, "#modalManualBtn", timerText, function () {
+                    closeAndOpenWindow('Время заявки вышло.');
+                });
+                // модалка открывается
+                popupOpen(modalManual);
+            };
         } else if (dataStatus === 'get_name') {
             // {"status": "get_name", "detail": "\u041c\u0430\u0440\u0438\u043d\u0430 \u0412\u043e\u043b\u043a\u043e\u0432\u0430"}
             // стало известно имя бота
@@ -148,13 +197,13 @@ function refillSocketOnMessage(e) {
         // {"closed":false,"done":false,"progress":"None","close_reason":"None","message":"","note":"","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // {"closed":true,"done":true,"progress":"WaitingMessage","close_reason":"NoMessage","message":"ÐÑ Ð½Ðµ Ð½Ð°Ð¿Ð¸ÑÐ°Ð»Ð¸ Ð±Ð¾ÑÑ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ Ð·Ð°Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ð²ÑÐµÐ¼ÐµÐ½Ð¸, Ð¿Ð¾Ð¿ÑÐ¾Ð±ÑÐ¹ÑÐµ ÐµÑÑ ÑÐ°Ð·.","note":"Ð¡Ð¾Ð¾Ð±ÑÐµÐ½Ð¸Ðµ Ð¾Ñ Ð¸Ð³ÑÐ¾ÐºÐ° Ð½Ðµ Ð¿ÑÐ¸ÑÐ»Ð¾ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ 331 ÑÐµÐºÑÐ½Ð´","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // пересылается ответ от сервера ботов
-        let serverMessage = data.message;
-        if (serverMessage != lastServerMessage) {
-            lastServerMessage = serverMessage;
-            let li = document.querySelector("#bot_message_refill");
-            li.textContent = `Сообщение от бота: ${serverMessage}`;
-            li.style.visibility = "visible";
-        };
+        // let serverMessage = data.message;
+        // if (serverMessage != lastServerMessage) {
+        //     lastServerMessage = serverMessage;
+        //     let li = document.querySelector("#bot_message_refill");
+        //     li.textContent = `Сообщение от бота: ${serverMessage}`;
+        //     li.style.visibility = "visible";
+        // };
         if (data.done) {
             let message = 'Заявка закрыта.';
             if (data.close_reason === 'Success') {
@@ -176,9 +225,9 @@ function refillSocketOnMessage(e) {
             }
             closeAndOpenWindow(message);
             requestOpened = false;
-        };
-    };
-};
+        }
+    }
+}
 
 
 let withdrawSocket = null;
@@ -193,6 +242,10 @@ btnTimerWithdraw.addEventListener("click", function(e) {
         // кнопка ожидайте
         btnTimerWithdraw.innerHTML = "<span>Ожидайте...</span>";
         btnTimerWithdraw.classList.add("btn_white");
+
+        if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
+            withdrawSocket.close(1000);
+        }
 
         withdrawSocket = new WebSocket(
             'ws://'
@@ -227,7 +280,7 @@ function hideFormWithdraw() {
     if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
         withdrawSocket.close(1000);
     }
-};
+}
 
 function closeAndOpenWindowWithdraw(message) {
     const popupOk = document.getElementById("refillOk");
@@ -237,10 +290,11 @@ function closeAndOpenWindowWithdraw(message) {
     hideFormWithdraw();
     withdrawSocket.close(1000);
     requestOpened = false;
-};
+}
 
 let botNameW = '';
 let lastServerMessageW = '';
+let timerStartedW = false;
 // обработка ответов сервера в заявке на пополнение
 function withdrawSocketOnMessage(e) {
     const data = JSON.parse(e.data);
@@ -254,9 +308,11 @@ function withdrawSocketOnMessage(e) {
         requestOpened = true;
         let span = document.querySelector("#withdraw_nickname");
         span.innerHTML = `<b>${botNameW}</b>`;
-        setTimeout(setCountdown, 0, "#modalManualBtn2", "10:00", function () {
-            closeAndOpenWindowWithdraw('Время заявки вышло.');
-        });
+        if (!timerStartedW) {
+            setTimeout(setCountdown, 0, "#modalManualBtn2", "10:00", function () {
+                closeAndOpenWindowWithdraw('Время заявки вышло.');
+            });
+        }
     } else if (data.hasOwnProperty('status')) {
 
         let dataStatus = data['status'];
@@ -276,6 +332,28 @@ function withdrawSocketOnMessage(e) {
         } else if (dataStatus === 'continue') {
             // {"status": "continue", "detail": 4}
             // произошёл реконнект на обработку старой заявки
+            let modalWithdraw = document.querySelector("#modalManualWithdraw");
+            if (modalWithdraw !== null) {
+                // кнопка ожидайте
+                timerStartedW = true;
+                btnTimerWithdraw.innerHTML = "<span>Ожидайте...</span>";
+                btnTimerWithdraw.classList.add("btn_white");
+                // таймер
+                // таймер
+                let startTime = parseInt(data.start);
+                let timeToStop = 10*60 + startTime - Math.floor(Date.now() / 1000);
+                if (timeToStop < 0) {
+                    timeToStop = 0;
+                }
+                let minutes = Math.floor(timeToStop / 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
+                let seconds = (timeToStop % 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
+                let timerText = `${minutes}:${seconds}`
+                setTimeout(setCountdown, 0, "#modalManualBtn2", timerText, function () {
+                    closeAndOpenWindowWithdraw('Время заявки вышло.');
+                });
+                // модалка открывается
+                popupOpen(modalWithdraw);
+            }
         } else if (dataStatus === 'get_name') {
             // {"status": "get_name", "detail": "\u041c\u0430\u0440\u0438\u043d\u0430 \u0412\u043e\u043b\u043a\u043e\u0432\u0430"}
             // стало известно имя бота
@@ -285,13 +363,13 @@ function withdrawSocketOnMessage(e) {
         // {"closed":false,"done":false,"progress":"None","close_reason":"None","message":"","note":"","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // {"closed":true,"done":true,"progress":"WaitingMessage","close_reason":"NoMessage","message":"ÐÑ Ð½Ðµ Ð½Ð°Ð¿Ð¸ÑÐ°Ð»Ð¸ Ð±Ð¾ÑÑ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ Ð·Ð°Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ð²ÑÐµÐ¼ÐµÐ½Ð¸, Ð¿Ð¾Ð¿ÑÐ¾Ð±ÑÐ¹ÑÐµ ÐµÑÑ ÑÐ°Ð·.","note":"Ð¡Ð¾Ð¾Ð±ÑÐµÐ½Ð¸Ðµ Ð¾Ñ Ð¸Ð³ÑÐ¾ÐºÐ° Ð½Ðµ Ð¿ÑÐ¸ÑÐ»Ð¾ Ð² ÑÐµÑÐµÐ½Ð¸Ð¸ 331 ÑÐµÐºÑÐ½Ð´","ban":false,"last_game_started":"0001-01-01T00:00:00","refill_started":"2022-12-22T21:16:21.7153191Z","refiil":0,"game_id":0}
         // пересылается ответ от сервера ботов
-        let serverMessage = data.message;
-        if (serverMessage != lastServerMessageW) {
-            lastServerMessageW = serverMessage;
-            let li = document.querySelector("#bot_message");
-            li.textContent = `Сообщение от бота: ${serverMessage}`;
-            li.style.visibility = "visible";
-        };
+        // let serverMessage = data.message;
+        // if (serverMessage != lastServerMessageW) {
+        //     lastServerMessageW = serverMessage;
+        //     let li = document.querySelector("#bot_message");
+        //     li.textContent = `Сообщение от бота: ${serverMessage}`;
+        //     li.style.visibility = "visible";
+        // }
         if (data.done) {
             let message = 'Заявка закрыта.';
             if (data.close_reason === 'Success') {
@@ -313,20 +391,42 @@ function withdrawSocketOnMessage(e) {
             }
             closeAndOpenWindowWithdraw(message);
             requestOpened = false;
-        };
-    };
-};
+        }
+    }
+}
 
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {
+    let redWrite = document.querySelector('.s-am-input__msg')
+    let inputWrite = document.querySelector(`input[name='add-sum']`)
+
+    inputWrite.addEventListener("input", validInput);
+    function validInput() {
+        let inputValueDinamic = inputWrite.value.split(/[^0-9]/g);
+        if (inputValueDinamic.length > 1 || inputWrite.value.length == 0) {
+            inputWrite.value = "";
+        } else {
+            if (inputWrite.value < 100) {
+                redWrite.style.display = "block"
+
+            } else if (inputWrite.value >= 100) {
+                redWrite.style.display = "none"
+
+            }
+        }
+    }
+
     userBalance = parseInt(document.querySelector('input.s-am-input__input').value);
-    if (e.target == document.querySelector("#unblock_close")) return;
+
+    if (e.target == document.querySelector("#unblock_close")) {
+        return
+    }
     if (!userBalance || userBalance < 100) {
         e.stopImmediatePropagation();
         e.preventDefault();
         const curentPopup = document.getElementById("selectAmountInput");
         popupOpen(curentPopup);
-    };
+    }
 });
 
 // возобновление показа окна с заявкой при его закрытии
@@ -396,12 +496,13 @@ function popupOpen(curentPopup) {
 
 // вешает на кнопки выбора размера пополнения атрибуты со стоимостью
 window.addEventListener('load', function(e) {
+    // извлечение суммы из нажатой кнопки
     let links = document.querySelectorAll("a.select-amount__item.popup-link");
     for (let a of links) {
         a.addEventListener("click", function (e) {
             if (a.hasAttribute("credits")) {
                 refillAmount = a.getAttribute("credits");
-            };
+            }
             e.preventDefault();
             if (refillAmount !== null && parseInt(refillAmount) >= 2000000) {
                 let li1 = document.querySelector("#li-p2-less-2M");
@@ -417,6 +518,39 @@ window.addEventListener('load', function(e) {
                 li2.style.display = "none";
                 let numberOfGames = document.querySelector('#number-of-games');
                 numberOfGames.textContent = 'X';
+            }
+        });
+    }
+    // возобновление заявки на пополнение
+    document.querySelector('[href="#selectAmount"]').addEventListener("click", function () {
+        if(is_auth) {
+            if (refillSocket !== null && refillSocket.readyState === 1) {
+                refillSocket.close(1000);
+            }
+            refillSocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/refill_payment/create/'
+            );
+
+            refillSocket.onmessage = refillSocketOnMessage;
+        }
+    });
+    // возобновление заявки на вывод
+    let withdrawButtons = document.querySelectorAll('[href="#selectAmountInput"]');
+    for (let withdrawButton of withdrawButtons) {
+        withdrawButton.addEventListener("click", function () {
+            if (is_auth) {
+                if (withdrawSocket !== null && withdrawSocket.readyState === 1) {
+                    withdrawSocket.close(1000);
+                }
+                withdrawSocket = new WebSocket(
+                    'ws://'
+                    + window.location.host
+                    + '/ws/withdraw_payment/create/'
+                );
+
+                withdrawSocket.onmessage = withdrawSocketOnMessage;
             }
         });
     }

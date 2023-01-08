@@ -4,7 +4,46 @@
 {% block title %}
 {{ title }}
 {% endblock %}
+<div class="popup" id="auth_to_vk_you">
+	<div class="popup__body">
+		<div class="popup__content modal modal_popup modal_authorization">
+			<a href="#" class="popup__close close-popup close-popup_close">
+				<svg class="close-popup__icon ">
+					<use xlink:href="static/img/icons/sprite.svg#close"></use>
+				</svg>
+			</a>
+			<div class="modal-enter">
+				<h3 class="modal__title modal-enter__title">
+					Авторизуйтесь для продолжения
+				</h3>
+				<div class="modal-enter__body">
+					<div class="modal-enter__row">
+						<div class="modal-enter__item">
+							<div class="modal-enter__img">
+								<svg class="yt">
+									<use xlink:href="{% get_static_prefix %}img/icons/sprite.svg#google_login"></use>
+								</svg>
+							</div>
+							<a href="/login/google-oauth2/" class="btn btns_yt modal-enter__btn">Войти через
+								Google</a>
+						</div>
+						<div class="modal-enter__item">
+							<div class="modal-enter__img">
+								<svg class="vk">
+									<use xlink:href="{% get_static_prefix %}img/icons/sprite.svg#vk"></use>
+								</svg>
+							</div>
+							<a href="/login/vk-oauth2/" class="btn btns_vk modal-enter__btn">Войти через
+								Вконтакте</a>
+						</div>
 
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 {% block maincontent %}
 <div class="profil-main__content">
     <section class="bonus-currency">
@@ -27,7 +66,9 @@
                     </form>
                 </div>
                 <div class="bonus-currency__item add-bonus">
+{#{% if user.social_auth.first.provider == 'google-oauth2' %}#}
                     <div class="add-bonus__item">
+
                         <div class="add-bonus__title-block">
                             <div class="add-bonus__logo">
                                 <svg class="icon icon_yt">
@@ -39,20 +80,21 @@
                             </div>
                         </div>
                         <hr>
-                        {% for i in sitecontent %}
+{#                        {% for i in sitecontent %}#}
                         <div class="add-bonus__value-block">
                             <div class="add-bonus__value">
-                                +{{ i.bonus_youtube }}K
+                                +{{ sitecontent2.bonus_youtube }}K
                             </div>
-
                             <svg>
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                             </svg>
                         </div>
+                        <a href="{{ sitecontent2.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn">Подписаться на
+                            {{ user.social_auth.provider }}</a>
 
-                        <a href="{{ i.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn">Подписаться на
-                            Youtube</a>
                     </div>
+{#{% endif %}#}
+{#                {% if user.social_auth.first.provider == 'vk-oauth2' %}#}
                     <div class="add-bonus__item">
                         <div class="add-bonus__title-block">
                             <div class="add-bonus__logo">
@@ -67,16 +109,17 @@
                         <hr>
                         <div class="add-bonus__value-block">
                             <div class="add-bonus__value">
-                                +{{ i.bonus_vk }}K
+                                +{{ sitecontent2.bonus_vk }}K
                             </div>
                             <svg>
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                             </svg>
                         </div>
-                        <a href="{{ i.url_vk }}" target="_blank" class="btns btns_vk add-bonus__btn">Подписаться во
+                        <a href="{{ sitecontent2.url_vk }}" target="_blank" class="btns btns_vk add-bonus__btn">Подписаться во
                             Вконтакте</a>
-                        {% endfor %}
+{#                        {% endfor %}#}
                     </div>
+{#                {% endif %}#}
                 </div>
             </div>
             <div class="bonus-currency__invite invite">
@@ -124,11 +167,11 @@
                                     <div class="invite__img">
                                         <img src="{% static 'img/gallery/bulb.png' %}" alt="">
                                     </div>
-                                    {% for i in sitecontent %}
+{#                                    {% for i in sitecontent %}#}
                                     <div class="invite__text">
-                                        {{ i.info2|safe }}
+                                        {{ sitecontent2.info2|safe }}
                                     </div>
-                                    {% endfor %}
+{#                                    {% endfor %}#}
                                 </div>
                                 <div class="invite__arrow invite__arrow_max">
                                     <svg class="icon">
@@ -144,11 +187,11 @@
                                     <div class="invite__img">
                                         <img src="{% static 'img/gallery/handshake.png' %}" alt="">
                                     </div>
-                                    {% for i in sitecontent %}
+{#                                    {% for i in sitecontent %}#}
                                     <div class="invite__text">
-                                        {{ i.info3|safe }}
+                                        {{ sitecontent2.info3|safe }}
                                     </div>
-                                    {% endfor %}
+{#                                    {% endfor %}#}
                                 </div>
                             </div>
                         </li>
@@ -161,7 +204,7 @@
                                 <svg class="num-game-currency__img-icon">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                                 </svg>
-                                <span class="num-game-currency__span-curent" id="free_amount">352</span>
+                                <span class="num-game-currency__span-curent" id="free_amount">0</span>
                             </div>
                             <div
                                     class="form__input num-game-currency__input num-game-currency__input_units conclusion_units">

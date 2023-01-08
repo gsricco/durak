@@ -10,20 +10,19 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
 from accaunts.models import Ban, AvatarProfile, DetailUser
-from configs.settings import BASE_DIR
+from configs.settings import BASE_DIR, REDIS_URL_STACK
 from accaunts.models import CustomUser, Level, ItemForUser
+from content_manager.admin import SET_BAD_SLAG
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
-from pay.views import rub_to_pay
+from pay.views import rub_to_pay, virtual_money_to_rub
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True, host="durak_redis_stack")
-
-from django.contrib.auth.decorators import user_passes_test
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -116,17 +115,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             else:
                 r.srem("online", self.scope["user"].id)
         online = r.scard("online")
-        if self.scope["user"].is_staff:
+        if staff := self.scope["user"].is_staff:
             await self.channel_layer.group_send('admin_group', {
                 "type": "get_online",
-                "get_online": online
+                "get_online": online,
+                "staff": staff
             })
-        else:
-            await self.channel_layer.group_send(self.room_group_name, {
-                "type": "get_online",
-                "get_online": online
-            })
-
+        # else:
+        if r.exists("fake_online"):
+            online = r.get("fake_online")
+        await self.channel_layer.group_send(self.room_group_name, {
+            "type": "get_online",
+            "get_online": online
+        })
 
     async def init_users_chat(self, channel):
         """Отправляет историю сообщений(до 50шт) общего чата, выгружая её из Редиса"""
@@ -328,13 +329,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def open_case(self, case):
         """Открывает кейсы"""
         user = self.scope['user']
-        case_id = Case.objects.filter(name=case).first()
-        if case_id:
-            owned_case = OwnedCase.objects.filter(owner=user.pk) \
-                .filter(date_opened=None) \
-                .filter(case=case_id) \
-                .last()
-            if owned_case:
+        if case_id := Case.objects.filter(name=case).first():
+            if owned_case := OwnedCase.objects.filter(owner=user.pk) \
+                    .filter(date_opened=None).filter(case=case_id).last():
                 if owned_case.owner.pk != user.pk:
                     print({"details": "Access forbidden"})
                 if owned_case.item is not None:
@@ -360,11 +357,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
                     'type': 'case_roll',
                     'case_roll_result': chosen_item.name
-                }
-                                                             )
+                })
                 # проверка является ли выпавший предмет деньгами
                 # если да пополняет баланс, если нет добавляет предмет в инвентарь
                 if chosen_item.is_money:
+                    ItemForUser.objects.create(user=user, user_item=chosen_item, is_money=True, is_used=True)
                     user.detailuser.balance += chosen_item.selling_price
                     user.detailuser.save()
                     tasks.send_balance_delay(user.pk)
@@ -382,8 +379,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if user.is_authenticated:
             if Item.objects.filter(name=data.get('name')).exists():
                 item = Item.objects.get(name=data.get('name'))
-                if ItemForUser.objects.filter(user_item=item, user=user, is_used=False).exists():
-                    user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
+                if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
                     user_item.is_used = True
                     user_item.save()
                     user.detailuser.balance += item.selling_price
@@ -404,11 +400,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def forward_item(self, data):
         user = self.scope['user']
         if user.is_authenticated:
-            if Item.objects.filter(name=data.get('item_name')).exists():
-                item = Item.objects.get(name=data.get('item_name'))
-                if ItemForUser.objects.filter(user_item=item, user=user, is_used=False).exists():
-                    user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
+            if item := Item.objects.filter(name=data.get('item_name')):
+                if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
                     user_item.is_used = True
+                    user_item.is_forwarded = True
                     user_item.save()
                     async_to_sync(self.get_user_items)()
                     durak_username = data.get('durak_username')
@@ -461,10 +456,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "type": 'roulette_countdown_state',
         })
         await self.set_online(is_auth)
-        if recieve_user == 'go':  # проверка подключение из админки или нет. 'go' - это не админка
+        if recieve_user == 'go':  # Проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
-            await self.init_support_chat(
-                user.pk)  # TODO: должен выгружать только на странице чата поддержки, в суппорт чат
+            await self.init_support_chat(user.pk)
             await self.init_users_chat(self.channel_name)
         else:
             await self.get_all_room()
@@ -555,9 +549,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send_free_balance()
         if text_data_json.get('free_balance') == 'get':
             await self.get_free_balance()
-        if text_data_json.get('rub'):
-            await self.send_credits_from_rubs(text_data_json['rub'])
-            
+        if rub := text_data_json.get("rub"):
+            if rub == "to_credits":
+                await self.send_rubs_from_credits(text_data_json.get("to_credits"))
+            else:
+                await self.send_credits_from_rubs(text_data_json["rub"])
+
         """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':
             if len(text_data_json.get("message")) > 500:
@@ -612,9 +609,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                                                         'not_read': not_read,
                                                                         })
         elif text_data_json.get('chat_type') == 'all_chat':
-            '''Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
+            """Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
             Проводим проверку на длину сообщения не более 250 символов.
-            Проводим проверку на бан пользователя.'''
+            Проводим проверку на бан пользователя."""
             all_chat_message = {"type": "chat_message",
                                 "chat_type": text_data_json.get('chat_type'),
                                 "message": text_data_json["message"],
@@ -626,18 +623,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                 }
             if len(all_chat_message["message"]) <= 250:
                 if await self.get_ban_chat_user(text_data_json["user"]):
-                    print("user is banned ===", all_chat_message)
-                    await self.send(text_data=json.dumps(all_chat_message))
-
+                    await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
+                elif not await self.check_bad_slang(text_data_json["message"].lower()):
+                    await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
                 else:
                     await self.channel_layer.group_send(self.room_group_name, all_chat_message)
                     await self.save_user_message_all_chat(all_chat_message)
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
-        await self.send(text_data=json.dumps({
-            "get_online": event.get('get_online'),
-        }))
+        message = {'get_online': event.get('get_online')}
+        if s := event.get('staff'):
+            message['staff'] = s
+        await self.send(text_data=json.dumps(message))
 
     async def get_rooms(self, event):
         await self.send(text_data=json.dumps({
@@ -753,12 +751,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         t = r.get('start:time')
         bets = r.json().get('round_bets')
         message = {'init': {
-                            "state": state,
-                            "t": str(t),
-                            "previous_rolls": r.json().get('last_winners'),
-                            "bets": bets
-                            }
-                   }
+            "state": state,
+            "t": str(t),
+            "previous_rolls": r.json().get('last_winners'),
+            "bets": bets
+        }
+        }
         if state == 'rolling' or state == 'stop':
             rap = r.json().get("RAP")
             round_result = r.get(ROUND_RESULT_FIELD_NAME)
@@ -875,18 +873,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({"last_visit": event.get("last_visit")}))
 
     async def send_free_balance(self):
-        detail_user = await DetailUser.objects.aget(user=self.scope['user'])
-        await self.send(json.dumps({"free_balance": detail_user.free_balance}))
+        if self.scope['user'].id:
+            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+            await self.send(json.dumps({"free_balance": detail_user.free_balance}))
 
     async def get_free_balance(self):
-        detail_user = await DetailUser.objects.aget(user=self.scope['user'])
-        if detail_user.free_balance > 0:
-            detail_user.balance += detail_user.free_balance
-            detail_user.free_balance = 0
-            await sync_to_async(detail_user.save)()
-        await self.send(json.dumps({"free_balance": detail_user.free_balance}))
-        message = {'current_balance': detail_user.balance}
-        await self.send(json.dumps(message))
+        if self.scope['user'].id:
+            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+            if detail_user.free_balance > 0:
+                detail_user.balance += detail_user.free_balance
+                detail_user.free_balance = 0
+                await sync_to_async(detail_user.save)()
+            await self.send(json.dumps({"free_balance": detail_user.free_balance}))
+            message = {'current_balance': detail_user.balance}
+            await self.send(json.dumps(message))
 
     async def send_credits_from_rubs(self, rub):
         """Переводит рубли в кредиты и возвращает пользователю"""
@@ -898,3 +898,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({
             "credits": sum_credits
         }))
+
+    async def send_rubs_from_credits(self, sum_credits):
+        print(sum_credits)
+        try:
+            int_credits = int(sum_credits)
+        except (TypeError, ValueError):
+            int_credits = 0
+        rubs = await sync_to_async(virtual_money_to_rub)(int_credits)
+        print(rubs, 'ETO BLAD RUBS!!!!!!!!!!!!!!!!!!!@#!@#$%!@$')
+        await self.send(json.dumps({
+            "creds_to_rubs": rubs
+        }))
+
+    @staticmethod
+    async def check_bad_slang(message: str) -> bool:
+        """Проверяет сообщение на наличие запрещённых слов"""
+        if r.exists("bad_slang"):
+            bad_words_set = r.smembers("bad_slang")
+            for word in bad_words_set:
+                if word in message:
+                    return False
+        return True

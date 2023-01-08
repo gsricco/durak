@@ -27,7 +27,6 @@ class SiteContent(models.Model):
         verbose_name = 'Контент сайта'
         verbose_name_plural = 'Контент сайта'
 
-
     def __str__(self):
         return f'Контент сайта'
 
@@ -50,9 +49,10 @@ class FAQ(models.Model):
 
     body_description.short_description = 'Описание вопроса'
 
+
 class BadSlang(models.Model):
     """Запрещенные слова"""
-    name = models.CharField(verbose_name='Запрещенное слово', max_length=100)
+    name = models.CharField(verbose_name='Запрещенное слово', max_length=100, unique=True)
 
     class Meta:
         verbose_name = 'Запрещенные слова'
@@ -60,3 +60,57 @@ class BadSlang(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class FakeOnline(models.Model):
+    """Фейковый онлайн чата"""
+    count = models.PositiveIntegerField(verbose_name="Фейк онлайн в чате", default=0)
+    is_active = models.BooleanField(default=False, verbose_name="Активно")
+
+    class Meta:
+        verbose_name = "Фейковый онлайн"
+        verbose_name_plural = "Фейковый онлайн"
+
+    def __str__(self):
+        return f'Онлайн: {self.count}'
+
+
+class ShowRound(models.Model):
+    """Показывать раунды в транзакциях(профиле пользователя)"""
+    show = models.BooleanField(verbose_name="Показывать раунд в транзакциях", default=True)
+
+    def __str__(self):
+        return f'Показывать раунды в транзакциях'
+
+    class Meta:
+        verbose_name = "Показывать раунд в транзакциях"
+        verbose_name_plural = "Показывать раунды в транзакциях"
+
+
+class DurakNickname(models.Model):
+    """Устанавливать Никнейм в модалке(в профиле юзера) при выводе предмета из кейса в игру дурак-онлайн"""
+    nickname = models.CharField(max_length=50, verbose_name='Ник для вывода')
+    date = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
+
+    def __str__(self):
+        return f'Текущий ник - {self.nickname}'
+
+    class Meta:
+        verbose_name = 'Никнейм для вывода'
+        verbose_name_plural = 'Никнейм для вывода'
+
+
+class BalanceEditor(models.Model):
+    """Предоставляет возможность изменения баланса юзера для админа"""
+    to_user = models.ForeignKey('accaunts.CustomUser', verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
+    amount = models.PositiveBigIntegerField(verbose_name="Сумма для изменения")
+    to_add = models.BooleanField(verbose_name="Добавить или уменьшить баланс", default=True)
+    date = models.DateTimeField(verbose_name="Дата операции", auto_now_add=True)
+
+    def __str__(self):
+        return ''
+
+    class Meta:
+        verbose_name = "Изменение баланса"
+        verbose_name_plural = "Изменение баланса"
+        ordering = "-date",

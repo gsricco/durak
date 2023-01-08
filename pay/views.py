@@ -1,10 +1,12 @@
 import hashlib
+import math
+
 from django.shortcuts import redirect, get_object_or_404
 from rest_framework import response, status
 from rest_framework.decorators import api_view
 from accaunts.models import DetailUser
 from configs.settings import MERCHANT_ID, SECRET_WORD
-from pay.models import Popoln, BalPay
+from pay.models import Popoln, BalPay, PayOff
 from psycopg2.extras import NumericRange
 
 
@@ -15,7 +17,16 @@ def rub_to_pay(rub):
         c_r = BalPay.objects.get(range_sum__contains=NumericRange(rub, rub + 1))
     except BalPay.DoesNotExist or BalPay.MultipleObjectsReturned:
         return 0
-    return int(rub * (c_r.conversion_coef/100))
+    return math.floor((rub * c_r.conversion_coef) / 1000) * 1000
+
+
+def virtual_money_to_rub(virtual_money):
+    """Расчёт денег за кредиты"""
+    try:
+        creds = BalPay.objects.get(range_credits__contains=NumericRange(virtual_money, virtual_money+1))
+    except (BalPay.DoesNotExist or BalPay.MultipleObjectsReturned) as error:
+        return 0
+    return math.ceil(virtual_money / creds.conversion_coef)
 
 
 def balance(request):
@@ -26,13 +37,17 @@ def balance(request):
     order_amount = request.GET.get('sum_rub', '0')
     pay = rub_to_pay(int(order_amount))
     currency = 'RUB'  # RUB,USD,EUR,UAH,KZT
+    if PayOff.objects.filter(work=False):
+        i = request.GET.get('paymentSystem')
+    else:
+        i = 1
     user_pay = Popoln(sum=order_amount, pay=pay, user_game=request.user)
     user_pay.url_pay = request.META.get('HTTP_REFERER')
     user_pay.save()
     order_id = user_pay.pk
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{currency}:{order_id}'.encode('utf-8')).hexdigest()
     return redirect(
-        f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&pay=PAY&s={sign}')
+        f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&pay=PAY&s={sign}&i={i}')
 
 
 @api_view(['GET'])
@@ -45,7 +60,6 @@ def pay_user(request):
     order_id = request.GET.get('MERCHANT_ORDER_ID', '')
     intid = request.GET.get('intid', '')
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{order_id}'.encode('utf-8')).hexdigest()
-    print(sign, 'signsignsignsign')
     po = request.GET.get('SIGN')
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
@@ -61,6 +75,5 @@ def pay_user(request):
     order.save()
     det_user = DetailUser.objects.get(user=order.user_game)
     det_user.balance += order.pay
-    print(det_user)
     det_user.save()
     return response.Response(status=status.HTTP_200_OK, data={})

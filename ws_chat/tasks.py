@@ -19,9 +19,10 @@ from django.db.utils import IntegrityError
 from django.utils import timezone
 from accaunts.models import Level, ItemForUser
 from bot_payment.models import RefillRequest, WithdrawalRequest
+from configs.settings import REDIS_URL_STACK
 
 channel_layer = get_channel_layer()
-r = Redis(encoding="utf-8", decode_responses=True, host="durak_redis_stack")
+r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_NUMBERS = {
@@ -86,7 +87,6 @@ def debug_task():
 @shared_task
 def roll():
     t = datetime.datetime.now()
-    print('start of ROLL', t)
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
@@ -339,25 +339,6 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                                                                  'lvl_img': user.level.img_name,
                                                                  'case_count': user.level.amount
                                                              }})
-            # if channel_name := bets_info[str(bet_key)]['channel_name']:
-            #     level = user.level.level
-            #     new_level = level + 1
-                # if level == max_level:
-                #     new_level = 'max'
-                # message = {
-                #     "type": "send_new_level",
-                #     "lvlup": {
-                #         "type": "send_new_level",
-                #         "new_lvl": new_level,
-                #         "lvlup": {
-                #             "new_lvl": new_level,
-                #             "levels": level,
-                #         },
-                #
-                #         "levels": level,
-                #     },
-                # }
-                # async_to_sync(channel_layer.send)(channel_name, message)
 
             # проверяет награды пользователя за новый уровень
             if rewards_for_level:
@@ -589,7 +570,8 @@ def setup_check_request_status(host_url, operation, id_shift, request_pk, user_p
 def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
     """Проверяет статус заявки на сервере ботов"""
     # удаляет из redis запись о заявке
-    r.delete(f"user_{operation}:{user_pk}")
+    # r.delete(f"user_{operation}:{user_pk}")
+    # r.delete(f"user_{operation}:{user_pk}:start")
     # создаёт url для получения статуса заявки
     url_get_status = f"{host_url}{operation}/get?id={request_pk + id_shift}"
     timeout = 2
@@ -646,10 +628,12 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                     detail_user.save()
             elif operation == 'withdraw':
                 user_request.amount = info.get('withdraw')
-                if user_request.amount > 0:
-                    detail_user = models.DetailUser.objects.get(user=user_request.user)
-                    detail_user.balance -= user_request.amount
-                    detail_user.save()
+                detail_user = models.DetailUser.objects.get(user=user_request.user)
+                frozen_balance_remain = detail_user.frozen_balance - user_request.amount
+                new_balance = max(0, detail_user.balance + frozen_balance_remain)
+                detail_user.balance = new_balance
+                detail_user.frozen_balance = 0
+                detail_user.save()
             else:
                 print(f'Unknown request operation: {operation}')
                 return
@@ -669,7 +653,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
 
 
 def check_round_number():
-    """проверяет, есть ли в redis счётчик числа раундов"""
+    """Проверяет, есть ли в redis счётчик числа раундов"""
     if r.get('round') is None:
         last_round = models.RouletteRound.objects.filter(rolled=True).aggregate(Max('round_number'))
         last_round_number = last_round.get('round_number__max')
@@ -679,7 +663,7 @@ def check_round_number():
 
 
 def check_rounds():
-    """проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
+    """Проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
         day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
@@ -702,8 +686,8 @@ celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=g
 @shared_task
 def send_items(user_pk=None):
     if models.CustomUser.objects.filter(pk=user_pk).exists():
-        user =models.CustomUser.objects.get(pk=user_pk)
-        user_items = ItemForUser.objects.filter(user=user,is_used=False)
+        user = models.CustomUser.objects.get(pk=user_pk)
+        user_items = ItemForUser.objects.filter(user=user, is_used=False)#, is_money=False)
         serializer = ItemForUserSerializer(user_items, many=True)
         message = {
             'type': 'send_user_item',
@@ -715,10 +699,11 @@ def send_items(user_pk=None):
         else:
             async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
 
+
 @shared_task
 def send_balance(user_pk=None):
     if models.CustomUser.objects.filter(pk=user_pk).exists():
-        user =models.CustomUser.objects.get(pk=user_pk)
+        user = models.CustomUser.objects.get(pk=user_pk)
         message = {
             'type': 'get_balance',
             'balance_update': {
@@ -729,6 +714,19 @@ def send_balance(user_pk=None):
             async_to_sync(channel_layer.group_send)(f'admin_group', message)
         else:
             async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
+
+
+@shared_task
+def send_balance_to_single(user_pk=None):
+    if models.CustomUser.objects.filter(pk=user_pk).exists():
+        user = models.CustomUser.objects.get(pk=user_pk)
+        message = {
+            'type': 'get_balance',
+            'balance_update': {
+                'current_balance': user.detailuser.balance
+            }
+        }
+        async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
 
 
 def send_balance_delay(user_pk):
