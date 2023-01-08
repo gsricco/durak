@@ -228,19 +228,14 @@ chatSocket.onmessage = function (e) {
             level_data_back = document.querySelector('.level_data_back')
             level_data_back.innerHTML = data.lvlup.levels + 'ур.'
             level_data_next.innerHTML = data.lvlup.new_lvl + 'ур.'
-            }
-    else if (data.expr){
-        level_line = document.querySelector('.header__profile-line_span')
-        level_line.style.width = data.expr.percent + '%'
+        if (data.expr){
+            level_line = document.querySelector('.header__profile-line_span')
+            level_line.style.width = data.expr.percent + '%'
+        }
     }
     else if (data.hasOwnProperty("current_balance")) {
             update_balance(data.current_balance)
         }
-    // if (data.hasOwnProperty('free_balance')) {
-    //     if (freeSpan) {
-    //         freeSpan.innerText = Math.floor(parseInt(data.free_balance) / 1000)
-    //     }
-    // }
     else if (data.hasOwnProperty('credits')) {
         let credits = data.credits;
         let sumCurrent = document.querySelector(".num-game-currency__span-curent");
@@ -384,51 +379,7 @@ window.addEventListener('load', function (e) {
                     inputForm.value = "";
                     redWrite.style.display = "block"
                 }
-    
-                // if (currentCredint < 1) {
-                //     inputForm.value = "";
-                // }
-                // if (currentCredint <= 2 && currentCredint >= 1) {
-                //     inputForm.value = `${(currentCredint * 69).toFixed(1)}`;
-                // }
-                //
-                // if (currentCredint <= 5 && currentCredint >= 2) {
-                //     inputForm.value = `${(currentCredint * 55).toFixed(1)}`;
-                // }
-                //
-                // if (currentCredint <= 10 && currentCredint >= 5) {
-                //     inputForm.value = `${(currentCredint * 36).toFixed(1)}`;
-                // }
-                //
-                // if (currentCredint <= 20 && currentCredint >= 10) {
-                //     inputForm.value = `${(currentCredint * 27.5).toFixed(1)}`;
-                // }
-                //
-                // if (currentCredint <= 40 && currentCredint >= 20) {
-                //     inputForm.value = `${(currentCredint * 23).toFixed(1)}`;
-                // }
-                //
-                // if (currentCredint <= 60 && currentCredint >= 40) {
-                //     inputForm.value = `${(currentCredint * 21.25).toFixed(1)}`;
-                // }
-                //
-                // if (currentCredint >= 60) {
-                //     inputForm.value = `${(currentCredint * 20).toFixed(1)}`;
-                // }
-                //
-                // if (sumCurrent.value == "" && sumCurrent.value == 0) {
-                //     inputForm.value = "";
-                // }
             }
         }
     }
-    
-    // ===============================================================
-    // Расчёт по кол-ву руб:
-    // от 69 до 109р кол-во кредов = (введенное число руб.)*725
-    // от 110 до 179р кол-во кредов = (введенное число руб.)*910
-    // от 180 до 239р кол-во кредов = (введенное число руб.)*1389
-    // от 240 до 459р кол-во кредов = (введенное число руб.)*2084
-    // от 460 до 1274р кол-во кредов = (введенное число руб.)*2174
-    // от 1275 кол-во кредов = (введенное число руб.)*2353
 });

@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from social_django.models import UserSocialAuth, Nonce, Association
 
 from bot_payment.models import RefillRequest, WithdrawalRequest
+from content_manager.admin import AdminBalanceEditor
 from .models import (CustomUser, UserAgent, DetailUser, ReferalUser,
                      ReferalCode, GameID, Ban, UserIP, Level, ItemForUser,
                      DayHash, RouletteRound, AvatarProfile, UserBet)
@@ -28,20 +29,21 @@ admin.site.unregister(ClockedSchedule)
 admin.site.unregister(CrontabSchedule)
 
 
-class OwnedCaseTabularInline(admin.TabularInline):
-    model = OwnedCase
-    extra = 1
-    classes = ['collapse']
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_add_permission(self, request, obj=None):
-        return False
+# class OwnedCaseTabularInline(admin.TabularInline):
+#     model = OwnedCase
+#     extra = 1
+#     classes = ['collapse']
+#
+#     def has_change_permission(self, request, obj=None):
+#         return False
+#
+#     def has_add_permission(self, request, obj=None):
+#         return False
 
 
 class ItemForUserInline(admin.TabularInline):
     model = ItemForUser
+    readonly_fields = "user_item", "date_modified", "is_used", "is_forwarded", "is_money"
     extra = 0
     classes = ['collapse']
 
@@ -56,8 +58,11 @@ class ReferalUserAdmin(admin.ModelAdmin):
 
 class DetailUserInline(admin.TabularInline):
     model = DetailUser
+    readonly_fields = "balance", "free_balance", "frozen_balance"
     extra = 0
-    classes = ['collapse']
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class UserAgentInline(admin.TabularInline):
@@ -133,8 +138,8 @@ class CustomUserAdmin(UserAdmin):
     list_editable = 'note',
     search_fields = 'username', 'id'
     search_help_text = 'Поиск по имени пользователя и id пользователя'
-    inlines = [PopolnInline, DetailUserInline, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
-               BanInline, OwnedCaseTabularInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
+    inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
+               BanInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
     readonly_fields = 'preview',
     fieldsets = (
         ('ИНФОРМАЦИЯ', {'fields': ('username', 'password', 'last_login', 'date_joined',)}),
@@ -154,6 +159,20 @@ class CustomUserAdmin(UserAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         obj.give_level(save_immediately=True)
+
+    def save_formset(self, request, form, formset, change):
+        if formset.has_changed() and formset.__class__.__name__ == 'BalanceEditorFormFormSet':
+            for new_form in formset:
+                if new_form.has_changed():
+                    if user_detail := DetailUser.objects.get(user=new_form.cleaned_data['to_user']):
+                        if new_form.cleaned_data['to_add'] == 'True':
+                            user_detail.balance += new_form.cleaned_data['amount']
+                        else:
+                            if user_detail.balance < new_form.cleaned_data['amount']:
+                                return
+                            user_detail.balance -= new_form.cleaned_data['amount']
+                        user_detail.save()
+        super().save_formset(request, form, formset, change)
 
     preview.short_description = 'Аватар'
 
@@ -218,7 +237,7 @@ class DayHashAdmin(admin.ModelAdmin):
 
 @admin.register(UserBet)
 class UserBetAdmin(admin.ModelAdmin):
-    list_display = 'user', 'user_id', 'round_number', 'sum_win', 'date', 'win'
+    list_display = 'user', 'user_id', 'round_number', 'sum', 'sum_win', 'date', 'win'
     list_filter = 'win', 'date'
     search_fields = 'user__username', 'user__id', 'sum_win'
     search_help_text = 'Поиск по имени пользователя id пользователя и сумме выйгрыша'

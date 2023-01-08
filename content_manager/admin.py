@@ -1,9 +1,11 @@
 import redis
+from django import forms
 from django.contrib import admin
 from django.contrib.admin.utils import get_deleted_objects
 from django.db.models import QuerySet
+from django.forms import RadioSelect
 
-from .models import SiteContent, FAQ, BadSlang, DurakNickname
+from .models import SiteContent, FAQ, BadSlang, DurakNickname, BalanceEditor
 from configs.settings import REDIS_URL_STACK
 from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
 
@@ -119,3 +121,25 @@ class DurakNicknameAdmin(admin.ModelAdmin):
     #     return False
     # def has_delete_permission(self, request, obj=None):
     #     return False
+
+
+class AdminBalanceEditorForm(forms.ModelForm):
+    SELECT_CHOICES = (
+        (True, "Добавить"),
+        (False, "Отнять"),
+    )
+    to_add = forms.ChoiceField(label="Опции", choices=SELECT_CHOICES, initial=True, widget=RadioSelect)
+
+    class Meta:
+        model = BalanceEditor
+        fields = '__all__'
+
+
+class AdminBalanceEditor(admin.TabularInline):
+    model = BalanceEditor
+    readonly_fields = "date",
+    form = AdminBalanceEditorForm
+    extra = 0
+
+    def has_change_permission(self, request, obj=None):
+        return False

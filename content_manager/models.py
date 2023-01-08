@@ -88,6 +88,7 @@ class ShowRound(models.Model):
 
 
 class DurakNickname(models.Model):
+    """Устанавливать Никнейм в модалке(в профиле юзера) при выводе предмета из кейса в игру дурак-онлайн"""
     nickname = models.CharField(max_length=50, verbose_name='Ник для вывода')
     date = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
 
@@ -97,3 +98,19 @@ class DurakNickname(models.Model):
     class Meta:
         verbose_name = 'Никнейм для вывода'
         verbose_name_plural = 'Никнейм для вывода'
+
+
+class BalanceEditor(models.Model):
+    """Предоставляет возможность изменения баланса юзера для админа"""
+    to_user = models.ForeignKey('accaunts.CustomUser', verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
+    amount = models.PositiveBigIntegerField(verbose_name="Сумма для изменения")
+    to_add = models.BooleanField(verbose_name="Добавить или уменьшить баланс", default=True)
+    date = models.DateTimeField(verbose_name="Дата операции", auto_now_add=True)
+
+    def __str__(self):
+        return ''
+
+    class Meta:
+        verbose_name = "Изменение баланса"
+        verbose_name_plural = "Изменение баланса"
+        ordering = "-date",

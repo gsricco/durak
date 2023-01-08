@@ -672,7 +672,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
 
 
 def check_round_number():
-    """проверяет, есть ли в redis счётчик числа раундов"""
+    """Проверяет, есть ли в redis счётчик числа раундов"""
     if r.get('round') is None:
         last_round = models.RouletteRound.objects.filter(rolled=True).aggregate(Max('round_number'))
         last_round_number = last_round.get('round_number__max')
@@ -682,7 +682,7 @@ def check_round_number():
 
 
 def check_rounds():
-    """проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
+    """Проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
         day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
@@ -705,8 +705,8 @@ celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=g
 @shared_task
 def send_items(user_pk=None):
     if models.CustomUser.objects.filter(pk=user_pk).exists():
-        user =models.CustomUser.objects.get(pk=user_pk)
-        user_items = ItemForUser.objects.filter(user=user,is_used=False)
+        user = models.CustomUser.objects.get(pk=user_pk)
+        user_items = ItemForUser.objects.filter(user=user, is_used=False)#, is_money=False)
         serializer = ItemForUserSerializer(user_items, many=True)
         message = {
             'type': 'send_user_item',
@@ -718,10 +718,11 @@ def send_items(user_pk=None):
         else:
             async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
 
+
 @shared_task
 def send_balance(user_pk=None):
     if models.CustomUser.objects.filter(pk=user_pk).exists():
-        user =models.CustomUser.objects.get(pk=user_pk)
+        user = models.CustomUser.objects.get(pk=user_pk)
         message = {
             'type': 'get_balance',
             'balance_update': {
@@ -737,7 +738,7 @@ def send_balance(user_pk=None):
 @shared_task
 def send_balance_to_single(user_pk=None):
     if models.CustomUser.objects.filter(pk=user_pk).exists():
-        user =models.CustomUser.objects.get(pk=user_pk)
+        user = models.CustomUser.objects.get(pk=user_pk)
         message = {
             'type': 'get_balance',
             'balance_update': {

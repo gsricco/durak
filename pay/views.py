@@ -26,10 +26,6 @@ def virtual_money_to_rub(virtual_money):
         creds = BalPay.objects.get(range_credits__contains=NumericRange(virtual_money, virtual_money+1))
     except (BalPay.DoesNotExist or BalPay.MultipleObjectsReturned) as error:
         return 0
-    # print(res := math.ceil(virtual_money / creds.conversion_coef), 'eto blad resultat')
-    # if res not in NumericRange(creds.range_sum.lower, creds.range_sum.upper):
-    #     # new_creds = BalPay.objects.get(range_sum__contains=NumericRange)
-    #     print('SUKA'*100)
     return math.ceil(virtual_money / creds.conversion_coef)
 
 

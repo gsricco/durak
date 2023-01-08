@@ -329,13 +329,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def open_case(self, case):
         """Открывает кейсы"""
         user = self.scope['user']
-        case_id = Case.objects.filter(name=case).first()
-        if case_id:
-            owned_case = OwnedCase.objects.filter(owner=user.pk) \
-                .filter(date_opened=None) \
-                .filter(case=case_id) \
-                .last()
-            if owned_case:
+        if case_id := Case.objects.filter(name=case).first():
+            if owned_case := OwnedCase.objects.filter(owner=user.pk) \
+                    .filter(date_opened=None).filter(case=case_id).last():
                 if owned_case.owner.pk != user.pk:
                     print({"details": "Access forbidden"})
                 if owned_case.item is not None:
@@ -361,11 +357,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
                     'type': 'case_roll',
                     'case_roll_result': chosen_item.name
-                }
-                                                             )
+                })
                 # проверка является ли выпавший предмет деньгами
                 # если да пополняет баланс, если нет добавляет предмет в инвентарь
                 if chosen_item.is_money:
+                    ItemForUser.objects.create(user=user, user_item=chosen_item, is_money=True, is_used=True)
                     user.detailuser.balance += chosen_item.selling_price
                     user.detailuser.save()
                     tasks.send_balance_delay(user.pk)
@@ -383,8 +379,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if user.is_authenticated:
             if Item.objects.filter(name=data.get('name')).exists():
                 item = Item.objects.get(name=data.get('name'))
-                if ItemForUser.objects.filter(user_item=item, user=user, is_used=False).exists():
-                    user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
+                if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
                     user_item.is_used = True
                     user_item.save()
                     user.detailuser.balance += item.selling_price
@@ -405,11 +400,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def forward_item(self, data):
         user = self.scope['user']
         if user.is_authenticated:
-            if Item.objects.filter(name=data.get('item_name')).exists():
-                item = Item.objects.get(name=data.get('item_name'))
-                if ItemForUser.objects.filter(user_item=item, user=user, is_used=False).exists():
-                    user_item = ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first()
+            if item := Item.objects.filter(name=data.get('item_name')):
+                if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
                     user_item.is_used = True
+                    user_item.is_forwarded = True
                     user_item.save()
                     async_to_sync(self.get_user_items)()
                     durak_username = data.get('durak_username')
@@ -560,7 +554,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 await self.send_rubs_from_credits(text_data_json.get("to_credits"))
             else:
                 await self.send_credits_from_rubs(text_data_json["rub"])
-            
+
         """Первичное получение и обработка сообщений"""
         if text_data_json.get('chat_type') == 'support':
             if len(text_data_json.get("message")) > 500:
@@ -757,12 +751,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         t = r.get('start:time')
         bets = r.json().get('round_bets')
         message = {'init': {
-                            "state": state,
-                            "t": str(t),
-                            "previous_rolls": r.json().get('last_winners'),
-                            "bets": bets
-                            }
-                   }
+            "state": state,
+            "t": str(t),
+            "previous_rolls": r.json().get('last_winners'),
+            "bets": bets
+        }
+        }
         if state == 'rolling' or state == 'stop':
             rap = r.json().get("RAP")
             round_result = r.get(ROUND_RESULT_FIELD_NAME)

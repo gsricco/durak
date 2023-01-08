@@ -297,10 +297,18 @@ class ItemForUser(models.Model):
                                   on_delete=models.CASCADE)
     user = models.ForeignKey('CustomUser', verbose_name='Пользователь', null=True, blank=True, on_delete=models.CASCADE)
     is_used = models.BooleanField(verbose_name='Использован', default=False)
+    # date = models.DateTimeField(verbose_name="Дата получения", null=True, auto_now_add=True)
+    date_modified = models.DateTimeField(verbose_name="Дата изменения", null=True, auto_now=True)
+    is_money = models.BooleanField(verbose_name="Деньги", default=False)
+    is_forwarded = models.BooleanField(verbose_name="Выведен", default=False)
 
     class Meta:
         verbose_name = 'Предмет пользователя'
         verbose_name_plural = 'Предметы пользователя'
+        ordering = "-date_modified",
+
+    def __str__(self):
+        return self.user_item.name
 
 
 class AvatarProfile(models.Model):
@@ -343,3 +351,4 @@ class UserBet(models.Model):
     class Meta:
         verbose_name = 'Ставка пользователя'
         verbose_name_plural = 'Ставки пользователей'
+

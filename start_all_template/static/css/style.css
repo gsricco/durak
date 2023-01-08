@@ -3467,6 +3467,10 @@ h3 {
   color: #e95656;
 }
 
+.transactions__item-text_neutral{
+  color: #ffffff;
+}
+
 .transactions__item-info {
   font-size: 0.875em;
   line-height: 121.4285714286%;
