@@ -134,11 +134,11 @@ class AvatarProfileAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
-    list_display = 'usernameinfo', 'id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note'
+    list_display = 'usernameinfo', 'id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
     list_editable = 'note',
-    search_fields = 'username', 'id'
-    search_help_text = 'Поиск по имени пользователя и id пользователя'
-    inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
+    search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id'
+    search_help_text = 'Поиск по имени пользователя, id пользователя, id c дурак онлайн, ссылки на vk, замтеки пользователя и ip пользователя'
+    inlines = [PopolnInline, DetailUserInline, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
                BanInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
     readonly_fields = 'preview',
     fieldsets = (

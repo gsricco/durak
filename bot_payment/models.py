@@ -83,3 +83,11 @@ class WithdrawalRequest(models.Model):
     class Meta:
         verbose_name = "Заявка на вывод"
         verbose_name_plural = "Заявки на вывод"
+
+
+class BotWork(models.Model):
+    work = models.BooleanField(verbose_name='Отключить работу бота', default=False)
+
+    class Meta:
+        verbose_name = "Отключеиние бота"
+        verbose_name_plural = "Отключеиние бота"

@@ -48,3 +48,14 @@ class WithdrawalRequestAdmin(admin.ModelAdmin):
     search_fields = 'user__username', 'amount'
     search_help_text = 'Поиск по имени пользователя и сумме пополнения'
     list_filter = WithdrawStatusListFilter, 'date_closed'
+
+
+@admin.register(models.BotWork)
+class BotWorkAdmin(admin.ModelAdmin):
+    list_display = 'id', 'work',
+    list_editable = 'work',
+
+    def has_add_permission(self, request):  # позволяет создать только одну модель
+        if self.model.objects.count() >= 1:
+            return False
+        return super().has_add_permission(request)

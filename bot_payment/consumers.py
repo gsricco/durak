@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.db.utils import Error
 from ws_chat.tasks import setup_check_request_status, send_balance_to_single
 from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK
-from .models import WithdrawalRequest
+from .models import WithdrawalRequest, BotWork, RefillRequest
 from django.utils import timezone
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)  # подключаемся к редису
@@ -103,6 +103,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
     async def create_request(self, text_data_json):
         """Создаёт новую заявку"""
+        # отключение бота
+        s = await BotWork.objects.afirst()
+        if s.work:
+            message = {"status": "error", "detail": "Идут работы!!!"}
+            await self.send(json.dumps(message))
+            return
         # проверяет правильность полученных данных
         if text_data_json.get('user') is None:
             text_data_json['user'] = { "id": self.scope['user'].pk }

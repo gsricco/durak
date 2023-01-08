@@ -5940,7 +5940,7 @@ margin-top: 36px;
 @media (min-width: 576px) {
   .modal.modal_select-amount_input {
     max-height: unset;
-    height: 700px;
+    height: 720px;
   }
 
   .modal.modal_select-amount {
