@@ -22,7 +22,7 @@ from bot_payment.models import RefillRequest, WithdrawalRequest
 from configs.settings import REDIS_URL_STACK
 
 channel_layer = get_channel_layer()
-r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
+r = Redis(encoding="utf-8", decode_responses=True, host="redis://durak_redis_stack")
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_NUMBERS = {
@@ -678,9 +678,9 @@ def initialize_rounds():
     check_rounds()
 
 
-initialize_rounds()
-celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
-celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
+# initialize_rounds()
+# celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
+# celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
 
 
 @shared_task

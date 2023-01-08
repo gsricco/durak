@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . import models
+from .models import RefillRequest, WithdrawalRequest, RefillRequest
 from accaunts.models import CustomUser
 
 
@@ -14,7 +14,7 @@ class RefillRequestModelSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
 
     def create(self, validated_data):
-        refill_request = models.RefillRequest()
+        refill_request = RefillRequest()
         refill_request.amount = validated_data.get('amount', 0)
         refill_request.balance = validated_data.get('balance', 0)
         user_pk = validated_data.get('user').get('id')
@@ -27,7 +27,7 @@ class RefillRequestModelSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = models.RefillRequest
+        model = RefillRequest
         fields = '__all__'        
 
 
@@ -35,7 +35,7 @@ class WithdrawRequestModelSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
 
     def create(self, validated_data):
-        withdraw_request = models.WithdrawalRequest()
+        withdraw_request = WithdrawalRequest()
         withdraw_request.amount = validated_data.get('amount', 0)
         withdraw_request.balance = validated_data.get('balance', 0)
         user_pk = validated_data.get('user').get('id')
@@ -48,5 +48,5 @@ class WithdrawRequestModelSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = models.WithdrawalRequest
+        model = WithdrawalRequest
         fields = '__all__'        

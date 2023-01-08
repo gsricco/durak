@@ -22,7 +22,7 @@ from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
+r = redis.Redis(encoding="utf-8", decode_responses=True, host="redis://durak_redis_stack")
 
 
 class ChatConsumer(AsyncWebsocketConsumer):

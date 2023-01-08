@@ -26,14 +26,16 @@ services:
     volumes:
       - durak_static:/app/start_all_template/static
       - durak_media:/app/media
+    command:
+      - /start
   durak_redis_stack:
-    container_name: durak_redis_stack
     image: redis/redis-stack-server:latest
     restart: unless-stopped
     ports:
-      - "6380:6379"
+      - "6379:6379"
     volumes:
       - durak_redis:/data/
+    container_name: durak_redis_stack
   celery_worker:
     container_name: durak_celery_worker
     build:
@@ -44,7 +46,8 @@ services:
     depends_on:
       - durak_db
       - durak_redis_stack
-    command: /start-celery-worker
+      - durak_backend
+    command: celery -A configs worker --loglevel=info
   celery_beat:
     container_name: durak_celery_beat
     build:
@@ -55,7 +58,8 @@ services:
     depends_on:
       - durak_db
       - durak_redis_stack
-    command: /start-celery-beat
+      - durak_backend
+    command: celery -A configs beat -l INFO  --scheduler django_celery_beat.schedulers:DatabaseScheduler
 volumes:
   durak_pgdata:
   durak_static:

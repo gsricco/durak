@@ -20,7 +20,8 @@ if (is_auth) {
 }
 const chatSocket = new WebSocket(
     'ws://'
-    + window.location.host
+    //+ window.location.host
+    + '0.0.0.0:8000'
     + '/ws/chat/go/'
 );
 

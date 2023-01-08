@@ -22,17 +22,17 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = bool(os.getenv("DEBUG"))
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
-
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 CORS_ALLOW_ALL_ORIGINS = True
-
-CSRF_TRUSTED_ORIGIN = os.getenv("CSRF_TRUSTED_ORIGIN")
+CSRF_TRUSTED_ORIGIN = ["https://durak-roll.itec.by", "0.0.0.0:8888"]
+# CSRF_TRUSTED_ORIGIN = os.getenv("CSRF_TRUSTED_ORIGIN")
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "daphne",
-    "ws_chat",
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'social_django',
 
+    "ws_chat",
     'accaunts',
     'start_all_template',
     'content_manager',
@@ -188,8 +189,8 @@ CHANNEL_LAYERS = {
 REDIS_URL_STACK = os.getenv("REDIS_URL_STACK", "localhost")
 # CELERY
 REDIS_URL = os.getenv("REDIS_URL")
-BROKER_URL = os.getenv("REDIS_URL")
-CELERY_BROKER_URL = os.getenv("REDIS_URL")
+BROKER_URL = "redis://durak_redis_stack:6379"
+CELERY_BROKER_URL = "redis://durak_redis_stack:6379"
 # CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'

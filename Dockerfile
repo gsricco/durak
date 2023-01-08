@@ -16,8 +16,8 @@ RUN pip install -r requirements.txt
 
 RUN pip install pip install channels-redis==3.4.1
 RUN pip install pip install channels==4.0.0
-RUN pip install pip install daphne==4.0.0
-
+RUN #pip install pip install daphne==4.0.0
+#RUN #pip install uvicorn
 COPY entrypoint.sh /entrypoint
 RUN chmod +x /entrypoint
 
