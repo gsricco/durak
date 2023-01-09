@@ -11,6 +11,8 @@ services:
     restart: unless-stopped
     volumes:
       - durak_pgdata:/var/lib/postgresql/data
+#    networks:
+#      - all
   durak_backend:
     container_name: durak_backend
     restart: unless-stopped
@@ -28,6 +30,9 @@ services:
       - durak_media:/app/media
     command:
       - /start
+#    networks:
+#      - redis_to_backend
+#      - all
   durak_redis_stack:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
@@ -36,6 +41,9 @@ services:
     volumes:
       - durak_redis:/data/
     container_name: durak_redis_stack
+#    networks:
+#      - redis_to_backend
+#      - all
   celery_worker:
     container_name: durak_celery_worker
     build:
@@ -47,11 +55,13 @@ services:
       - durak_db
       - durak_redis_stack
       - durak_backend
-    command: celery -A configs worker --loglevel=info
+    command: /start-celery-worker
+#    networks:
+#      - all
   celery_beat:
     container_name: durak_celery_beat
     build:
-      context: ../
+      context: ../.
     restart: unless-stopped
     env_file:
       - ../.env_prod
@@ -59,9 +69,30 @@ services:
       - durak_db
       - durak_redis_stack
       - durak_backend
-    command: celery -A configs beat -l INFO  --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: /start-celery-beat
+#    networks:
+#      - all
+  nginx:
+    image: nginx:1.23-alpine
+    build :
+      context: ./
+    container_name: durak-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx-setup.conf:/etc/nginx/conf.d/default.conf:ro
+      - durak_static:/app/start_all_template/static
+      - durak_media:/app/media
+    depends_on:
+      - durak_backend
+#    networks:
+#      - all
 volumes:
   durak_pgdata:
   durak_static:
   durak_media:
   durak_redis:
+#networks:
+#  redis_to_backend: {}
+#  all : {}

@@ -22,7 +22,7 @@ from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True, host="redis://durak_redis_stack")
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -436,8 +436,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         """Подключение пользователя"""
-        recieve_user = str(self.scope["url_route"]["kwargs"][
-                               "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
+        recieve_user = "go"#str(self.scope["url_route"]["kwargs"][
+                               #"user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = self.scope['user']  # TODO получаем имя пользователя который подключился с фронта
         user_id = str(self.scope["user"].id)
         if is_auth := self.scope['user'].is_authenticated:

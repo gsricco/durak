@@ -13,7 +13,7 @@ from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK
 from .models import WithdrawalRequest, BotWork, RefillRequest
 from django.utils import timezone
 
-r = redis.Redis(encoding="utf-8", decode_responses=True, host="redis://durak_redis_stack")  # подключаемся к редису
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)  # подключаемся к редису
 
 
 class RequestConsumer(AsyncWebsocketConsumer):

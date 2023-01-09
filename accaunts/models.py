@@ -58,7 +58,7 @@ class CustomUser(AbstractUser):
                                        on_delete=models.CASCADE, null=True, blank=True)
     vk_url = models.URLField(verbose_name="Ссылка на профиль VK", blank=True, null=True)
     photo = models.URLField(blank=True, null=True)
-    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT,# default=Level.get_default_lvl,
+    level = models.ForeignKey('Level', verbose_name="Уровень", on_delete=models.PROTECT, default=Level.get_default_lvl,
                               blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
     note = models.CharField(verbose_name='Заметка', max_length=100, blank=True, null=True)
