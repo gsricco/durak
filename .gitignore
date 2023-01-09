@@ -24,6 +24,7 @@ robokassa_pay/migrations/*.py
 # C extensions
 *.so
 /media
+!/media/img/avatar/
 # Distribution / packaging
 .Python
 build/

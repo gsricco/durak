@@ -272,7 +272,7 @@ class RouletteRound(models.Model):
         ('coin', 'Монетка'),
     ]
 
-    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', unique=True)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES,
                                   default='hearts')

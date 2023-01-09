@@ -60,6 +60,7 @@ def record_work_time(function):
 @shared_task
 def sender():
     t = datetime.datetime.now()
+    # check_round_number()
     r.incr('round', 1)
     r.set('state', 'countdown', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
@@ -77,7 +78,6 @@ def debug_task():
     z = timezone.now()
     t = datetime.datetime.now()
     sender.apply_async()
-    # roll.apply_async(countdown=20)
     roll.apply_async(eta=z + datetime.timedelta(seconds=20))
     generate_round_result.apply_async(countdown=21, args=(True,))
     stop.apply_async(countdown=25)
@@ -90,10 +90,12 @@ def roll():
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
+    if r.get("round") is None:
+        check_round_number()
     round_number = int(r.get('round'))
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
-    except (models.RouletteRound.DoesNotExist, models.RouletteRound.MultipleObjectsReturned):
+    except models.RouletteRound.DoesNotExist:
         # если раунда нет в БД, то произойдёт проверка текущего
         # и следующих раундов на день - если их нет, они создадутся
         check_rounds()
@@ -496,6 +498,9 @@ def generate_round_result(process_after_generating: bool = False) -> int:
 @record_work_time
 def generate_daily(day_hash_pk=None, update_rounds=True):
     """Генерирует хеши для получения результатов раундов и сами раунды"""
+    if r.exists('generated_daily'):
+        return
+    r.set('generated_daily', 1, ex=60)
     # генерация хеша
     if day_hash_pk is None:
         try:
@@ -658,8 +663,8 @@ def check_round_number():
         last_round = models.RouletteRound.objects.filter(rolled=True).aggregate(Max('round_number'))
         last_round_number = last_round.get('round_number__max')
         if last_round_number is None:
-            last_round_number = 1
-        r.set('round', last_round_number)
+            last_round_number = 0
+        r.set('round', last_round_number + 1, ex=40)
 
 
 def check_rounds():
@@ -667,7 +672,7 @@ def check_rounds():
     try:
         day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
-        # generate_daily(day_hash_pk=day_hash.pk)
+        generate_daily(day_hash_pk=day_hash.pk)
     except models.DayHash.DoesNotExist:
         generate_daily()
 

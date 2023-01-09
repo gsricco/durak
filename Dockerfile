@@ -29,7 +29,7 @@ RUN chmod +x /start-celery-worker
 
 COPY beat-start.sh /start-celery-beat
 RUN chmod +x /start-celery-beat
-
+COPY media/img/avatar/ media/img/avatar/
 COPY . .
 
 ENTRYPOINT ["/entrypoint"]
