@@ -758,10 +758,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }
         }
         if state == 'rolling' or state == 'stop':
-            rap = r.json().get("RAP")
+            if r.exists("RAP"):
+                rap = r.json().get("RAP")
+                message["init"].update(rap)
             round_result = r.get(ROUND_RESULT_FIELD_NAME)
             message['init']['w'] = round_result
-            message["init"].update(rap)
+
         await self.send(json.dumps(message))
 
     async def send_cases_info(self, event):

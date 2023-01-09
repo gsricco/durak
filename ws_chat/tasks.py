@@ -93,7 +93,7 @@ def roll():
     round_number = int(r.get('round'))
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
-    except models.RouletteRound.DoesNotExist:
+    except (models.RouletteRound.DoesNotExist, models.RouletteRound.MultipleObjectsReturned):
         # если раунда нет в БД, то произойдёт проверка текущего
         # и следующих раундов на день - если их нет, они создадутся
         check_rounds()
@@ -253,7 +253,7 @@ def save_round_results(bets_info):
     round_started = timezone.now()
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
-    except ObjectDoesNotExist:
+    except (models.RouletteRound.DoesNotExist, models.RouletteRound.MultipleObjectsReturned):
         current_round = models.RouletteRound()
     current_round.rolled = True
     current_round.total_bet_amount = total_amount
@@ -522,7 +522,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME)
     # print(rounds_per_day,'rounds per day')
     current_round = int(r.get('round'))
-    # print(current_round,'current round')
+    print(current_round,'current round')
 
     # получение следующих за текущим раундов для их обновления
     existing_rounds = models.RouletteRound.objects.filter(round_number__gte=current_round)
@@ -667,8 +667,8 @@ def check_rounds():
     try:
         day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
         # дополнит бд недостающими раундами, если их нет
-        generate_daily(day_hash_pk=day_hash.pk)
-    except ObjectDoesNotExist:
+        # generate_daily(day_hash_pk=day_hash.pk)
+    except models.DayHash.DoesNotExist:
         generate_daily()
 
 
