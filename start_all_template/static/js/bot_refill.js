@@ -18,7 +18,7 @@ btnTimerInstructin.addEventListener("click", function(e) {
         }
 
         refillSocket = new WebSocket(
-            'ws://'
+            'wss://'
             + window.location.host
             + '/ws/refill_payment/create/'
         );
@@ -248,7 +248,7 @@ btnTimerWithdraw.addEventListener("click", function(e) {
         }
 
         withdrawSocket = new WebSocket(
-            'ws://'
+            'wss://'
             + window.location.host
             + '/ws/withdraw_payment/create/'
         );
@@ -528,7 +528,7 @@ window.addEventListener('load', function(e) {
                 refillSocket.close(1000);
             }
             refillSocket = new WebSocket(
-                'ws://'
+                'wss://'
                 + window.location.host
                 + '/ws/refill_payment/create/'
             );
@@ -545,7 +545,7 @@ window.addEventListener('load', function(e) {
                     withdrawSocket.close(1000);
                 }
                 withdrawSocket = new WebSocket(
-                    'ws://'
+                    'wss://'
                     + window.location.host
                     + '/ws/withdraw_payment/create/'
                 );

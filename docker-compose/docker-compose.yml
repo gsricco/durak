@@ -5,7 +5,7 @@ services:
     container_name: durak_db
     image: postgres:14-alpine
     ports:
-      - '5436:5432'
+      - '5432:5432'
     env_file:
       - ../.env_prod
     restart: unless-stopped

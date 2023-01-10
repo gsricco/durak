@@ -19,7 +19,7 @@ if (is_auth) {
     ava = document.getElementById('ava').getAttribute('src');
 }
 const chatSocket = new WebSocket(
-    'ws://'
+    'wss://'
     + window.location.host
     + '/ws/chat/go/'
 );

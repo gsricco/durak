@@ -1,4 +1,4 @@
-const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/go/')
+const chatSocket = new WebSocket('wss://' + window.location.host + '/ws/chat/go/')
 const ava = document.getElementById('ava').getAttribute('src');
 const list = document.querySelector('.list');
 const rubin = JSON.parse(document.getElementById('kamen').textContent);

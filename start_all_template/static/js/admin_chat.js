@@ -185,7 +185,7 @@ const newRoom = (data) => {
 };
 
 const chatS = new WebSocket(
-    'ws://'
+    'wss://'
     + window.location.host
     + '/ws/chat/'
     + 'admin_chat'

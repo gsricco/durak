@@ -250,7 +250,7 @@ const scrollBlock = document.querySelector('.online-chat__body')
 const online = document.querySelector('.online-chat__current')
 // WS Connection
 const chatSocket = new WebSocket(
-    'ws://'
+    'wss://'
     + window.location.host
     + '/ws/chat/go/'
 );
