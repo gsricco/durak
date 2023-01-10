@@ -22,13 +22,13 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = bool(os.getenv("DEBUG"))
 
-# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
+# ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGIN = ["http://127.0.0.1:8080"]#, "https://durak-roll.itec.by", "0.0.0.0:8888", ]
+CSRF_TRUSTED_ORIGIN = ["https://durak-roll.itec.by"]#, "https://durak-roll.itec.by", "0.0.0.0:8888", ]
 # CSRF_TRUSTED_ORIGIN = os.getenv("CSRF_TRUSTED_ORIGIN")
 
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "daphne",
@@ -104,7 +104,7 @@ DATABASES = {
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        # 'PORT': os.getenv('DB_PORT'),
     }
 }
 
