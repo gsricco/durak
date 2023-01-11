@@ -263,7 +263,7 @@ buttonSend.onclick = function (e) {
         if(message.trim() !== ''){
             chatSocket.send(JSON.stringify({
                 "chat_type": "all_chat",
-                'message': message,
+                'message': message.trim(),
                 'user': username,
                 'avatar': ava,
                 'rubin': rubin,
