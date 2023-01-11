@@ -1,5 +1,5 @@
 from django.core.exceptions import PermissionDenied
-from accaunts.models import Ban, UserIP, UserAgent
+from accaunts.models import Ban, UserIP, UserAgent, CustomUser
 
 
 class BanIPandAgentMiddleware:
@@ -9,33 +9,34 @@ class BanIPandAgentMiddleware:
 
     def __call__(self, request):
         agent = (request.META['HTTP_USER_AGENT'])
-        ip = (request.META['REMOTE_ADDR'])
-        all_ban_ip = Ban.objects.filter(ban_ip=True)
-        list_ban_ip_agent = []
-        for ban in all_ban_ip:
-            list_ban_ip_agent.extend([i.userip for i in UserIP.objects.filter(user_id=ban.user_id)])
-            list_ban_ip_agent.extend([a.useragent for a in UserAgent.objects.filter(user_id=ban.user_id)])
-            # print(list_ban_ip_agent)
-            if ip in list_ban_ip_agent and agent in list_ban_ip_agent:
-                print(ban.user)
-                raise PermissionDenied
-            list_ban_ip_agent = []
+        ip = request.META.get("HTTP_X_REAL_IP")
+        # ip = (request.META['REMOTE_ADDR'])
+        # all_ban_ip = Ban.objects.filter(ban_ip=True)
+        # list_ban_ip_agent = []
+        # for ban in all_ban_ip:
+        #     list_ban_ip_agent.extend([i.userip for i in UserIP.objects.filter(user_id=ban.user_id)])
+        #     list_ban_ip_agent.extend([a.useragent for a in UserAgent.objects.filter(user_id=ban.user_id)])
+        #     if ip in list_ban_ip_agent and agent in list_ban_ip_agent:
+        #         raise PermissionDenied
+        #     list_ban_ip_agent = []
+        if CustomUser.objects.filter(userip__userip=ip, useragent__useragent=agent, ban__ban_ip=True).exists():
+            print(CustomUser.objects.filter(userip__userip=ip, useragent__useragent=agent, ban__ban_ip=True))
+            raise PermissionDenied
         response = self.get_response(request)
         return response
 
 
-def add_new_ip(get_response):
+def add_new_ip_ua(get_response):
 
-    def mw(request):
+    def middleware(request):
         if request.user.is_authenticated:
-            ip1 = (request.META['REMOTE_ADDR'])
+            agent = (request.META['HTTP_USER_AGENT'])
             ip = request.META.get("HTTP_X_REAL_IP")
-            print(ip, 'ETO IP FROM HTTP_X_REAL_IP')
-            print(ip1, "ETO IP FROM REMOTE ADDR")
+            print(ip, agent)
             if not request.user.userip_set.filter(userip=ip).exists():
-                # print(request.user.userip_set.filter(userip=ip1).exists())
                 UserIP.objects.create(userip=ip, user=request.user)
-                # UserIP.objects.create(userip=ip2, user=request.user)
+            if not request.user.useragent_set.filter(useragent=agent).exists():
+                UserAgent.objects.create(useragent=agent, user=request.user)
             response = get_response(request)
             return response
-    return mw
+    return middleware
