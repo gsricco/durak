@@ -13,6 +13,15 @@ services:
       - durak_pgdata:/var/lib/postgresql/data
 #    networks:
 #      - all
+  durak_pg_admin:
+    container_name: durak_pg_admin
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: superadminkorney@admin.com
+      PGADMIN_DEFAULT_PASSWORD: yoyoyoqweasdzxc
+    ports:
+      - "5050:80"
   durak_backend:
     container_name: durak_backend
     restart: unless-stopped
