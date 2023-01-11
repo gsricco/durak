@@ -28,9 +28,10 @@ def add_new_ip(get_response):
 
     def mw(request):
         if request.user.is_authenticated:
-            # ip1 = (request.META['REMOTE_ADDR'])
+            ip1 = (request.META['REMOTE_ADDR'])
             ip = request.META.get("HTTP_X_REAL_IP")
             print(ip, 'ETO IP FROM HTTP_X_REAL_IP')
+            print(ip1, "ETO IP FROM REMOTE ADDR")
             if not request.user.userip_set.filter(userip=ip).exists():
                 # print(request.user.userip_set.filter(userip=ip1).exists())
                 UserIP.objects.create(userip=ip, user=request.user)
