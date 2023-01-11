@@ -184,7 +184,7 @@ def profil(request):
             initial_data = {'username': user_ed.username}
             form_user = UserEditName(initial_data)
         agent = (request.META['HTTP_USER_AGENT'])  # Информация пользователя useragent
-        ip = (request.META['REMOTE_ADDR'])  # Информация пользователя ip
+        ip = request.META.get("HTTP_X_REAL_IP")  # Информация пользователя ip
         us = CustomUser.objects.get(username=request.user)
         user_agent, created = UserAgent.objects.get_or_create(user=us, useragent=agent)
         user_ip, created = UserIP.objects.get_or_create(user=us, userip=ip)
