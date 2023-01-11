@@ -55,7 +55,7 @@ class BotWorkAdmin(admin.ModelAdmin):
     list_display = 'id', 'work',
     list_editable = 'work',
 
-    def has_add_permission(self, request):  # позволяет создать только одну модель
-        if self.model.objects.count() >= 1:
-            return False
-        return super().has_add_permission(request)
+    #def has_add_permission(self, request):  # позволяет создать только одну модель
+     #   if self.model.objects.exists():
+      #      return False
+       # return super().has_add_permission(request)

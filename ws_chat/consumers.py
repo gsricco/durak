@@ -436,8 +436,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         """Подключение пользователя"""
-        recieve_user = "go"#str(self.scope["url_route"]["kwargs"][
-                               #"user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
+        recieve_user = str(self.scope["url_route"]["kwargs"][
+                               "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = self.scope['user']  # TODO получаем имя пользователя который подключился с фронта
         user_id = str(self.scope["user"].id)
         if is_auth := self.scope['user'].is_authenticated:
