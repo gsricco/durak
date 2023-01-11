@@ -22,21 +22,13 @@ class BanIPandAgentMiddleware:
         if CustomUser.objects.filter(userip__userip=ip, useragent__useragent=agent, ban__ban_ip=True).exists():
             print(CustomUser.objects.filter(userip__userip=ip, useragent__useragent=agent, ban__ban_ip=True))
             raise PermissionDenied
-        response = self.get_response(request)
-        return response
-
-
-def add_new_ip_ua(get_response):
-
-    def middleware(request):
         if request.user.is_authenticated:
-            agent = (request.META['HTTP_USER_AGENT'])
-            ip = request.META.get("HTTP_X_REAL_IP")
-            print(ip, agent)
             if not request.user.userip_set.filter(userip=ip).exists():
                 UserIP.objects.create(userip=ip, user=request.user)
             if not request.user.useragent_set.filter(useragent=agent).exists():
                 UserAgent.objects.create(useragent=agent, user=request.user)
-            response = get_response(request)
-            return response
-    return middleware
+        response = self.get_response(request)
+        return response
+
+
+
