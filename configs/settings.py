@@ -71,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    "configs.middleware.add_new_ip",
     "configs.middleware.BanIPandAgentMiddleware",
 ]
 

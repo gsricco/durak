@@ -22,3 +22,19 @@ class BanIPandAgentMiddleware:
             list_ban_ip_agent = []
         response = self.get_response(request)
         return response
+
+
+def add_new_ip(get_response):
+
+    def mw(request):
+        if request.user.is_authenticated:
+            # ip1 = (request.META['REMOTE_ADDR'])
+            ip2 = request.META.get("HTTP_X_REAL_IP")
+            # print(ip1, ip2)
+            if not request.user.userip_set.filter(userip=ip1).exists():
+                # print(request.user.userip_set.filter(userip=ip1).exists())
+                UserIP.objects.create(userip=ip1, user=request.user)
+                # UserIP.objects.create(userip=ip2, user=request.user)
+            response = get_response(request)
+            return response
+    return mw
