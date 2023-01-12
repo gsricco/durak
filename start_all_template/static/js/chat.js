@@ -154,6 +154,7 @@ chatSocket.onmessage = function (e) {
             svgBan.innerHTML = `<use xlink:href="${static_prefix}img/icons/sprite.svg#ban_user"></use>`
             btnBan.appendChild(svgBan)
         }
+        scrollBlock.scrollTop = scrollBlock.scrollHeight
     }
     else if (data.chat_type === 'all_chat_list') {
         messageBlock.innerHTML = ''
@@ -222,6 +223,7 @@ chatSocket.onmessage = function (e) {
                 btnBan.appendChild(svgBan)
             }
         }
+        scrollBlock.scrollTop = scrollBlock.scrollHeight
     }
     else if (data.lvlup) {
             level_data_next = document.querySelector('.level_data_next')
@@ -248,7 +250,6 @@ chatSocket.onmessage = function (e) {
         let inputRubs = document.querySelector(".amount-selection__input");
         inputRubs.value = `${rubs}`
     }
-    scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
 messageInput.focus();
