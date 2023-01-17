@@ -10,7 +10,7 @@ from configs.settings import REDIS_URL_STACK
 from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
-SET_BAD_SLAG = set()
+
 
 
 @admin.register(SiteContent)

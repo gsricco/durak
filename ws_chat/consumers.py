@@ -13,8 +13,8 @@ from django.shortcuts import get_object_or_404
 from accaunts.models import Ban, AvatarProfile, DetailUser
 from configs.settings import BASE_DIR, REDIS_URL_STACK
 from accaunts.models import CustomUser, Level, ItemForUser
-from content_manager.admin import SET_BAD_SLAG
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
+from content_manager.models import BadSlang
 from support_chat.models import Message, UserChatRoom
 from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 from pay.views import rub_to_pay, virtual_money_to_rub
@@ -901,12 +901,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "creds_to_rubs": rubs
         }))
 
-    @staticmethod
-    async def check_bad_slang(message: str) -> bool:
+    async def check_bad_slang(self, message: str) -> bool:
         """Проверяет сообщение на наличие запрещённых слов"""
-        if r.exists("bad_slang"):
-            bad_words_set = r.smembers("bad_slang")
-            for word in bad_words_set:
-                if word in message:
-                    return False
+        if not r.exists("bad_slang"):
+            await self.init_bad_slang()
+        bad_words_set = r.smembers("bad_slang")
+        for word in bad_words_set:
+            if word in message:
+                return False
         return True
+
+    @sync_to_async
+    def init_bad_slang(self):
+        if words := BadSlang.objects.all().only("name").values_list("name", flat=True):
+            all_words = words
+            r.sadd("bad_slang", *set(all_words))
