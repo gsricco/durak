@@ -80,7 +80,7 @@ class CustomUser(AbstractUser):
         if not DetailUser.objects.filter(user=self).exists():
             detail = DetailUser(user=self)
             detail.save()
-        if not Ban.objects.filter(user=self).exists():    # создание бана при регистрации пользователя
+        if not Ban.objects.filter(user=self).exists():
             ban = Ban(user=self)
             ban.save()
 
@@ -105,12 +105,10 @@ class CustomUser(AbstractUser):
         # give available level
         while self.experience >= self.level.experience_range.upper:
             new_levels = Level.objects.filter(level__gt=self.level.level).order_by('level')
-            print(f"Available levels {new_levels}")
             # если есть доступные уровни
             if new_levels:
                 # связывает новый уровень с пользователем (не сохраняет в БД)
                 new_level = new_levels.first()
-                print(f"New level {new_level}")
                 self.level = new_level
                 level_changed = True
 
@@ -272,7 +270,7 @@ class RouletteRound(models.Model):
         ('coin', 'Монетка'),
     ]
 
-    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', unique=True)
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES,
                                   default='hearts')
@@ -352,3 +350,15 @@ class UserBet(models.Model):
         verbose_name = 'Ставка пользователя'
         verbose_name_plural = 'Ставки пользователей'
 
+class BonusVKandYoutube(models.Model):
+    """Модель полученных бонусов за подписки на vk и youtube"""
+    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
+    bonus_vk = models.BooleanField(verbose_name="Получен бонус за vk", default=False)
+    bonus_youtube = models.BooleanField(verbose_name="Получен бонус за youtube", default=False)
+
+    class Meta:
+        verbose_name = 'Бонус за подписку'
+        verbose_name_plural = 'Бонусы за подписки'
+
+    def __str__(self):
+        return f'{self.user}'

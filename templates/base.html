@@ -687,6 +687,9 @@
                             только после нас!</li>
                         <li id="bot_message" style="visibility: hidden;" class="modal-manual__footnote"></li>
                     </ul>
+                    <div class="modal-manual__footnote" style="color: #474747;">
+                        *в случае неудачной попытки обыгрыша валюта не возвращается
+                    </div>
                 </div>
                 <a href="#" class="btn btn_danger modal-manual__btn" id="modalManualBtn2">
                     <div class="timer" id="timerPay">Начать</div>
@@ -799,6 +802,56 @@
             </div>
         </div>
     </div>
+<div class="popup" id="auth_to_vk_you">
+	<div class="popup__body">
+		<div class="popup__content modal modal_popup modal_authorization">
+			<a href="#" class="popup__close close-popup close-popup_close">
+				<svg class="close-popup__icon ">
+					<use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+				</svg>
+			</a>
+			<div class="modal-enter">
+				<h3 class="modal__title modal-enter__title">
+                    {% if not user.is_authenticated %}
+					    Авторизуйтесь для продолжения
+                    {% elif social_google %}
+                        Свяжите аккаунт с VK
+                    {% elif social_vk %}
+                        Свяжите аккаунт с Google
+                    {% endif %}
+				</h3>
+				<div class="modal-enter__body">
+					<div class="modal-enter__row">
+						<div class="modal-enter__item">
+							<div class="modal-enter__img">
+                            {% if social_vk or not user.is_authenticated %}
+
+								<svg class="yt">
+									<use xlink:href="{% get_static_prefix %}img/icons/sprite.svg#google_login"></use>
+								</svg>
+							</div>
+							<a href="/login/google-oauth2/" class="btn btns_yt modal-enter__btn">Привязать аккаунт Google</a>
+                            {% endif %}
+						</div>
+						<div class="modal-enter__item">
+							<div class="modal-enter__img">
+                                {% if social_google or not user.is_authenticated %}
+								<svg class="vk">
+									<use xlink:href="{% get_static_prefix %}img/icons/sprite.svg#vk"></use>
+								</svg>
+							</div>
+
+							<a href="/login/vk-oauth2/" class="btn btns_vk modal-enter__btn">Привязать аккаунт Вконтакте</a>
+                            {% endif %}
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
     <div class="popup" id="modalAccountSocial">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal_authorization">

@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import datetime
 import json
@@ -20,6 +21,7 @@ from pay.views import rub_to_pay, virtual_money_to_rub
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
+from .views import vk_api_subscribe, give_bonus_vk_youtube
 
 # подключаемся к редису
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
@@ -34,17 +36,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def create_or_get_support_chat_room(self, user_pk):
-        if CustomUser.objects.filter(pk=user_pk).exists():
-            user = CustomUser.objects.get(pk=user_pk)
-            chat_room, created = UserChatRoom.objects.get_or_create(user=user, room_id=user.pk)
-            return chat_room
+        chat_room, created = UserChatRoom.objects.get_or_create(user_id=user_pk, room_id=user_pk)
+        return chat_room
 
     async def save_user_message_all_chat(self, all_chat_message):
         """Сохраняет последние 1-50 сообщений из общего чата в Редис"""
         if not r.exists("all_chat_50"):
             r.json().set("all_chat_50", ".", [])
         r.json().arrappend("all_chat_50", ".", all_chat_message)
-        if arr_len := r.json().arrlen("all_chat_50") > 50:
+        if (arr_len := r.json().arrlen("all_chat_50")) > 50:
             r.json().arrtrim("all_chat_50", ".", arr_len - 50, -1)
 
     @sync_to_async()
@@ -60,18 +60,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user = self.scope['user']
             save_name = f'media/support_chat/{user.pk}/{save_date}.{file_type}'
             if os.path.isdir(f'{BASE_DIR}/media/support_chat'):
-                print('in if$1')
                 if os.path.isdir(f'{BASE_DIR}/media/support_chat/{user.pk}'):
-                    print('in if$2')
                     with open(save_name, 'wb') as f:
                         f.write(new_file)
                 else:
-                    print('in else$2')
                     os.mkdir(f'media/support_chat/{user.pk}')
                     with open(save_name, 'wb') as f:
                         f.write(new_file)
             else:
-                print('in else$1')
                 os.mkdir('media/support_chat')
                 os.mkdir(f'media/support_chat/{user.pk}')
                 with open(save_name, 'wb') as f:
@@ -81,19 +77,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return ''
 
     @sync_to_async
-    def save_user_message(self, room, user, message, file_path='', is_sell_item=False):  # сохраняет сообщение в бд
-        """Cохраняет сообщения из чата поддержки в БД"""
-        if user:
-            user = CustomUser.objects.get(username=user).pk
-            user_mess = Message(user_posted_id=user, message=message,
-                                file_message=file_path[6:], is_sell_item=is_sell_item)
-            # user_mess.full_clean()
-            user_mess.save()
-            room.message.add(user_mess, bulk=False)
-            room.save()
-            room.notread.save()
-            async_to_sync(self.get_all_room)()
-            return user_mess
+    def save_user_message(self, room, user_id, message, file_path='', is_sell_item=False):
+        """Сохраняет сообщения из чата поддержки в БД"""
+        user_mess = Message(user_posted_id=user_id, message=message,
+                            file_message=file_path[6:], is_sell_item=is_sell_item)
+        user_mess.save()
+        room.message.add(user_mess, bulk=False)
+        room.save()
+        room.notread.save()
+        async_to_sync(self.get_all_room)()
+        return user_mess
 
     @sync_to_async()
     def get_all_room(self):
@@ -161,7 +154,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async()
     def get_ban_chat_user(self, user):
         """Проверка бана пользователя в общем чате"""
-        user = CustomUser.objects.get(username=user).pk
+        # user = CustomUser.objects.get(username=user).pk
         if Ban.objects.get(user=user).ban_chat:
             return True
         else:
@@ -262,11 +255,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(message))
 
     @sync_to_async()
-    def get_cases_info(self):
+    def get_cases_info(self, user):
         """Функция отправки информации о кейсах"""
         # поулчаем все выданные и не открытые кейсы
-        users = self.scope['user']
-        owned_cases_for_user = OwnedCase.objects.filter(owner=users.pk)
+        owned_cases_for_user = OwnedCase.objects.filter(owner=user.pk)
         not_owned_case = owned_cases_for_user.filter(date_opened=None)
         # получаем все имена кейсов из бд и делаем из них дикт
         all_case_name = Case.objects.all()
@@ -313,37 +305,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     @sync_to_async()
-    def get_user_items(self):
+    def get_user_items(self, user):
         """Шлёт кейсы пользователям"""
-        user = self.scope['user']
-        if user.is_authenticated:
-            user_items = ItemForUser.objects.filter(user=user, is_used=False)
-            serializer = ItemForUserSerializer(user_items, many=True)
-            message = {
-                'type': 'send_user_item',
-                'user_items': serializer.data
-            }
-            async_to_sync(self.channel_layer.group_send)(self.unique_room_name, message)
+        user_items = ItemForUser.objects.filter(user=user, is_used=False)
+        serializer = ItemForUserSerializer(user_items, many=True)
+        message = {
+            'type': 'send_user_item',
+            'user_items': serializer.data
+        }
+        async_to_sync(self.channel_layer.group_send)(self.unique_room_name, message)
 
     @sync_to_async()
-    def open_case(self, case):
+    def open_case(self, case, user):
         """Открывает кейсы"""
-        user = self.scope['user']
         if case_id := Case.objects.filter(name=case).first():
             if owned_case := OwnedCase.objects.filter(owner=user.pk) \
                     .filter(date_opened=None).filter(case=case_id).last():
-                if owned_case.owner.pk != user.pk:
-                    print({"details": "Access forbidden"})
-                if owned_case.item is not None:
-                    print({"details": "Case is already opened"})
+                # if owned_case.owner.pk != user.pk:
+                #     print({"details": "Access forbidden"})
+                # if owned_case.item is not None:
+                #     print({"details": "Case is already opened"})
                 last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
                     .exclude(date_opened=None) \
                     .order_by("-date_opened") \
                     .first()
                 if last_user_case is not None:
                     delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
-                    if delta_time < datetime.timedelta(hours=1):
-                        print({"details": "Wait before you can open next case"})
+                    # if delta_time < datetime.timedelta(hours=1):
+                    #     print({"details": "Wait before you can open next case"})
                 case = owned_case.case
                 case_items = ItemForCase.objects.filter(case=case)
                 weights = [float(item['chance']) for item in case_items.values('chance')]
@@ -368,39 +357,37 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 else:
                     ItemForUser.objects.create(user=user, user_item=chosen_item)
                     tasks.send_items_delay(user.pk)
-            else:
-                print('Нет выданного кейса')
-        else:
-            print('Нет такого кейса')
+        #     else:
+        #         print('Нет выданного кейса')
+        # else:
+        #     print('Нет такого кейса')
 
     @sync_to_async
-    def sell_item(self, data):
-        user = self.scope['user']
-        if user.is_authenticated:
-            if Item.objects.filter(name=data.get('name')).exists():
-                item = Item.objects.get(name=data.get('name'))
-                if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
-                    user_item.is_used = True
-                    user_item.save()
-                    user.detailuser.balance += item.selling_price
-                    user.detailuser.save()
-                    message = {
-                        'type': 'get_balance',
-                        'balance_update': {
-                            'current_balance': user.detailuser.balance
-                        }
+    def sell_item(self, data, user):
+        if Item.objects.filter(name=data.get('name')).exists():
+            item = Item.objects.get(name=data.get('name'))
+            if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
+                user_item.is_used = True
+                user_item.save()
+                user.detailuser.balance += item.selling_price
+                user.detailuser.save()
+                message = {
+                    'type': 'get_balance',
+                    'balance_update': {
+                        'current_balance': user.detailuser.balance
                     }
-                    async_to_sync(self.get_user_items)()
-                    if user.is_staff:
-                        async_to_sync(self.channel_layer.group_send)(f'admin_group', message)
-                    else:
-                        async_to_sync(self.channel_layer.group_send)(f'{user.id}_room', message)
+                }
+                async_to_sync(self.get_user_items)()
+                if user.is_staff:
+                    async_to_sync(self.channel_layer.group_send)(f'admin_group', message)
+                else:
+                    async_to_sync(self.channel_layer.group_send)(f'{user.id}_room', message)
 
     @sync_to_async
     def forward_item(self, data):
         user = self.scope['user']
         if user.is_authenticated:
-            if item := Item.objects.filter(name=data.get('item_name')):
+            if item := Item.objects.filter(name=data.get('item_name')).first():
                 if user_item := ItemForUser.objects.filter(user_item=item, user=user, is_used=False).first():
                     user_item.is_used = True
                     user_item.is_forwarded = True
@@ -418,16 +405,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }
 
                     room = async_to_sync(self.create_or_get_support_chat_room)(user.pk)
-                    async_to_sync(self.save_user_message)(room, user, f'{durak_username};{item_name};{svg_name}',
+                    async_to_sync(self.save_user_message)(room, user.id, f'{durak_username};{item_name};{svg_name}',
                                                           is_sell_item=True)
                     async_to_sync(self.channel_layer.group_send)(f'{user.id}_room', message)
                     async_to_sync(self.channel_layer.group_send)('admin_group', message)
 
     @sync_to_async
-    def read_all_message_from_room(self, room_id):
+    def read_all_message_from_room(self, user_pk, room_id):
         room = async_to_sync(self.create_or_get_support_chat_room)(int(room_id))
         # room = UserChatRoom.objects.get(room_id=room_id)
-        user_pk = self.scope.get('user').pk
+        # user_pk = self.scope.get('user').pk
+        # print(user_pk, room_id)
         if room_id != user_pk:
             room.message.filter(is_read=False).filter(user_posted=room_id).update(is_read=True)
         else:
@@ -439,17 +427,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         recieve_user = str(self.scope["url_route"]["kwargs"][
                                "user"])  # сюда с фронта передаём имя комнаты для выгрузки сообщения в админ чат
         user = self.scope['user']  # TODO получаем имя пользователя который подключился с фронта
-        user_id = str(self.scope["user"].id)
-        if is_auth := self.scope['user'].is_authenticated:
+        #user_id = str(self.scope["user"].id)
+        if is_auth := user.is_authenticated:
             if self.scope['user'].is_staff:
                 await self.channel_layer.group_add('admin_group', self.channel_name)
-                await self.channel_layer.group_add(f'{user_id}_room', self.channel_name)
+                await self.channel_layer.group_add(f'{user.id}_room', self.channel_name)
             else:
-                await self.channel_layer.group_add(f'{user_id}_room',
+                await self.channel_layer.group_add(f'{user.id}_room',
                                                    self.channel_name)  # TODO добавляем в группу юзеров
         self.room_name = 'go'  # задаем статический румнейм для общего чата
         self.room_group_name = f"chat_{self.room_name}"  # формируем рум груп нейм
-        self.unique_room_name = f"{user_id}_room"
+        self.unique_room_name = f"{user.id}_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
         await self.accept()
         await self.channel_layer.send(self.channel_name, {
@@ -476,159 +464,161 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
         text_data_json = json.loads(text_data)
-        # Инициализация страницы faq
-        if text_data_json.get('init_faq'):
-            await self.read_all_message_from_room(self.scope.get('user').pk)
-            await self.channel_layer.group_send(f'{self.scope.get("user").pk}_room', {
-                "type": "not_read",
-                'not_read': None
-            })
-        elif text_data_json.get('last_visit'):
-            is_approved = await self.check_last_visit(text_data_json.get('last_visit'))
-            if is_approved:
-                message = {"type": "send_approving_for_support_chat", "last_visit": 1}
-            else:
-                message = {"type": "send_approving_for_support_chat", "last_visit": 0}
-            await self.channel_layer.group_send(self.unique_room_name, message)
-        # Удаление сообщения из общего чата
-        elif message_to_delete := text_data_json.get('delete_message'):
-            if self.scope['user'].is_staff:
-                new_list_all_chat_50 = await self.all_chat_delete_message(message_to_delete)
-                await self.channel_layer.group_send(self.room_group_name, {
-                    "type": "chat_message",
-                    "chat_type": "all_chat_list",
-                    "message": "list",
-                    "list": new_list_all_chat_50
-                }
-                                                    )
-        elif user_id_to_ban := text_data_json.get("ban_user_all_chat"):
-            await self.add_user_to_chat_ban(user_id_to_ban)
-        if text_data_json.get('get_avatar'):
-            await self.get_avatar(text_data_json)
-        if text_data_json.get('set_avatar'):
-            await self.set_avatar_new_username(text_data_json)
-        # обмен предмета пользователя на валюту дурак-ролл
-        if text_data_json.get('sell_user_item'):
-            await self.sell_item(text_data_json.get('sell_user_item'))
-        # обмен предмета пользователя на валюту в дурак-онлайн
-        if text_data_json.get('forward_user_item'):
-            await self.forward_item(text_data_json.get('forward_user_item'))
-        if text_data_json.get('get_cases_items'):
-            await self.get_items_for_cases()
-        # получение предметов в инвентарь
-        if text_data_json.get('item'):
-            await self.get_user_items()
-        # кнопка открытия кейса
-        if text_data_json.get('open_case'):
-            this_case = text_data_json.get('open_case')
-            await self.open_case(this_case)
-            # await self.get_user_items()
-            await self.get_cases_info()
-        # информация о кейсах
-        if text_data_json.get('cases'):
-            await self.get_cases_info()
-        if text_data_json.get('bet') is not None:
-            user = self.scope.get('user')
-            if user and user.is_authenticated:
-                user_pk = user.pk
-                bet = text_data_json.get('bet')
-                print(f"receive method in consumers.py: Receiving bet from user({user_pk}): {bet}")
-                bet_is_valid = await self.save_bet(bet, user_pk)
-                amount = None
-                if bet_is_valid:
-                    amount = bet.get('bidCount')
-                await self.change_balance(user, amount)
-                await self.channel_layer.group_send(
-                    self.room_group_name, {
-                        "type": "get_bid",
-                        "bid": text_data_json,
+        user = self.scope['user']
+        if user.is_authenticated:
+            if user.is_staff:
+                if message_to_delete := text_data_json.get('delete_message'):
+                    new_list_all_chat_50 = await self.all_chat_delete_message(message_to_delete)
+                    await self.channel_layer.group_send(self.room_group_name, {
+                        "type": "chat_message",
+                        "chat_type": "all_chat_list",
+                        "message": "list",
+                        "list": new_list_all_chat_50
                     }
-                )
-        # получение запроса на зачисление бонусных средств
-        if text_data_json.get("get_free_balance") == 'g':
-            await self.send_free_balance()
-        if text_data_json.get('free_balance') == 'get':
-            await self.get_free_balance()
-        if rub := text_data_json.get("rub"):
-            if rub == "to_credits":
-                await self.send_rubs_from_credits(text_data_json.get("to_credits"))
-            else:
-                await self.send_credits_from_rubs(text_data_json["rub"])
-
-        """Первичное получение и обработка сообщений"""
-        if text_data_json.get('chat_type') == 'support':
-            if len(text_data_json.get("message")) > 500:
-                print("message all_chat more 500")
-            else:
+                                                        )
+                elif user_id_to_ban := text_data_json.get("ban_user_all_chat"):
+                    await self.add_user_to_chat_ban(user_id_to_ban)
+            if text_data_json.get('vk_youtube_api') == 1:
+                user_pk = self.scope.get('user').pk
+                if text_data_json.get('subscribe') == "vk":
+                    if await vk_api_subscribe(user_pk):
+                        print("Подписался!!!!")
+                    else:
+                        print("Не подписался!!!!")
+                elif text_data_json.get('subscribe') == "youtube":
+                    print("Подписка на youtube --- ждем 15 сек....")
+                    await asyncio.sleep(15)
+                    await give_bonus_vk_youtube(user_pk, "bonus_youtube")
+            elif text_data_json.get('init_faq'):
+                await self.read_all_message_from_room(user.pk, user.pk)
+                await self.channel_layer.group_send(f'{user.pk}_room', {
+                    "type": "not_read",
+                    'not_read': None
+                })
+            elif text_data_json.get('last_visit'):
+                is_approved = await self.check_last_visit(text_data_json.get('last_visit'))
+                if is_approved:
+                    message = {"type": "send_approving_for_support_chat", "last_visit": 1}
+                else:
+                    message = {"type": "send_approving_for_support_chat", "last_visit": 0}
+                await self.channel_layer.group_send(self.unique_room_name, message)
+            elif text_data_json.get('get_avatar'):
+                await self.get_avatar(text_data_json)
+            elif text_data_json.get('set_avatar'):
+                await self.set_avatar_new_username(text_data_json)
+            # обмен предмета пользователя на валюту дурак-ролл
+            elif text_data_json.get('sell_user_item'):
+                await self.sell_item(text_data_json.get('sell_user_item'), user)
+            # обмен предмета пользователя на валюту в дурак-онлайн
+            elif text_data_json.get('forward_user_item'):
+                await self.forward_item(text_data_json.get('forward_user_item'))
+            elif text_data_json.get('get_cases_items'):
+                await self.get_items_for_cases()
+            # получение предметов в инвентарь
+            # elif text_data_json.get('item'):
+                await self.get_user_items(user)
+            # кнопка открытия кейса
+            elif text_data_json.get('open_case'):
+                this_case = text_data_json.get('open_case')
+                await self.open_case(this_case, user)
+                # await self.get_user_items()
+                await self.get_cases_info(user)
+            # информация о кейсах
+            elif text_data_json.get('cases'):
+                await self.get_cases_info(user)
+            elif text_data_json.get('bet') is not None:
+                if user:
+                    user_pk = user.pk
+                    bet = text_data_json.get('bet')
+                    bet_is_valid = await self.save_bet(bet, user_pk)
+                    amount = None
+                    if bet_is_valid:
+                        amount = bet.get('bidCount')
+                    await self.change_balance(user, amount)
+                    await self.channel_layer.group_send(
+                        self.room_group_name, {
+                            "type": "get_bid",
+                            "bid": text_data_json,
+                        }
+                    )
+            # получение запроса на зачисление бонусных средств
+            elif text_data_json.get("get_free_balance") == 'g':
+                await self.send_free_balance(user)
+            elif text_data_json.get('free_balance') == 'get':
+                await self.get_free_balance(user)
+            elif rub := text_data_json.get("rub"):
+                if rub == "to_credits":
+                    await self.send_rubs_from_credits(text_data_json.get("to_credits"))
+                else:
+                    await self.send_credits_from_rubs(text_data_json["rub"])
+            #Первичное получение и обработка сообщений
+            elif text_data_json.get('chat_type') == 'support':
+                if len(text_data_json.get("message")) <= 500:
+                    file_path = ''
+                    if filed := text_data_json.get('file'):
+                        file_path = await self.base64_to_image(filed)
+                    room = await self.create_or_get_support_chat_room(user.pk)
+                    await self.save_user_message(room, user.id, text_data_json["message"], file_path)
+                    if not user.is_staff:
+                        await self.send_support_chat_message(self.channel_name,
+                                                             text_data_json["message"],
+                                                             user.username, file_path)  # из супорт чата на сайте себе
+                    await self.channel_layer.group_send('admin_group', {"type": "support_chat_message",
+                                                                        "chat_type": "support",
+                                                                        "message": text_data_json["message"],
+                                                                        "user": user.username,
+                                                                        "file_path": f'/{file_path}'
+                                                                        })  # отправка сообщения пользователя админам
+            elif text_data_json.get('chat_type') == 'support_admin':
+                '''Получем сообщение от админа из админки'''
                 file_path = ''
                 if text_data_json.get('file'):
                     filed = text_data_json.get('file')
                     file_path = await self.base64_to_image(filed)
-                user = self.scope.get('user')
-                room = await self.create_or_get_support_chat_room(user.pk)
-                # сохранение сообщения
-                await self.save_user_message(room, user.username, text_data_json["message"], file_path)
-                if not user.is_staff:
-                    await self.send_support_chat_message(self.channel_name,
-                                                         text_data_json["message"],
-                                                         user.username, file_path)  # из супорт чата на сайте себе
-                await self.channel_layer.group_send('admin_group', {"type": "support_chat_message",
-                                                                    "chat_type": "support",
-                                                                    "message": text_data_json["message"],
-                                                                    "user": user.username,
-                                                                    "file_path": f'/{file_path}'
-                                                                    })  # отправка сообщения пользователя админам
-        elif text_data_json.get('chat_type') == 'support_admin':
-            '''Получем сообщение от админа из админки'''
-            file_path = ''
-            if text_data_json.get('file'):
-                filed = text_data_json.get('file')
-                file_path = await self.base64_to_image(filed)
 
-            if text_data_json.get('receiver_user_room'):
-                receive_user = text_data_json.get('receiver_user_room')
-                await self.read_all_message_from_room(receive_user)
-                await self.get_all_room()
-                await self.init_support_chat(receive_user)
-            else:
-                sender_user = self.scope['user']
-                receive = text_data_json.get('receive')
-                room = await self.create_or_get_support_chat_room(receive)
-                await self.save_user_message(room, sender_user.username,
-                                             text_data_json["message"], file_path)  # сохранении сообщение админа в бд
-                not_read = await self.get_not_read(room)
-                await self.send_support_chat_message(self.channel_name, text_data_json["message"],
-                                                     sender_user.username,
-                                                     file_path)  # отправка сообщения самому себе в админку
-                await self.channel_layer.group_send(f'{receive}_room', {"type": "support_chat_message",
-                                                                        "chat_type": "support",
-                                                                        "message": text_data_json["message"],
-                                                                        "file_path": f'/{file_path}',
-                                                                        "user": sender_user.username, })  # отправка сообщения пользователю в рум
-                await self.channel_layer.group_send(f'{receive}_room', {"type": "not_read",
-                                                                        'not_read': not_read,
-                                                                        })
-        elif text_data_json.get('chat_type') == 'all_chat':
-            """Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
-            Проводим проверку на длину сообщения не более 250 символов.
-            Проводим проверку на бан пользователя."""
-            all_chat_message = {"type": "chat_message",
-                                "chat_type": text_data_json.get('chat_type'),
-                                "message": text_data_json["message"],
-                                "user": text_data_json["user"],
-                                "avatar": text_data_json["avatar"],
-                                "rubin": text_data_json.get("rubin"),
-                                "t": text_data_json.get("t"),
-                                "id": text_data_json.get("id")
-                                }
-            if len(all_chat_message["message"]) <= 250:
-                if await self.get_ban_chat_user(text_data_json["user"]):
-                    await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
-                elif not await self.check_bad_slang(text_data_json["message"].lower()):
-                    await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
+                if text_data_json.get('receiver_user_room'):
+                    receive_user = text_data_json.get('receiver_user_room')
+                    await self.read_all_message_from_room(user.pk, receive_user)
+                    await self.get_all_room()
+                    await self.init_support_chat(receive_user)
                 else:
-                    await self.channel_layer.group_send(self.room_group_name, all_chat_message)
-                    await self.save_user_message_all_chat(all_chat_message)
+                    receive = text_data_json.get('receive')
+                    room = await self.create_or_get_support_chat_room(receive)
+                    await self.save_user_message(room, user.id,
+                                                 text_data_json["message"], file_path)  # сохранении сообщение админа в бд
+                    not_read = await self.get_not_read(room)
+                    await self.send_support_chat_message(self.channel_name, text_data_json["message"],
+                                                         user.username,
+                                                         file_path)  # отправка сообщения самому себе в админку
+                    await self.channel_layer.group_send(f'{receive}_room', {"type": "support_chat_message",
+                                                                            "chat_type": "support",
+                                                                            "message": text_data_json["message"],
+                                                                            "file_path": f'/{file_path}',
+                                                                            "user": user.username, })  # отправка сообщения пользователю в рум
+                    await self.channel_layer.group_send(f'{receive}_room', {"type": "not_read",
+                                                                            'not_read': not_read,
+                                                                            })
+            elif text_data_json.get('chat_type') == 'all_chat':
+                """Общий чат на всех страницах. Получаем сообщение и рассылаем его всем.
+                Проводим проверку на длину сообщения не более 250 символов.
+                Проводим проверку на бан пользователя."""
+                all_chat_message = {"type": "chat_message",
+                                    "chat_type": text_data_json.get('chat_type'),
+                                    "message": text_data_json["message"],
+                                    "user": text_data_json["user"],
+                                    "avatar": text_data_json["avatar"],
+                                    "rubin": text_data_json.get("rubin"),
+                                    "t": text_data_json.get("t"),
+                                    "id": text_data_json.get("id")
+                                    }
+                if len(all_chat_message["message"]) <= 250:
+                    if await self.get_ban_chat_user(user):
+                        await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
+                    elif not await self.check_bad_slang(text_data_json["message"].lower()):
+                        await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
+                    else:
+                        await self.channel_layer.group_send(self.room_group_name, all_chat_message)
+                        await self.save_user_message_all_chat(all_chat_message)
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
@@ -727,7 +717,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def save_bet(self, bet, user_pk):
         storage_name = tasks.KEYS_STORAGE_NAME
-        print(f"Saving bet in {storage_name}")
         bet["channel_name"] = self.unique_room_name
         is_valid = await tasks.save_as_nested(storage_name, user_pk, bet)
         return is_valid
@@ -874,14 +863,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def send_approving_for_support_chat(self, event):
         await self.send(json.dumps({"last_visit": event.get("last_visit")}))
 
-    async def send_free_balance(self):
-        if self.scope['user'].id:
-            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+    async def send_free_balance(self, user):
+        if user.id:
+            detail_user = await DetailUser.objects.aget(user_id=user.id)
             await self.send(json.dumps({"free_balance": detail_user.free_balance}))
 
-    async def get_free_balance(self):
-        if self.scope['user'].id:
-            detail_user = await DetailUser.objects.aget(user_id=self.scope['user'].id)
+    async def get_free_balance(self, user):
+        if user.id:
+            detail_user = await DetailUser.objects.aget(user_id=user.id)
             if detail_user.free_balance > 0:
                 detail_user.balance += detail_user.free_balance
                 detail_user.free_balance = 0
@@ -902,13 +891,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def send_rubs_from_credits(self, sum_credits):
-        print(sum_credits)
+        """Переводит кредиты в рубли"""
         try:
             int_credits = int(sum_credits)
         except (TypeError, ValueError):
             int_credits = 0
         rubs = await sync_to_async(virtual_money_to_rub)(int_credits)
-        print(rubs, 'ETO BLAD RUBS!!!!!!!!!!!!!!!!!!!@#!@#$%!@$')
         await self.send(json.dumps({
             "creds_to_rubs": rubs
         }))

@@ -161,15 +161,16 @@ class CustomUserAdmin(UserAdmin):
         obj.give_level(save_immediately=True)
 
     def save_formset(self, request, form, formset, change):
-        if formset.has_changed() and formset.__class__.__name__ == 'BalanceEditorFormFormSet':
-            for new_form in formset:
+        if formset.__class__.__name__ == 'BalanceEditorFormFormSet':
+            for i, new_form in enumerate(formset.forms):
                 if new_form.has_changed():
-                    if user_detail := DetailUser.objects.get(user=new_form.cleaned_data['to_user']):
+                    if user_detail := DetailUser.objects.filter(user=new_form.cleaned_data['to_user']).first():
                         if new_form.cleaned_data['to_add'] == 'True':
                             user_detail.balance += new_form.cleaned_data['amount']
                         else:
                             if user_detail.balance < new_form.cleaned_data['amount']:
-                                return
+                                formset.forms.pop(i)
+                                break
                             user_detail.balance -= new_form.cleaned_data['amount']
                         user_detail.save()
         super().save_formset(request, form, formset, change)

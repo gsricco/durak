@@ -18,7 +18,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from accaunts.models import Level, ItemForUser
-from bot_payment.models import RefillRequest, WithdrawalRequest
+from bot_payment.models import RefillRequest, WithdrawalRequest, BanTime
 from configs.settings import REDIS_URL_STACK
 
 channel_layer = get_channel_layer()
@@ -60,7 +60,6 @@ def record_work_time(function):
 @shared_task
 def sender():
     t = datetime.datetime.now()
-    # check_round_number()
     r.incr('round', 1)
     r.set('state', 'countdown', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
@@ -168,12 +167,12 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         if str(dict_key) in round_bets:
             previous_bet = r.json().get('round_bets', dict_key)
             if bet_info['bidCard'] in previous_bet['amount']:
-                print(f'{bet_info["userName"]} Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+                # print(f'{bet_info["userName"]} Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
                 r.json().numincrby('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
             elif vice_versa_dict.get(bet_info['bidCard']) in previous_bet['amount']:
                 return False
             else:
-                print(f'{bet_info["userName"]} Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
+                # print(f'{bet_info["userName"]} Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
                 r.json().set('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
         else:
             r.json().set('round_bets', f".{dict_key}", bet_to_redis_json)
@@ -213,7 +212,7 @@ def eval_balance(user_bet: dict, round_result: str) -> int:
                 credits = int(user_bet[bet_card]) * 2
             else:
                 credits = int(user_bet[bet_card]) * 14
-    print(f'Кол-во кредитов к начислению : {credits}')
+    # print(f'Кол-во кредитов к начислению : {credits}')
     return credits
 
 
@@ -286,17 +285,17 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     # обработка результатов раунда
     save_round_results(bets_info)
 
-    print(f"Extracted keys: {bets_keys}", type(bets_keys))
+    # print(f"Extracted keys: {bets_keys}", type(bets_keys))
     if not bets_keys:
-        print('There were no bets for this round')
+        # print('There were no bets for this round')
         return 1
 
     users = models.CustomUser.objects.filter(pk__in=list(map(lambda x: int(x), bets_keys)))
-    print(f"Users with a bet: f{users}")
+    # print(f"Users with a bet: f{users}")
 
     # Get round results
     round_result = r.get(round_result_field_name)
-    print(f"Current round result: {round_result}")
+    # print(f"Current round result: {round_result}")
 
     # список с наградами пользователей за новые уровни -
     # после обработки всех ставок награды сохранятся в БД через bulk_create
@@ -341,13 +340,32 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
                                                                  'lvl_img': user.level.img_name,
                                                                  'case_count': user.level.amount
                                                              }})
+            # if channel_name := bets_info[str(bet_key)]['channel_name']:
+            #     level = user.level.level
+            #     new_level = level + 1
+                # if level == max_level:
+                #     new_level = 'max'
+                # message = {
+                #     "type": "send_new_level",
+                #     "lvlup": {
+                #         "type": "send_new_level",
+                #         "new_lvl": new_level,
+                #         "lvlup": {
+                #             "new_lvl": new_level,
+                #             "levels": level,
+                #         },
+                #
+                #         "levels": level,
+                #     },
+                # }
+                # async_to_sync(channel_layer.send)(channel_name, message)
 
             # проверяет награды пользователя за новый уровень
             if rewards_for_level:
                 # добавляет награды в список с наградами других пользователей
                 # для дальнейшего сохранения в БД
                 users_rewards.extend(rewards_for_level)
-                print(f"Rewards was given: {users_rewards}")
+                # print(f"Rewards was given: {users_rewards}")
 
                 # отправляем пользователю сообщение о доступных наградах
                 if channel_name:
@@ -362,10 +380,10 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
     detail_users = [user.detailuser for user in users]
     update_balance = models.DetailUser.objects.bulk_update(detail_users, ['balance'])
     updated = models.CustomUser.objects.bulk_update(users, ['experience', 'level'])
-    print(f"Experience updated for {updated} users")
+    # print(f"Experience updated for {updated} users")
     if users_rewards:
         granted = OwnedCase.objects.bulk_create(users_rewards)
-        print(f"Rewards granted:{granted}")
+        # print(f"Rewards granted:{granted}")
 
     return 0
 
@@ -527,7 +545,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
     rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME)
     # print(rounds_per_day,'rounds per day')
     current_round = int(r.get('round'))
-    print(current_round,'current round')
+    # print(current_round,'current round')
 
     # получение следующих за текущим раундов для их обновления
     existing_rounds = models.RouletteRound.objects.filter(round_number__gte=current_round)
@@ -596,20 +614,20 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         elif operation == 'withdraw':
             model = WithdrawalRequest
         else:
-            print(f'Unknown request operation: {operation}')
+            # print(f'Unknown request operation: {operation}')
             return
         # достаёт заявку из бд
         try:
             user_request = model.objects.get(pk=request_pk)
         except model.DoesNotExist as err:
-            print(f'Request {request_pk} does not exist')
+            # print(f'Request {request_pk} does not exist')
             return
         except Error:
             setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
             return
         # проверяет, не была ли заявка закрыта ранее
         if user_request.status != 'open' or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
-            print(f'Request {request_pk} already closed')
+            # print(f'Request {request_pk} already closed')
             return
         # закрывает заявку в БД
         # отмечает заявку как закрытую
@@ -640,7 +658,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 detail_user.frozen_balance = 0
                 detail_user.save()
             else:
-                print(f'Unknown request operation: {operation}')
+                # print(f'Unknown request operation: {operation}')
                 return
             user_request.save()
         except Error as err:
@@ -653,8 +671,9 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 ban.ban_site = True
                 ban.save()
             except Error as err:
-                print("Database error. Can't load a ban.")
+                # print("Database error. Can't load a ban.")
                 return
+        ban_user_for_bad_request.apply_async(args=(user_pk, operation))
 
 
 def check_round_number():
@@ -740,3 +759,62 @@ def send_balance_delay(user_pk):
 
 def send_items_delay(user_pk):
     send_items.apply_async(args=(user_pk,), countdown=5)
+
+
+@shared_task
+def remove_user_from_ban(user_pk):
+    """Убирает пользователя из бана"""
+    # достаёт бан пользователя из бд
+    try:
+        user_ban = models.Ban.objects.get(user_id=user_pk)
+    except models.Ban.DoesNotExist:
+        return
+    # достаёт пользователя из бана
+    user_ban.ban_site = False
+    user_ban.save()
+
+
+@shared_task
+def ban_user_for_time(user_pk, seconds):
+    """Банит пользователя с user_pk на seconds секунд"""
+    # достаёт бан пользователя из бд
+    try:
+        user_ban = models.Ban.objects.get(user_id=user_pk)
+    except models.Ban.DoesNotExist:
+        return
+    # отправляет пользователя в бан
+    user_ban.ban_site = True
+    user_ban.save()
+    # планируем снятие бана
+    remove_user_from_ban.apply_async(args=(user_pk,), countdown=seconds)
+
+
+@shared_task
+def ban_user_for_bad_request(user_pk, operation):
+    """Банит пользователя за неудачные попытки пополнения/вывода"""
+    # определяем модель
+    if operation == 'refill':
+        model = RefillRequest
+    elif operation == 'withdraw':
+        model = WithdrawalRequest
+    else:
+        return 0
+    # банит пользователя если у него три подряд закрытые заявки с причинами закрытия
+    # Timeout / ClientDontReady / ClientDontJoined / NoMessage
+    # причины неуспешного закрытия заявок по вине пользователя
+    user_fault_close_reasons = ('Timeout', 'ClientDontReady', 'ClientDontJoined', 'NoMessage')
+    # получает три последних заявки пользователя
+    last_closed_requests = model.objects.filter(user_id=user_pk).order_by('-date_opened')[:3]
+    # проверяет причины закрытия заявок
+    user_faults = 0 # количество заявок, закрытых неуспешно по вине пользователя
+    for closed_request in last_closed_requests:
+        if closed_request.close_reason in user_fault_close_reasons:
+            user_faults += 1
+    # если количество закрытых по вине пользователя заявок 3, то банит его
+    if user_faults >= 3:
+        ban_time = BanTime.objects.first()
+        if ban_time is not None:
+            seconds_of_ban = ban_time.hours * 60 * 60
+            ban_user_for_time.apply_async(args=(user_pk, seconds_of_ban))
+            return ban_time.hours
+    return 0

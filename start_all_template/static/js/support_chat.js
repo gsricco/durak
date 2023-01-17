@@ -160,6 +160,7 @@ function super_new(f) {
                     }
                 }
             }
+        setTimeout(()=>{chatBlock.scrollTop = chatBlock.scrollHeight},100)
         }
         if (data.not_read_count){
             document.title = `Помощь (${data.not_read_count})`
@@ -167,7 +168,6 @@ function super_new(f) {
         if (0<=data.last_visit<=1){
             disableChat(data.last_visit)
         }
-        setTimeout(()=>{chatBlock.scrollTop = chatBlock.scrollHeight},100)
     }
 }
 
@@ -184,7 +184,7 @@ sendBtn.addEventListener('click', () => {
             'file': byteFile,
             "chat_type": "support",
             'message': inputValue.value.trim(),
-            'init_faq': 'init_faq'
+            // 'init_faq': 'init_faq'
         }));
         }
 
@@ -221,9 +221,6 @@ function disableChat(foo) {
             }, 1000);
             inputValue.focus();
         }
-
         setTimeout(clickChat, timer);
-
     }
-
 }

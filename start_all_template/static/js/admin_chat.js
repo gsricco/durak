@@ -33,7 +33,6 @@ function checkFileSize(elem) {
             byteFile = reader.result
         };
         reader.onerror = function (error) {
-            console.log('Error: ', error);
         };
         showFile.innerHTML = "<span>Load</span>"
         setTimeout(() => showFile.innerHTML = '', 2000)

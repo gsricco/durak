@@ -38,7 +38,6 @@ function generateItems(winnerCard) {
     } else {
         cells = (numbersCards % 2 === 0) ? numbersCards + 1 : numbersCards
     }
-    console.log(cells)
 
     let h = 8;
     // четные элементы красные, нечетные черные, каждая 8 карта coin
@@ -103,7 +102,6 @@ function startRoll(winnerCard) {
     }
 
     let swingFinish = `translate3d(${randomInteger(-496, -504) / 10}%, 0, 0)`
-    console.log('sss ' + swingFinish)
 
     list.style.left = '50%'
     list.style.transform = swingFinish
@@ -282,7 +280,6 @@ chatSocket.onmessage = function (e) {
             timerCounter(remainTime)
         }
         if (data.init.state === 'rolling') {
-            console.log(data)
 
             startRoll(data.init.winner)
 

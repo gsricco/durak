@@ -173,3 +173,52 @@ chatSocket.onopen = function (e) {
     }));
 
 };
+function show_modal(id){
+    const modal = document.querySelector(`#${id}`)
+    modal.classList.add('open')
+    modal.addEventListener("click", function (e) {
+        if (!e.target.closest(".popup__content")) {
+            popupClose(e.target.closest(".popup"));
+}})}
+let btn_vk = document.querySelector("#btn_vk");
+let btn_youtube = document.querySelector("#btn_youtube");
+if(btn_vk){
+    btn_vk.addEventListener('click',
+        ()=> {
+        if (!is_auth) {
+            show_modal('authorization')
+        }
+        else{
+            chatSocket.send(JSON.stringify(
+                {"vk_youtube_api": 1,
+                "subscribe": "vk"}))
+    }})
+}
+if (btn_youtube) {
+    btn_youtube.addEventListener('click',
+        () => {
+            if (!is_auth) {
+                show_modal('authorization')
+            } else {
+                chatSocket.send(JSON.stringify(
+                    {
+                        "vk_youtube_api": 1,
+                        "subscribe": "youtube"
+                    }))
+            }
+        });
+}
+let btn_vk_new_modal = document.querySelector("#btn_vk_new_modal");
+let btn_youtube_new_modal = document.querySelector("#btn_youtube_new_modal");
+if (btn_vk_new_modal) {
+    btn_vk_new_modal.addEventListener('click',
+        () => {
+            show_modal('auth_to_vk_you')
+        });
+}
+if(btn_youtube_new_modal){
+    btn_youtube_new_modal.addEventListener('click',
+        () => {
+            show_modal('auth_to_vk_you')
+        });
+}

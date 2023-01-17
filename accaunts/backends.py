@@ -10,9 +10,6 @@ class CustomGoogleOAuth2(GoogleOAuth2):
             email = response['email']
         else:
             email = ''
-        # print(response, 'ETO RESPONSE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        # print(self.__dict__)
-        # print(self.__dict__.get('strategy').__dict__)
         name, given_name, family_name, picture = (
             response.get('name', ''),
             response.get('given_name', ''),
@@ -30,11 +27,6 @@ class CustomGoogleOAuth2(GoogleOAuth2):
                 'last_name': last_name,
                 'photo': picture}
 
-    # def process_error(self, data):
-    #     print('!' * 100)
-    #     print(self)
-    #     print(data)
-    #     print('!' * 100)
     def run_pipeline(self, pipeline, pipeline_index=0, *args, **kwargs):
         out = kwargs.copy()
         out.setdefault('strategy', self.strategy)

@@ -86,8 +86,19 @@ class WithdrawalRequest(models.Model):
 
 
 class BotWork(models.Model):
-    work = models.BooleanField(verbose_name='Отключить работу бота', default=False)
+    work = models.BooleanField(verbose_name='Отключить работу бота на пополнение', default=False)
+    work_t = models.BooleanField(verbose_name='Отключить работу бота на вывод', default=False)
 
     class Meta:
-        verbose_name = "Отключеиние бота"
-        verbose_name_plural = "Отключеиние бота"
+        verbose_name = "Отключение бота"
+        verbose_name_plural = "Отключение бота"
+
+    def __str__(self):
+        return f"Отключение бота"
+
+class BanTime(models.Model):
+    hours = models.PositiveIntegerField(verbose_name="Количество часов бана пользователя", default=4)
+
+    class Meta:
+        verbose_name = "Время бана пользователя"
+        verbose_name_plural = "Время бана пользователя"

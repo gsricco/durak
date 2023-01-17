@@ -39,11 +39,11 @@ def index(request):
                     pay.url_ok = False
                     pay.save()
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=request.user.level.pk)
+        # level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
-            'level_data': level_data,
+            # 'level_data': level_data,
             'title': 'Рулетка',
         }
     else:
@@ -64,12 +64,22 @@ def bonus_currency(request):
     sitecontent2 = sitecontent.first()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=request.user.level.pk)
+        if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
+            social_google = True
+        else:
+            social_google = False
+        if UserSocialAuth.objects.filter(user_id=request.user.id, provider='vk-oauth2'):
+            social_vk = True
+        else:
+            social_vk = False
+        # level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'sitecontent2': sitecontent2,
             'detail_user': detail_user,
-            'level_data': level_data,
+            "social_google": social_google,
+            "social_vk": social_vk,
+            # 'level_data': level_data,
             'title': 'Free',
         }
     else:
@@ -87,11 +97,11 @@ def contact(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=request.user.level.pk)
+        # level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
-            'level_data': level_data,
+            # 'level_data': level_data,
             'title': 'Контакты',
         }
     else:
@@ -109,11 +119,11 @@ def faq(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=request.user.level.pk)
+        # level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
-            'level_data': level_data,
+            # 'level_data': level_data,
             "faq": faq,
             'title': 'Помощь',
         }
@@ -132,11 +142,11 @@ def honesty(request):
     sitecontent = SiteContent.objects.all()
     if request.user.is_authenticated:
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=request.user.level.pk)
+        # level_data = Level.objects.get(pk=request.user.level.pk)
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
-            'level_data': level_data,
+            # 'level_data': level_data,
             'title': 'Честность',
         }
     else:
@@ -183,13 +193,13 @@ def profil(request):
         else:
             initial_data = {'username': user_ed.username}
             form_user = UserEditName(initial_data)
-        agent = (request.META['HTTP_USER_AGENT'])  # Информация пользователя useragent
-        ip = request.META.get("HTTP_X_REAL_IP")  # Информация пользователя ip
-        us = CustomUser.objects.get(username=request.user)
-        user_agent, created = UserAgent.objects.get_or_create(user=us, useragent=agent)
-        user_ip, created = UserIP.objects.get_or_create(user=us, userip=ip)
+        # agent = (request.META['HTTP_USER_AGENT'])  # Информация пользователя useragent
+        # ip = (request.META['REMOTE_ADDR'])  # Информация пользователя ip
+        # us = CustomUser.objects.get(username=request.user)
+        # user_agent, created = UserAgent.objects.get_or_create(user=us, useragent=agent)
+        # user_ip, created = UserIP.objects.get_or_create(user=us, userip=ip)
         detail_user = DetailUser.objects.get(user_id=request.user.id)
-        level_data = Level.objects.get(pk=request.user.level.pk)
+        # level_data = Level.objects.get(pk=request.user.level.pk)
         if UserSocialAuth.objects.filter(user_id=request.user.id, provider='google-oauth2'):
             social_google = True
         else:
@@ -229,12 +239,14 @@ def profil(request):
         page_paginated = True if page_number else False
         show_round = ShowRound.objects.filter().only("show").first()
         mod_nick = ''
+
+        item_user = ItemForUser.objects.filter(user=request.user, is_used=False).exists()
         if mod_nick := DurakNickname.objects.first():
             mod_nick = mod_nick.nickname
         context = {
             'sitecontent': sitecontent,
             'detail_user': detail_user,
-            'level_data': level_data,
+            # 'level_data': level_data,
             'social_google': social_google,
             'social_vk': social_vk,
             'form_user': form_user,
@@ -243,8 +255,9 @@ def profil(request):
             'page_obj': page_obj,
             'page_paginated': page_paginated,
             'modal_nickname': mod_nick,
-            'show_round': show_round.show
+            'show_round': show_round.show,
             # 'paginator': paginator,
+            'item_user': item_user,
         }
     else:
         level_data = Level.objects.get(level=1)

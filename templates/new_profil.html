@@ -144,9 +144,12 @@
 
 {#                   ИНВЕНТАРЬ         #}
                                 <div class="profil__items">
-                                    <div class="profil__warning" style="display: none;">
+                                    {% if  not item_user %}
+                                    <div class="profil__warning">
                                         Предметы можно получить из кейсов (даются за новый уровень)..
                                     </div>
+                                    {% endif %}
+
                                     {% if user.is_authenticated %}
                                 </div>
 
@@ -272,13 +275,19 @@
                                     </div>
 
                                     <div class="transactions__item-type transactions__item-info">
-                                        <span>{{ transaction.tr_type }}
+                                        <span>
+                                        {% if transaction.tr_type == 'От Админа' and not transaction.tr_plus %}
+                                            Удержание суммы - обратитесь в поддержку
+                                            {% else %}
+                                        {{ transaction.tr_type }}
+                                        {% endif %}
                                             {% if show_round and transaction.round_r %}
                                                 (раунд #{{ transaction.round_r }})
                                                 {% elif transaction.name %}
                                                 ({{ transaction.name }})
                                             {% endif %}
                                         </span>
+
                                     </div>
                                     <div class="transactions__item-date transactions__item-info">
                                         <span>{{ transaction.date }}</span>
@@ -355,8 +364,7 @@
                     </div>
                     <div class="profile-settings__btn-block">
                         <div class="btn btn_dark profile-settings__btn" id="avaBtnHide">Скрыть аватарку</div>
-                        <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать
-                            аватарку
+                        <div class="btn btn_dark profile-settings__btn" id="avaBtnShow" style="display:none;">Показать аватарку
                         </div>
                         <button id="btnSaveImgAvatar" onclick="window.location.reload()" class="btn btn_danger profile-settings__btn profile-settings__btn_save">
                             Сохранить

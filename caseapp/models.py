@@ -18,7 +18,7 @@ class Item(models.Model):
         ('smile_card_warm', 'PockerCard'),
         ('smile_card_cold', 'RussianStyle'),# не нашёл в svg картинку
     )
-    name = models.CharField(verbose_name='Название', max_length=255)
+    name = models.CharField(verbose_name='Название', max_length=255, unique=True)
     image = models.CharField(verbose_name='Изображение', max_length=50, default='amber_case', choices=ITEM_CHOICES)
     selling_price = models.PositiveIntegerField(verbose_name='Цена продажи', default=0)
     # chance_price = models.PositiveIntegerField(verbose_name='Цена для расчёта шансов', null=True,blank=True,default=0 )

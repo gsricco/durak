@@ -1,3 +1,13 @@
+*:after, *:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  outline: 0;
+}
+
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -3616,6 +3626,9 @@ h3 {
   overflow-y: auto;
   padding: 40px 20px 5px 20px;
   direction: rtl;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .support__chat-block::-webkit-scrollbar {
@@ -6101,7 +6114,8 @@ margin-top: 36px;
   }
 
   .bonus-currency__invite {
-    top: 70px;
+    /*top: 70px;*/
+    bottom: 28px;
   }
 
   .invite__head {

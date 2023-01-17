@@ -250,6 +250,7 @@ chatSocket.onmessage = function (e) {
         let inputRubs = document.querySelector(".amount-selection__input");
         inputRubs.value = `${rubs}`
     }
+    // scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
 messageInput.focus();

@@ -83,19 +83,16 @@ chatSocket.onmessage = function (e) {
                 timerCounter(remainTime)
             }
             if (data.init.state === 'rolling') {
-                console.log(data)
 
                 startRoll(data.init.winner)
 
             }
         }
         if (data.current_balance) {
-            console.log(data.current_balance, 'CURRENT BALANCE')
             UserBalance.innerHTML = `${data.current_balance}`
         }
 
         if (data.bid) {
-            console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
             createBidItemRow(data.bid)
         }
         if (data.roll) {
@@ -116,7 +113,6 @@ chatSocket.onmessage = function (e) {
                 bidsNumber.forEach(el => {
                     //обновление баланса user////
                     // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                    console.log(balanceUser)
                     // /////////////////////
                     el.style.color = 'green'
                     document.querySelector('.hearts').style.opacity = '1'
@@ -127,7 +123,6 @@ chatSocket.onmessage = function (e) {
                 bidsNumber.forEach(el => {
                     //обновление баланса user////
                     // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                    console.log(balanceUser)
                     // /////////////////////
                     el.style.color = 'green'
                     document.querySelector('.coin').style.opacity = '1'
@@ -138,7 +133,6 @@ chatSocket.onmessage = function (e) {
                 bidsNumber.forEach(el => {
                     //обновление баланса user////
                     // let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                    console.log(balanceUser)
                     // /////////////////////
                     el.style.color = 'green'
                     document.querySelector('.spades').style.opacity = '1'
@@ -172,7 +166,6 @@ chatSocket.onmessage = function (e) {
     // 8) КЕЙСЫ
 
     if (data.cases) {
-        console.log('прилетели кейсы')
         setModalConst(data.cases)
     }
     if (data.lvl_info && document.title ==='Профиль'){
