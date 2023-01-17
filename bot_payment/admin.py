@@ -66,9 +66,10 @@ class BanTimeAdmin(admin.ModelAdmin):
     list_display = 'id', 'hours',
     list_editable = 'hours',
 
-    def has_add_permission(self, request):  # позволяет создать только одну модель
-        if self.model.objects.count() >= 1:
-            return False
+    def has_add_permission(self, request):
+        if self.model.objects.all().exists:
+            if self.model.objects.count() >= 1:
+                return False
         return super().has_add_permission(request)
 
     def has_delete_permission(self, request, obj=None):
