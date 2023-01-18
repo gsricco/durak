@@ -83,6 +83,9 @@ class CustomUser(AbstractUser):
         if not Ban.objects.filter(user=self).exists():
             ban = Ban(user=self)
             ban.save()
+        if not BonusVKandYoutube.objects.filter(user=self).exists():
+            BonusVKandYoutube.objects.create(user=self)
+
 
     class Meta:
         verbose_name = 'Пользователь'
