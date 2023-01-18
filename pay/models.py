@@ -28,7 +28,7 @@ class Popoln(models.Model):
 class BalPay(models.Model):
     """Кредиты за реальные деньги"""
     conversion_coef = models.PositiveIntegerField(verbose_name='Коэффициент конверсии рубль/игровая валюта',
-                                                  help_text="В х раз")
+                                                  help_text="В х раз", default=1)
     range_sum = BigIntegerRangeField(verbose_name='Диапазон в рублях - на который применяется данный коэффициент',
                                      null=True)
     range_credits = BigIntegerRangeField(verbose_name="Диапазон в кредитах", null=True)
