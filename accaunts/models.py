@@ -361,4 +361,4 @@ class BonusVKandYoutube(models.Model):
         verbose_name_plural = 'Бонусы за подписки'
 
     def __str__(self):
-        return f'{self.user}'
+        return ''

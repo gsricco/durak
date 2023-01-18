@@ -7,7 +7,7 @@ from bot_payment.models import RefillRequest, WithdrawalRequest
 from content_manager.admin import AdminBalanceEditor
 from .models import (CustomUser, UserAgent, DetailUser, ReferalUser,
                      ReferalCode, GameID, Ban, UserIP, Level, ItemForUser,
-                     DayHash, RouletteRound, AvatarProfile, UserBet)
+                     DayHash, RouletteRound, AvatarProfile, UserBet, BonusVKandYoutube)
 from .forms import LevelForm
 from pay.models import Popoln
 from caseapp.models import OwnedCase, ItemForCase
@@ -19,14 +19,14 @@ admin.site.unregister(UserSocialAuth)
 admin.site.unregister(Nonce)
 admin.site.unregister(Association)
 
-# admin.site.unregister(TaskResult)
-# admin.site.unregister(GroupResult)
-#
-# admin.site.unregister(SolarSchedule)
-# admin.site.unregister(PeriodicTask)
-# admin.site.unregister(IntervalSchedule)
-# admin.site.unregister(ClockedSchedule)
-# admin.site.unregister(CrontabSchedule)
+admin.site.unregister(TaskResult)
+admin.site.unregister(GroupResult)
+
+admin.site.unregister(SolarSchedule)
+admin.site.unregister(PeriodicTask)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(ClockedSchedule)
+admin.site.unregister(CrontabSchedule)
 
 
 # class OwnedCaseTabularInline(admin.TabularInline):
@@ -131,6 +131,17 @@ class AvatarProfileAdmin(admin.ModelAdmin):
     preview.short_description = 'Аватарки профиля'
 
 
+class BonusVKandYoutubeInLine(admin.TabularInline):
+    """Подписки на YouTube и VK"""
+    model = BonusVKandYoutube
+    extra = 0
+    classes = ['collapse']
+    readonly_fields = "bonus_vk", "bonus_youtube",
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
@@ -138,7 +149,7 @@ class CustomUserAdmin(UserAdmin):
     list_editable = 'note',
     search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id'
     search_help_text = 'Поиск по имени пользователя, id пользователя, id c дурак онлайн, ссылки на vk, замтеки пользователя и ip пользователя'
-    inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
+    inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, BonusVKandYoutubeInLine, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
                BanInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
     readonly_fields = 'preview',
     fieldsets = (

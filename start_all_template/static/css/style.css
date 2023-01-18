@@ -5523,8 +5523,11 @@ margin-top: 36px;
 
 .add-bonus__btn {
   margin-top: 20px;
+  width: 100%;
 }
-
+.add-bonus__btn:disabled{
+  cursor: not-allowed;
+}
 .invite__head {
   background: #272727;
   border-radius: 6px;

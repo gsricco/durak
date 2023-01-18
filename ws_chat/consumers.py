@@ -3,6 +3,7 @@ import base64
 import datetime
 import json
 import os
+import threading
 from random import choices
 from django.utils import timezone
 from caseapp.serializers import OwnedCaseTimeSerializer, ItemForUserSerializer, CaseAndCaseItemSerializer
@@ -463,6 +464,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
+        print('receive start', self.scope['user'].username)
         text_data_json = json.loads(text_data)
         user = self.scope['user']
         if user.is_authenticated:
@@ -481,13 +483,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if text_data_json.get('vk_youtube_api') == 1:
                 user_pk = self.scope.get('user').pk
                 if text_data_json.get('subscribe') == "vk":
-                    if await vk_api_subscribe(user_pk):
-                        print("Подписался!!!!")
-                    else:
-                        print("Не подписался!!!!")
+                    t1 = threading.Thread(target=vk_api_subscribe, args=(user_pk,))
+                    t1.start()
                 elif text_data_json.get('subscribe') == "youtube":
-                    print("Подписка на youtube --- ждем 15 сек....")
-                    await asyncio.sleep(15)
+                    await asyncio.sleep(5)
                     await give_bonus_vk_youtube(user_pk, "bonus_youtube")
             elif text_data_json.get('init_faq'):
                 await self.read_all_message_from_room(user.pk, user.pk)
@@ -619,6 +618,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     else:
                         await self.channel_layer.group_send(self.room_group_name, all_chat_message)
                         await self.save_user_message_all_chat(all_chat_message)
+        print('END OF RECIEVE ', self.scope['user'].username)
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""

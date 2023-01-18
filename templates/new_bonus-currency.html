@@ -76,7 +76,6 @@
                     </form>
                 </div>
                 <div class="bonus-currency__item add-bonus">
-{#{% if user.social_auth.first.provider == 'google-oauth2' %}#}
                     <div class="add-bonus__item">
 
                         <div class="add-bonus__title-block">
@@ -90,7 +89,6 @@
                             </div>
                         </div>
                         <hr>
-{#                        {% for i in sitecontent %}#}
                         <div class="add-bonus__value-block">
                             <div class="add-bonus__value">
                                 +{{ sitecontent2.bonus_youtube }}K
@@ -99,8 +97,9 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                             </svg>
                         </div>
-
-                        {% if social_google %}
+                        {% if user.bonusvkandyoutube.bonus_youtube %}
+                            <button class="btns btns_yt add-bonus__btn" id="btn_youtube" disabled="disabled">Бонус уже получен</button>
+                        {% elif social_google %}
                         <a href="{{ sitecontent2.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn" id="btn_youtube">Подписаться на Youtube</a>
                         {% elif social_vk %}
                             <button class="btns btns_yt add-bonus__btn" id="btn_youtube_new_modal">Подписаться на YouTube</button>
@@ -108,7 +107,6 @@
                             <button class="btns btns_yt add-bonus__btn" id="btn_youtube">Подписаться на YouTube</button>
                         {% endif %}
                     </div>
-{#{% endif %}#}
                     <div class="add-bonus__item">
                         <div class="add-bonus__title-block">
                             <div class="add-bonus__logo">
@@ -129,7 +127,9 @@
                                 <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                             </svg>
                         </div>
-                    {% if social_vk %}
+                    {% if user.bonusvkandyoutube.bonus_vk %}
+                        <button class="btns btns_vk add-bonus__btn" id="btn_vk" disabled="disabled">Бонус уже получен</button>
+                    {% elif social_vk %}
                         <a href="{{ sitecontent2.url_vk }}" target="_blank" class="btns btns_vk add-bonus__btn" id="btn_vk">Подписаться во
                             Вконтакте</a>
                     {% elif social_google %}
@@ -137,9 +137,7 @@
                     {% else %}
                         <button class="btns btns_vk add-bonus__btn" id="btn_vk">Подписаться во Вконтакте</button>
                     {% endif %}
-{#                        {% endfor %}#}
                     </div>
-{#                {% endif %}#}
                 </div>
             </div>
             <div class="bonus-currency__invite invite">
@@ -178,7 +176,6 @@
                                     </svg>
                                 </div>
                             </div>
-
                         </li>
                         <li class="invite__step">
                             <div class="invite__wrapper invite__wrapper_text">
@@ -187,11 +184,9 @@
                                     <div class="invite__img">
                                         <img src="{% static 'img/gallery/bulb.png' %}" alt="">
                                     </div>
-{#                                    {% for i in sitecontent %}#}
                                     <div class="invite__text">
                                         {{ sitecontent2.info2|safe }}
                                     </div>
-{#                                    {% endfor %}#}
                                 </div>
                                 <div class="invite__arrow invite__arrow_max">
                                     <svg class="icon">
@@ -207,11 +202,9 @@
                                     <div class="invite__img">
                                         <img src="{% static 'img/gallery/handshake.png' %}" alt="">
                                     </div>
-{#                                    {% for i in sitecontent %}#}
                                     <div class="invite__text">
                                         {{ sitecontent2.info3|safe }}
                                     </div>
-{#                                    {% endfor %}#}
                                 </div>
                             </div>
                         </li>
