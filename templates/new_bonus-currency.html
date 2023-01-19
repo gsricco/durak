@@ -103,6 +103,8 @@
                         <a href="{{ sitecontent2.url_youtube }}" target="_blank" class="btns btns_yt add-bonus__btn" id="btn_youtube">Подписаться на Youtube</a>
                         {% elif social_vk %}
                             <button class="btns btns_yt add-bonus__btn" id="btn_youtube_new_modal">Подписаться на YouTube</button>
+                        {% elif user.is_staff%}
+                            <button class="btns btns_yt add-bonus__btn" id="btn_youtube" disabled="disabled">Подписка недоступна</button>
                         {% else %}
                             <button class="btns btns_yt add-bonus__btn" id="btn_youtube">Подписаться на YouTube</button>
                         {% endif %}
@@ -134,6 +136,8 @@
                             Вконтакте</a>
                     {% elif social_google %}
                         <button class="btns btns_vk add-bonus__btn" id="btn_vk_new_modal">Подписаться во Вконтакте</button>
+                    {% elif user.is_staff %}
+                        <button class="btns btns_vk add-bonus__btn" id="btn_vk" disabled="disabled">Подписка неактивна</button>
                     {% else %}
                         <button class="btns btns_vk add-bonus__btn" id="btn_vk">Подписаться во Вконтакте</button>
                     {% endif %}
