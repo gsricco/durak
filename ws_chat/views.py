@@ -49,7 +49,7 @@ def give_bonus_vk_youtube(user_pk, type_bonus):
         # проверяем, не получал ли юзер бонус за VK
         if not user_bonus.bonus_vk:
             detail_user = DetailUser.objects.get(user_id=user_pk)
-            detail_user.balance += SiteContent.objects.all().first().bonus_vk
+            detail_user.balance += SiteContent.objects.all().first().bonus_vk * 1000
             detail_user.save()
             message = {
                 'type': 'get_balance',
@@ -63,7 +63,7 @@ def give_bonus_vk_youtube(user_pk, type_bonus):
         # проверяем, не получал ли юзер бонус за YouTube
         if not user_bonus.bonus_youtube:
             detail_user = DetailUser.objects.get(user_id=user_pk)
-            detail_user.balance += SiteContent.objects.all().first().bonus_youtube
+            detail_user.balance += SiteContent.objects.all().first().bonus_youtube * 1000
             user_bonus.bonus_youtube = True
             detail_user.save()
             user_bonus.save()
