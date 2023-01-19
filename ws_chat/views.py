@@ -1,7 +1,7 @@
 import json
 import time
 import requests
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 from accaunts.models import CustomUser, BonusVKandYoutube, DetailUser
 from content_manager.models import SiteContent
@@ -40,7 +40,8 @@ def vk_api_subscribe(user_pk):
             give_bonus_vk_youtube(user_pk, "bonus_vk")
             return 1
 
-# @sync_to_async
+
+@sync_to_async
 def give_bonus_vk_youtube(user_pk, type_bonus):
     """Даёт бонус за подписку пользователя на канал в YouTube"""
     user_bonus, created = BonusVKandYoutube.objects.get_or_create(user_id=user_pk)
