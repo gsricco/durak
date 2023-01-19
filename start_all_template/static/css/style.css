@@ -7698,6 +7698,7 @@ margin-top: 36px;
 
   .roulette__accordion-wrapper .panel {
     margin-bottom: 15px;
+    min-height: 5px;
   }
 
   .roulette__accordion-wrapper {
@@ -8615,7 +8616,7 @@ margin-top: 36px;
 
   .roulette__item-header {
     width: 100%;
-    max-width: 87px;
+    /*max-width: 87px;*/
     height: 100px;
     -webkit-box-pack: center;
     -ms-flex-pack: center;
@@ -9518,7 +9519,8 @@ margin-top: 36px;
   }
 
   .roulette__item-header {
-    max-width: 99px;
+    /*max-width: 99px;*/
+    height: 108px;
   }
 
   .height800-895 .roulette__rull {
@@ -9575,7 +9577,11 @@ margin-top: 36px;
     margin-top: 1px;
   }
 
-  .height800-895 .roulette__item-header {
+  /*.height800-895 .roulette__item-header {*/
+  /*  max-width: 99px;*/
+  /*  height: 108px;*/
+  /*}*/
+.height800-895 {
     max-width: 99px;
     height: 108px;
   }
@@ -9598,7 +9604,10 @@ margin-top: 36px;
     margin-bottom: 13px;
   }
 
-  .height800-895 .roulette__item-header {
+  /*.height800-895 .roulette__item-header {*/
+  /*  width: 99px;*/
+  /*}*/
+.height800-895 {
     width: 99px;
   }
 
