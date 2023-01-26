@@ -760,7 +760,10 @@ def initialize_rounds():
 
 
 if psutil.Process().name().lower() == 'python':
+    print("INIT ROUNDS"*100)
     initialize_rounds()
+else:
+    print(psutil.Process().name() * 100)
 
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.00')
 celery_app.add_periodic_task(schedule=schedules.crontab(hour=0, minute=52), sig=generate_daily.s(), name='Генерация хеша каждый день')
