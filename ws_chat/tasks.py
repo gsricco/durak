@@ -97,7 +97,7 @@ def roll():
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
-    round_number = int(r.get('round'))
+    round_number = int(r.get('round')) if r.get('round') else 0
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     except models.RouletteRound.DoesNotExist:
@@ -759,11 +759,9 @@ def initialize_rounds():
     check_rounds(datetime.date.today())
 
 
-if psutil.Process().name().lower() == 'python':
-    print("INIT ROUNDS"*100)
+if psutil.Process().name().lower() == 'python' or 'daphne':
     initialize_rounds()
-else:
-    print(psutil.Process().name() * 100)
+
 
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.00')
 celery_app.add_periodic_task(schedule=schedules.crontab(hour=0, minute=52), sig=generate_daily.s(), name='Генерация хеша каждый день')
