@@ -237,6 +237,7 @@ chatSocket.onmessage = function (e) {
     }
     else if (data.hasOwnProperty("current_balance")) {
             update_balance(data.current_balance)
+            cahmax(data.current_balance)
         }
     else if (data.hasOwnProperty('credits')) {
         let credits = data.credits;

@@ -8,11 +8,11 @@ from . import models
 
 
 class RefillRequestViewSet(viewsets.ViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         """
-        Возвращает все заявки пользователя
+        Возвращает все заявки пользователя :нахуя оно возвращает?
         """
         user_pk = request.user.pk
         queryset = models.RefillRequest.objects.filter(user=user_pk)

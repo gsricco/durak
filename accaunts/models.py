@@ -173,6 +173,8 @@ class DetailUser(models.Model):
     balance = models.PositiveBigIntegerField(verbose_name="Баланс", default=0)
     free_balance = models.PositiveBigIntegerField(verbose_name="Бонусный счёт", default=0)
     frozen_balance = models.PositiveBigIntegerField(verbose_name='Замороженные средства', default=0)
+    # subscribe_balance = models.PositiveBigIntegerField(verbose_name="Бонус за подписку", default=0)
+    # bonus_balance = models.PositiveBigIntegerField(verbose_name="Общий бонусный счёт", default=0)
 
     class Meta:
         verbose_name = 'Баланс пользователя в игре'
@@ -180,6 +182,11 @@ class DetailUser(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+    # @property
+    # def total_balance(self):
+    #     balance = self.balance + self.bonus_balance
+    #     return balance
 
 
 class ReferalCode(models.Model):
@@ -254,7 +261,7 @@ class DayHash(models.Model):
     private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True,
                                           blank=True)
     date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
-    show_hash = models.BooleanField(verbose_name='Показывать в честности (текущий день)', default=False)
+    show_hash = models.BooleanField(verbose_name='Показывать в честности (текущий день)', default=True)
 
     def __str__(self):
         return f"{self.date_generated}: {self.private_key}-{self.public_key}"
@@ -272,8 +279,7 @@ class RouletteRound(models.Model):
         ('hearts', 'Червы'),
         ('coin', 'Монетка'),
     ]
-
-    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0)
+    round_number = models.PositiveBigIntegerField(verbose_name='Номер раунда', default=0, unique=True)
     round_started = models.DateTimeField(verbose_name='Время начала раунда', blank=True, null=True)
     round_roll = models.CharField(verbose_name='Результат раунда', max_length=6, choices=ROUND_RESULT_CHOISES,
                                   default='hearts')
@@ -282,6 +288,8 @@ class RouletteRound(models.Model):
     # show_round = models.BooleanField(verbose_name='Отображение раунда в честности', default=True)
     total_bet_amount = models.PositiveBigIntegerField(verbose_name='Общая сумма ставок', default=0)
     winners = models.ManyToManyField('CustomUser', verbose_name='Победители раунда', blank=True)
+    day_of_round = models.DateField(verbose_name="Дата когда должен быть сыгран раунд", auto_now_add=True)
+    time_rolled = models.DateTimeField(verbose_name="Время когда был сыгран", auto_now=True)
 
     def __str__(self):
         return f"Раунд номер {self.round_number}: {self.total_bet_amount} кредитов. {self.round_roll}"
@@ -289,7 +297,7 @@ class RouletteRound(models.Model):
     class Meta:
         verbose_name = 'Раунд рулетки'
         verbose_name_plural = 'Раунды рулетки'
-        ordering = ('-round_started', '-rolled')
+        ordering = ('round_number',)
 
 
 class ItemForUser(models.Model):

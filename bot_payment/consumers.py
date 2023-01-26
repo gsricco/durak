@@ -1,6 +1,10 @@
 import json
+import threading
+
 import aiohttp
 import asyncio
+
+import requests
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
@@ -101,6 +105,10 @@ class RequestConsumer(AsyncWebsocketConsumer):
         """Замораживает средства перед выводом"""
         pass
 
+    def get_request(self, spisok):
+        response = requests.get("http://178.211.139.11:8888/refill/get_bot_info?bot_id=0").json()
+        print(response, "ETO RESPONSE IN REQUEST")
+        spisok.append(response)
     async def create_request(self, text_data_json):
         """Создаёт новую заявку"""
         # отключение бота
@@ -115,20 +123,20 @@ class RequestConsumer(AsyncWebsocketConsumer):
             return
         # проверяет правильность полученных данных
         if text_data_json.get('user') is None:
-            text_data_json['user'] = { "id": self.scope['user'].pk }
+            text_data_json['user'] = {"id": self.scope['user'].pk}
         serializer = self.model_serializer(data=text_data_json)
         if serializer.is_valid():
             user = self.scope['user']
             # проверяет условия, специфичные для типа операции
             check_result = await self.check_conditions(text_data_json)
             if check_result != "OK":
-                message = {"status": "error","detail": check_result}
+                message = {"status": "error", "detail": check_result}
                 await self.send(json.dumps(message))
                 return
             
             # проверяет, создаётся ли заявка для текущего юзера
             if user.pk != serializer.validated_data['user']['id']:
-                message = {"status": "error","detail": "Нельзя создать заявку для другого пользователя."}
+                message = {"status": "error", "detail": "Нельзя создать заявку для другого пользователя."}
                 await self.send(json.dumps(message))
                 return
 
@@ -142,7 +150,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             # ban = await sync_to_async(ban_tuple.__getitem__)(0)
             # if ban.ban_site:
             if ban_tuple.ban_site:
-                message = {"status": "error","detail": "На сервере ведутся технические работы."}
+                message = {"status": "error", "detail": "На сервере ведутся технические работы."}
                 await self.send(json.dumps(message))
                 return
 
@@ -161,7 +169,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     retries += 1
                     # если слишком много запрсов, то перестаём искать
                     if retries > MAX_RETRIES:
-                        message = {"status": "error","detail": "Нет свободных ботов."}
+                        message = {"status": "error", "detail": "Нет свободных ботов."}
                         await self.send(json.dumps(message))
                         return
                     # пытается получить от сервера ответ
@@ -187,7 +195,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     # -1 в id бота - на сервере нет свободных ботов
                     if bot_id == -1:
                         # отсылаем на фронт ответ о том, что поиск ещё идёт
-                        message = {"status": "process","detail": "Поиск свободных ботов..."}
+                        message = {"status": "process", "detail": "Поиск свободных ботов..."}
                         await self.send(json.dumps(message))
                         await asyncio.sleep(self.connection_delay)
                     else:
@@ -200,29 +208,38 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
                 # если бота кто-то использовал, то прерывает создание заявки
                 if bot_owner is None:
-                    message = {"status": "error","detail": "Игровой бот занят."}
+                    message = {"status": "error", "detail": "Игровой бот занят."}
                     await self.send(json.dumps(message))
                     return
                 # если бота занял другой пользователь, то прерывает создание заявки
                 if int(bot_owner) != user.pk:
-                    message = {"status": "error","detail": "Игровой бот занят."}
+                    message = {"status": "error", "detail": "Игровой бот занят."}
                     await self.send(json.dumps(message))
                     return 
                 # получает имя бота по его id 
                 url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
                 # получает список ботов из ответа сервера
+                print(url_get_bot_info)
+                spisok = []
                 try:
-                    resp = await session.get(url_get_bot_info)
-                    bot_list = await resp.json()
+                    # resp = await session.get(url_get_bot_info)
+                    t1 = threading.Thread(target=self.get_request, args=(spisok,))
+                    t1.start()
+                    t1.join()
+                    print(spisok, "<<<<<<<<<<<<<<<<<<<SPISOK")
+                    # bot_list = await resp.json()
+                    bot_list = spisok[0]
+                    print(bot_list, "ETO BOT_LIST")
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
-                    await self.send(json.dumps({"status": "error", "detail": f"Ошибка получения имени бота."}))
+                    print(err.__dict__)
+                    await self.send(json.dumps({"status": "error", "detail": f"Ошибка получения имени бота.",}))
                     return
                 finally:
                     resp.close()
                 # получает имя бота, с которым нужно будет взаимодействовать пользователю
                 bot_name = await self.get_bot_name(bot_list)
                 # посылаем имя бота на фронт для отображения пользователю
-                message = {"status": "get_name","detail": bot_name}
+                message = {"status": "get_name", "detail": bot_name}
                 await self.send(json.dumps(message))
 
                 # создаёт заявку и сохраняет её в бд

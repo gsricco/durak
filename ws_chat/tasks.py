@@ -1,5 +1,7 @@
 import datetime
 import math
+import time
+import psutil
 import uuid
 from django.db import Error
 import requests
@@ -30,7 +32,7 @@ ROUND_NUMBERS = {
                  'hearts': (103, 107, 111, 115, 119, 123),
                  'coin': (113,),}
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
-ROUND_TIME = 30.03
+ROUND_TIME = 30.0
 KEYS_STORAGE_NAME = 'USERID:list'
 SERVER_SEED = 'server_seed:str'
 PUBLIC_SEED = 'public_seed:str'
@@ -44,6 +46,8 @@ CREDITS_TO_EXP_COEF = 1000
 def record_work_time(function):
     """Засекает время работы функции"""
     def wrapper(*args, **kwargs):
+        rounds_start = models.RouletteRound.objects.all()
+        print(f'START AMOUNT OF ROUND ----- {len(rounds_start)}')
         start = timezone.now()
         print(f"Time record from {__name__} for function {function.__name__}")
         print(f"Start at {start}")
@@ -52,6 +56,9 @@ def record_work_time(function):
         print(f"End at {end}")
         delta = end - start
         print(f'Worked for {delta}')
+        rounds_end = models.RouletteRound.objects.all()
+        print(timezone.now(), datetime.datetime.now(), "tz and regular time")
+        print(f'END AMOUNT OF ROUND ----- {len(rounds_end)}', len(rounds_end) - len(rounds_start))
         return res
 
     return wrapper
@@ -59,8 +66,8 @@ def record_work_time(function):
 
 @shared_task
 def sender():
-    t = datetime.datetime.now()
-    r.incr('round', 1)
+    t = timezone.now()
+    # r.incr('round', 1)
     r.set('state', 'countdown', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     async_to_sync(channel_layer.group_send)('chat_go',
@@ -77,6 +84,7 @@ def debug_task():
     z = timezone.now()
     t = datetime.datetime.now()
     sender.apply_async()
+    # roll.apply_async(countdown=20)
     roll.apply_async(eta=z + datetime.timedelta(seconds=20))
     generate_round_result.apply_async(countdown=21, args=(True,))
     stop.apply_async(countdown=25)
@@ -85,12 +93,10 @@ def debug_task():
 
 @shared_task
 def roll():
-    t = datetime.datetime.now()
+    t = timezone.now()
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
-    if r.get("round") is None:
-        check_round_number()
     round_number = int(r.get('round'))
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
@@ -125,9 +131,14 @@ def roll():
 
 @shared_task
 def go_back():
-    t = datetime.datetime.now()
+    t = timezone.now()
     r.set('state', 'go_back', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
+    round = r.get("round")
+    if curr_round := models.RouletteRound.objects.filter(round_number=round):
+        if curr_round.first().rolled:
+            r.incr('round', 1)
+            r.expire('round', 32)
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'go_back',
@@ -137,7 +148,7 @@ def go_back():
 
 @shared_task
 def stop():
-    t = datetime.datetime.now()
+    t = timezone.now()
     r.set('state', 'stop', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     winner = r.get(ROUND_RESULT_FIELD_NAME)
@@ -158,7 +169,6 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         dict_key (str|int): ключ в словаре - user-id для записи/доступа;
         bet_info (dict): информация о конкретной ставке пользователя в текущем раунде;
     """
-    current_round = r.get('round')
     bet_to_redis_json = bet_info
     bet_to_redis_json['amount'] = {bet_info['bidCard']: bet_info['bidCount']}
     to_save = {dict_key: bet_to_redis_json}
@@ -167,18 +177,15 @@ async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info
         if str(dict_key) in round_bets:
             previous_bet = r.json().get('round_bets', dict_key)
             if bet_info['bidCard'] in previous_bet['amount']:
-                # print(f'{bet_info["userName"]} Incrementing amount of bid for {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
                 r.json().numincrby('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
             elif vice_versa_dict.get(bet_info['bidCard']) in previous_bet['amount']:
                 return False
             else:
-                # print(f'{bet_info["userName"]} Add new bid with amount {bet_info["bidCount"]} to card:{bet_info["bidCard"]}')
                 r.json().set('round_bets', f'{dict_key}.amount.{bet_info["bidCard"]}', bet_info['bidCount'])
         else:
             r.json().set('round_bets', f".{dict_key}", bet_to_redis_json)
     else:
         r.json().set('round_bets', ".", to_save)
-
     return True
 
 
@@ -187,8 +194,6 @@ def eval_experience(user_bet: dict, round_result: str) -> int:
 
     Args:
         user_bet (dict): полная информация о ставке пользователя
-        round_result (str): победная карта текущего раунда
-
     Returns:
         int: evaluated amount of experience
     """
@@ -254,13 +259,13 @@ def save_round_results(bets_info):
     round_started = timezone.now()
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
-    except (models.RouletteRound.DoesNotExist, models.RouletteRound.MultipleObjectsReturned):
+    except models.RouletteRound.DoesNotExist:
         current_round = models.RouletteRound()
     current_round.rolled = True
     current_round.total_bet_amount = total_amount
-    current_round.winners.set(winners)
     current_round.round_started = round_started
     current_round.save()
+    current_round.winners.set(winners)
     models.UserBet.objects.bulk_create(users_bets, batch_size=64)
 
 
@@ -514,52 +519,59 @@ def generate_round_result(process_after_generating: bool = False) -> int:
 
 @shared_task
 @record_work_time
-def generate_daily(day_hash_pk=None, update_rounds=True):
+def generate_daily(day_hash=None, time_now=None):
     """Генерирует хеши для получения результатов раундов и сами раунды"""
-    if r.exists('generated_daily'):
-        return
-    r.set('generated_daily', 1, ex=60)
-    # генерация хеша
-    if day_hash_pk is None:
+    if day_hash is None:
         try:
             try:
-                # находит существующий хеш на день
-                day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
-            except ObjectDoesNotExist:
-                # если хеша на день нет, создаёт новый
+                day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
+                if models.RouletteRound.objects.filter(day_hash=day_hash).exists():
+                    print('allo blad')
+                    check_round_number()
+                    return
+            except models.DayHash.DoesNotExist:
                 day_hash = models.DayHash()
                 day_hash.private_key = generate_private_key()
                 day_hash.public_key = generate_public_key()
                 day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
                 day_hash.save()
         except IntegrityError:
-            # если новый хеш создался во время выполнения функции в другом потоке, то достаёт его
-            day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
+            day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
+    if time_now:
+        date_now = datetime.datetime.now()
+        next_day = datetime.datetime(date_now.year, date_now.month, date_now.day+1, 0, 0, 0)
+        time_delta = (next_day - date_now).seconds
+        rounds_per_day = math.ceil(time_delta / ROUND_TIME) - 1
+        try:
+            round_to_generate_from = models.RouletteRound.objects.values_list("round_number", flat=True)\
+                                                            .order_by("round_number")\
+                                                            .last()
+            if round_to_generate_from is None:
+                round_to_generate_from = 1
+            else:
+                round_to_generate_from += 1
+        except AttributeError:
+            round_to_generate_from = 1
+        check_round_number(starting_round=round_to_generate_from)
     else:
-        day_hash = models.DayHash.objects.get(pk=day_hash_pk)
-
-    # генерация результатов раундов
-    # определение количества раундов для генерации
-    seconds_per_day = 24*60*60
-    # при делении получается нецелое число - количество раундов округляется вверх
-    rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME)
-    # print(rounds_per_day,'rounds per day')
-    current_round = int(r.get('round'))
-    # print(current_round,'current round')
-
-    # получение следующих за текущим раундов для их обновления
-    existing_rounds = models.RouletteRound.objects.filter(round_number__gte=current_round)
-    existing_rounds_dict = {round.round_number: round for round in existing_rounds}
-    # обновление старых и создание новых раундов
+        seconds_per_day = 24*60*60
+        rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME) - 1
+        try:
+            round_to_generate_from = models.RouletteRound.objects.select_related("day_hash")\
+                                                                 .filter(day_hash__date_generated=datetime.date.today())\
+                                                                 .values_list("round_number", flat=True)\
+                                                                 .order_by("round_number")\
+                                                                 .last()
+            if round_to_generate_from is None:
+                round_to_generate_from = 1
+            else:
+                round_to_generate_from += 1
+        except AttributeError:
+            round_to_generate_from = 1
     roulette_rounds = []
-    for round_number in range(current_round, current_round + rounds_per_day + 1):
-        if round_number in existing_rounds_dict:
-            if not update_rounds:
-                continue
-            round = existing_rounds_dict[round_number]
-        else:
-            round = models.RouletteRound(round_number=round_number)
-            roulette_rounds.append(round)
+    for round_number in range(round_to_generate_from, round_to_generate_from + rounds_per_day):
+        round = models.RouletteRound(round_number=round_number)
+        roulette_rounds.append(round)
         round.round_roll = roll_fair(
             day_hash.private_key,
             day_hash.public_key,
@@ -568,18 +580,7 @@ def generate_daily(day_hash_pk=None, update_rounds=True):
             ROUND_WEIGHTS
         )
         round.day_hash = day_hash
-    # сохранение обновлённых раундов в БД
-    if update_rounds:
-        models.RouletteRound.objects.bulk_update(existing_rounds, ['round_roll', 'day_hash'])
-    # сохранение новых раундов в БД
     models.RouletteRound.objects.bulk_create(roulette_rounds)
-    # удаление дубликатов раундов
-    models.RouletteRound.objects.filter(round_number__gte=current_round).exclude(day_hash=day_hash).delete()
-    # считает количество выпавших на сегодня результатов рулетки
-    # print('Generated rounds for this day:')
-    # for result in ROUND_RESULTS:
-    #     amount = models.RouletteRound.objects.filter(round_number__gte=current_round, round_roll=result).count()
-    #     print(f"{result} = {amount}")
 
 
 def setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, delay):
@@ -589,13 +590,10 @@ def setup_check_request_status(host_url, operation, id_shift, request_pk, user_p
         countdown=delay
     )
 
+
 @shared_task
 def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
     """Проверяет статус заявки на сервере ботов"""
-    # удаляет из redis запись о заявке
-    # r.delete(f"user_{operation}:{user_pk}")
-    # r.delete(f"user_{operation}:{user_pk}:start")
-    # создаёт url для получения статуса заявки
     url_get_status = f"{host_url}{operation}/get?id={request_pk + id_shift}"
     timeout = 2
     # попытка соединения с сервером ботов
@@ -614,20 +612,17 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         elif operation == 'withdraw':
             model = WithdrawalRequest
         else:
-            # print(f'Unknown request operation: {operation}')
             return
         # достаёт заявку из бд
         try:
             user_request = model.objects.get(pk=request_pk)
         except model.DoesNotExist as err:
-            # print(f'Request {request_pk} does not exist')
             return
         except Error:
             setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
             return
         # проверяет, не была ли заявка закрыта ранее
         if user_request.status != 'open' or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
-            # print(f'Request {request_pk} already closed')
             return
         # закрывает заявку в БД
         # отмечает заявку как закрытую
@@ -658,7 +653,6 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 detail_user.frozen_balance = 0
                 detail_user.save()
             else:
-                # print(f'Unknown request operation: {operation}')
                 return
             user_request.save()
         except Error as err:
@@ -671,40 +665,105 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 ban.ban_site = True
                 ban.save()
             except Error as err:
-                # print("Database error. Can't load a ban.")
                 return
         ban_user_for_bad_request.apply_async(args=(user_pk, operation))
 
 
-def check_round_number():
-    """Проверяет, есть ли в redis счётчик числа раундов"""
-    if r.get('round') is None:
-        last_round = models.RouletteRound.objects.filter(rolled=True).aggregate(Max('round_number'))
-        last_round_number = last_round.get('round_number__max')
-        if last_round_number is None:
-            last_round_number = 0
-        r.set('round', last_round_number + 1, ex=40)
+def check_round_number(starting_round=None, time_now=None):
+    """Находит, устанавливает и возвращает нужный номер раунда в Redis"""
+    print(starting_round, 'начальный раунд если есть')
+    if starting_round:
+        print('ti pizda?')
+        r.set("round", starting_round, ex=32)
+        return starting_round
+    elif r.exists("round"):
+        if models.RouletteRound.objects.filter(rolled=True, round_number__gte=int(r.get("round"))).exists():
+            if starting_round := models.RouletteRound.objects\
+                                                     .filter(rolled=True, round_number__gte=starting_round)\
+                                                     .order_by("round_number")\
+                                                     .values_list('round_number', flat=True)\
+                                                     .last():
+                r.set("round", starting_round, ex=32)
+        print('if round EXISTS ', r.get("round"))
+        return int(r.get('round'))
+    else:
+        date_now = datetime.datetime.now()
+        next_day = datetime.datetime(date_now.year, date_now.month, date_now.day + 1, 0, 0, 0)
+        time_delta = (next_day - date_now).seconds
+        rounds_till_midnight = math.ceil(time_delta / ROUND_TIME) - 1
+        all_rounds = models.RouletteRound.objects.filter(day_hash__date_generated=date_now.date())
+        last_round_for_day = all_rounds.values_list("round_number", flat=True).order_by("round_number").last()
+        round_to_start_from = last_round_for_day - rounds_till_midnight
+        try:
+            round_to_populate = models.RouletteRound.objects.get(day_hash__date_generated=date_now.date(),
+                                                                 round_number=round_to_start_from)
+            if round_to_populate.rolled:
+                r.set("round", round_to_populate.round_number + 1, ex=32)
+                print('if ROUND WAS ALREADY ROLLED', round_to_populate.round_number + 1)
+                return round_to_populate.round_number + 1
+            else:
+                r.set("round", round_to_populate.round_number)
+                print('IF ROUND IS OK', round_to_populate.round_number)
+                return round_to_populate.round_number
+        except models.RouletteRound.DoesNotExist:
+            pass
 
 
-def check_rounds():
+def pizda():
+    date_now = datetime.datetime.now()
+    next_day = datetime.datetime(date_now.year, date_now.month, date_now.day + 1, 0, 0, 0)
+    time_delta = (next_day - date_now).seconds
+    rounds_till_midnight = math.ceil(time_delta / ROUND_TIME) - 1
+    r = models.RouletteRound.objects.filter(day_hash__date_generated=date_now.date())
+    last = r.order_by('round_number').last()
+    diff = len(r) - rounds_till_midnight
+    print(rounds_till_midnight,'rounds til midnight', len(r), 'TOTAL rounds', diff, 'difference')
+    print('*****',datetime.datetime.now().time(), '**********')
+    total_r = 24*60*60/30
+    suka = rounds_till_midnight * 30
+    print(suka, 'секунд блять до полуночи чтоле', last)
+    da = datetime.datetime(2023, 1, 27, 0, 0)
+    delta = datetime.timedelta(seconds=suka)
+    itogo = da - delta
+    print(itogo)
+    res = last.round_number - rounds_till_midnight
+    print('Должен быть раунд ', res)
+    try:
+        round_to_populate = models.RouletteRound.objects.get(day_hash__date_generated=date_now.date(),
+                                                             round_number=res)
+        print(round_to_populate.__dict__, ' eto round')
+    except models.RouletteRound.DoesNotExist:
+        pass
+
+
+def check_rounds(current_date=None):
     """Проверяет, есть ли в БД раунды и создаёт их, если раундов нет"""
     try:
-        day_hash = models.DayHash.objects.get(date_generated=timezone.now().date())
-        # дополнит бд недостающими раундами, если их нет
-        generate_daily(day_hash_pk=day_hash.pk)
+        day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
+        if models.RouletteRound.objects.filter(day_hash=day_hash).exists():
+            check_round_number()
+            return
+        else:
+            generate_daily(day_hash=day_hash, time_now=datetime.date.today())
     except models.DayHash.DoesNotExist:
-        generate_daily()
+        if current_date:
+            generate_daily(time_now=current_date)
+        else:
+            generate_daily()
 
 
 def initialize_rounds():
     """Проверяет, есть ли в redis номер текущего раунда, а в БД - сами раунды"""
-    check_round_number()
-    check_rounds()
+    # if timezone.now().time()
+    # check_round_number()
+    check_rounds(datetime.date.today())
 
 
-initialize_rounds()
-celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.03')
-celery_app.add_periodic_task(schedule=schedules.crontab(minute=0, hour=0), sig=generate_daily.s(), name='Генерация хеша каждый день')
+if psutil.Process().name().lower() == 'python':
+    initialize_rounds()
+
+celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.00')
+celery_app.add_periodic_task(schedule=schedules.crontab(hour=0, minute=52), sig=generate_daily.s(), name='Генерация хеша каждый день')
 
 
 @shared_task

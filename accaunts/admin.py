@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
+from rangefilter.filters import DateTimeRangeFilter
 from social_django.models import UserSocialAuth, Nonce, Association
 
 from bot_payment.models import RefillRequest, WithdrawalRequest
@@ -13,6 +14,9 @@ from pay.models import Popoln
 from caseapp.models import OwnedCase, ItemForCase
 from django_celery_results.models import TaskResult, GroupResult
 from django_celery_beat.models import IntervalSchedule, CrontabSchedule, SolarSchedule, ClockedSchedule, PeriodicTask
+
+from django.contrib.admin.views.main import ChangeList
+from django.db.models import Sum, Count
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
 admin.site.unregister(UserSocialAuth)
@@ -48,12 +52,24 @@ class ItemForUserInline(admin.TabularInline):
     classes = ['collapse']
 
 
+class MyChangeListOleg(ChangeList):
+
+    def get_results(self, *args, **kwargs):
+        super(MyChangeListOleg, self).get_results(*args, **kwargs)
+        q = self.result_list.aggregate(asum=Sum('bonus_sum'))
+        self.sum_count = q['asum']
+
+
 @admin.register(ReferalUser)
 class ReferalUserAdmin(admin.ModelAdmin):
-    list_display = 'user_with_bonus', 'user_with_bonus_id', 'invited_user', 'invited_user_id', 'date',
-    list_filter = 'date',
+    list_display = 'user_with_bonus', 'user_with_bonus_id', 'invited_user', 'invited_user_id', 'bonus_sum', 'date',
+    list_filter = 'date', ('date', DateTimeRangeFilter),
     search_fields = 'user_with_bonus__username', 'user_with_bonus__id',
     search_help_text = 'Поиск по имени пользователя который пригласил и его id'
+    list_per_page = 100
+
+    def get_changelist(self, request):
+        return MyChangeListOleg
 
 
 class DetailUserInline(admin.TabularInline):
@@ -152,6 +168,7 @@ class CustomUserAdmin(UserAdmin):
     inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, BonusVKandYoutubeInLine, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
                BanInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
     readonly_fields = 'preview',
+    list_select_related = "level", "avatar_default",
     fieldsets = (
         ('ИНФОРМАЦИЯ', {'fields': ('username', 'password', 'last_login', 'date_joined',)}),
         ('ПЕРСОНАЛЬНЫЕ ДАННЫЕ', {'classes': ('collapse',), 'fields': ('first_name', 'last_name', 'email', 'vk_url',)}),
@@ -198,6 +215,7 @@ class LevelAdmin(admin.ModelAdmin):
     list_filter = 'img_name', 'level'
     ordering = 'level',
     readonly_fields = 'preview',
+    list_select_related = "case",
 
     @admin.display(description='Опыт до следующего уровня')
     def experience_for_lvl(self, obj):
@@ -226,23 +244,25 @@ class BanUserAdmin(admin.ModelAdmin):
     search_help_text = 'Поиск по имени пользователя и id пользователя'
     list_editable = 'ban_site', 'ban_chat', 'ban_ip'
     list_filter = 'ban_site', 'ban_chat', 'ban_ip'
+    list_select_related = "user",
 
 
 @admin.register(RouletteRound)
 class RouletteRoundAdmin(admin.ModelAdmin):
-    list_display = 'round_number', 'round_roll', 'rolled', 'round_started',
+    list_display = 'round_number', 'round_roll', 'rolled', 'round_started', "day_of_round",
     list_editable = 'round_roll',
     search_fields = '=round_number',
     search_help_text = 'Поиск по номеру раунда'
-    list_filter = 'rolled', 'round_roll', 'round_started'
-    readonly_fields = 'day_hash', 'round_number', 'round_started',  'rolled', 'total_bet_amount', 'winners',
+    list_filter = 'round_started', ('round_started', DateTimeRangeFilter), 'rolled', 'round_roll',
+    readonly_fields = 'day_hash', 'round_number', 'round_started', 'rolled', 'total_bet_amount', 'winners',
     ordering = '-rolled', '-round_started'
+    list_select_related = "day_hash",
 
 
 @admin.register(DayHash)
 class DayHashAdmin(admin.ModelAdmin):
     list_display = 'date_generated', 'private_key', 'public_key', 'show_hash',
-    list_filter = 'date_generated',
+    list_filter = 'date_generated', ('date_generated', DateTimeRangeFilter)
     list_editable = 'show_hash',
     readonly_fields = 'private_key', 'public_key', 'private_key_hashed'
 
@@ -250,11 +270,12 @@ class DayHashAdmin(admin.ModelAdmin):
 @admin.register(UserBet)
 class UserBetAdmin(admin.ModelAdmin):
     list_display = 'user', 'user_id', 'round_number', 'sum', 'sum_win', 'date', 'win'
-    list_filter = 'win', 'date'
+    list_filter = 'win', 'date',  ('date', DateTimeRangeFilter)
     search_fields = 'user__username', 'user__id', 'sum_win'
     search_help_text = 'Поиск по имени пользователя id пользователя и сумме выйгрыша'
     fields = "sum", "sum_win", "win", "round_number", "placed_on", "user"
     readonly_fields = "sum", "sum_win", "win", "round_number", "placed_on", "user"
+    list_select_related = "user",
 
 
 @admin.register(ItemForCase)
@@ -262,3 +283,24 @@ class ItemForCase(admin.ModelAdmin):
     list_display = 'item', 'case', 'chance',
     list_editable = 'chance',
     list_filter = 'case', 'item',
+
+
+class MyChangeList(ChangeList):
+    """Предмет пользователя"""
+
+    def get_results(self, *args, **kwargs):
+        super(MyChangeList, self).get_results(*args, **kwargs)
+        q = self.result_list.filter(is_forwarded=True).aggregate(asum=Count('is_forwarded'))
+        self.sum_count = q['asum']
+
+
+@admin.register(ItemForUser)
+class ItemForUser(admin.ModelAdmin):
+    list_display = 'user', 'user_item', 'is_used', 'is_forwarded', 'date_modified'
+    list_filter = 'date_modified', ('date_modified', DateTimeRangeFilter), 'is_used', 'is_forwarded', 'user_item'
+    search_fields = 'user__username',
+    search_help_text = 'Поиск по имени пользователя'
+    list_per_page = 100
+
+    def get_changelist(self, request):
+        return MyChangeList

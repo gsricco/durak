@@ -96,9 +96,13 @@ class BotWork(models.Model):
     def __str__(self):
         return f"Отключение бота"
 
+
 class BanTime(models.Model):
     hours = models.PositiveIntegerField(verbose_name="Количество часов бана пользователя", default=4)
 
     class Meta:
-        verbose_name = "Время бана пользователя"
-        verbose_name_plural = "Время бана пользователя"
+        verbose_name = "Время бана более 3-х попыток"
+        verbose_name_plural = "Время бана более 3-х попыток"
+
+    def __str__(self):
+        return f"Время бана пользователя"

@@ -46,7 +46,6 @@ def give_bonus_vk_youtube(user_pk, type_bonus):
     """Даёт бонус за подписку пользователя на канал в YouTube"""
     user_bonus, created = BonusVKandYoutube.objects.get_or_create(user_id=user_pk)
     if type_bonus == "bonus_vk":
-        print('for vk')
         # проверяем, не получал ли юзер бонус за VK
         if not user_bonus.bonus_vk:
             detail_user = DetailUser.objects.get(user_id=user_pk)
@@ -61,7 +60,6 @@ def give_bonus_vk_youtube(user_pk, type_bonus):
             async_to_sync(channel_layer.group_send)(f"{user_pk}_room", message)
             return
     elif type_bonus == "bonus_youtube":
-        print('for youtube')
         # проверяем, не получал ли юзер бонус за YouTube
         if not user_bonus.bonus_youtube:
             detail_user = DetailUser.objects.get(user_id=user_pk)
@@ -69,7 +67,6 @@ def give_bonus_vk_youtube(user_pk, type_bonus):
             user_bonus.bonus_youtube = True
             detail_user.save()
             user_bonus.save()
-            print("Бонус YouTube в обработке")
             message = {
                 'type': 'get_balance',
                 'balance_update': {
@@ -78,7 +75,6 @@ def give_bonus_vk_youtube(user_pk, type_bonus):
             }
             async_to_sync(channel_layer.group_send)(f"{user_pk}_room", message)
             return
-    print("Вы уже получали бонус")
     return
 
 

@@ -47,6 +47,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         r.json().arrappend("all_chat_50", ".", all_chat_message)
         if (arr_len := r.json().arrlen("all_chat_50")) > 50:
             r.json().arrtrim("all_chat_50", ".", arr_len - 50, -1)
+        r.expire("all_chat_50", datetime.timedelta(hours=48))
 
     @sync_to_async()
     def base64_to_image(self, file):
@@ -441,6 +442,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.unique_room_name = f"{user.id}_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
         await self.accept()
+        await self.get_free_balance(user)
         await self.channel_layer.send(self.channel_name, {
             "type": 'roulette_countdown_state',
         })

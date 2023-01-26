@@ -58,6 +58,10 @@ INSTALLED_APPS = [
     'bot_payment',
 
     'pay',
+
+    'admin_numeric_filter',
+    'rangefilter',
+
 ]
 
 MIDDLEWARE = [

@@ -1,21 +1,33 @@
 import math
-
-from django.contrib import admin
-from django.core.exceptions import ValidationError
-from django.db.models import BaseConstraint
-from django.http import HttpResponse
 from django.shortcuts import render
 from psycopg2._range import NumericRange
+from rangefilter.filters import DateTimeRangeFilter
+from .models import Popoln, BalPay, RefillBotSum, WithdrawBotSum, PayOff
+from admin_numeric_filter.admin import NumericFilterModelAdmin, RangeNumericFilter
+from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
+from django.db.models import Sum
 
-from .models import Popoln, BalPay, RefillBotSum, WithdrawBotSum,  PayOff
+
+class MyChangeList(ChangeList):
+    """Пополнение"""
+
+    def get_results(self, *args, **kwargs):
+        super(MyChangeList, self).get_results(*args, **kwargs)
+        q = self.result_list.filter(status_pay=True).aggregate(asum=Sum('sum'))
+        self.sum_count = q['asum']
 
 
 @admin.register(Popoln)
-class PopolnAdmin(admin.ModelAdmin):
-    list_display = 'id', 'user_game', 'sum', 'date', 'status_pay',
-    list_filter = 'status_pay', 'date',
+class PopolnAdmin(NumericFilterModelAdmin):
+    list_display = 'id', 'user_game', 'sum', 'pay', 'status_pay', 'date',
+    list_filter = 'date', ('date', DateTimeRangeFilter), 'status_pay', ('pay', RangeNumericFilter), ('sum', RangeNumericFilter),
     search_fields = 'user_game__username', 'sum'
     search_help_text = 'Поиск по имени игрока или сумме пополнения'
+    list_per_page = 100
+
+    def get_changelist(self, request):
+        return MyChangeList
 
 
 @admin.register(BalPay)
@@ -72,7 +84,7 @@ class WithdrawBotSumAdmin(admin.ModelAdmin):
 
 @admin.register(PayOff)
 class PayOffAdmin(admin.ModelAdmin):
-    list_display = 'id', 'work',
+    list_display = '__str__', 'work',
     list_editable = 'work',
 
     def has_add_permission(self, request):  # позволяет создать только одну модель

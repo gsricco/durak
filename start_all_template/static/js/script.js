@@ -1,4 +1,6 @@
 // 'use strict';
+
+var maxNumber = 0
 window.addEventListener("DOMContentLoaded", () => {
     const BODY = document.querySelector("body");
     const MAIN = document.querySelector("main");
@@ -794,7 +796,6 @@ window.addEventListener("DOMContentLoaded", () => {
         var inputTable = document.querySelector(".roulette__table-input");
         var btnsArrow = document.querySelectorAll(".roulette__table-link");
         var currentValue = document.querySelector(".roulette__current-block");
-        var maxNumber = 500000000;
 
         inputTable.addEventListener("focus", function () {
             currentValue.classList.add("roulette__current-block_focus");
@@ -896,7 +897,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                 if (event.target.textContent == "MAX") {
                     inputTable.value = maxNumber;
-                    currentValue.innerText = String(maxNumber * 1000)
+                    currentValue.innerText = String(maxNumber * 1)
                         .split(/(?=(?:...)*$)/)
                         .join(" ");
                 }
@@ -1239,3 +1240,4 @@ function modalAuth(){
         }
     });
 }
+const cahmax=function(n){maxNumber=n}

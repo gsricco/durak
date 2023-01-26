@@ -74,7 +74,7 @@ class PayOff(models.Model):
     work = models.BooleanField(verbose_name='Оплаты только через FKWallet', default=False)
 
     def __str__(self):
-        return f"{self.work}"
+        return f"FKWallet"
 
     class Meta:
         verbose_name = "Оплаты только через FKWallet"

@@ -1,16 +1,18 @@
+import datetime
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from social_django.models import UserSocialAuth
 from django.core.paginator import Paginator
 from django.utils import timezone
-from django.db.models import Value, F
+from django.db.models import Value, F, Count
 
 from accaunts.forms import UserEditName
 from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser, ItemForUser
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 from bot_payment.models import RefillRequest, WithdrawalRequest
 from .models import FAQ, SiteContent, ShowRound, DurakNickname, BalanceEditor
-
+from django.db.models import Sum
 
 def add_pay_buttons(context):
     """
@@ -155,7 +157,7 @@ def honesty(request):
             'title': 'Честность',
         }
     # получение хешей для отображения
-    day_hashes = DayHash.objects.all()
+    day_hashes = DayHash.objects.all().prefetch_related("rouletteround_set")
 
     paginator = Paginator(day_hashes, 7)
     page_number = request.GET.get('page')
@@ -165,12 +167,12 @@ def honesty(request):
         page_range = range(1, 6)
     elif page_obj.number >= paginator.num_pages - 1:
         page_range = range(max(paginator.num_pages - 4, 1), paginator.num_pages + 1)
-    else: 
+    else:
         page_range = range(page_obj.number - 2, page_obj.number + 3)
 
     context['page_obj'] = page_obj
     context['paginator'] = paginator
-    context['today'] = timezone.now().date()
+    context['today'] = datetime.datetime.now().date()
     context['page_range'] = page_range
 
     add_pay_buttons(context)
@@ -268,3 +270,72 @@ def profil(request):
         }
     add_pay_buttons(context)
     return render(request, 'new_profil.html', context)
+
+
+def get_loss() -> int:
+    """Возвращает убыток от обыгрышей бота на пополнение"""
+    # заметка заявки на пополнение при убытке начинается с "Убыток". Пример: "Убыток: 23"
+    LOSS_REQ_START = "Убыток"
+    # получает заявки с убытком
+    loss_requests_notes = RefillRequest.objects.filter(note__startswith=LOSS_REQ_START).values_list("note")
+    if loss_requests_notes:
+        int_loss = 0
+        for loss_note in loss_requests_notes:
+            try:
+                # парсит строку с заметкой об убытке и получает из неё числовое значение убытка
+                str_loss = loss_note[0].split()[1]
+                int_loss += int(str_loss)
+            except (ValueError, IndexError) as err:
+                # пропускает заметку с неправильным форматом заметки об убытке
+                continue
+        return int_loss
+    else:
+        # УБыток равен нулю, если нет заявок с убытком
+        return 0
+
+
+def info(request):
+    """Ставка пользователя"""
+    loss_requests_notes = get_loss()  # Кредитов, полученных с игроков, которые хотели обыграть бота для пополнения
+    sum_of_all_bets = UserBet.objects.aggregate(Sum('sum'))["sum__sum"]
+    if sum_of_all_bets is None:
+        sum_of_all_bets = 0
+    sum_of_all_winner_bets = UserBet.objects.aggregate(Sum('sum_win'))["sum_win__sum"]
+    if sum_of_all_winner_bets is None:
+        sum_of_all_winner_bets = 0
+    difference_all_vs_winners_bets = sum_of_all_bets - sum_of_all_winner_bets
+    sum_amount_req_1 = RefillRequest.objects.filter(status='fail')\
+                                            .aggregate(Sum('amount'))["amount__sum"]  # “Заработок с нарушителей”
+    sum_items_user_sold = ItemForUser.objects.filter(is_forwarded=True)\
+                                             .aggregate(Count('is_forwarded'))["is_forwarded__count"]  # 2 Коллекционных предметов (медведь, робот, покерная и т.д.), выведенных с сайта. Отобразить их количество
+    sum_referal_bonus = ReferalUser.objects.aggregate(Sum('bonus_sum'))["bonus_sum__sum"]  # 3 Кредитов, полученных игроками за активацию кода
+    if sum_referal_bonus is None:
+        sum_referal_bonus = 0
+    sum_all_payments_rubs = Popoln.objects.filter(status_pay=True)\
+                                          .aggregate(Sum('sum'))["sum__sum"]
+    if sum_all_payments_rubs is None:
+        sum_all_payments_rubs = 0
+    sum_to_withdraw_all = WithdrawalRequest.objects.filter(status='succ')\
+                                                   .aggregate(Sum('amount'))["amount__sum"]
+    if sum_to_withdraw_all is None:
+        sum_to_withdraw_all = 0
+    sum_to_refill_all = RefillRequest.objects.filter(status='succ')\
+                                             .aggregate(Sum('amount'))["amount__sum"]
+    if sum_to_refill_all is None:
+        sum_to_refill_all = 0
+    # ss3 = sum_amount - sum_amount_req_1  # 1 Кредитов, полученных с игроков, которые хотели обыграть бота для пополнения
+    full_profit_with_credits_exclude_items = sum_to_refill_all - sum_to_withdraw_all + loss_requests_notes - sum_referal_bonus
+
+    context = {
+        'sum_bets1': sum_of_all_bets,
+        'sum_bets2': sum_of_all_winner_bets,
+        'sum_bonus': sum_referal_bonus,
+        'sum_item_user': sum_items_user_sold,
+        'sum_amount': sum_to_withdraw_all,
+        'sum_amount_req': sum_to_refill_all,
+        'sum_money': sum_all_payments_rubs,
+        "ss": difference_all_vs_winners_bets,
+        "ss2": full_profit_with_credits_exclude_items,
+        "loss_requests_notes": loss_requests_notes
+    }
+    return render(request, 'admin/info.html', context)
