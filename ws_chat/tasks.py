@@ -49,7 +49,8 @@ URLMETHOD = '/sendMessage'
 
 def tg_logger():
     len_chat = r.json().arrlen("all_chat_50")
-    if len_chat == 0:
+
+    if len_chat == 0 or not r.exists("all_chat_50"):
         requests.post(url=URL + LOGGER_BOT_TOKEN + URLMETHOD,
                       data={'chat_id': MY_ID,
                             'text': f'{len_chat}-len 0 \n {datetime.datetime.now()}',
