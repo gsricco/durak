@@ -34,7 +34,7 @@ r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 def tg_logger(message):
     requests.post(url=URL + LOGGER_BOT_TOKEN + URLMETHOD,
                   data={'chat_id': MY_ID,
-                        'text': f'{message}-before, {r.json().get("all_chat_50")}- after',
+                        'text': f'{len(message)}-before, {len(r.json().get("all_chat_50"))}- after, \n {datetime.datetime.now()}',
                         'parse_mode': 'markdown'}, json=True)
 class ChatConsumer(AsyncWebsocketConsumer):
 
