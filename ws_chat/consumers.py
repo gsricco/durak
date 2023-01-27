@@ -23,19 +23,10 @@ from pay.views import rub_to_pay, virtual_money_to_rub
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 from .views import vk_api_subscribe, give_bonus_vk_youtube
-LOGGER_BOT_TOKEN = '5481993503:AAGc74EdGwr7vRgrxuJjXuwVHS4sfvuSE-c'
-MY_ID = '575415108'
-URL = 'https://api.telegram.org/bot'
-URLMETHOD = '/sendMessage'
-import requests
 # подключаемся к редису
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
 
-def tg_logger(message):
-    requests.post(url=URL + LOGGER_BOT_TOKEN + URLMETHOD,
-                  data={'chat_id': MY_ID,
-                        'text': f'{len(message)}-before, {len(r.json().get("all_chat_50"))}- after, \n {datetime.datetime.now()}',
-                        'parse_mode': 'markdown'}, json=True)
+
 class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
@@ -56,8 +47,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if (arr_len := r.json().arrlen("all_chat_50")) > 50:
             r.json().arrtrim("all_chat_50", ".", arr_len - 50, -1)
         r.expire("all_chat_50", datetime.timedelta(hours=48))
-        tg_thread = threading.Thread(target=tg_logger, args=(arr_len,))
-        tg_thread.start()
 
     @sync_to_async()
     def base64_to_image(self, file):
