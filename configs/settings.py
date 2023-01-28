@@ -197,7 +197,7 @@ REDIS_URL_STACK = os.getenv("REDIS_URL_STACK")
 # CELERY
 REDIS_URL = os.getenv("REDIS_URL")
 BROKER_URL = REDIS_URL
-CELERY_BROKER_URL = REDIS_URL
+CELERY_BROKER_URL = "redis://:hello_darkness_my_old_friend@durak_redis_stack:6379/1"
 # CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
