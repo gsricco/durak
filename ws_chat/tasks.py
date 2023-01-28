@@ -116,7 +116,10 @@ def roll():
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
     # достаёт из БД результат раунда
-    round_number = int(r.get('round')) if r.get('round') else 0
+    if r.exists("round"):
+        round_number = int(r.get('round'))
+    else:
+        round_number = check_round_number()
     try:
         current_round = models.RouletteRound.objects.get(round_number=round_number)
     except models.RouletteRound.DoesNotExist:
@@ -253,7 +256,10 @@ def save_round_results(bets_info):
     total_amount = 0
     winners = []
     round_result = r.get(ROUND_RESULT_FIELD_NAME)
-    round_number = int(r.get('round'))
+    if r.exists("round"):
+        round_number = int(r.get('round'))
+    else:
+        round_number = check_round_number()
     # обработка раундов без ставок
     if bets_info is None:
         bets_info = {}
@@ -542,12 +548,16 @@ def generate_round_result(process_after_generating: bool = False) -> int:
 
 @shared_task
 @record_work_time
-def generate_daily(day_hash=None, time_now=None):
+def generate_daily(day_hash=None, time_now=None, new=False):
     """Генерирует хеши для получения результатов раундов и сами раунды"""
+    timer = datetime.datetime.now().date()
+    if new:
+        one_day = datetime.timedelta(days=1)
+        timer += + one_day
     if day_hash is None:
         try:
             try:
-                day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
+                day_hash = models.DayHash.objects.get(date_generated=timer)
                 if models.RouletteRound.objects.filter(day_hash=day_hash).exists():
                     print('allo blad')
                     check_round_number()
@@ -695,14 +705,15 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
 def check_round_number(starting_round=None, time_now=None):
     """Находит, устанавливает и возвращает нужный номер раунда в Redis"""
     print(starting_round, 'начальный раунд если есть')
-    if starting_round:
-        print('ti pizda?')
+    last_rolled = models.RouletteRound.objects.filter(rolled=True).last()
+    if starting_round and starting_round >= last_rolled.round_number:
+        print('starting round, and starting_round > last_round_rolled?')
         r.set("round", starting_round, ex=32)
         return starting_round
     elif r.exists("round"):
         if models.RouletteRound.objects.filter(rolled=True, round_number__gte=int(r.get("round"))).exists():
             if starting_round := models.RouletteRound.objects\
-                                                     .filter(rolled=True, round_number__gte=starting_round)\
+                                                     .filter(rolled=True, round_number__gte=int(r.get("round")))\
                                                      .order_by("round_number")\
                                                      .values_list('round_number', flat=True)\
                                                      .last():
@@ -715,11 +726,19 @@ def check_round_number(starting_round=None, time_now=None):
         time_delta = (next_day - date_now).seconds
         rounds_till_midnight = math.ceil(time_delta / ROUND_TIME) - 1
         all_rounds = models.RouletteRound.objects.filter(day_hash__date_generated=date_now.date())
+        if not all_rounds:
+            return check_rounds()
         last_round_for_day = all_rounds.values_list("round_number", flat=True).order_by("round_number").last()
         round_to_start_from = last_round_for_day - rounds_till_midnight
+        print(round_to_start_from, '!'*200, all_rounds.first().round_number, len(all_rounds))
+        if last_rolled:
+            print(last_rolled, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<LAST ROLLED ROUND_NUMBER")
         try:
             round_to_populate = models.RouletteRound.objects.get(day_hash__date_generated=date_now.date(),
                                                                  round_number=round_to_start_from)
+            # if last_rolled:
+            #     if last_rolled.round_number <= round_to_populate:
+            #         round_to_populate
             if round_to_populate.rolled:
                 r.set("round", round_to_populate.round_number + 1, ex=32)
                 print('if ROUND WAS ALREADY ROLLED', round_to_populate.round_number + 1)
@@ -785,9 +804,8 @@ def initialize_rounds():
 if psutil.Process().name().lower() == 'python' or 'daphne':
     initialize_rounds()
 
-
 celery_app.add_periodic_task(ROUND_TIME, debug_task.s(), name=f'debug_task every 30.00')
-celery_app.add_periodic_task(schedule=schedules.crontab(hour=0, minute=52), sig=generate_daily.s(), name='Генерация хеша каждый день')
+celery_app.add_periodic_task(schedule=schedules.crontab(hour=20, minute=58), sig=generate_daily.s(), name='Генерация хеша каждый день', kwargs={'new': True})
 
 
 @shared_task

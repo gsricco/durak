@@ -78,19 +78,29 @@ function startRoll(winnerCard, cardNumber, cardPosition, timer_for_roulette) {
 const returnToStartPosition = () => {
     let trWidth;
     if (window.screen.width === 1920) trWidth = 380;
-    if (window.screen.width === 1366) trWidth = 470;
+    if (window.screen.width > 1440 && window.screen.width < 1920) trWidth = 420;
+    if (window.screen.width === 1440) trWidth = 450;
+    if (window.screen.width > 1281 && window.screen.width < 1440) trWidth = 470;
+    // if (window.screen.width === 1366) trWidth = 470;
     if (window.screen.width === 1280) trWidth = 500;
+    if (window.screen.width > 1080 && window.screen.width < 1280) trWidth = 525;
     if (window.screen.width === 1080) trWidth = 530;
+    if (window.screen.width > 1050 && window.screen.width < 1080) trWidth = 535;
     if (window.screen.width === 1050) trWidth = 540;
+    if (window.screen.width > 1024 && window.screen.width < 1050) trWidth = 545;
     if (window.screen.width === 1024) trWidth = 550;
+    if (window.screen.width > 991 && window.screen.width < 1024) trWidth = 540;
     if (window.screen.width === 991) trWidth = 420;
+    if (window.screen.width > 800 && window.screen.width < 991) trWidth = 500;
     if (window.screen.width === 800) trWidth = 515;
+    if (window.screen.width > 767 && window.screen.width < 800) trWidth = 520;
     if (window.screen.width === 767) trWidth = 530;
     if (window.screen.width === 750) trWidth = 530;
     if (window.screen.width === 640) trWidth = 590;
-    if (window.screen.width === 414) trWidth = 850;
+    if (window.screen.width === 414) trWidth = 865;
     if (window.screen.width === 412) trWidth = 860;
-    if (window.screen.width === 390) trWidth = 780;
+    if (window.screen.width > 390 && window.screen.width < 412) trWidth = 780;
+    if (window.screen.width === 390) trWidth = 785;
     if (window.screen.width === 375) trWidth = 650;
     if (window.screen.width === 360) trWidth = 655;
 

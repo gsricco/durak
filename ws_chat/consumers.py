@@ -322,18 +322,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if case_id := Case.objects.filter(name=case).first():
             if owned_case := OwnedCase.objects.filter(owner=user.pk) \
                     .filter(date_opened=None).filter(case=case_id).last():
-                # if owned_case.owner.pk != user.pk:
-                #     print({"details": "Access forbidden"})
-                # if owned_case.item is not None:
-                #     print({"details": "Case is already opened"})
                 last_user_case = OwnedCase.objects.filter(owner_id=user.pk) \
                     .exclude(date_opened=None) \
                     .order_by("-date_opened") \
                     .first()
                 if last_user_case is not None:
                     delta_time = datetime.datetime.now(datetime.timezone.utc) - last_user_case.date_opened
-                    # if delta_time < datetime.timedelta(hours=1):
-                    #     print({"details": "Wait before you can open next case"})
                 case = owned_case.case
                 case_items = ItemForCase.objects.filter(case=case)
                 weights = [float(item['chance']) for item in case_items.values('chance')]
@@ -358,11 +352,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 else:
                     ItemForUser.objects.create(user=user, user_item=chosen_item)
                     tasks.send_items_delay(user.pk)
-        #     else:
-        #         print('Нет выданного кейса')
-        # else:
-        #     print('Нет такого кейса')
-
     @sync_to_async
     def sell_item(self, data, user):
         if Item.objects.filter(name=data.get('name')).exists():
@@ -465,7 +454,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data=None, bytes_data=None):
         """Принятие сообщения"""
-        print('receive start', self.scope['user'].username)
         text_data_json = json.loads(text_data)
         user = self.scope['user']
         if user.is_authenticated:
@@ -619,7 +607,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     else:
                         await self.channel_layer.group_send(self.room_group_name, all_chat_message)
                         await self.save_user_message_all_chat(all_chat_message)
-        print('END OF RECIEVE ', self.scope['user'].username)
 
     async def get_online(self, event):
         """Получение онлайна для нового юзера"""
