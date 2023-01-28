@@ -24,7 +24,7 @@ from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 from .views import vk_api_subscribe, give_bonus_vk_youtube
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):

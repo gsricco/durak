@@ -186,9 +186,9 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [("durak_redis_stack", 6379)],
         },
-        "OPTIONS": {
-            "PASSWORD": os.getenv("REDIS_PASSWORD")
-        }
+        # "OPTIONS": {
+        #     "PASSWORD": os.getenv("REDIS_PASSWORD")
+        # }
     },
 }
 

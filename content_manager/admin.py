@@ -9,7 +9,7 @@ from .models import SiteContent, FAQ, BadSlang, DurakNickname, BalanceEditor
 from configs.settings import REDIS_URL_STACK, REDIS_PASSWORD
 from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
 
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)
 
 
 

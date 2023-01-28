@@ -17,7 +17,7 @@ from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK, REDIS_PASSWORD
 from .models import WithdrawalRequest, BotWork, RefillRequest, BanTime
 from django.utils import timezone
 
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)  # подключаемся к редису
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)  # подключаемся к редису
 
 
 class RequestConsumer(AsyncWebsocketConsumer):
