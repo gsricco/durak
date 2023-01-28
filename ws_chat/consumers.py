@@ -12,7 +12,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
 from accaunts.models import Ban, AvatarProfile, DetailUser
-from configs.settings import BASE_DIR, REDIS_URL_STACK
+from configs.settings import BASE_DIR, REDIS_URL_STACK, REDIS_PASSWORD
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from content_manager.models import BadSlang
@@ -24,7 +24,7 @@ from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
 from .views import vk_api_subscribe, give_bonus_vk_youtube
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
