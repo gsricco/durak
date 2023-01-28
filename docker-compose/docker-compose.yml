@@ -11,8 +11,6 @@ services:
     restart: unless-stopped
     volumes:
       - durak_pgdata:/var/lib/postgresql/data
-#    networks:
-#      - all
   durak_pg_admin:
     container_name: durak_pg_admin
     image: dpage/pgadmin4:latest
@@ -39,20 +37,20 @@ services:
       - durak_media:/app/media
     command:
       - /start
-#    networks:
-#      - redis_to_backend
-#      - all
   durak_redis_stack:
     image: redis/redis-stack-server:latest
-#    restart: unless-stopped
+    restart: unless-stopped
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASSWORD}"
+    env_file:
+      - ../.env_prod
     ports:
       - "6379:6379"
     volumes:
       - durak_redis:/data/
     container_name: durak_redis_stack
-#    networks:
-#      - redis_to_backend
-#      - all
   celery_worker:
     container_name: durak_celery_worker
     build:
@@ -65,8 +63,6 @@ services:
       - durak_redis_stack
       - durak_backend
     command: /start-celery-worker
-#    networks:
-#      - all
   celery_beat:
     container_name: durak_celery_beat
     build:
@@ -79,8 +75,6 @@ services:
       - durak_redis_stack
       - durak_backend
     command: /start-celery-beat
-#    networks:
-#      - all
 #  nginx:
 #    image: nginx:1.23-alpine
 #    build :
@@ -102,6 +96,3 @@ volumes:
   durak_static:
   durak_media:
   durak_redis:
-#networks:
-#  redis_to_backend: {}
-#  all : {}
