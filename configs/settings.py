@@ -199,7 +199,7 @@ print(REDIS_URL_STACK, "REDIS_URL_STACK")
 REDIS_URL = os.getenv("REDIS_URL")
 print(REDIS_URL, "REDIS_URL")
 BROKER_URL = REDIS_URL
-CELERY_BROKER_URL = "redis://default:hello_darkness_my_old_friend@durak_redis_stack:6379/1"
+CELERY_BROKER_URL = "redis://:hello_darkness_my_old_friend@durak_redis_stack:6379/1"
 # CELERY_RESULT_BACKEND = REDIS_URL
 print(CELERY_BROKER_URL, 'CELERY BROKER URL')
 CELERY_ACCEPT_CONTENT = ['application/json']
