@@ -559,10 +559,11 @@ def generate_daily(day_hash=None, time_now=None, new=False):
             try:
                 day_hash = models.DayHash.objects.get(date_generated=timer)
                 if models.RouletteRound.objects.filter(day_hash=day_hash).exists():
-                    print('allo blad')
+                    print('hash is not None, and rounds exists')
                     check_round_number()
                     return
             except models.DayHash.DoesNotExist:
+                print("NO hash, so NEW CREATING")
                 day_hash = models.DayHash()
                 day_hash.private_key = generate_private_key()
                 day_hash.public_key = generate_public_key()
@@ -571,10 +572,12 @@ def generate_daily(day_hash=None, time_now=None, new=False):
         except IntegrityError:
             day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
     if time_now:
+        print('if time_now - so only  необходимые раунды должны быть созданы')
         date_now = datetime.datetime.now()
         next_day = datetime.datetime(date_now.year, date_now.month, date_now.day+1, 0, 0, 0)
         time_delta = (next_day - date_now).seconds
         rounds_per_day = math.ceil(time_delta / ROUND_TIME) - 1
+        print(rounds_per_day, "КОлво РАУНДОВ КОТОРЫЕ НУЖНО СОЗДАТЬ")
         try:
             round_to_generate_from = models.RouletteRound.objects.values_list("round_number", flat=True)\
                                                             .order_by("round_number")\
@@ -789,8 +792,10 @@ def check_rounds(current_date=None):
             generate_daily(day_hash=day_hash, time_now=datetime.date.today())
     except models.DayHash.DoesNotExist:
         if current_date:
+            print('if current date')
             generate_daily(time_now=current_date)
         else:
+            print('no current date')
             generate_daily()
 
 
