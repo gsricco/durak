@@ -1,6 +1,6 @@
 // 'use strict';
 
-var maxNumber = 0
+let maxNumber = 0;
 window.addEventListener("DOMContentLoaded", () => {
     const BODY = document.querySelector("body");
     const MAIN = document.querySelector("main");
