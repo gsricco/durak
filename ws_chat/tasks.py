@@ -565,6 +565,7 @@ def generate_daily(day_hash=None, time_now=None, new=False):
             except models.DayHash.DoesNotExist:
                 print("NO hash, so NEW CREATING")
                 day_hash = models.DayHash()
+                day_hash.date_generated = timer
                 day_hash.private_key = generate_private_key()
                 day_hash.public_key = generate_public_key()
                 day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
