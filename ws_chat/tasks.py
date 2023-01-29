@@ -706,7 +706,7 @@ def check_round_number(starting_round=None, time_now=None):
     """Находит, устанавливает и возвращает нужный номер раунда в Redis"""
     print(starting_round, 'начальный раунд если есть')
     last_rolled = models.RouletteRound.objects.filter(rolled=True).last()
-    if starting_round and starting_round >= last_rolled.round_number:
+    if starting_round:# and starting_round >= last_rolled.round_number:
         print('starting round, and starting_round > last_round_rolled?')
         r.set("round", starting_round, ex=32)
         return starting_round
