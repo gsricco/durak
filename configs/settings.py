@@ -20,8 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = bool(os.getenv("DEBUG"))
-
+#DEBUG = bool(os.getenv("DEBUG"))
+DEBUG = False
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
 # ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 CORS_ALLOW_ALL_ORIGINS = True
