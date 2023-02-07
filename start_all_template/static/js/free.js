@@ -3,6 +3,9 @@
 const inviteBtn = document.querySelector('.invite__btn');
 const textStatus = document.querySelectorAll('.form__msg');
 const inviteInput = document.querySelector('.invite__input');
+const channelIdInput = document.querySelector('.s-am-input__input_yt');
+const buttonSendYoutubeId = document.querySelector('#ueban');
+
 textStatus[1].textContent = '';
 textStatus[2].textContent = '';
 
@@ -166,6 +169,18 @@ function super_new(f) {
             credits / 1000,
         ).toFixed(0)}`;
     }
+    if(data.sub ==='info') {
+        if (data.youtube_subscribe === 'success') {
+            show_modal('sub__success')
+        } else if (data.youtube_subscribe === 'fail') {
+            show_modal('youtubeError')
+        }
+        if(data.vk_subscribe === 'success'){
+            show_modal('sub__success')
+        } else if (data.vk_subscribe === 'fail'){
+            show_modal('vkError')
+        }
+    }
     }}
 chatSocket.onopen = function (e) {
     chatSocket.send(JSON.stringify({
@@ -200,11 +215,7 @@ if (btn_youtube) {
             if (!is_auth) {
                 show_modal('authorization')
             } else {
-                chatSocket.send(JSON.stringify(
-                    {
-                        "vk_youtube_api": 1,
-                        "subscribe": "youtube"
-                    }))
+                show_modal('youtubeBonus')
             }
         });
 }
@@ -221,4 +232,18 @@ if(btn_youtube_new_modal){
         () => {
             show_modal('auth_to_vk_you')
         });
+}
+if(buttonSendYoutubeId){
+    buttonSendYoutubeId.addEventListener('click',
+        ()=>{
+            const youtubeId = channelIdInput.value;
+            if(youtubeId && youtubeId.length === 24 && youtubeId.startsWith('UC')){
+                chatSocket.send(JSON.stringify({
+                    'vk_youtube_api': 1,
+                    'subscribe': 'y',
+                    'payload': youtubeId
+                    }
+                ))
+            }
+        })
 }

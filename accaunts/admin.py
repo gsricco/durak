@@ -161,16 +161,16 @@ class BonusVKandYoutubeInLine(admin.TabularInline):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
-    list_display = 'usernameinfo', 'id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
+    list_display = 'usernameinfo', 'id', 'random_id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
     list_editable = 'note',
-    search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id'
-    search_help_text = 'Поиск по имени пользователя, id пользователя, id c дурак онлайн, ссылки на vk, замтеки пользователя и ip пользователя'
+    search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id', 'random_id'
+    search_help_text = 'Поиск по имени пользователя, id пользователя, id c дурак онлайн, ссылки на vk, замтеки пользователя, ip пользователя И cгенерированного id'
     inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, BonusVKandYoutubeInLine, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
                BanInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
-    readonly_fields = 'preview',
+    readonly_fields = 'preview', 'random_id',
     list_select_related = "level", "avatar_default",
     fieldsets = (
-        ('ИНФОРМАЦИЯ', {'fields': ('username', 'password', 'last_login', 'date_joined',)}),
+        ('ИНФОРМАЦИЯ', {'fields': ('random_id', 'username', 'password', 'last_login', 'date_joined')}),
         ('ПЕРСОНАЛЬНЫЕ ДАННЫЕ', {'classes': ('collapse',), 'fields': ('first_name', 'last_name', 'email', 'vk_url',)}),
         ('АВАТАРКИ ПОЛЬЗОВАТЕЛЯ',
          {'classes': ('collapse',), 'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default',)}),

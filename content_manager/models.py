@@ -22,6 +22,8 @@ class SiteContent(models.Model):
     info3 = RichTextField(verbose_name='Информация #3', null=True)
     bonus_vk = models.IntegerField(verbose_name="Бонус за подписку на VK", null=True)
     bonus_youtube = models.IntegerField(verbose_name="Бонус за подписку на YouTube", null=True)
+    vk_group_id = models.CharField(verbose_name="ID группы Вконтакте", null=True, max_length=250)
+    youtube_channel_id = models.CharField(verbose_name="ID канала на YouTube", null=True, max_length=250)
 
     class Meta:
         verbose_name = 'Контент сайта'

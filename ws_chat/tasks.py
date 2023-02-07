@@ -157,11 +157,23 @@ def go_back():
     t = timezone.now()
     r.set('state', 'go_back', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
-    round = r.get("round")
-    if curr_round := models.RouletteRound.objects.filter(round_number=round):
-        if curr_round.first().rolled:
+    round = int(r.get("round"))
+    if curr_round := models.RouletteRound.objects.filter(round_number=round, rolled=True):
+        if models.RouletteRound.objects.select_related('day_hash')\
+                                       .filter(round_number=round+1,
+                                               rolled=False,
+                                               day_hash__date_generated=datetime.datetime.now().date())\
+                                       .exists():
             r.incr('round', 1)
             r.expire('round', 32)
+        elif round_to_populate := models.RouletteRound.objects.select_related('day_hash')\
+                                                              .filter(day_hash__date_generated=datetime.datetime.now().date())\
+                                                              .first():
+            r.set('round', round_to_populate.round_number)
+            r.expire('round', 32)
+        else:
+            generate_daily(time_now=True)
+
     async_to_sync(channel_layer.group_send)('chat_go',
                                             {
                                                 'type': 'go_back',
@@ -549,36 +561,43 @@ def generate_round_result(process_after_generating: bool = False) -> int:
 @shared_task
 @record_work_time
 def generate_daily(day_hash=None, time_now=None, new=False):
-    """Генерирует хеши для получения результатов раундов и сами раунды"""
+    """Генерирует хеши для получения результатов раундов и сами раунды
+    Args:
+        day_hash(models.DayHash|None) : DayHash if exists
+        time_now(bool|datetime|date|None) : flag
+        new(bool|None): flag - if True generates new DayHash and RouletteRounds for next day
+    """
     timer = datetime.datetime.now().date()
+    if new and (datetime.datetime.now() < datetime.datetime(timer.year, timer.month, timer.day, 23, 58)):
+        return
+    #  checks new -> arg new - called from celery periodic task -> generates rounds for next day
     if new:
         one_day = datetime.timedelta(days=1)
-        timer += + one_day
+        timer += one_day
+    #  always goes into IF except HASH for this day exists and rounds not somehow
     if day_hash is None:
         try:
             try:
                 day_hash = models.DayHash.objects.get(date_generated=timer)
                 if models.RouletteRound.objects.filter(day_hash=day_hash).exists():
-                    print('hash is not None, and rounds exists')
+                    print('allo blad')
                     check_round_number()
                     return
             except models.DayHash.DoesNotExist:
-                print("NO hash, so NEW CREATING")
                 day_hash = models.DayHash()
-                day_hash.date_generated = timer
                 day_hash.private_key = generate_private_key()
                 day_hash.public_key = generate_public_key()
                 day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
                 day_hash.save()
         except IntegrityError:
             day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
+    #  time_now arg comes from start/restart server, if HASH exists but Rounds not for this - so calling to populate day with rounds
     if time_now:
-        print('if time_now - so only  необходимые раунды должны быть созданы')
         date_now = datetime.datetime.now()
-        next_day = datetime.datetime(date_now.year, date_now.month, date_now.day+1, 0, 0, 0)
+        next_day_date = date_now + datetime.timedelta(days=1)
+        next_day = datetime.datetime(next_day_date.year, next_day_date.month, next_day_date.day, 0, 0, 0)
         time_delta = (next_day - date_now).seconds
         rounds_per_day = math.ceil(time_delta / ROUND_TIME) - 1
-        print(rounds_per_day, "КОлво РАУНДОВ КОТОРЫЕ НУЖНО СОЗДАТЬ")
         try:
             round_to_generate_from = models.RouletteRound.objects.values_list("round_number", flat=True)\
                                                             .order_by("round_number")\
@@ -590,9 +609,10 @@ def generate_daily(day_hash=None, time_now=None, new=False):
         except AttributeError:
             round_to_generate_from = 1
         check_round_number(starting_round=round_to_generate_from)
+    # here goes only if function called from celery periodic task and generates rounds for next day
     else:
         seconds_per_day = 24*60*60
-        rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME) - 1
+        rounds_per_day = math.ceil(seconds_per_day / ROUND_TIME)
         try:
             round_to_generate_from = models.RouletteRound.objects.select_related("day_hash")\
                                                                  .filter(day_hash__date_generated=datetime.date.today())\
@@ -726,7 +746,8 @@ def check_round_number(starting_round=None, time_now=None):
         return int(r.get('round'))
     else:
         date_now = datetime.datetime.now()
-        next_day = datetime.datetime(date_now.year, date_now.month, date_now.day + 1, 0, 0, 0)
+        next_day_date = date_now + datetime.timedelta(days=1)
+        next_day = datetime.datetime(next_day_date.year, next_day_date.month, next_day_date.day, 0, 0, 0)
         time_delta = (next_day - date_now).seconds
         rounds_till_midnight = math.ceil(time_delta / ROUND_TIME) - 1
         all_rounds = models.RouletteRound.objects.filter(day_hash__date_generated=date_now.date())
@@ -793,10 +814,8 @@ def check_rounds(current_date=None):
             generate_daily(day_hash=day_hash, time_now=datetime.date.today())
     except models.DayHash.DoesNotExist:
         if current_date:
-            print('if current date')
             generate_daily(time_now=current_date)
         else:
-            print('no current date')
             generate_daily()
 
 

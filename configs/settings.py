@@ -211,3 +211,6 @@ SECRET_WORD = os.getenv('SECRET_WORD')  # Секретное слово
 # bot payment
 HOST_URL = os.getenv('HOST_URL')
 ID_SHIFT = int(os.getenv('ID_SHIFT'))
+
+# subscribers
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')

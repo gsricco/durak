@@ -2,21 +2,56 @@ import redis
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.utils import get_deleted_objects
+from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.forms import RadioSelect
 
 from .models import SiteContent, FAQ, BadSlang, DurakNickname, BalanceEditor
 from configs.settings import REDIS_URL_STACK, REDIS_PASSWORD
 from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
+from .utils import get_vk_group_id, get_youtube_id
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)
 
+
+# class SiteContentAdminModelForm(forms.ModelForm):
+#     class Meta:
+#         model = SiteContent
+#         fields = '__all__'
+#
+#     def clean(self):
+#         if self.changed_data:
+#             if 'url_vk' in self.changed_data:
+#                 self.data._mutable = True
+#                 group_id = get_vk_group_id(self.cleaned_data['url_vk'])
+#                 if group_id:
+#                     self.cleaned_data['vk_group_id'] = str(group_id)
+#                 else:
+#                     raise ValidationError('Неправильная ссылка на группу VK')
+#             if 'url_youtube' in self.changed_data:
+#                 youtube_id = get_youtube_id(self.cleaned_data['url_youtube'])
+#                 if youtube_id:
+#                     self.cleaned_data['youtube_channel_id'] = str(youtube_id)
+#                 else:
+#                     raise ValidationError('Неправильная ссылка на YouTube канал')
+#         return self.cleaned_data
+#
+#     def save(self, commit=False):
+#         obj = super(SiteContentAdminModelForm, self).save(commit=False)
+#         if new_vk_id := self.cleaned_data.get('vk_group_id'):
+#             obj.vk_group_id = new_vk_id
+#         if new_youtube_id := self.cleaned_data.get('youtube_channel_id'):
+#             obj.youtube_channel_id = new_youtube_id
+#         obj.save()
+#         return obj
 
 
 @admin.register(SiteContent)
 class SiteContentAdmin(admin.ModelAdmin):
     """Контент сайта"""
+    # form = SiteContentAdminModelForm
     list_display = '__str__', 'support_email',
+    # readonly_fields = 'vk_group_id', 'youtube_channel_id',
     fieldsets = (
         ('ПРАВИЛО ЧАТА', {
             'classes': ('collapse',),
@@ -32,7 +67,9 @@ class SiteContentAdmin(admin.ModelAdmin):
         }),
         ('Страница КОНТАКТЫ', {
             'classes': ('collapse',),
-            'fields': ('about_us', 'description', 'support_email', 'url_vk', 'url_youtube')
+            'fields': ('about_us', 'description', 'support_email',
+                       'url_vk', 'vk_group_id',
+                       'url_youtube', 'youtube_channel_id')
         }),
         ('Страница FREE', {
             'classes': ('collapse',),

@@ -4,9 +4,13 @@ from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
+from .pix_list_rgb import list_rgb
 from .validators import validate_referal
 from caseapp.models import OwnedCase
 import sys
+from PIL import Image
+import random
+import string
 
 
 def is_migrate():
@@ -48,10 +52,17 @@ class Level(models.Model):
         verbose_name_plural = 'Уровни в игре'
 
 
+def random_number():
+    """Создание сгенерированного id пользователя из 3 букв и 2 чисел"""
+    random_id_user = str(''.join(random.choices(string.ascii_lowercase, k=3))+''.join(random.choices(string.digits, k=2)))
+    return random_id_user
+
+
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
-                              default='img/avatar/user/ava_S.svg')
+                              default='img/avatar/user/ava_S.png',)
+                              # validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])])
     use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
                                      help_text='Рандомная аватарка с галочкой, а стандартная без')
     avatar_default = models.ForeignKey('AvatarProfile', verbose_name='Рандомные автарки профиля',
@@ -62,20 +73,28 @@ class CustomUser(AbstractUser):
                               blank=True, null=True)
     experience = models.IntegerField(verbose_name="Опыт", default=0)
     note = models.CharField(verbose_name='Заметка', max_length=100, blank=True, null=True)
+    random_id = models.CharField(verbose_name='Сгенерированный id', max_length=5, null=True)#unique=True, default=random_number, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.photo and self.avatar == 'img/avatar/user/ava_S.svg':
+        # Проверяем на уникальность Сгенерированный id для пользователя в момент его регистрации
+        if self.random_id is None:
+            while CustomUser.objects.filter(random_id=self.random_id).exists():
+                self.random_id = random_number()
+        if self.photo and (self.avatar == 'img/avatar/user/ava_S.png'):
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
             self.avatar.save(f"image_{self.pk}", File(img_temp))
-        # if not Level.objects.all().exists():  # создание первого лвл при регистрации первого пользователя
-        #         level_1 = Level(level=0, experience_range=NumericRange(0, 600))
-        #         level_1.save()
-        #         self.level = level_1
-        # if self.level is None:
-        #     print(self.experience)
-        #     self.level = Level.objects.get(level=1)
+            im = Image.open(self.avatar)
+            x = 4
+            y = 4
+            pix = im.load()
+            pix_list = list_rgb
+            if pix[x, y] in pix_list:
+                img_ava = list(AvatarProfile.objects.all())
+                img_ra = random.choice(img_ava)
+                self.avatar = img_ra.avatar_img
+            self.avatar.save(self.avatar.name, self.avatar)
         super().save(*args, **kwargs)
         if not DetailUser.objects.filter(user=self).exists():
             detail = DetailUser(user=self)
@@ -85,7 +104,6 @@ class CustomUser(AbstractUser):
             ban.save()
         if not BonusVKandYoutube.objects.filter(user=self).exists():
             BonusVKandYoutube.objects.create(user=self)
-
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -260,7 +278,7 @@ class DayHash(models.Model):
     private_key = models.CharField(verbose_name='Приватный ключ', max_length=64, null=True, blank=True)
     private_key_hashed = models.CharField(verbose_name='Захешированный приватный ключ', max_length=64, null=True,
                                           blank=True)
-    date_generated = models.DateField(verbose_name='Дата генерации', unique=True)
+    date_generated = models.DateField(verbose_name='Дата генерации', auto_now_add=True, unique=True)
     show_hash = models.BooleanField(verbose_name='Показывать в честности (текущий день)', default=True)
 
     def __str__(self):
@@ -361,9 +379,10 @@ class UserBet(models.Model):
         verbose_name = 'Ставка пользователя'
         verbose_name_plural = 'Ставки пользователей'
 
+
 class BonusVKandYoutube(models.Model):
     """Модель полученных бонусов за подписки на vk и youtube"""
-    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
+    user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name='vk_youtube')
     bonus_vk = models.BooleanField(verbose_name="Получен бонус за vk", default=False)
     bonus_youtube = models.BooleanField(verbose_name="Получен бонус за youtube", default=False)
 

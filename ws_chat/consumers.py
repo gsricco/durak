@@ -5,14 +5,16 @@ import json
 import os
 import threading
 from random import choices
+
+from django.db.models import Sum
 from django.utils import timezone
 from caseapp.serializers import OwnedCaseTimeSerializer, ItemForUserSerializer, CaseAndCaseItemSerializer
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
-from accaunts.models import Ban, AvatarProfile, DetailUser
-from configs.settings import BASE_DIR, REDIS_URL_STACK, REDIS_PASSWORD
+from accaunts.models import Ban, AvatarProfile, DetailUser, UserBet
+from configs.settings import BASE_DIR, REDIS_URL_STACK
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from content_manager.models import BadSlang
@@ -22,7 +24,9 @@ from pay.views import rub_to_pay, virtual_money_to_rub
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
 from . import tasks
-from .views import vk_api_subscribe, give_bonus_vk_youtube
+from .utils import check_youtube_subscribers, vk_subscribe
+
+
 # подключаемся к редису
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)
 
@@ -153,9 +157,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return False
 
     @sync_to_async()
+    def check_total_transactions(self, user):
+        """Проверяет кол-во транзакций пользователя - если меньше 3000_000 то не даёт писать в чат"""
+        all_user_bets = UserBet.objects.filter(user=user).aggregate(total_bets=Sum('sum')).get('total_bets')
+        if all_user_bets:
+            if all_user_bets >= 3000000:
+                return False
+        return True
+
+    @sync_to_async()
     def get_ban_chat_user(self, user):
         """Проверка бана пользователя в общем чате"""
-        # user = CustomUser.objects.get(username=user).pk
         if Ban.objects.get(user=user).ban_chat:
             return True
         else:
@@ -164,7 +176,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async()
     def add_user_to_chat_ban(self, user_id):
         """Устанавливает юзеру бан общего чата"""
-        user_to_ban, created = Ban.objects.get_or_create(user_id=user_id)
+        user_to_ban = Ban.objects.get(user_id=user_id)
         user_to_ban.ban_chat = True
         user_to_ban.save()
 
@@ -403,9 +415,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async
     def read_all_message_from_room(self, user_pk, room_id):
         room = async_to_sync(self.create_or_get_support_chat_room)(int(room_id))
-        # room = UserChatRoom.objects.get(room_id=room_id)
-        # user_pk = self.scope.get('user').pk
-        # print(user_pk, room_id)
         if room_id != user_pk:
             room.message.filter(is_read=False).filter(user_posted=room_id).update(is_read=True)
         else:
@@ -470,13 +479,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 elif user_id_to_ban := text_data_json.get("ban_user_all_chat"):
                     await self.add_user_to_chat_ban(user_id_to_ban)
             if text_data_json.get('vk_youtube_api') == 1:
-                user_pk = self.scope.get('user').pk
                 if text_data_json.get('subscribe') == "vk":
-                    t1 = threading.Thread(target=vk_api_subscribe, args=(user_pk,))
+                    t1 = threading.Thread(target=vk_subscribe, args=(user,))
                     t1.start()
-                elif text_data_json.get('subscribe') == "youtube":
-                    await asyncio.sleep(5)
-                    await give_bonus_vk_youtube(user_pk, "bonus_youtube")
+                elif text_data_json.get('subscribe') == "y":
+                    if youtube_id := text_data_json.get('payload'):
+                        thread_for_youtube = threading.Thread(target=check_youtube_subscribers, args=(youtube_id, user))
+                        thread_for_youtube.start()
+                        # await check_youtube_subscribers(youtube_id)
             elif text_data_json.get('init_faq'):
                 await self.read_all_message_from_room(user.pk, user.pk)
                 await self.channel_layer.group_send(f'{user.pk}_room', {
@@ -599,6 +609,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                     "t": text_data_json.get("t"),
                                     "id": text_data_json.get("id")
                                     }
+                if await self.check_total_transactions(user):
+                    return await self.channel_layer.group_send(self.unique_room_name, {'type':'all_chat_error'})
                 if len(all_chat_message["message"]) <= 250:
                     if await self.get_ban_chat_user(user):
                         await self.channel_layer.group_send(self.unique_room_name, all_chat_message)
@@ -904,3 +916,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if words := BadSlang.objects.all().only("name").values_list("name", flat=True):
             all_words = words
             r.sadd("bad_slang", *set(all_words))
+
+    async def subscriber(self, event):
+        event.pop('type')
+        await self.send(json.dumps(event))
+
+    async def all_chat_error(self, event):
+        message = {'error': 'erroro 3М'}
+        await self.send(json.dumps(message))

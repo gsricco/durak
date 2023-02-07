@@ -13,11 +13,11 @@ from . import models, serializers
 from django.utils import timezone
 from django.db.utils import Error
 from ws_chat.tasks import setup_check_request_status, send_balance_to_single, ban_user_for_bad_request
-from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK, REDIS_PASSWORD
+from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK
 from .models import WithdrawalRequest, BotWork, RefillRequest, BanTime
 from django.utils import timezone
 
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)  # подключаемся к редису
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)  # подключаемся к редису
 
 
 class RequestConsumer(AsyncWebsocketConsumer):
@@ -54,7 +54,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 await self.send(json.dumps({"status": "process", "detail": "Создаём новый запрос в базе данных..."}))
             except Error as err:
                 await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
-                print(f"Database error. {type(err)}: {err}.")
                 return
             # отправляет имя бота на фронт
             message = {"status": "get_name","detail": user_request.bot_name}
@@ -257,7 +256,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     await sync_to_async(new_request.save)()
                 except Error as err:
                     await self.send(json.dumps({"status": "process", "detail": f"Loosing request ID: {new_request.request_id}"}))
-                url_request_create = f"{HOST_URL}{self.operation}/create?id={new_request.request_id}&bot_id={bot_id}&site_id={user.pk}&bet={new_request.amount}"
+                url_request_create = f"{HOST_URL}{self.operation}/create?id={new_request.request_id}&bot_id={bot_id}&site_id={user.random_id}&bet={new_request.amount}"
                 if self.operation == 'withdraw':
                     url_request_create += f"&balance={new_request.balance}"
                 if not new_request.game_id is None:

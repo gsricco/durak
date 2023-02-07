@@ -34,6 +34,108 @@
 		</div>
 	</div>
 </div>
+<div class="popup select-amount" id="youtubeBonus">
+  <div class="popup__body">
+    <div class="popup__content modal modal_select-amount modal_select-youtubeBonus" id="hueta">
+
+      <a href="#" class="popup__close close-popup">
+        <svg class="close-popup__icon ">
+            <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+        </svg>
+      </a>
+      <div class="select-amount__s-am-input s-am-input">
+        <h3 class="s-am-input__title">
+          Ваш ютуб-идентификатор
+        </h3>
+
+        <div class="s-am-input__input-block" id="hueta2">
+          <svg>
+            <use xlink:href="{% static 'img/icons/sprite-edits.svg' %}#youtube"></use>
+          </svg>
+          <input inputmode="numeric" class="s-am-input__input_yt" placeholder="UCxxxxxxxxxxxxxxxxxxxxxx" type="tel"
+            step="1" name="add-sum" maxlength="24" minlength="24">
+          <button type="submit" class="btn btn_danger profile-settings__btn youtube-id__btn_sell" style="
+" id="ueban">Отправить</button>
+        </div>
+      </div>
+      <p id="hueta3">1. Перейдите на
+  <a href="https://www.youtube.com/account_advanced" target="_blank"><u>youtube.com/account_advanced</u></a>
+ и скопируйте идентификатор канала (это нужно для проверки подписки). <br>
+
+2. Подпишитесь на
+  <a href="{{ sitecontent2.url_youtube }}" target="_blank"><u>наш ютуб канал </u>и нажмите "Отправить".</a></p>
+    </div>
+  </div>
+</div>
+<div class="popup" id="vkError">
+	<div class="popup__body">
+		<div class="popup__content modal modal_popup modal_authorization">
+			<a href="#" class="popup__close close-popup">
+				<svg class="close-popup__icon ">
+                    <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+				</svg>
+			</a>
+
+			<div class="modal-message">
+				<div class="modal-message__img">
+					<svg class="icon-error">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+					</svg>
+				</div>
+				<div class="modal-message__text">
+					<p>Подписка не обнаружена. Спустя 15 минут попробуйте подписаться на канал заново.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="popup" id="youtubeError">
+	<div class="popup__body">
+		<div class="popup__content modal modal_popup modal_authorization">
+			<a href="#" class="popup__close close-popup">
+				<svg class="close-popup__icon ">
+					<use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+				</svg>
+			</a>
+
+			<div class="modal-message">
+				<div class="modal-message__img">
+					<svg class="icon-error">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+					</svg>
+				</div>
+				<div class="modal-message__text">
+					<p>Подписка не обнаружена. Пожалуйста, перейдите на
+  <a href="https://youtube.com/account_privacy" target="_blank"><u>youtube.com/account_privacy</u></a>
+ и переведите нижний переключатель в левое положение. Спустя 15 минут попробуйте подписаться на канал заново.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="popup modal-manual" id="sub__success">
+        <div class="popup__body">
+            <div class="popup__content modal modal_popup modal_message modal-manual__modal">
+                <a href="/" class="popup__close close-popup">
+                    <svg class="close-popup__icon ">
+                        <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
+                    </svg>
+                </a>
+
+                <div class="modal-message">
+                    <div class="modal-message__img">
+                        <svg class="icon-ok">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#item"></use>
+                        </svg>
+                    </div>
+                    <div class="modal-message__text">
+                        Подписка проверена <br>
+                        Баланс успешно пополнен на <br>{{ sitecontent2.bonus_youtube}}к
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <div class="wrapper homepage" id="wrapper">
 
     <div class="preloader">
@@ -307,7 +409,9 @@
                                     </div>
                                 </div>
                             </div>
-
+<div class="form__msg__chat">
+Ваша общая сумма ставок <3М кредитов
+</div>
                             <div class="online-chat__input-block">
                                 <input placeholder="Написать сообщение..." name="chat-message" type="text"
                                        class="online-chat__input" autocomplete="off" maxlength="250">
@@ -625,11 +729,11 @@
                         <li>1. Добавьте наш аккаунт в друзья, никнейм - <span id="bot-nickname-r">(отобразится после начала)</span>. 
                             Заявка принимается в течении 5-10 секунд.</li>
                         <li id="li-p2-less-2M">2. Отправьте нам в личные сообщения в игре ваш айди с сайта 
-                            ({{ user.username }}, Ваш ID: {{ user.pk }}), примите приглашение
+                            ({{ user.username }}, Ваш ID: {{ user.random_id }}), примите приглашение
                              от нашего аккаунта и сразу проиграйте игру. Если вы не успели зайти/нажать готов
                               - повторите этот пункт с начала, пока ваша заявка открыта.</li>
                         <li id="li-p2-ge-2M">Отправьте нам в личные сообщения в игре 
-                            ваш айди с сайта ({{ user.username }}, Ваш ID: {{ user.pk }}), примите приглашение
+                            ваш айди с сайта ({{ user.username }}, Ваш ID: {{ user.random_id }}), примите приглашение
                              на 1м от нашего аккаунта и проиграйте <span id="number-of-games">X</span> игр. Если вы не успели 
                              зайти/нажать готов - повторите этот пункт с начала, пока ваша заявка открыта.</li>
                         <li id="bot_message_refill" style="visibility: hidden;" class="modal-manual__footnote"></li>
@@ -681,7 +785,7 @@
                     <ul>
                         <li>1. Добавьте наш аккаунт в друзья, никнейм - <span id="withdraw_nickname">(отобразится после начала)</span>.
                              Заявка принимается в течение 5-10 секунд.</li>
-                        <li>2. Отправьте нам в личные сообщения в игре ваш айди с сайта. ({{ user.username }}, Ваш ID: {{ user.pk }}). 
+                        <li>2. Отправьте нам в личные сообщения в игре ваш айди с сайта. ({{ user.username }}, Ваш ID: {{ user.random_id }}).
                             Мы будем приглашать вас в игру и проигрывать, пока общая сумма проигрышей 
                             не будет равна сумме вывода (игровую комиссию мы не доплачиваем).  Выходить из лобби нужно 
                             только после нас!</li>
@@ -852,7 +956,7 @@
 		</div>
 	</div>
 </div>
-    <div class="popup" id="modalAccountSocial">
+        <div class="popup" id="modalAccountSocial">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal_authorization">
                 <a href="#" class="popup__close close-popup">

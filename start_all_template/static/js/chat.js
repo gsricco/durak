@@ -251,6 +251,13 @@ chatSocket.onmessage = function (e) {
         let inputRubs = document.querySelector(".amount-selection__input");
         inputRubs.value = `${rubs}`
     }
+
+    else if (data.error==='erroro 3М'){
+    document.querySelector('.form__msg__chat').style.display='block'
+    setTimeout(()=>{
+    document.querySelector('.form__msg__chat').style.display='none'
+    }, 5000)
+    }
     // scrollBlock.scrollTop = scrollBlock.scrollHeight
 
 };
