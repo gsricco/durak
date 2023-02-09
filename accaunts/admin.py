@@ -26,14 +26,14 @@ admin.site.unregister(UserSocialAuth)
 admin.site.unregister(Nonce)
 admin.site.unregister(Association)
 
-admin.site.unregister(TaskResult)
-admin.site.unregister(GroupResult)
-
-admin.site.unregister(SolarSchedule)
-admin.site.unregister(PeriodicTask)
-admin.site.unregister(IntervalSchedule)
-admin.site.unregister(ClockedSchedule)
-admin.site.unregister(CrontabSchedule)
+# admin.site.unregister(TaskResult)
+# admin.site.unregister(GroupResult)
+#
+# admin.site.unregister(SolarSchedule)
+# admin.site.unregister(PeriodicTask)
+# admin.site.unregister(IntervalSchedule)
+# admin.site.unregister(ClockedSchedule)
+# admin.site.unregister(CrontabSchedule)
 
 
 # class OwnedCaseTabularInline(admin.TabularInline):
