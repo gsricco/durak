@@ -50,6 +50,11 @@ MY_ID = '575415108'
 URL = 'https://api.telegram.org/bot'
 URLMETHOD = '/sendMessage'
 
+def new_rounds_logger(s, e):
+    requests.post(url=URL + LOGGER_BOT_TOKEN + URLMETHOD,
+                  data={'chat_id': MY_ID,
+                        'text': f'Раундов было: {len(s)}\n Раундов стало: {len(e)}\n Добавлено раундов {len(s) - len(e)}\n **{datetime.datetime.now()}**',
+                        'parse_mode': 'markdown'}, json=True)
 def tg_logger():
     len_chat = r.json().arrlen("all_chat_50")
 
@@ -75,6 +80,7 @@ def record_work_time(function):
         rounds_end = models.RouletteRound.objects.all()
         print(timezone.now(), datetime.datetime.now(), "tz and regular time")
         print(f'END AMOUNT OF ROUND ----- {len(rounds_end)}', len(rounds_end) - len(rounds_start))
+        tg_thread = threading.Thread(target=new_rounds_logger, args=(rounds_start, rounds_end))
         return res
 
     return wrapper
