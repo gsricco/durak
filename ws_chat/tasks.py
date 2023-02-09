@@ -584,6 +584,7 @@ def generate_daily(day_hash=None, time_now=None, new=False):
     if new:
         one_day = datetime.timedelta(days=1)
         timer += one_day
+        print(timer, 'Время Generate_daily для создания хэша на следующий день, а текущее время ->', datetime.datetime.now().date())
     #  always goes into IF except HASH for this day exists and rounds not somehow
     if day_hash is None:
         try:
@@ -598,6 +599,7 @@ def generate_daily(day_hash=None, time_now=None, new=False):
                 day_hash.private_key = generate_private_key()
                 day_hash.public_key = generate_public_key()
                 day_hash.private_key_hashed = sha256(day_hash.private_key.encode()).hexdigest()
+                day_hash.date_generated = timer
                 day_hash.save()
         except IntegrityError:
             day_hash = models.DayHash.objects.get(date_generated=datetime.datetime.now().date())
