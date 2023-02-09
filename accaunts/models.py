@@ -64,7 +64,7 @@ def random_number():
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
-                              default='img/avatar/user/ava_S.png',)
+                              default='img/avatar/user/ava_S.svg',)
                               # validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])])
     use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
                                      help_text='Рандомная аватарка с галочкой, а стандартная без')
@@ -83,7 +83,7 @@ class CustomUser(AbstractUser):
         if self.random_id is None:
             while CustomUser.objects.filter(random_id=self.random_id).exists():
                 self.random_id = random_number()
-        if self.photo and (self.avatar == 'img/avatar/user/ava_S.png'):
+        if self.photo and (self.avatar == 'img/avatar/user/ava_S.svg'):
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
