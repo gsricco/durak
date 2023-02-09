@@ -752,6 +752,9 @@
     <div class="popup modal-manual" id="refillOk">
         <div class="popup__body">
             <div class="popup__content modal modal_popup modal_message modal-manual__modal">
+                <div class="modal-manual__queries" id="withdraw_query1" style="visibility: hidden;">
+                    Заявка #
+                </div>
                 <a href="/" class="popup__close close-popup">
                     <svg class="close-popup__icon ">
                         <use xlink:href="{% static 'img/icons/sprite.svg' %}#close"></use>
@@ -759,6 +762,17 @@
                 </a>
 
                 <div class="modal-message">
+                    <div class="modal-message__img" id="mes_error">
+                        <svg class="icon-error">
+                            <use xlink:href="{% static 'img/icons/sprite.svg' %}#error"></use>
+                        </svg>
+                    </div>
+
+                    <div class="modal-message__img" id="mes_ok">
+                        <svg class="icon-ok">
+                             <use xlink:href="{% static 'img/icons/sprite.svg' %}#item"></use>
+                        </svg>
+				    </div>
                     <div class="modal-message__text" id="refill_message_ok">
                         Баланс успешно пополнен на <br> {{ pay_modal.pay }}
                     </div>

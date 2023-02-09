@@ -949,6 +949,14 @@ def ban_user_for_bad_request(user_pk, operation):
     # если количество закрытых по вине пользователя заявок 3, то банит его
     if user_faults >= 3:
         ban_time = BanTime.objects.first()
+        user = models.CustomUser.objects.get(pk=user_pk)
+        message = {
+            'type': 'subscriber',
+            'ban': {
+                'ban_user': True
+            }
+        }
+        async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)
         if ban_time is not None:
             seconds_of_ban = ban_time.hours * 60 * 60
             ban_user_for_time.apply_async(args=(user_pk, seconds_of_ban))

@@ -251,6 +251,16 @@ chatSocket.onmessage = function (e) {
         let inputRubs = document.querySelector(".amount-selection__input");
         inputRubs.value = `${rubs}`
     }
+    else if(data.ban){
+        const popupOk = document.getElementById("refillOk");
+        let message_box = document.querySelector("#refill_message_ok");
+        const iconerror = document.getElementById("mes_error");
+        const iconok = document.getElementById("mes_ok");
+        iconok.style.display = "none";
+        iconerror.style.display = "flex";
+        message_box.innerHTML = "Ошибка. Вы сделали слишком много неудачных попыток пополнения.";
+        popupOpen(popupOk);
+    }
 
     else if (data.error==='erroro 3М'){
     document.querySelector('.form__msg__chat').style.display='block'

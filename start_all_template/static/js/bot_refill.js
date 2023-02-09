@@ -108,25 +108,38 @@ function setCountdown(timerContainerId, startTime, callAfter) {
     }, 1000);
 }
 
-function closeAndOpenWindow(message) {
+function closeAndOpenWindow(message, success) {
     const popupOk = document.getElementById("refillOk");
     let message_box = document.querySelector("#refill_message_ok");
+    const iconerror = document.getElementById("mes_error");
+    const iconok = document.getElementById("mes_ok");
+    if (success){
+        iconok.style.display = "flex";
+        iconerror.style.display = "none";
+    } else {
+        iconok.style.display = "none";
+        iconerror.style.display = "flex";
+    }
     message_box.innerHTML = message;
     popupOpen(popupOk);
     hideForm();
     refillSocket.close(1000);
     requestOpened = false;
 }
-// обработка ответов сервера в заявке на пополнение
+// обработка ответов сервера в заявке на ПОПОЛНЕНИЕ
 let lastServerMessage = '';
 let requestOpened = false;
 let timerStarted = false;
+let request_id1 = '';
 function refillSocketOnMessage(e) {
     const data = JSON.parse(e.data);
-
     if (data.hasOwnProperty('request_id') && data.status === 'open') {
         // {"id": 4, "user": {"id": 1}, "request_id": 4, "status": "open", "amount": 1000, "balance": 0, "date_opened": "2022-12-22T21:16:20.118312Z", "date_closed": null, "note": null, "close_reason": null, "game_id": null}
         // сервер прислал созданную заявку
+        request_id1 = data.request_id;
+        let query1 = document.querySelector("#withdraw_query1");
+        query1.style.visibility =  "visible";
+        query1.textContent = "Заявка #" + data.request_id;
         let query = document.querySelector("#manual_queries_r");
         query.style.visibility =  "visible";
         query.textContent = "Заявка #" + data.request_id;
@@ -144,7 +157,7 @@ function refillSocketOnMessage(e) {
         }
         if (!timerStarted) {
             setTimeout(setCountdown, 0, "#modalManualBtn", "6:00", function () {
-                closeAndOpenWindow('Время заявки вышло.');
+                closeAndOpenWindow('Баланс не пополнен.<br> Ошибка!!!!', false);
             });
         }
         timerStarted = false;
@@ -161,6 +174,14 @@ function refillSocketOnMessage(e) {
             setTimeout(hideForm, 3000);
             refillSocket.close(1000);
             requestOpened = false;
+            if (data.detail === 'Идут работы!!!' )
+            {
+              let message = 'Пополнение в данный момент не доступно. Пожалуйста, попробуйте позже.';
+              let success = false
+            closeAndOpenWindow(message, success);
+            requestOpened = false;
+            }
+
         } else if (dataStatus === 'process') {
             // на сервере ошибка, ничего серьёзного))
 
@@ -176,14 +197,16 @@ function refillSocketOnMessage(e) {
                 // таймер
                 let startTime = parseInt(data.start);
                 let timeToStop = 6*60 + startTime - Math.floor(Date.now() / 1000);
+//                let timeToStop = 1;
                 if (timeToStop < 0) {
-                    timeToStop = 0;
+                    timeToStop = 120;
                 }
                 let minutes = Math.floor(timeToStop / 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
                 let seconds = (timeToStop % 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
                 let timerText = `${minutes}:${seconds}`
                 setTimeout(setCountdown, 0, "#modalManualBtn", timerText, function () {
-                    closeAndOpenWindow('Время заявки вышло.');
+//                    closeAndOpenWindow('Баланс не пополнен.<br> Ошибка (стр 201)', false);
+                      closeAndOpenWindow(`Баланс не пополнен.<br> Ошибка #${request_id1}`, false);
                 });
                 // модалка открывается
                 popupOpen(modalManual);
@@ -206,24 +229,28 @@ function refillSocketOnMessage(e) {
         // };
         if (data.done) {
             let message = 'Заявка закрыта.';
+            let success = false;
             if (data.close_reason === 'Success') {
-                message = `Баланс успешно пополнен на<br>${data.refiil}`;
+                message = `Баланс пополнен на <br>${Math.round(data.refiil/100)*100} кредитов. Приятной игры!`;
+                success = true;
             } else if (data.close_reason === 'NoMessage') {
-                message = 'Ошибка. Вы не написали боту.';
+                message = 'Ошибка. Пожалуйста, в следующий раз следуйте инструкции.';
             } else if (data.close_reason === 'ClientScoreLessThanMinimum') {
-                message = 'Ошибка. Пополнение в данный момент не доступно. Пожалуйста, попробуйте позже.';
+                message = 'Пополнение в данный момент не доступно. Пожалуйста, попробуйте позже.';
             } else if (data.close_reason === 'ClientBanned') {
-                message = 'Ошибка. Приносим извинения. На сервере ведутся технические работы, попробуйте чуть позже.';
+                message = 'Ошибка. Приносим извинения. Ведутся технические работы, попробуйте чуть позже.';
             } else if (data.close_reason === 'ClientDontJoined') {
-                message = 'Ошибка. Вы не присоединились к игре.';
+                message = 'Ошибка. Пожалуйста, в следующий раз следуйте инструкции.';
             } else if (data.close_reason === 'ClientDontReady') {
-                message = 'Ошибка. Вы не нажали готов.';
+                message = 'Ошибка. Пожалуйста, в следующий раз следуйте инструкции.';
             } else if (data.close_reason === 'Error') {
-                message = 'Ошибка. На сервере ведутся работы.';
+                message = 'Пополнение в данный момент не доступно. Пожалуйста, попробуйте позже.';
+            } else if (data.close_reason === 'Timeout') {
+                message = 'Ошибка. Пожалуйста, в следующий раз следуйте инструкции.';
             } else {
-                message = 'Время на выполнение вышло.'
+                message = `Баланс не пополнен.<br> Ошибка ${request_id1}`;
             }
-            closeAndOpenWindow(message);
+            closeAndOpenWindow(message, success);
             requestOpened = false;
         }
     }
@@ -282,7 +309,16 @@ function hideFormWithdraw() {
     }
 }
 
-function closeAndOpenWindowWithdraw(message) {
+function closeAndOpenWindowWithdraw(message, success) {
+    const iconerror = document.getElementById("mes_error");
+    const iconok = document.getElementById("mes_ok");
+    if (success){
+        iconok.style.display = "flex";
+        iconerror.style.display = "none";
+    } else {
+        iconok.style.display = "none";
+        iconerror.style.display = "flex";
+    }
     const popupOk = document.getElementById("refillOk");
     let message_box = document.querySelector("#refill_message_ok");
     message_box.innerHTML = message;
@@ -295,22 +331,26 @@ function closeAndOpenWindowWithdraw(message) {
 let botNameW = '';
 let lastServerMessageW = '';
 let timerStartedW = false;
-// обработка ответов сервера в заявке на пополнение
+let request_id = '';
+// обработка ответов сервера в заявке на ВЫВОД
 function withdrawSocketOnMessage(e) {
     const data = JSON.parse(e.data);
-
     if (data.hasOwnProperty('request_id') && data.status === 'open') {
         // {"id": 4, "user": {"id": 1}, "request_id": 4, "status": "open", "amount": 1000, "balance": 0, "date_opened": "2022-12-22T21:16:20.118312Z", "date_closed": null, "note": null, "close_reason": null, "game_id": null}
         // сервер прислал созданную заявку
+        request_id = data.request_id;
         let query = document.querySelector("#withdraw_query");
         query.style.visibility =  "visible";
         query.textContent = "Заявка #" + data.request_id;
+        let query1 = document.querySelector("#withdraw_query1");
+        query1.style.visibility =  "visible";
+        query1.textContent = "Заявка #" + data.request_id;
         requestOpened = true;
         let span = document.querySelector("#withdraw_nickname");
         span.innerHTML = `<b>${botNameW}</b>`;
         if (!timerStartedW) {
             setTimeout(setCountdown, 0, "#modalManualBtn2", "10:00", function () {
-                closeAndOpenWindowWithdraw('Время заявки вышло.');
+                closeAndOpenWindowWithdraw('Баланс не пополнен.<br> Ошибка', false);
             });
         }
     } else if (data.hasOwnProperty('status')) {
@@ -326,6 +366,13 @@ function withdrawSocketOnMessage(e) {
             setTimeout(hideFormWithdraw, 3000);
             withdrawSocket.close(1000);
             requestOpened = false;
+            if (data.detail === 'Идут работы!!!' )
+            {
+              let message = 'Ошибка. Приносим извинения. Ведутся технические работы, попробуйте чуть позже.';
+              let success = false
+            closeAndOpenWindowWithdraw(message, success);
+            requestOpened = false;
+            }
         } else if (dataStatus === 'process') {
             // на сервере ошибка, ничего серьёзного))
 
@@ -343,13 +390,13 @@ function withdrawSocketOnMessage(e) {
                 let startTime = parseInt(data.start);
                 let timeToStop = 10*60 + startTime - Math.floor(Date.now() / 1000);
                 if (timeToStop < 0) {
-                    timeToStop = 0;
+                    timeToStop = 120;
                 }
                 let minutes = Math.floor(timeToStop / 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
                 let seconds = (timeToStop % 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
                 let timerText = `${minutes}:${seconds}`
                 setTimeout(setCountdown, 0, "#modalManualBtn2", timerText, function () {
-                    closeAndOpenWindowWithdraw('Время заявки вышло.');
+                    closeAndOpenWindowWithdraw('Время заявки вышло.', false);
                 });
                 // модалка открывается
                 popupOpen(modalWithdraw);
@@ -372,24 +419,28 @@ function withdrawSocketOnMessage(e) {
         // }
         if (data.done) {
             let message = 'Заявка закрыта.';
+            let success = false;
             if (data.close_reason === 'Success') {
-                message = `Успешный вывод на сумму<br>${data.withdraw}`;
+                message = `Выведено <br>${data.withdraw} кредитов.`;
+            success = true;
             } else if (data.close_reason === 'NoMessage') {
-                message = 'Ошибка. Вы не написали боту.';
+                message = 'Вы не забрали свою валюту. В следующий раз, пожалуйста, следуйте инструкции!';
             } else if (data.close_reason === 'ClientScoreLessThanMinimum') {
                 message = 'Отклонено. Мы не производим вывод на пустой аккаунт. Пожалуйста, войдите с более старого аккаунта.';
             } else if (data.close_reason === 'ClientBanned') {
-                message = 'Ошибка. Приносим извинения. На сервере ведутся технические работы, попробуйте чуть позже.';
+                message = 'Ошибка. Приносим извинения. Ведутся технические работы, попробуйте чуть позже.';
             } else if (data.close_reason === 'ClientDontJoined') {
-                message = 'Ошибка. Вы не присоединились к игре.';
+                message = 'Вы не забрали свою валюту. В следующий раз, пожалуйста, следуйте инструкции!';
             } else if (data.close_reason === 'ClientDontReady') {
-                message = 'Ошибка. Вы не нажали готов.';
+                message = 'Вы не забрали свою валюту. В следующий раз, пожалуйста, следуйте инструкции!';
+            } else if (data.close_reason === 'Timeout'){
+                message = 'Вы не забрали свою валюту. В следующий раз, пожалуйста, следуйте инструкции!';
             } else if (data.close_reason === 'Error') {
-                message = 'Ошибка. На сервере ведутся работы.';
+                message = 'Ошибка. Приносим извинения. Ведутся технические работы, попробуйте чуть позже.';
             } else {
-                message = 'Время на выполнение вышло.'
+                message = `Баланс не пополнен.<br> Ошибка ${request_id}`;
             }
-            closeAndOpenWindowWithdraw(message);
+            closeAndOpenWindowWithdraw(message, success);
             requestOpened = false;
         }
     }

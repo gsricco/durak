@@ -223,14 +223,14 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 print(url_get_bot_info)
                 spisok = []
                 try:
-                    # resp = await session.get(url_get_bot_info)
-                    t1 = threading.Thread(target=self.get_request, args=(spisok,))
-                    t1.start()
-                    t1.join()
-                    print(spisok, "<<<<<<<<<<<<<<<<<<<SPISOK")
-                    # bot_list = await resp.json()
-                    bot_list = spisok[0]
-                    print(bot_list, "ETO BOT_LIST")
+                    resp = await session.get(url_get_bot_info)
+                    # t1 = threading.Thread(target=self.get_request, args=(spisok,))
+                    # t1.start()
+                    # t1.join()
+                    # print(spisok, "<<<<<<<<<<<<<<<<<<<SPISOK")
+                    bot_list = await resp.json()
+                    # bot_list = spisok[0]
+                    # print(bot_list, "ETO BOT_LIST")
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
                     print(err.__dict__)
                     await self.send(json.dumps({"status": "error", "detail": f"Ошибка получения имени бота.",}))
