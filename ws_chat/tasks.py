@@ -81,6 +81,7 @@ def record_work_time(function):
         print(timezone.now(), datetime.datetime.now(), "tz and regular time")
         print(f'END AMOUNT OF ROUND ----- {len(rounds_end)}', len(rounds_end) - len(rounds_start))
         tg_thread = threading.Thread(target=new_rounds_logger, args=(rounds_start, rounds_end))
+        tg_thread.start()
         return res
 
     return wrapper
