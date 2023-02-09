@@ -24,7 +24,7 @@ from accaunts.models import Level, ItemForUser
 from bot_payment.models import RefillRequest, WithdrawalRequest, BanTime
 from configs.settings import REDIS_URL_STACK, REDIS_PASSWORD
 channel_layer = get_channel_layer()
-r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)
+r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
 ROUND_NUMBERS = {

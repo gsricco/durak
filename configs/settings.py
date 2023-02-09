@@ -186,14 +186,15 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [("durak_redis_stack", 6379)],
         },
-        # "OPTIONS": {
-        #     "PASSWORD": os.getenv("REDIS_PASSWORD")
-        # }
+        "OPTIONS": {
+            "PASSWORD": os.getenv("REDIS_PASSWORD")
+        }
     },
 }
 
 # REDIS
 REDIS_URL_STACK = os.getenv("REDIS_URL_STACK")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 # CELERY
 REDIS_URL = os.getenv("REDIS_URL")
 BROKER_URL = REDIS_URL
@@ -203,7 +204,6 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IGNORE_RESULT = True
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 """freekassa"""
 MERCHANT_ID = os.getenv('MERCHANT_ID')  # ID Вашего магазина
 SECRET_WORD = os.getenv('SECRET_WORD')  # Секретное слово
@@ -214,3 +214,4 @@ ID_SHIFT = int(os.getenv('ID_SHIFT'))
 
 # subscribers
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+VK_TOKEN = os.getenv('VK_TOKEN')

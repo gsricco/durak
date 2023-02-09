@@ -14,7 +14,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
 from django.shortcuts import get_object_or_404
 from accaunts.models import Ban, AvatarProfile, DetailUser, UserBet
-from configs.settings import BASE_DIR, REDIS_URL_STACK
+from configs.settings import BASE_DIR, REDIS_URL_STACK, REDIS_PASSWORD
 from accaunts.models import CustomUser, Level, ItemForUser
 from caseapp.models import OwnedCase, Case, ItemForCase, Item
 from content_manager.models import BadSlang
@@ -28,7 +28,7 @@ from .utils import check_youtube_subscribers, vk_subscribe
 
 
 # подключаемся к редису
-r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK)#, password=REDIS_PASSWORD)
+r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):

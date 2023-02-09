@@ -8,22 +8,22 @@ from content_manager.models import SiteContent
 
 # YOUTUBE
 if YOUTUBE_API_KEY is None:
-    YOUTUBE_API_KEY = 'AIzaSyBxKAi_XTdjMX3NLK1AfjwA_017G7v-bc0' # my API_KEY
+    YOUTUBE_API_KEY = 'AIzaSyBxKAi_XTdjMX3NLK1AfjwA_017G7v-bc0'
 BASE_URL = 'https://youtube.googleapis.com/youtube/v3/subscriptions?part=snippet%2CcontentDetails'
-
 CHANNEL_ID = '&channelId='
 MAX_RESULT = '&maxResults=5'
 PAGE_TOKEN = '&pageToken='
 API_KEY = '&key='+YOUTUBE_API_KEY
 
 # VK
+VK_URL = "https://api.vk.com/method/groups.isMember"
+VK_EXTENDED = 0
+VK_API_VERSION = 5.92
 if VK_TOKEN is None:
     VK_TOKEN = '''vk1.a.HAHCn97Rw-ySBtvABHBhCgk2A4foP7eunqdb95ZvvthL2iAk_h
             ozLljuybjRTsxS7E4ANLdmA2uDJXI73TPeKgNzUDkDjMPdyg85PRwNqa
             S5nUC1IEHWSjwwj8vL0Bs0CtiHZPRXPVHJFusy4YN4SFrkmAZkID7dAy
             zFMyiDuzTyg8XeKNK8wlStk9ADjCw0ZbA7-B2AaXfGy6XYEHnavw'''
-#
-#
 
 channel_layer = get_channel_layer()
 
@@ -115,7 +115,6 @@ def check_youtube_subscribers(user_channel_id, user_obj):
                             except AttributeError:
                                 send_error(user_obj, 'y')
                                 return False
-                            # channel_title = channel.get('snippet')['title']
                             if channel_id == site_channel_id_youtube:
                                 add_bonus('y', user_obj, user_bonus)
                                 return True
@@ -124,7 +123,7 @@ def check_youtube_subscribers(user_channel_id, user_obj):
 
 
 def vk_subscribe(user_obj):
-    """ Функция проверяет подписан ли пользователь на группу в VK"""
+    """ Проверяет подписан ли пользователь на группу в VK"""
     vk_auth = user_obj.social_auth.filter(provider='vk-oauth2').first()
     user_bonus, created = BonusVKandYoutube.objects.get_or_create(user_id=user_obj.id)
     if vk_auth and not user_bonus.bonus_vk:
@@ -134,18 +133,15 @@ def vk_subscribe(user_obj):
                 vk_id = vk_auth.uid
                 group_id = SiteContent.objects.first().vk_group_id
                 if group_id:
-                    # group_id = "club218205130"    # группа Миши
-                    extended = 0
-                    version = 5.92
                     for _ in range(4):
-                        time.sleep(2)
-                        response = requests.get("https://api.vk.com/method/groups.isMember",
+                        time.sleep(30)
+                        response = requests.get(VK_URL,
                                                 params={
                                                     "access_token": VK_TOKEN,
                                                     'group_id': group_id,
                                                     'user_id': vk_id,
-                                                    'extended': extended,
-                                                    'v': version})
+                                                    'extended': VK_EXTENDED,
+                                                    'v': VK_API_VERSION})
                         data = response.json()
                         if data['response']:
                             add_bonus('v', user_obj, user_bonus)
