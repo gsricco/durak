@@ -185,7 +185,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis://:hellodarknessmyoldfriend@durak_redis_stack", 6379)],
+            "hosts": ["redis://:hellodarknessmyoldfriend@durak_redis_stack:6379/0"],
+            "symmetric_encryption_keys": [os.getenv('SECRET_KEY')],
         },
         # "OPTIONS": {
         #     "PASSWORD": os.getenv("REDIS_PASSWORD")
