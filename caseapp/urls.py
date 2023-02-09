@@ -1,13 +1,8 @@
 from django.urls import path
-from .api_views import (
-    get_cases,
-    get_case_by_id,
-    get_items,
-    get_items_in_case,
-    open_case,
-    get_user_cases,
-    get_time_for_next_case,
-)
+
+from .api_views import (get_case_by_id, get_cases, get_items,
+                        get_items_in_case, get_time_for_next_case,
+                        get_user_cases, open_case)
 
 urlpatterns = [
     path('cases/', get_cases, name='api_cases'),

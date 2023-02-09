@@ -1,12 +1,13 @@
 import datetime
+from random import choices
 
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .serializers import CaseSerializer, ItemSerializer, OwnedCaseSerializer, OwnedCaseTimeSerializer
-from .models import Case, Item, ItemForCase, OwnedCase
 
-from random import choices
+from .models import Case, Item, ItemForCase, OwnedCase
+from .serializers import (CaseSerializer, ItemSerializer, OwnedCaseSerializer,
+                          OwnedCaseTimeSerializer)
 
 
 @api_view(['GET'])

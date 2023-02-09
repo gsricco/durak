@@ -1,13 +1,14 @@
 import hashlib
 import math
 
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from psycopg2.extras import NumericRange
 from rest_framework import response, status
 from rest_framework.decorators import api_view
+
 from accaunts.models import DetailUser
 from configs.settings import MERCHANT_ID, SECRET_WORD
-from pay.models import Popoln, BalPay, PayOff
-from psycopg2.extras import NumericRange
+from pay.models import BalPay, PayOff, Popoln
 
 
 # Создается форма платежа

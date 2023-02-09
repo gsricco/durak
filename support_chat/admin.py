@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Message, UserChatRoom, NotRead
+from .models import Message, NotRead, UserChatRoom
 
 
 @admin.register(Message)

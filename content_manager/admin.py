@@ -6,10 +6,10 @@ from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.forms import RadioSelect
 
-from .models import SiteContent, FAQ, BadSlang, DurakNickname, BalanceEditor
-from configs.settings import REDIS_URL_STACK, REDIS_PASSWORD
-from .models import SiteContent, FAQ, BadSlang, FakeOnline, ShowRound
-from .utils import get_vk_group_id, get_youtube_id
+from configs.settings import REDIS_PASSWORD, REDIS_URL_STACK
+
+from .models import (FAQ, BadSlang, BalanceEditor, DurakNickname, FakeOnline,
+                     ShowRound, SiteContent)
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
 

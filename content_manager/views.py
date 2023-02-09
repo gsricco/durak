@@ -1,18 +1,20 @@
 import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render, redirect
-from social_django.models import UserSocialAuth
 from django.core.paginator import Paginator
+from django.db.models import Count, F, Sum, Value
+from django.shortcuts import redirect, render
 from django.utils import timezone
-from django.db.models import Value, F, Count
+from social_django.models import UserSocialAuth
 
 from accaunts.forms import UserEditName
-from accaunts.models import DetailUser, Level, CustomUser, UserAgent, UserIP, DayHash, UserBet, ReferalUser, ItemForUser
-from pay.models import Popoln, RefillBotSum, WithdrawBotSum
+from accaunts.models import (CustomUser, DayHash, DetailUser, ItemForUser,
+                             Level, ReferalUser, UserAgent, UserBet, UserIP)
 from bot_payment.models import RefillRequest, WithdrawalRequest
-from .models import FAQ, SiteContent, ShowRound, DurakNickname, BalanceEditor
-from django.db.models import Sum
+from pay.models import Popoln, RefillBotSum, WithdrawBotSum
+
+from .models import FAQ, BalanceEditor, DurakNickname, ShowRound, SiteContent
+
 
 def add_pay_buttons(context):
     """

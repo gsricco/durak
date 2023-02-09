@@ -1,22 +1,25 @@
 from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count, Sum
 from django.utils.safestring import mark_safe
+from django_celery_beat.models import (ClockedSchedule, CrontabSchedule,
+                                       IntervalSchedule, PeriodicTask,
+                                       SolarSchedule)
+from django_celery_results.models import GroupResult, TaskResult
 from rangefilter.filters import DateTimeRangeFilter
-from social_django.models import UserSocialAuth, Nonce, Association
+from social_django.models import Association, Nonce, UserSocialAuth
 
 from bot_payment.models import RefillRequest, WithdrawalRequest
+from caseapp.models import ItemForCase, OwnedCase
 from content_manager.admin import AdminBalanceEditor
-from .models import (CustomUser, UserAgent, DetailUser, ReferalUser,
-                     ReferalCode, GameID, Ban, UserIP, Level, ItemForUser,
-                     DayHash, RouletteRound, AvatarProfile, UserBet, BonusVKandYoutube)
-from .forms import LevelForm
 from pay.models import Popoln
-from caseapp.models import OwnedCase, ItemForCase
-from django_celery_results.models import TaskResult, GroupResult
-from django_celery_beat.models import IntervalSchedule, CrontabSchedule, SolarSchedule, ClockedSchedule, PeriodicTask
 
-from django.contrib.admin.views.main import ChangeList
-from django.db.models import Sum, Count
+from .forms import LevelForm
+from .models import (AvatarProfile, Ban, BonusVKandYoutube, CustomUser,
+                     DayHash, DetailUser, GameID, ItemForUser, Level,
+                     ReferalCode, ReferalUser, RouletteRound, UserAgent,
+                     UserBet, UserIP)
 
 """Модели которые не нужно отображать в Admin из SocialAuth"""
 admin.site.unregister(UserSocialAuth)

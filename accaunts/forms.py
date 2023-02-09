@@ -2,8 +2,9 @@ from django import forms
 from django.db.models import Max
 from django.forms import ValidationError
 from psycopg2 import DataError
-from accaunts.models import CustomUser, Level
 from psycopg2.extras import NumericRange
+
+from accaunts.models import CustomUser, Level
 
 
 class UserEditName(forms.ModelForm):

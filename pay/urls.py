@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import pay_user, balance
+from .views import balance, pay_user
 
 urlpatterns = [
     path('buy/', balance, name='balance'),

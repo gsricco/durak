@@ -1,21 +1,23 @@
+import asyncio
 import json
 import threading
 
 import aiohttp
-import asyncio
-
-import requests
-from asgiref.sync import sync_to_async, async_to_sync
-from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
-from accaunts.models import CustomUser, Ban, DetailUser
-from . import models, serializers
-from django.utils import timezone
+import requests
+from asgiref.sync import async_to_sync, sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
 from django.db.utils import Error
-from ws_chat.tasks import setup_check_request_status, send_balance_to_single, ban_user_for_bad_request
-from configs.settings import HOST_URL, ID_SHIFT, REDIS_URL_STACK, REDIS_PASSWORD
-from .models import WithdrawalRequest, BotWork, RefillRequest, BanTime
 from django.utils import timezone
+
+from accaunts.models import Ban, CustomUser, DetailUser
+from configs.settings import (HOST_URL, ID_SHIFT, REDIS_PASSWORD,
+                              REDIS_URL_STACK)
+from ws_chat.tasks import (ban_user_for_bad_request, send_balance_to_single,
+                           setup_check_request_status)
+
+from . import models, serializers
+from .models import BanTime, BotWork, RefillRequest, WithdrawalRequest
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)  # подключаемся к редису
 

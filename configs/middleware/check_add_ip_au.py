@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
-from accaunts.models import Ban, UserIP, UserAgent, CustomUser
+
+from accaunts.models import Ban, CustomUser, UserAgent, UserIP
 
 
 class BanIPandAgentMiddleware:

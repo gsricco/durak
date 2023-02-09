@@ -1,6 +1,8 @@
-from rest_framework import serializers
-from .models import Case, Item, OwnedCase, ItemForCase
 import datetime
+
+from rest_framework import serializers
+
+from .models import Case, Item, ItemForCase, OwnedCase
 
 # class GradeModelSerializer(serializers.ModelSerializer):
 #     """Grade serializer for Case serializer"""

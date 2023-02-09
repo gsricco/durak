@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Case, OwnedCase, Item, ItemForCase
 from django.utils.safestring import mark_safe
+
+from .models import Case, Item, ItemForCase, OwnedCase
 
 
 @admin.register(OwnedCase)

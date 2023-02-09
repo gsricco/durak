@@ -1,12 +1,15 @@
 import math
-from django.shortcuts import render
-from psycopg2._range import NumericRange
-from rangefilter.filters import DateTimeRangeFilter
-from .models import Popoln, BalPay, RefillBotSum, WithdrawBotSum, PayOff
-from admin_numeric_filter.admin import NumericFilterModelAdmin, RangeNumericFilter
+
+from admin_numeric_filter.admin import (NumericFilterModelAdmin,
+                                        RangeNumericFilter)
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models import Sum
+from django.shortcuts import render
+from psycopg2._range import NumericRange
+from rangefilter.filters import DateTimeRangeFilter
+
+from .models import BalPay, PayOff, Popoln, RefillBotSum, WithdrawBotSum
 
 
 class MyChangeList(ChangeList):

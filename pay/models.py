@@ -1,6 +1,7 @@
 from django.contrib.postgres.fields import BigIntegerRangeField
 from django.db import models
 from django.utils import timezone
+
 from accaunts.models import CustomUser
 
 

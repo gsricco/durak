@@ -4,8 +4,10 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from accaunts.models import CustomUser
+
 from .models import Message, UserChatRoom
-from .serializers import MessageGetSerializer, MessageCreateSerializer, RoomSerializer
+from .serializers import (MessageCreateSerializer, MessageGetSerializer,
+                          RoomSerializer)
 
 
 class MessageViewSet(viewsets.ViewSet):

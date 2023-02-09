@@ -1,9 +1,9 @@
 from django.contrib import admin
-
-from . import models
 from django.contrib.admin.views.main import ChangeList
 from django.db.models import Sum
 from rangefilter.filters import DateTimeRangeFilter
+
+from . import models
 
 
 class StatusListFilter(admin.SimpleListFilter):

@@ -1,9 +1,11 @@
-import requests
 import time
+
+import requests
 from asgiref.sync import async_to_sync
-from accaunts.models import DetailUser, BonusVKandYoutube, CustomUser
-from configs.settings import YOUTUBE_API_KEY, VK_TOKEN
 from channels.layers import get_channel_layer
+
+from accaunts.models import BonusVKandYoutube, CustomUser, DetailUser
+from configs.settings import VK_TOKEN, YOUTUBE_API_KEY
 from content_manager.models import SiteContent
 
 # YOUTUBE

@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
+from rest_framework.parsers import (FileUploadParser, FormParser,
+                                    MultiPartParser)
 
 from accaunts.models import CustomUser
-from .models import Message, UserChatRoom
 
+from .models import Message, UserChatRoom
 
 
 class UserSerializer(serializers.ModelSerializer):

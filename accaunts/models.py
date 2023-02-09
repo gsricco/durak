@@ -1,16 +1,19 @@
-from tempfile import NamedTemporaryFile
-from urllib.request import urlopen
-from django.core.files import File
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
-from .pix_list_rgb import list_rgb
-from .validators import validate_referal
-from caseapp.models import OwnedCase
-import sys
-from PIL import Image
 import random
 import string
+import sys
+from tempfile import NamedTemporaryFile
+from urllib.request import urlopen
+
+from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
+from django.core.files import File
+from django.db import models
+from PIL import Image
+
+from caseapp.models import OwnedCase
+
+from .pix_list_rgb import list_rgb
+from .validators import validate_referal
 
 
 def is_migrate():

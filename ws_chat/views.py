@@ -1,4 +1,5 @@
 import json
+
 # import time
 # import requests
 # from asgiref.sync import async_to_sync, sync_to_async
@@ -76,6 +77,3 @@ import json
 #             async_to_sync(channel_layer.group_send)(f"{user_pk}_room", message)
 #             return
 #     return
-
-
-

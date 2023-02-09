@@ -6,26 +6,29 @@ import os
 import threading
 from random import choices
 
-from django.db.models import Sum
-from django.utils import timezone
-from caseapp.serializers import OwnedCaseTimeSerializer, ItemForUserSerializer, CaseAndCaseItemSerializer
-from asgiref.sync import sync_to_async, async_to_sync
-from channels.generic.websocket import AsyncWebsocketConsumer
 import redis
+from asgiref.sync import async_to_sync, sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
-from accaunts.models import Ban, AvatarProfile, DetailUser, UserBet
-from configs.settings import BASE_DIR, REDIS_URL_STACK, REDIS_PASSWORD
-from accaunts.models import CustomUser, Level, ItemForUser
-from caseapp.models import OwnedCase, Case, ItemForCase, Item
+from django.utils import timezone
+
+from accaunts.models import (AvatarProfile, Ban, CustomUser, DetailUser,
+                             ItemForUser, Level, UserBet)
+from caseapp.models import Case, Item, ItemForCase, OwnedCase
+from caseapp.serializers import (CaseAndCaseItemSerializer,
+                                 ItemForUserSerializer,
+                                 OwnedCaseTimeSerializer)
+from configs.settings import BASE_DIR, REDIS_PASSWORD, REDIS_URL_STACK
 from content_manager.models import BadSlang
-from support_chat.models import Message, UserChatRoom
-from support_chat.serializers import RoomSerializer, OnlyRoomSerializer
 from pay.views import rub_to_pay, virtual_money_to_rub
+from support_chat.models import Message, UserChatRoom
+from support_chat.serializers import OnlyRoomSerializer, RoomSerializer
+
+from . import tasks
 # хранит победную карту текущего раунда
 from .tasks import ROUND_RESULT_FIELD_NAME
-from . import tasks
 from .utils import check_youtube_subscribers, vk_subscribe
-
 
 # подключаемся к редису
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
