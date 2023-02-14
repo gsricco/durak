@@ -432,7 +432,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = self.scope['user']  # TODO получаем имя пользователя который подключился с фронта
         #user_id = str(self.scope["user"].id)
         if is_auth := user.is_authenticated:
-            await self.change_balance(user)
             if self.scope['user'].is_staff:
                 await self.channel_layer.group_add('admin_group', self.channel_name)
                 await self.channel_layer.group_add(f'{user.id}_room', self.channel_name)
@@ -449,6 +448,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "type": 'roulette_countdown_state',
         })
         await self.set_online(is_auth)
+        if is_auth:
+            await self.change_balance(user)
         if recieve_user == 'go':  # Проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
             await self.init_support_chat(user.pk)
