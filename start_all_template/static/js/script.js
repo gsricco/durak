@@ -1,7 +1,7 @@
 // 'use strict';
-const UserBalance = document.querySelector('.header__profile-sum>span')
-if (UserBalance) {
-    let maxNumber = UserBalance.innerHTML
+const UserBalance1 = document.querySelector('.header__profile-sum>span')
+if (UserBalance1) {
+    let maxNumber = UserBalance1.innerHTML
 }
 else {
     let maxNumber = 0
