@@ -1,6 +1,6 @@
 // 'use strict';
-const UserBalance1 = document.querySelector('.header__profile-sum>span')
-let maxNumber = UserBalance1.innerHTML
+const maxNumber = document.querySelector('.header__profile-sum>span')
+console.log(maxNumber)
 
 window.addEventListener("DOMContentLoaded", () => {
     const BODY = document.querySelector("body");
