@@ -1,3 +1,4 @@
+from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -5,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import DetailUser, ReferalCode, ReferalUser
+from .models import DetailUser, ReferalCode, ReferalUser, UserBonus
 from .serializers import ReferalCodeModelSerializer
 
 
@@ -14,21 +15,34 @@ def give_bonus(request, ref_code):
     """Даёт бонус за регистрацию пользователю"""
     if request.user.is_authenticated:
         # проверяем, есть ли такой код
-        referal = get_object_or_404(ReferalCode, ref_code=ref_code)
+        referal_code = get_object_or_404(ReferalCode, ref_code=ref_code)
         # проверка, не активировал ли юзер свой же код
-        if referal.user == request.user:
+        if referal_code.user == request.user:
             return Response(data='{detail: "Вы активируете свой код"}', status=status.HTTP_403_FORBIDDEN)
-        # проверяем, не активировал ли юзер код 
-        (referal_user, created) = ReferalUser.objects.get_or_create(invited_user=request.user)
-        # если это первая активация
-        if created:
-            referal_user.user_with_bonus = referal.user
-            detail_user = get_object_or_404(DetailUser, user=referal.user)
-            detail_user.free_balance += referal_user.bonus_sum
-            referal_user.save()
-            detail_user.save()
-            return Response(data='{detail: "Код активирован"}', status=status.HTTP_200_OK)
-        return Response(data='{detail: "Вы уже активировали код"}', status=status.HTTP_403_FORBIDDEN)
+        # проверяем, не активировал ли юзер код
+        try:
+            with transaction.atomic():
+                (activation_referal, created) = ReferalUser.objects.get_or_create(invited_user=request.user)
+                # если это первая активация
+                if created:
+                    activation_referal.user_with_bonus = referal_code.user  # != request.user
+                    detail_user = get_object_or_404(DetailUser, user=referal_code.user)
+                    detail_user.free_balance += activation_referal.bonus_sum
+                    request.user.detailuser.free_balance += activation_referal.bonus_sum
+                    # request.user -> user who activating, detail_user -> user who owns code
+                    UserBonus.objects.create(detail_user=request.user.detailuser,
+                                             _bonus_to_win_back=activation_referal.bonus_sum * 3,
+                                             total_bonus=activation_referal.bonus_sum)
+                    UserBonus.objects.create(detail_user=detail_user,
+                                             _bonus_to_win_back=activation_referal.bonus_sum * 2,
+                                             total_bonus=activation_referal.bonus_sum)
+                    activation_referal.save()
+                    request.user.detailuser.save()
+                    detail_user.save()
+                    return Response(data='{detail: "Код активирован"}', status=status.HTTP_200_OK)
+                return Response(data='{detail: "Вы уже активировали код"}', status=status.HTTP_403_FORBIDDEN)
+        except IntegrityError:
+            return Response(data='{detail: "Ошибка, попробуйте ещё раз позже"}', status=status.HTTP_403_FORBIDDEN)
     return Response(data='{detail: "Войдите в аккаунт на сайте"}', status=status.HTTP_401_UNAUTHORIZED)
 
 

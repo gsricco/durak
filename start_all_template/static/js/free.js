@@ -204,6 +204,12 @@ if(btn_vk){
             show_modal('authorization')
         }
         else{
+            btn_vk.href = "#";
+            // let a_inside_button = document.querySelector("#a__inside__button");
+            btn_vk.innerHTML = 'Подписка проверяется...';
+            // a_inside_button.remove()
+            btn_vk.disabled = true;
+            btn_vk.style.cursor = 'not-allowed';
             chatSocket.send(JSON.stringify(
                 {"vk_youtube_api": 1,
                 "subscribe": "vk"}))
@@ -238,6 +244,8 @@ if(buttonSendYoutubeId){
         ()=>{
             const youtubeId = channelIdInput.value;
             if(youtubeId && youtubeId.length === 24 && youtubeId.startsWith('UC')){
+                buttonSendYoutubeId.disabled = true;
+                buttonSendYoutubeId.style.cursor = 'not-allowed';
                 chatSocket.send(JSON.stringify({
                     'vk_youtube_api': 1,
                     'subscribe': 'y',

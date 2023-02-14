@@ -1,28 +1,32 @@
 function generateItems(winnerCard, cardNumber) {
     const list = document.querySelector('.list');
     let cells = cardNumber
-
-    let h = 8;
+    console.log(cardNumber, winnerCard)
+    let h = 14;
+    let p = 0;
     // четные элементы красные, нечетные черные, каждая 8 карта coin
     for (let i = 0; i < cells; i++) {
 
         let item;
-        if (i % 2) {
+        if (p % 2) {
             item = `<svg>
                             <use xlink:href="/static/img/icons/sprite.svg#hearts_stroke_white"></use>
                         </svg>`;
+            p++;
         } else {
             item = `<svg>
                             <use xlink:href="/static/img/icons/sprite.svg#spades_stroke_white"></use>
                         </svg>`;
+            p++;
         }
-        // каждый 8-я карта coin
+        // каждый 14-я карта coin
         if (i === h) {
 
             item = `<svg>
                             <use xlink:href="/static/img/icons/sprite.svg#coin_stroke_white"></use>
                         </svg>`;
-            h = h + 8;
+            h = h + 14;
+            p++;
         }
 
         const div = document.createElement('div')
@@ -77,32 +81,65 @@ function startRoll(winnerCard, cardNumber, cardPosition, timer_for_roulette) {
 // анимация возврата после прокрутки
 const returnToStartPosition = () => {
     let trWidth;
-    if (window.screen.width === 1920) trWidth = 380;
-    if (window.screen.width > 1440 && window.screen.width < 1920) trWidth = 420;
-    if (window.screen.width === 1440) trWidth = 450;
-    if (window.screen.width > 1281 && window.screen.width < 1440) trWidth = 470;
-    // if (window.screen.width === 1366) trWidth = 470;
-    if (window.screen.width === 1280) trWidth = 500;
-    if (window.screen.width > 1080 && window.screen.width < 1280) trWidth = 525;
-    if (window.screen.width === 1080) trWidth = 530;
-    if (window.screen.width > 1050 && window.screen.width < 1080) trWidth = 535;
-    if (window.screen.width === 1050) trWidth = 540;
-    if (window.screen.width > 1024 && window.screen.width < 1050) trWidth = 545;
-    if (window.screen.width === 1024) trWidth = 550;
-    if (window.screen.width > 991 && window.screen.width < 1024) trWidth = 540;
-    if (window.screen.width === 991) trWidth = 420;
-    if (window.screen.width > 800 && window.screen.width < 991) trWidth = 500;
-    if (window.screen.width === 800) trWidth = 515;
-    if (window.screen.width > 767 && window.screen.width < 800) trWidth = 520;
-    if (window.screen.width === 767) trWidth = 530;
-    if (window.screen.width === 750) trWidth = 530;
-    if (window.screen.width === 640) trWidth = 590;
-    if (window.screen.width === 414) trWidth = 865;
-    if (window.screen.width === 412) trWidth = 860;
-    if (window.screen.width > 390 && window.screen.width < 412) trWidth = 780;
-    if (window.screen.width === 390) trWidth = 785;
-    if (window.screen.width === 375) trWidth = 650;
-    if (window.screen.width === 360) trWidth = 655;
+    //new
+    if (window.screen.width === 1920) trWidth = 1015;
+    if (window.screen.width > 1440 && window.screen.width < 1920) trWidth = 1060;
+    if (window.screen.width === 1440) trWidth = 1080;
+    if (window.screen.width > 1281 && window.screen.width < 1440) trWidth = 1125;
+    if (window.screen.width === 1280) trWidth = 1135;
+    if (window.screen.width > 1080 && window.screen.width < 1280) trWidth = 1150;
+    if (window.screen.width === 1080) trWidth = 1160;
+    if (window.screen.width > 1050 && window.screen.width < 1080) trWidth = 1165;
+    if (window.screen.width === 1050) trWidth = 1170;
+    if (window.screen.width > 1024 && window.screen.width < 1050) trWidth = 1175;
+    if (window.screen.width === 1024) trWidth = 1180;
+    if (window.screen.width > 991 && window.screen.width < 1024) trWidth = 1190;
+    if (window.screen.width === 991) trWidth = 1045;
+    if (window.screen.width > 800 && window.screen.width < 991) trWidth = 1130;
+    if (window.screen.width === 800) trWidth = 1145;
+    if (window.screen.width > 767 && window.screen.width < 800) trWidth = 1150;
+    if (window.screen.width === 767) trWidth = 1160;
+    if (window.screen.width === 750) trWidth = 1165;
+    if (window.screen.width > 641 && window.screen.width < 750) trWidth = 1200;
+    if (window.screen.width === 640) trWidth = 1220;
+    if (window.screen.width > 500 && window.screen.width < 640) trWidth = 1535;
+    if (window.screen.width > 415 && window.screen.width < 500) trWidth = 1590;
+    if (window.screen.width === 414) trWidth = 1600;
+    if (window.screen.width === 413) trWidth = 1600;
+    if (window.screen.width === 412) trWidth = 1610;
+    if (window.screen.width > 390 && window.screen.width < 412) trWidth = 1455;
+    if (window.screen.width === 390) trWidth = 1460;
+    if (window.screen.width === 375) trWidth = 1470;
+    if (window.screen.width === 360) trWidth = 1230;
+    if (window.screen.width < 360) trWidth = 1270;
+
+    //old
+    // if (window.screen.width === 1920) trWidth = 380;
+    // if (window.screen.width > 1440 && window.screen.width < 1920) trWidth = 420;
+    // if (window.screen.width === 1440) trWidth = 450;
+    // if (window.screen.width > 1281 && window.screen.width < 1440) trWidth = 470;
+    // // if (window.screen.width === 1366) trWidth = 470;
+    // if (window.screen.width === 1280) trWidth = 500;
+    // if (window.screen.width > 1080 && window.screen.width < 1280) trWidth = 525;
+    // if (window.screen.width === 1080) trWidth = 530;
+    // if (window.screen.width > 1050 && window.screen.width < 1080) trWidth = 535;
+    // if (window.screen.width === 1050) trWidth = 540;
+    // if (window.screen.width > 1024 && window.screen.width < 1050) trWidth = 545;
+    // if (window.screen.width === 1024) trWidth = 550;
+    // if (window.screen.width > 991 && window.screen.width < 1024) trWidth = 540;
+    // if (window.screen.width === 991) trWidth = 420;
+    // if (window.screen.width > 800 && window.screen.width < 991) trWidth = 500;
+    // if (window.screen.width === 800) trWidth = 515;
+    // if (window.screen.width > 767 && window.screen.width < 800) trWidth = 520;
+    // if (window.screen.width === 767) trWidth = 530;
+    // if (window.screen.width === 750) trWidth = 530;
+    // if (window.screen.width === 640) trWidth = 590;
+    // if (window.screen.width === 414) trWidth = 865;
+    // if (window.screen.width === 412) trWidth = 860;
+    // if (window.screen.width > 390 && window.screen.width < 412) trWidth = 780;
+    // if (window.screen.width === 390) trWidth = 785;
+    // if (window.screen.width === 375) trWidth = 650;
+    // if (window.screen.width === 360) trWidth = 655;
 
 
     list.style.left = '0%'

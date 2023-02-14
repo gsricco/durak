@@ -2,14 +2,14 @@ import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Sum, Value
+from django.db.models import Count, F, Sum, Value, IntegerField, CharField
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from social_django.models import UserSocialAuth
 
 from accaunts.forms import UserEditName
 from accaunts.models import (CustomUser, DayHash, DetailUser, ItemForUser,
-                             Level, ReferalUser, UserAgent, UserBet, UserIP)
+                             Level, ReferalUser, UserAgent, UserBet, UserIP, BonusVKandYoutube)
 from bot_payment.models import RefillRequest, WithdrawalRequest
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 
@@ -236,7 +236,39 @@ def profil(request):
             .annotate(sum=F("amount"), amount_to=F("amount"), tr_type=Value("От Админа"), tr_plus=F("to_add"), round_r=Value(0),
                       name=Value(""))\
             .values("date", "sum", "tr_type", "tr_plus", "amount_to", "round_r", "name")
-        transactions = popoln.union(user_bets, refill, withdraw, referal, items_for_user, balance_from_admin).order_by('-date')
+        y_bonus = int(sitecontent.first().bonus_youtube) * 1000
+        vk_bonus = int(sitecontent.first().bonus_vk) * 1000
+        if vk_sub := BonusVKandYoutube.objects.filter(user=request.user, bonus_vk=True):
+            bonus_sub_vk = BonusVKandYoutube.objects.filter(user=request.user)\
+                .annotate(sum=Value(vk_bonus), amount_to=Value(0),
+                          tr_type=Value("Подписка VK"), tr_plus=Value(True),
+                          round_r=Value(0), name=Value(""))\
+                .values('date_created_vk', 'sum', 'tr_type', 'tr_plus', 'amount_to', 'round_r', 'name')
+        if youtube_sub := BonusVKandYoutube.objects.filter(user=request.user, bonus_youtube=True):
+            bonus_sub_youtube = BonusVKandYoutube.objects.filter(user=request.user)\
+                .annotate(sum=Value(y_bonus), amount_to=Value(0),
+                          tr_type=Value("Подписка Youtube"), tr_plus=Value(True),
+                          round_r=Value(0), name=Value(""))\
+                .values('date_created_youtube', 'sum', 'tr_type', 'tr_plus', 'amount_to', 'round_r', 'name')
+        if vk_sub and youtube_sub:
+            transactions = popoln.union(user_bets, refill, withdraw, referal,
+                                        items_for_user, balance_from_admin,
+                                        bonus_sub_vk, bonus_sub_youtube)\
+                                 .order_by('-date')
+        elif vk_sub:
+            transactions = popoln.union(user_bets, refill, withdraw, referal,
+                                        items_for_user, balance_from_admin,
+                                        bonus_sub_vk) \
+                                 .order_by('-date')
+        elif youtube_sub:
+            transactions = popoln.union(user_bets, refill, withdraw, referal,
+                                        items_for_user, balance_from_admin,
+                                        bonus_sub_youtube) \
+                                 .order_by('-date')
+        else:
+            transactions = popoln.union(user_bets, refill, withdraw, referal,
+                                        items_for_user, balance_from_admin) \
+                                 .order_by('-date')
         paginator = Paginator(transactions, 8)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -298,6 +330,10 @@ def get_loss() -> int:
 
 def info(request):
     """Ставка пользователя"""
+    if not request.user.is_authenticated: # Если пользователь не зарегестрирован.
+        return index(request)
+    if not request.user.is_superuser: # Если пользователь не superuser.
+        return index(request)
     loss_requests_notes = get_loss()  # Кредитов, полученных с игроков, которые хотели обыграть бота для пополнения
     sum_of_all_bets = UserBet.objects.aggregate(Sum('sum'))["sum__sum"]
     if sum_of_all_bets is None:

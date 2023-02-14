@@ -10,8 +10,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.db.utils import Error
 from django.utils import timezone
 
-from accaunts.models import Ban, CustomUser, DetailUser
-from configs.settings import (HOST_URL, ID_SHIFT, REDIS_PASSWORD,
+from accaunts.models import Ban, CustomUser, DetailUser, UserBonus
+from configs.settings import (HOST_URL, ID_SHIFT,
                               REDIS_URL_STACK)
 from ws_chat.tasks import (ban_user_for_bad_request, send_balance_to_single,
                            setup_check_request_status)
@@ -108,8 +108,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
     def get_request(self, spisok):
         response = requests.get("http://178.211.139.11:8888/refill/get_bot_info?bot_id=0").json()
-        print(response, "ETO RESPONSE IN REQUEST")
         spisok.append(response)
+
     async def create_request(self, text_data_json):
         """Создаёт новую заявку"""
         # отключение бота
@@ -414,11 +414,15 @@ class RequestConsumer(AsyncWebsocketConsumer):
     async def process_balance(self, user_request, response):
         """Производит операции с балансом пользователя"""
         # начисление на баланс пользователя полученных кредитов
-        user_request.amount = response.get('refiil')
+        user_request.amount = response.get('refill')
         if user_request.amount > 0:
-            detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
-            detail_user.balance += user_request.amount
-            await sync_to_async(detail_user.save)()
+            # detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
+            # detail_user.balance += user_request.amount
+            bonus = await UserBonus.objects.acreate(_bonus_to_win_back=user_request.amount,
+                                                    total_bonus=user_request.amount,
+                                                    is_active=True,
+                                                    detail_user=user_request.user_id)
+            # await sync_to_async(detail_user.save)()
 
     async def send_ban(self, event):
         """Отправляет пользователю сообщение о том, что он забанен"""
@@ -452,7 +456,8 @@ class WithdrawConsumer(RequestConsumer):
     async def check_conditions(self, text_data_json):
         user = self.scope['user']
         detail_user = await DetailUser.objects.aget(user=user)
-        if detail_user.balance < int(text_data_json.get('amount', 0)):
+        approved_to_withdraw = await detail_user.check_withdraw()
+        if approved_to_withdraw < int(text_data_json.get('amount', 0)):
             return "Недостаточно кредитов."
         return "OK"
 
@@ -461,9 +466,13 @@ class WithdrawConsumer(RequestConsumer):
         # начисление на баланс пользователя полученных кредитов
         user_request.amount = response.get('withdraw')
         detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
-        frozen_balance_remain = detail_user.frozen_balance - user_request.amount
-        new_balance = max(0, detail_user.balance + frozen_balance_remain)
-        detail_user.balance = new_balance
+        result = await detail_user.do_withdraw(user_request.amount)
+        if not result:
+            await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных. Заявка не сохранена."}))
+            return
+        # frozen_balance_remain = detail_user.frozen_balance - user_request.amount
+        # new_balance = max(0, detail_user.balance + frozen_balance_remain)
+        # detail_user.balance = new_balance
         detail_user.frozen_balance = 0
         await sync_to_async(detail_user.save)()
 

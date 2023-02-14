@@ -4,13 +4,16 @@ import sys
 from tempfile import NamedTemporaryFile
 from urllib.request import urlopen
 
+from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import BigIntegerRangeField, RangeOperators
 from django.core.files import File
 from django.db import models
+from django.db.models import Sum
 from PIL import Image
 
 from caseapp.models import OwnedCase
+from content_manager.models import SiteContent
 
 from .pix_list_rgb import list_rgb
 from .validators import validate_referal
@@ -64,7 +67,7 @@ def random_number():
 class CustomUser(AbstractUser):
     """Пользователи"""
     avatar = models.FileField(verbose_name='Аватар', upload_to='img/avatar/user/',
-                              default='img/avatar/user/ava_S.svg',)
+                              default='img/avatar/user/ava_S.png',)
                               # validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])])
     use_avatar = models.BooleanField(verbose_name='Рандомная аватарка профиля', default=False,
                                      help_text='Рандомная аватарка с галочкой, а стандартная без')
@@ -83,7 +86,7 @@ class CustomUser(AbstractUser):
         if self.random_id is None:
             while CustomUser.objects.filter(random_id=self.random_id).exists():
                 self.random_id = random_number()
-        if self.photo and (self.avatar == 'img/avatar/user/ava_S.svg'):
+        if self.photo and (self.avatar == 'img/avatar/user/ava_S.png'):
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
@@ -191,23 +194,183 @@ class UserIP(models.Model):
 class DetailUser(models.Model):
     """Данные юзера по балансу и опыту"""
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE)
-    balance = models.PositiveBigIntegerField(verbose_name="Баланс", default=0)
+    balance = models.PositiveBigIntegerField(verbose_name="Баланс Который Можно Снять", default=0)
     free_balance = models.PositiveBigIntegerField(verbose_name="Бонусный счёт", default=0)
     frozen_balance = models.PositiveBigIntegerField(verbose_name='Замороженные средства', default=0)
     # subscribe_balance = models.PositiveBigIntegerField(verbose_name="Бонус за подписку", default=0)
     # bonus_balance = models.PositiveBigIntegerField(verbose_name="Общий бонусный счёт", default=0)
+    _reserve = models.PositiveBigIntegerField(verbose_name="Резерв - сумма пополнений реальными деньгами",
+                                              default=0)
 
     class Meta:
         verbose_name = 'Баланс пользователя в игре'
         verbose_name_plural = 'Баланс пользователя в игре'
 
     def __str__(self):
-        return f'{self.user}'
+        return f'{self.user}, total:{self.total_balance}, reserve:{self._reserve}'
 
-    # @property
-    # def total_balance(self):
-    #     balance = self.balance + self.bonus_balance
-    #     return balance
+    @property
+    def reserve(self):
+        return self._reserve
+
+    @reserve.setter
+    def reserve(self, value):
+        """
+        Изменения резерва - той части которую точно можно вывести
+        """
+        assert value >= self._reserve
+        diff = value - self._reserve
+        self.balance += diff
+        self._reserve = value
+
+    async def do_withdraw(self, value):
+        """
+        Вывод денег
+        Args:
+            value(int) : сумма, которую хочет вывести пользователь, должна быть > 0;
+        Returns:
+            int: code 0 если вывод не удался, 1 при удачном списании средств
+        """
+        if value > 0:
+            if withdaw_amount := await self.check_withdraw():
+                if withdaw_amount >= value:
+                    # если то что возможно снять > чем резерв
+                    if withdaw_amount > self._reserve:
+                        diff = withdaw_amount - self._reserve
+                        if value > diff:
+                            # self.balance -= value
+                            reserve_to_subtract = value - diff
+                            self._reserve -= reserve_to_subtract
+                        else:
+                            return 1
+                            # self.balance -= value
+                    else:
+                        # self.balance -= value
+                        self._reserve -= value
+                    return 1
+        return 0
+
+    async def check_withdraw(self):
+        """Сколько можно снять"""
+        bonus = await sync_to_async(self.check_bonus_amount)()
+        if self.reserve > 0:
+            if self.total_balance > self.reserve:
+                diff = self.total_balance - self.reserve
+                if diff > bonus:
+                    withdraw_sum = self.total_balance - bonus
+                else:
+                    withdraw_sum = self.reserve
+            else:
+                withdraw_sum = self.total_balance
+            return withdraw_sum
+        else:
+            if self.total_balance > bonus:
+                withdraw_sum = self.total_balance - bonus
+                return withdraw_sum
+            else:
+                return 0
+
+    def check_bonus_amount_to_win_back(self):
+        bonus_to_win_back = UserBonus.objects.filter(detail_user=self,
+                                                     is_active=True,)\
+                                             .aggregate(total_win_back=Sum('_bonus_to_win_back'))\
+                                             .get('total_win_back')
+        return bonus_to_win_back if bonus_to_win_back is not None else 0
+
+    def check_bonus_amount(self):
+        """Просчитывает все бонусные кредиты юзера"""
+        bonus = UserBonus.objects.filter(detail_user=self,
+                                         is_active=True,)\
+                                 .aggregate(user_total_bonus=Sum('total_bonus'))\
+                                 .get('user_total_bonus')
+        return bonus if bonus is not None else 0
+
+    @property
+    def total_balance(self):
+        """ВЕСЬ БАЛАНС С УЧЁТОМ БОНУСОВ"""
+        return self.balance
+
+    @total_balance.setter
+    def total_balance(self, value):
+        # setting to ZERO
+        if value == 0:
+            # if value is 0... here should be some function call
+            all_bonus = UserBonus.objects.filter(detail_user=self,
+                                                 is_active=True)\
+                                         .update(is_active=False)
+            self._reserve = 0
+            self.balance = 0
+        # decrease total_balance
+        elif self.balance > value:
+            diff = self.balance - value
+            balance = self.calculate_balance_after_bet(diff)
+            self.balance = value
+        # increase total_balance
+        elif self.balance < value:
+            # total_bonus = self.check_bonus_amount()
+            self.balance = value
+
+    def calculate_balance_after_bet(self, value):
+        list_of_bonuses = []
+        if all_active_bonuses := UserBonus.objects.filter(detail_user=self, is_active=True):
+            for bonus in all_active_bonuses:
+                if value >= bonus.bonus_to_win_back:
+                    value -= bonus.bonus_to_win_back
+                    bonus.bonus_to_win_back = 0
+                else:
+                    diff = bonus.bonus_to_win_back - value
+                    bonus.bonus_to_win_back = diff
+                    value = 0
+                list_of_bonuses.append(bonus)
+                if value == 0:
+                    break
+            UserBonus.objects.bulk_update(list_of_bonuses, ['_bonus_to_win_back', 'is_active',])
+            return value
+        else:
+            return value
+
+
+class UserBonus(models.Model):
+    """Хранит все бонусные начисления кредитов для каждого юзера"""
+    _bonus_to_win_back = models.IntegerField(verbose_name="Кол-во кредитов которые нужно отыграть", db_index=True)
+    total_bonus = models.IntegerField(verbose_name="Кол-во кредитов бонусом которые ещё актуальны")
+    # initial_bonus = models.IntegerField(verbose_name="Стартовый зачисленный бонус", null=True)
+    # in_process = models.BooleanField(verbose_name="В процессе списания", default=False, db_index=True)
+    is_active = models.BooleanField(verbose_name="Активен", default=False, db_index=True)
+    is_from_referal_activated = models.BooleanField(verbose_name="Бонус с рефералок который надо дополнительно забрать",
+                                                    db_index=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    detail_user = models.ForeignKey('DetailUser', on_delete=models.CASCADE, null=True, related_name='bonuses')
+
+    @property
+    def bonus_to_win_back(self):
+        return self._bonus_to_win_back
+
+    @bonus_to_win_back.setter
+    def bonus_to_win_back(self, value):
+        """Если отыгрывать больше нечего -> _bonus_to_win_back=0
+        ставит флаги:
+        is_active=False,
+        """
+        self._bonus_to_win_back = value
+        if value == 0:
+            self.is_active = False
+
+    def save(self, *args, **kwargs):
+        if self.id is None and self.is_from_referal_activated is not None:
+            self.detail_user.balance += self.total_bonus
+            self.detail_user.save()
+        if self.is_from_referal_activated and self.is_active and self.id:
+            self.detail_user.balance += self.total_bonus
+            self.detail_user.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.total_bonus}/{self._bonus_to_win_back}, {self.detail_user}'
+
+    class Meta:
+        ordering = "date_created", "-_bonus_to_win_back",
 
 
 class ReferalCode(models.Model):
@@ -248,7 +411,7 @@ class ReferalUser(models.Model):
 
 
 class GameID(models.Model):
-    """Модель игровых id с дурак онлайн"""
+    """Модель игровых id из игры дурак онлайн"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     game_id = models.IntegerField(verbose_name="Игрвой id дурак онлайн", blank=True, null=True)
 
@@ -388,6 +551,10 @@ class BonusVKandYoutube(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name='vk_youtube')
     bonus_vk = models.BooleanField(verbose_name="Получен бонус за vk", default=False)
     bonus_youtube = models.BooleanField(verbose_name="Получен бонус за youtube", default=False)
+    date_created_vk = models.DateTimeField(null=True, verbose_name='Когда создана подписка ВК')
+    date_created_youtube = models.DateTimeField(null=True, verbose_name='Когда создана подписка YouTube')
+    vk_disabled = models.BooleanField(default=False, verbose_name="Неактивно на время проверки подписки")
+    youtube_disabled = models.BooleanField(default=False, verbose_name="Неактивно на время проверки подписки")
 
     class Meta:
         verbose_name = 'Бонус за подписку'

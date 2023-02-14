@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from accaunts.models import (AvatarProfile, Ban, CustomUser, DetailUser,
-                             ItemForUser, Level, UserBet)
+                             ItemForUser, Level, UserBet, UserBonus)
 from caseapp.models import Case, Item, ItemForCase, OwnedCase
 from caseapp.serializers import (CaseAndCaseItemSerializer,
                                  ItemForUserSerializer,
@@ -53,7 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         r.json().arrappend("all_chat_50", ".", all_chat_message)
         if (arr_len := r.json().arrlen("all_chat_50")) > 50:
             r.json().arrtrim("all_chat_50", ".", arr_len - 50, -1)
-        r.expire("all_chat_50", datetime.timedelta(hours=48))
+        # r.expire("all_chat_50", datetime.timedelta(hours=48))
 
     @sync_to_async()
     def base64_to_image(self, file):
@@ -112,7 +112,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if is_auth:
             if incr:
                 r.sadd("online", self.scope["user"].id)
-                r.expire("online", 86400)
+                # r.expire("online", 86400)
             else:
                 r.srem("online", self.scope["user"].id)
         online = r.scard("online")
@@ -367,6 +367,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 else:
                     ItemForUser.objects.create(user=user, user_item=chosen_item)
                     tasks.send_items_delay(user.pk)
+
     @sync_to_async
     def sell_item(self, data, user):
         if Item.objects.filter(name=data.get('name')).exists():
@@ -442,7 +443,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.unique_room_name = f"{user.id}_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # добавляем в группу юзеров
         await self.accept()
-        await self.get_free_balance(user)
+        # await self.get_free_balance(user)
         await self.channel_layer.send(self.channel_name, {
             "type": 'roulette_countdown_state',
         })
@@ -709,12 +710,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def change_balance(self, user, amount_to_subtract=None):
         user_to_change = CustomUser.objects.get(id=user.id)
         if amount_to_subtract:
-            user_to_change.detailuser.balance -= amount_to_subtract
+            user_to_change.detailuser.total_balance -= amount_to_subtract
             user_to_change.detailuser.save()
         async_to_sync(self.channel_layer.group_send)(self.unique_room_name, {
             'type': 'get_balance',
             'balance_update': {
-                'current_balance': user_to_change.detailuser.balance
+                'current_balance': user_to_change.detailuser.total_balance
             }
         })
 
@@ -871,15 +872,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
             detail_user = await DetailUser.objects.aget(user_id=user.id)
             await self.send(json.dumps({"free_balance": detail_user.free_balance}))
 
+    @sync_to_async
+    def check_bonuses(self, user):
+        bonuses = UserBonus.objects.filter(detail_user_id=user.id, is_active=False, is_from_referal_activated=None)
+        if bonuses:
+            bonuses.update(is_active=True, is_from_referal_activated=True)
+            return True
+        return False
+
+    @sync_to_async
+    def get_total_balance(self, user):
+        balance = user.detailuser.total_balance
+        return balance
+
     async def get_free_balance(self, user):
         if user.id:
             detail_user = await DetailUser.objects.aget(user_id=user.id)
-            if detail_user.free_balance > 0:
+            bonuses_activated = await self.check_bonuses(user)
+            if bonuses_activated and detail_user.free_balance > 0:
                 detail_user.balance += detail_user.free_balance
                 detail_user.free_balance = 0
                 await sync_to_async(detail_user.save)()
             await self.send(json.dumps({"free_balance": detail_user.free_balance}))
-            message = {'current_balance': detail_user.balance}
+            # total_balance = await self.get_total_balance(user)
+            message = {'current_balance': detail_user.total_balance}
             await self.send(json.dumps(message))
 
     async def send_credits_from_rubs(self, rub):

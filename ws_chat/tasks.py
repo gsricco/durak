@@ -30,9 +30,13 @@ channel_layer = get_channel_layer()
 r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
 ROUND_RESULTS = ['spades', 'hearts', 'coin']
 ROUND_WEIGHTS = (7, 7, 1)
+# ROUND_NUMBERS = {
+#                  'spades': (115, 119, 123, 109, 105, 101),
+#                  'hearts': (111, 117, 121, 107, 103, 123),
+#                  'coin': (113,),}
 ROUND_NUMBERS = {
-                 'spades': (101, 105, 109, 117, 121, 125),
-                 'hearts': (103, 107, 111, 115, 119, 123),
+                 'spades': (103, 107, 111, 117, 121, 125),
+                 'hearts': (105, 109, 115, 119, 123, 127),
                  'coin': (113,),}
 ROUND_RESULT_FIELD_NAME = 'ROUND_RESULT:str'
 ROUND_TIME = 30.0
@@ -368,7 +372,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
         # расчёт количества начисляемого опыта
         xp = eval_experience(user_bets['amount'], round_result)
         # расчёт и начисление баланса без сохранения в БД
-        user.detailuser.balance += eval_balance(user_bets['amount'], round_result)
+        user.detailuser.total_balance += eval_balance(user_bets['amount'], round_result)
         # добавление опыта пользователю без сохранения в БД
         # если уровень максимальный, не добавляем
         if Level.objects.filter(level=user.level.level+1).exists():
@@ -379,7 +383,7 @@ def process_bets(keys_storage_name: str, round_result_field_name: str) -> int:
             message = {
                 'type': 'get_balance',
                 'balance_update': {
-                    'current_balance': user.detailuser.balance
+                    'current_balance': user.detailuser.total_balance
                 }
             }
             eval_balance_with_delay.apply_async(args=(channel_name, message),
@@ -584,7 +588,6 @@ def generate_daily(day_hash=None, time_now=None, new=False):
     if new:
         one_day = datetime.timedelta(days=1)
         timer += one_day
-        print(timer, 'Время Generate_daily для создания хэша на следующий день, а текущее время ->', datetime.datetime.now().date())
     #  always goes into IF except HASH for this day exists and rounds not somehow
     if day_hash is None:
         try:
@@ -869,7 +872,7 @@ def send_balance(user_pk=None):
         message = {
             'type': 'get_balance',
             'balance_update': {
-                'current_balance': user.detailuser.balance
+                'current_balance': user.detailuser.total_balance
             }
         }
         if user.is_staff:
@@ -885,7 +888,7 @@ def send_balance_to_single(user_pk=None):
         message = {
             'type': 'get_balance',
             'balance_update': {
-                'current_balance': user.detailuser.balance
+                'current_balance': user.detailuser.total_balance
             }
         }
         async_to_sync(channel_layer.group_send)(f'{user.id}_room', message)

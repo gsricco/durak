@@ -71,17 +71,21 @@ class ReferalUserAdmin(admin.ModelAdmin):
     search_help_text = 'Поиск по имени пользователя который пригласил и его id'
     list_per_page = 100
 
-    def get_changelist(self, request):
+    def get_changelist(self, request, **kwargs):
         return MyChangeListOleg
 
 
 class DetailUserInline(admin.TabularInline):
     model = DetailUser
-    readonly_fields = "balance", "free_balance", "frozen_balance"
+    readonly_fields = "balance", "_reserve",  "free_balance", "frozen_balance",
     extra = 0
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    # @admin.display(description='Общий Баланс')
+    # def total_balance(self, obj):
+    #     return obj.total_balance
 
 
 class UserAgentInline(admin.TabularInline):

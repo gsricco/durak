@@ -373,6 +373,13 @@ function withdrawSocketOnMessage(e) {
             closeAndOpenWindowWithdraw(message, success);
             requestOpened = false;
             }
+            if (data.detail === 'Недостаточно кредитов.' )
+            {
+              let message = 'Недостаточно кредитов';
+              let success = false
+            closeAndOpenWindowWithdraw(message, success);
+            requestOpened = false;
+            }
         } else if (dataStatus === 'process') {
             // на сервере ошибка, ничего серьёзного))
 
@@ -449,23 +456,24 @@ function withdrawSocketOnMessage(e) {
 // проверка баланса в дураке
 document.querySelector('#selectAmountInput').addEventListener('click', function (e) {
     let redWrite = document.querySelector('.s-am-input__msg')
-    let inputWrite = document.querySelector(`input[name='add-sum']`)
-
-    inputWrite.addEventListener("input", validInput);
-    function validInput() {
+    // let inputWrite = document.querySelector(`input[name='add-sum']`)
+    let inputWrite = document.querySelector('#hesus')
+    inputWrite.addEventListener("input", function(e){
+    // function validInput() {
         let inputValueDinamic = inputWrite.value.split(/[^0-9]/g);
         if (inputValueDinamic.length > 1 || inputWrite.value.length == 0) {
             inputWrite.value = "";
+            redWrite.textContent = "Введите количество ваших кредитов в игре!"
         } else {
             if (inputWrite.value < 100) {
-                redWrite.style.display = "block"
+                redWrite.textContent = "Вы должны иметь минимум 100 кредитов!"
+                redWrite.style.display = "block";
 
             } else if (inputWrite.value >= 100) {
-                redWrite.style.display = "none"
-
+                redWrite.style.display = "none";
             }
         }
-    }
+    });
 
     userBalance = parseInt(document.querySelector('input.s-am-input__input').value);
 

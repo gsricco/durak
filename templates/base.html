@@ -183,7 +183,7 @@
                     <!-- If logged-in and has balance -->
                     {% if user.is_authenticated %}
                     <a href="{% url 'profil' %}" class="header__balance">
-                        <span id="userBalMob"> {{ detail_user.balance }}</span>
+                        <span id="userBalMob"> {{ detail_user.total_balance }}</span>
                     </a>
                     {% endif %}
                 </div>
@@ -249,7 +249,7 @@
                                             <use xlink:href="{% static 'img/icons/sprite.svg' %}#dollar"></use>
                                         </svg>
                                     </div>
-                                    <span id="userBal">{{ detail_user.balance }}</span>
+                                    <span id="userBal">{{ detail_user.total_balance }}</span>
                                 </a>
                                 <a href="#modalPayment" class="header__profile-link popup-link">
                                     Пополнить
@@ -836,8 +836,8 @@
                         </svg>
                         <input inputmode="numeric" class="s-am-input__input"
                                placeholder="Введите ваш баланс в Дураке..."
-                               type="tel" step="1" name="add-sum" class="roulette__table-input">
-                        <div class="s-am-input__msg">Вы должны иметь минимум 100 кредитов!</div>
+                               type="tel" step="1" name="add-sum" class="roulette__table-input" id="hesus">
+                        <div class="s-am-input__msg">Введите количество ваших кредитов в игре!</div>
                     </div>
                 </div>
                 <h3 class="modal__title select-amount__title">

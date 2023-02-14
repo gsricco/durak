@@ -75,6 +75,7 @@ def pay_user(request):
     order.intid = intid
     order.save()
     det_user = DetailUser.objects.get(user=order.user_game)
+    det_user._reserve += order.pay
     det_user.balance += order.pay
     det_user.save()
     return response.Response(status=status.HTTP_200_OK, data={})
