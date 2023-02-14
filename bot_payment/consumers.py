@@ -12,7 +12,7 @@ from django.utils import timezone
 
 from accaunts.models import Ban, CustomUser, DetailUser, UserBonus
 from configs.settings import (HOST_URL, ID_SHIFT,
-                              REDIS_URL_STACK)
+                              REDIS_URL_STACK, REDIS_PASSWORD)
 from ws_chat.tasks import (ban_user_for_bad_request, send_balance_to_single,
                            setup_check_request_status)
 
@@ -232,7 +232,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     # bot_list = spisok[0]
                     # print(bot_list, "ETO BOT_LIST")
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
-                    print(err.__dict__)
                     await self.send(json.dumps({"status": "error", "detail": f"Ошибка получения имени бота.",}))
                     return
                 finally:
@@ -421,6 +420,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             bonus = await UserBonus.objects.acreate(_bonus_to_win_back=user_request.amount,
                                                     total_bonus=user_request.amount,
                                                     is_active=True,
+                                                    is_from_referal_activated=False,
                                                     detail_user=user_request.user_id)
             # await sync_to_async(detail_user.save)()
 

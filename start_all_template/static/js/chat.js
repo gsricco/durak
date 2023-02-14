@@ -6,8 +6,8 @@ const messageBlock = document.querySelector('.online-chat__list')
 const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
 const scrollBlock = document.querySelector('.online-chat__body')
-const UserBalance = document.querySelector('.header__profile-sum>span')
-const UserBalanceMob = document.querySelector('.header__balance>span')
+// const UserBalance = document.querySelector('.header__profile-sum>span')
+// const UserBalanceMob = document.querySelector('.header__balance>span')
 const online = document.querySelector('#onlineChat')
 const onlineMob = document.querySelector('#onlineChatMob')
 const is_user_staff = JSON.parse(document.getElementById('staffed').textContent);
@@ -237,7 +237,18 @@ chatSocket.onmessage = function (e) {
     }
     else if (data.hasOwnProperty("current_balance")) {
             update_balance(data.current_balance)
-            cahmax(data.current_balance)
+            let current_balance = data.current_balance;
+        let userBalFront = document.querySelector('.header__profile-sum>span')
+        let userBal = userBalFront.textContent;
+        let lastSymbol = userBal[userBal.length-1];
+        let balanceUser;
+
+        if(lastSymbol === 'M'){
+            balanceUser=Number(userBal.slice(0,userBal.length-1))*1000000
+        } else if(lastSymbol === 'K'){
+            balanceUser=Number(userBal.slice(0,userBal.length-1))*1000
+        }else balanceUser=Number(userBal)
+        cahmax(balanceUser)
         }
     else if (data.hasOwnProperty('credits')) {
         let credits = data.credits;

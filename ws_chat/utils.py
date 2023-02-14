@@ -46,7 +46,6 @@ def add_bonus(sub_type, user_obj, user_bonus):
         'sub': 'info',
     }
     bonus = SiteContent.objects.first()
-    detail_user = DetailUser.objects.get(user_id=user_obj.id)
     if bonus:
 
         if sub_type == 'y':
@@ -54,7 +53,8 @@ def add_bonus(sub_type, user_obj, user_bonus):
                 UserBonus.objects.create(detail_user=user_obj.detailuser,
                                          _bonus_to_win_back=bonus.bonus_youtube * 1000 * 3,
                                          total_bonus=bonus.bonus_youtube * 1000,
-                                         is_active=True)
+                                         is_active=True,
+                                         is_from_referal_activated=False)
             # detail_user.balance += bonus.bonus_youtube * 1000 if bonus.bonus_youtube else 0
             user_bonus.bonus_youtube = True
             user_bonus.youtube_disabled = False
@@ -66,13 +66,14 @@ def add_bonus(sub_type, user_obj, user_bonus):
                 UserBonus.objects.create(detail_user=user_obj.detailuser,
                                          _bonus_to_win_back=bonus.bonus_vk * 1000 * 3,
                                          total_bonus=bonus.bonus_vk * 1000,
-                                         is_active=True)
+                                         is_active=True,
+                                         is_from_referal_activated=False)
             user_bonus.bonus_vk = True
             user_bonus.vk_disabled = False
             user_bonus.date_created_vk = datetime.datetime.now()
             message['vk_subscribe'] = 'success'
-        detail_user.save()
         user_bonus.save()
+    detail_user = DetailUser.objects.get(user_id=user_obj.id)
     balance_message = {
         'type': 'get_balance',
         'balance_update': {

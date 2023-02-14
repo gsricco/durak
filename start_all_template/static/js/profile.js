@@ -20,7 +20,7 @@ let profilProgressExp = document.querySelector('.profil__progressbar-lvl-progres
 let profilProgressExpMob = document.querySelector('.profil__progressbar-lvl-progress-mob')
 let profileCaseTitle
 let caseItems
-
+let cases = document.getElementById('no_cases')
 chatSocket.addEventListener('open', (event) => {
     chatSocket.send(JSON.stringify({
         'item': 'init_item',
@@ -234,10 +234,9 @@ function timerSecond(caseData) {
 
 function newUserItem(data) {
     let profCaseItem = document.querySelector('.profil__items')
-    // profCaseItem.innerHTML = ''
     let allProfCaseItem = document.querySelectorAll('.profil__item')
     allProfCaseItem.forEach((e) => e.remove())
-    data.forEach((e) => {
+    data.forEach((e, index) => {
         let cost = e.user_item.selling_price
         let name = e.user_item.name
         let image = e.user_item.image
@@ -250,8 +249,14 @@ function newUserItem(data) {
         }else {
             format_cost = cost
         }
+        if(cases) {
+            cases.style.display = 'none';
+        }
         let new_div = document.createElement('div')
         new_div.className = 'profil__item'
+        if (data.length === 1) {
+            new_div.style.verticalAlign = 'middle';
+        }
         new_div.innerHTML = `
             <div class="profil__item-wrapper">
                 <div class="profil__item-img">

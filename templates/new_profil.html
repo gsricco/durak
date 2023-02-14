@@ -144,9 +144,9 @@
 
 {#                   ИНВЕНТАРЬ         #}
                                 <div class="profil__items">
-                                    {% if  not item_user %}
-                                    <div class="profil__warning">
-                                        Предметы можно получить из кейсов (даются за новый уровень)..
+                                    {% if not item_user %}
+                                    <div class="profil__warning" >
+                                        <span id="no_cases">Предметы можно получить из кейсов (даются за новый уровень)..</span>
                                     </div>
                                     {% endif %}
 

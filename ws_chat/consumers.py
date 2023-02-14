@@ -383,7 +383,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'current_balance': user.detailuser.balance
                     }
                 }
-                async_to_sync(self.get_user_items)()
+                async_to_sync(self.get_user_items)(user)
                 if user.is_staff:
                     async_to_sync(self.channel_layer.group_send)(f'admin_group', message)
                 else:
@@ -398,7 +398,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     user_item.is_used = True
                     user_item.is_forwarded = True
                     user_item.save()
-                    async_to_sync(self.get_user_items)()
+                    async_to_sync(self.get_user_items)(user)
                     durak_username = data.get('durak_username')
                     item_name = data.get('item_name')
                     svg_name = data.get('item_image')
@@ -448,6 +448,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "type": 'roulette_countdown_state',
         })
         await self.set_online(is_auth)
+        await self.change_balance(user)
         if recieve_user == 'go':  # Проверка подключение из админки или нет. 'go' - это не админка
             # выгружает свою историю чата поддержки
             await self.init_support_chat(user.pk)

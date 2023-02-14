@@ -1,6 +1,8 @@
 // 'use strict';
-
-let maxNumber = 0;
+const UserBalance = document.querySelector('.header__profile-sum>span')
+const UserBalanceMob = document.querySelector('.header__balance>span')
+let maxNumber = UserBalance.innerHTML
+console.log(maxNumber)
 window.addEventListener("DOMContentLoaded", () => {
     const BODY = document.querySelector("body");
     const MAIN = document.querySelector("main");
@@ -793,9 +795,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     //! Рулетка формула
     if (document.querySelector(".roulette__table")) {
-        var inputTable = document.querySelector(".roulette__table-input");
-        var btnsArrow = document.querySelectorAll(".roulette__table-link");
-        var currentValue = document.querySelector(".roulette__current-block");
+        let inputTable = document.querySelector(".roulette__table-input");
+        let btnsArrow = document.querySelectorAll(".roulette__table-link");
+        let currentValue = document.querySelector(".roulette__current-block");
 
         inputTable.addEventListener("focus", function () {
             currentValue.classList.add("roulette__current-block_focus");
@@ -896,13 +898,13 @@ window.addEventListener("DOMContentLoaded", () => {
                 }
 
                 if (event.target.textContent == "MAX") {
-                    inputTable.value = maxNumber;
+                    inputTable.value = maxNumber/1000;
                     currentValue.innerText = String(maxNumber * 1)
                         .split(/(?=(?:...)*$)/)
                         .join(" ");
                 }
 
-                if (inputTable.value > maxNumber) {
+                if (Number(inputTable.value*1000) > Number(maxNumber)) {
                     inputTable.value = "";
                     currentValue.innerText = "";
                     currentValue.style.color = "#575757";

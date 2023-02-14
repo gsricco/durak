@@ -159,7 +159,9 @@ class BonusVKandYoutubeInLine(admin.TabularInline):
     model = BonusVKandYoutube
     extra = 0
     classes = ['collapse']
-    readonly_fields = "bonus_vk", "bonus_youtube",
+    readonly_fields = ("bonus_vk", "bonus_youtube", "date_created_vk",
+                       "date_created_youtube", "vk_disabled", "youtube_disabled")
+
 
     def has_delete_permission(self, request, obj=None):
         return False

@@ -226,8 +226,11 @@ def profil(request):
             .annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False),  round_r=Value(0), name=Value(""))\
             .values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount', 'round_r', 'name')
         referal = ReferalUser.objects.filter(user_with_bonus=request.user)\
-            .annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True), round_r=Value(0), name=Value(""))\
+            .annotate(tr_type=Value('Активация вашего промокода'), tr_plus=Value(True), round_r=Value(0), name=Value(""))\
             .values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus', 'round_r', 'name')
+        referal_invited = ReferalUser.objects.filter(invited_user=request.user) \
+            .annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True), round_r=Value(0), name=Value("")) \
+            .values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'invited_user', 'round_r', 'name')
         items_for_user = ItemForUser.objects.filter(user=request.user)\
             .annotate(sum=F("user_item__selling_price"), amount=Value(0), tr_type=Value("Бонусный кейс"), tr_plus=F("is_used"), round_r=Value(0),
                       name=F("user_item__name"), )\
@@ -251,22 +254,22 @@ def profil(request):
                           round_r=Value(0), name=Value(""))\
                 .values('date_created_youtube', 'sum', 'tr_type', 'tr_plus', 'amount_to', 'round_r', 'name')
         if vk_sub and youtube_sub:
-            transactions = popoln.union(user_bets, refill, withdraw, referal,
+            transactions = popoln.union(user_bets, refill, withdraw, referal, referal_invited,
                                         items_for_user, balance_from_admin,
                                         bonus_sub_vk, bonus_sub_youtube)\
                                  .order_by('-date')
         elif vk_sub:
-            transactions = popoln.union(user_bets, refill, withdraw, referal,
+            transactions = popoln.union(user_bets, refill, withdraw, referal, referal_invited,
                                         items_for_user, balance_from_admin,
                                         bonus_sub_vk) \
                                  .order_by('-date')
         elif youtube_sub:
-            transactions = popoln.union(user_bets, refill, withdraw, referal,
+            transactions = popoln.union(user_bets, refill, withdraw, referal, referal_invited,
                                         items_for_user, balance_from_admin,
                                         bonus_sub_youtube) \
                                  .order_by('-date')
         else:
-            transactions = popoln.union(user_bets, refill, withdraw, referal,
+            transactions = popoln.union(user_bets, refill, withdraw, referal, referal_invited,
                                         items_for_user, balance_from_admin) \
                                  .order_by('-date')
         paginator = Paginator(transactions, 8)

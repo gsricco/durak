@@ -357,13 +357,19 @@ class UserBonus(models.Model):
         if value == 0:
             self.is_active = False
 
+    def add_bonus_to_balance(self):
+        d_user = DetailUser.objects.get(user_id=self.detail_user_id)
+        d_user.total_balance += self.total_bonus
+        d_user.save()
+        d = DetailUser.objects.get(user_id=self.detail_user_id)
+
     def save(self, *args, **kwargs):
         if self.id is None and self.is_from_referal_activated is not None:
-            self.detail_user.balance += self.total_bonus
-            self.detail_user.save()
+            self.add_bonus_to_balance()
         if self.is_from_referal_activated and self.is_active and self.id:
-            self.detail_user.balance += self.total_bonus
-            self.detail_user.save()
+            d_user = DetailUser.objects.get(user_id=self.detail_user_id)
+            d_user.balance += self.total_bonus
+            d_user.save()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -551,8 +557,8 @@ class BonusVKandYoutube(models.Model):
     user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name='vk_youtube')
     bonus_vk = models.BooleanField(verbose_name="Получен бонус за vk", default=False)
     bonus_youtube = models.BooleanField(verbose_name="Получен бонус за youtube", default=False)
-    date_created_vk = models.DateTimeField(null=True, verbose_name='Когда создана подписка ВК')
-    date_created_youtube = models.DateTimeField(null=True, verbose_name='Когда создана подписка YouTube')
+    date_created_vk = models.DateTimeField(null=True, blank=True, verbose_name='Когда создана подписка ВК')
+    date_created_youtube = models.DateTimeField(null=True, blank=True, verbose_name='Когда создана подписка YouTube')
     vk_disabled = models.BooleanField(default=False, verbose_name="Неактивно на время проверки подписки")
     youtube_disabled = models.BooleanField(default=False, verbose_name="Неактивно на время проверки подписки")
 
