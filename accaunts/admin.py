@@ -1,6 +1,8 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserChangeForm
 from django.db.models import Count, Sum
 from django.utils.safestring import mark_safe
 from django_celery_beat.models import (ClockedSchedule, CrontabSchedule,
@@ -162,14 +164,26 @@ class BonusVKandYoutubeInLine(admin.TabularInline):
     readonly_fields = ("bonus_vk", "bonus_youtube", "date_created_vk",
                        "date_created_youtube", "vk_disabled", "youtube_disabled")
 
-
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+class CustomUserModelForm(UserChangeForm):
+    level = forms.ModelChoiceField(queryset=Level.objects, empty_label=None)
+
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+
+    # def __init__(self, *args, **kwargs):
+    #     super(CustomUserModelForm, self).__init__(*args, **kwargs)
+    #     self.fields['level'].initial = 0
 
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
+    form = CustomUserModelForm
     list_display = 'usernameinfo', 'id', 'random_id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
     list_editable = 'note',
     search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id', 'random_id'

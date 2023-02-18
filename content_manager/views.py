@@ -9,7 +9,7 @@ from social_django.models import UserSocialAuth
 
 from accaunts.forms import UserEditName
 from accaunts.models import (CustomUser, DayHash, DetailUser, ItemForUser,
-                             Level, ReferalUser, UserAgent, UserBet, UserIP, BonusVKandYoutube)
+                             Level, ReferalUser, UserAgent, UserBet, UserIP, BonusVKandYoutube, FreeBalanceHistory)
 from bot_payment.models import RefillRequest, WithdrawalRequest
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 
@@ -225,12 +225,16 @@ def profil(request):
         withdraw = WithdrawalRequest.objects.filter(user=request.user, status='succ')\
             .annotate(tr_type=Value('Вывод кредитов в игру'), tr_plus=Value(False),  round_r=Value(0), name=Value(""))\
             .values('date_closed', 'balance', 'tr_type', 'tr_plus', 'amount', 'round_r', 'name')
-        referal = ReferalUser.objects.filter(user_with_bonus=request.user)\
+        referal = FreeBalanceHistory.objects.filter(detail_user_id=request.user.id,
+                                                    is_active=False,
+                                                    activated_by=0)\
             .annotate(tr_type=Value('Активация вашего промокода'), tr_plus=Value(True), round_r=Value(0), name=Value(""))\
-            .values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'user_with_bonus', 'round_r', 'name')
-        referal_invited = ReferalUser.objects.filter(invited_user=request.user) \
+            .values('created', 'bonus_sum', 'tr_type', 'tr_plus', 'detail_user', 'round_r', 'name')
+        referal_invited = FreeBalanceHistory.objects.filter(detail_user_id=request.user.id,
+                                                            is_active=False,
+                                                            activated_by=1) \
             .annotate(tr_type=Value('Активация промокода'), tr_plus=Value(True), round_r=Value(0), name=Value("")) \
-            .values('date', 'bonus_sum', 'tr_type', 'tr_plus', 'invited_user', 'round_r', 'name')
+            .values('created', 'bonus_sum', 'tr_type', 'tr_plus', 'detail_user', 'round_r', 'name')
         items_for_user = ItemForUser.objects.filter(user=request.user)\
             .annotate(sum=F("user_item__selling_price"), amount=Value(0), tr_type=Value("Бонусный кейс"), tr_plus=F("is_used"), round_r=Value(0),
                       name=F("user_item__name"), )\

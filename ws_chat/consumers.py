@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from accaunts.models import (AvatarProfile, Ban, CustomUser, DetailUser,
-                             ItemForUser, Level, UserBet, UserBonus)
+                             ItemForUser, Level, UserBet, UserBonus, FreeBalanceHistory)
 from caseapp.models import Case, Item, ItemForCase, OwnedCase
 from caseapp.serializers import (CaseAndCaseItemSerializer,
                                  ItemForUserSerializer,
@@ -883,6 +883,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return False
 
     @sync_to_async
+    def calculate_free(self, detail_user):
+        free_balance_history = FreeBalanceHistory.objects.filter(detail_user=detail_user, is_active=True)
+        total_bonus_free = free_balance_history.aggregate(total_bonus=Sum('bonus_sum')).get('total_bonus')
+        free_balance_history.update(is_active=False)
+
+    @sync_to_async
     def get_total_balance(self, user):
         balance = user.detailuser.total_balance
         return balance
@@ -893,6 +899,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             bonuses_activated = await self.check_bonuses(user)
             if bonuses_activated and detail_user.free_balance > 0:
                 detail_user.balance += detail_user.free_balance
+                await self.calculate_free(detail_user)
                 detail_user.free_balance = 0
                 await sync_to_async(detail_user.save)()
             await self.send(json.dumps({"free_balance": detail_user.free_balance}))

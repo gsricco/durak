@@ -399,6 +399,22 @@ class ReferalCode(models.Model):
         return f'{self.ref_code}'
 
 
+class FreeBalanceHistory(models.Model):
+    WHO_ACTIVATING_CHOICES = (
+        (0, 'Активируют твой'),
+        (1, 'Активируешь ты')
+    )
+    """История начислений баланса через активацию промокода"""
+    detail_user = models.ForeignKey('DetailUser', on_delete=models.CASCADE, related_name='free',
+                                    null=True, verbose_name='Пользователь')
+    # own_bonus = models.BooleanField(default=False, verbose_name='Твой код активируют', db_index=True)
+    # other_bonus = models.BooleanField(default=False, verbose_name='Ты активируешь', db_index=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    activated_by = models.IntegerField(choices=WHO_ACTIVATING_CHOICES, default=0)
+    bonus_sum = models.PositiveBigIntegerField(verbose_name='Сумма бонуса', default=25000)
+    created = models.DateTimeField(verbose_name="Дата получения бонуса", auto_now_add=True)
+
+
 class ReferalUser(models.Model):
     """Модель пользователей приглашённых на сайт"""
     user_with_bonus = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name="users_with_bonus",

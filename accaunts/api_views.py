@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import DetailUser, ReferalCode, ReferalUser, UserBonus
+from .models import DetailUser, ReferalCode, ReferalUser, UserBonus, FreeBalanceHistory
 from .serializers import ReferalCodeModelSerializer
 
 
@@ -30,6 +30,11 @@ def give_bonus(request, ref_code):
                     detail_user.free_balance += activation_referal.bonus_sum
                     request.user.detailuser.free_balance += activation_referal.bonus_sum
                     # request.user -> user who activating, detail_user -> user who owns code
+                    FreeBalanceHistory.objects.create(detail_user=request.user.detailuser,
+                                                      bonus_sum=activation_referal.bonus_sum,
+                                                      activated_by=1)
+                    FreeBalanceHistory.objects.create(detail_user=detail_user,
+                                                      bonus_sum=activation_referal.bonus_sum)
                     UserBonus.objects.create(detail_user=request.user.detailuser,
                                              _bonus_to_win_back=activation_referal.bonus_sum * 3,
                                              total_bonus=activation_referal.bonus_sum)
