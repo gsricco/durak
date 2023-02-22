@@ -335,6 +335,26 @@ def get_loss() -> int:
         return 0
 
 
+def earnings() -> int:
+    LOSS_REQ_START = "Профит"
+    # получает заявки с Профит
+    loss_requests_notes = RefillRequest.objects.filter(note__startswith=LOSS_REQ_START).values_list("note")
+    if loss_requests_notes:
+        int_loss = 0
+        for loss_note in loss_requests_notes:
+            try:
+                # парсит строку с заметкой об Профит и получает из неё числовое значение Профит
+                str_loss = loss_note[0].split()[1]
+                int_loss += int(str_loss)
+            except (ValueError, IndexError) as err:
+                # пропускает заметку с неправильным форматом заметки об Профит
+                continue
+        return int_loss
+    else:
+        # УБыток равен нулю, если нет заявок с Профит
+        return 0
+
+
 def info(request):
     """Ставка пользователя"""
     if not request.user.is_authenticated: # Если пользователь не зарегестрирован.
@@ -349,8 +369,11 @@ def info(request):
     if sum_of_all_winner_bets is None:
         sum_of_all_winner_bets = 0
     difference_all_vs_winners_bets = sum_of_all_bets - sum_of_all_winner_bets
-    sum_amount_req_1 = RefillRequest.objects.filter(status='fail')\
-                                            .aggregate(Sum('amount'))["amount__sum"]  # “Заработок с нарушителей”
+    # sum_amount_req_1 = RefillRequest.objects.filter(status='fail')\
+    #                                         .aggregate(Sum('amount'))["amount__sum"]
+    sum_gain = earnings()-get_loss()  # “Заработок с нарушителей”
+    if sum_gain is None:
+        sum_gain = 0
     sum_items_user_sold = ItemForUser.objects.filter(is_forwarded=True)\
                                              .aggregate(Count('is_forwarded'))["is_forwarded__count"]  # 2 Коллекционных предметов (медведь, робот, покерная и т.д.), выведенных с сайта. Отобразить их количество
     sum_referal_bonus = ReferalUser.objects.aggregate(Sum('bonus_sum'))["bonus_sum__sum"]  # 3 Кредитов, полученных игроками за активацию кода
@@ -369,7 +392,7 @@ def info(request):
     if sum_to_refill_all is None:
         sum_to_refill_all = 0
     # ss3 = sum_amount - sum_amount_req_1  # 1 Кредитов, полученных с игроков, которые хотели обыграть бота для пополнения
-    full_profit_with_credits_exclude_items = sum_to_refill_all - sum_to_withdraw_all + loss_requests_notes - sum_referal_bonus
+    full_profit_with_credits_exclude_items = sum_to_refill_all - sum_to_withdraw_all + sum_gain - sum_referal_bonus  # Чистого профита в кредитах без учета смайлов
 
     context = {
         'sum_bets1': sum_of_all_bets,
@@ -381,6 +404,7 @@ def info(request):
         'sum_money': sum_all_payments_rubs,
         "ss": difference_all_vs_winners_bets,
         "ss2": full_profit_with_credits_exclude_items,
-        "loss_requests_notes": loss_requests_notes
+        "loss_requests_notes": loss_requests_notes,
+        "sum_gain":sum_gain
     }
     return render(request, 'admin/info.html', context)

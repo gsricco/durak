@@ -49,8 +49,8 @@ class MyChangeListKorney(ChangeList):
 class RefillRequestAdmin(admin.ModelAdmin):
     list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status', 'date_closed'
     list_editable = 'note', 'status'
-    search_fields = 'user__username', 'amount'
-    search_help_text = 'Поиск по имени пользователя и сумме пополнения'
+    search_fields = 'user__username', 'amount', 'note'
+    search_help_text = 'Поиск по имени пользователя, сумме пополнения и заметке'
     list_filter = 'date_closed', ('date_closed', DateTimeRangeFilter), RefillStatusListFilter,
     list_per_page = 100
 
@@ -71,8 +71,8 @@ class MyChangeList(ChangeList):
 class WithdrawalRequestAdmin(admin.ModelAdmin):
     list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status', 'date_closed'
     list_editable = 'note', 'status'
-    search_fields = 'user__username', 'amount'
-    search_help_text = 'Поиск по имени пользователя и сумме пополнения'
+    search_fields = 'user__username', 'amount', 'note'
+    search_help_text = 'Поиск по имени пользователя, сумме пополнения и заметке'
     list_filter = 'date_closed', ('date_closed', DateTimeRangeFilter), WithdrawStatusListFilter,
     list_per_page = 100
 

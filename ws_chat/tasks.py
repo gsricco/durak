@@ -24,7 +24,7 @@ from bot_payment.models import BanTime, RefillRequest, WithdrawalRequest
 from caseapp.models import OwnedCase
 from caseapp.serializers import ItemForUserSerializer
 from configs import celery_app
-from configs.settings import REDIS_PASSWORD, REDIS_URL_STACK
+from configs.settings import REDIS_PASSWORD, REDIS_URL_STACK, HOST_URL, ID_SHIFT
 
 channel_layer = get_channel_layer()
 r = Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)
@@ -694,7 +694,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
             setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
             return
         # проверяет, не была ли заявка закрыта ранее
-        if user_request.status != 'open' or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
+        if user_request.status != 'open': #or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
             return
         # закрывает заявку в БД
         # отмечает заявку как закрытую
@@ -967,3 +967,28 @@ def ban_user_for_bad_request(user_pk, operation):
             ban_user_for_time.apply_async(args=(user_pk, seconds_of_ban))
             return ban_time.hours
     return 0
+
+
+@shared_task()
+def check_requests_st():
+    """Проверка статусов заявок на вывод и пополнение"""
+    areq = WithdrawalRequest.objects.filter(status='open')
+    breq = RefillRequest.objects.filter(status='open')
+    li = []
+    for request in breq:
+        t = threading.Thread(target=check_request_status, args=(HOST_URL, 'refill', ID_SHIFT, request.id , request.user_id))
+        li.append(t)
+    for request in areq:
+        t = threading.Thread(target=check_request_status, args=(HOST_URL, 'withdraw', ID_SHIFT, request.id , request.user_id))
+        li.append(t)
+    for t in li:
+        t.start()
+    for i in li:
+        i.join()
+
+
+CHECK_STATUS_TIME = 15*60
+celery_app.add_periodic_task(CHECK_STATUS_TIME, check_requests_st.s(), name=f'Проверка статусов заявок')
+
+# check_requests_st()
+# check_request_status('http://178.211.139.11:8888/', 'refill', 200, 74, 120)

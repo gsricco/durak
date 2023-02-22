@@ -157,7 +157,7 @@ function refillSocketOnMessage(e) {
         }
         if (!timerStarted) {
             setTimeout(setCountdown, 0, "#modalManualBtn", "6:00", function () {
-                closeAndOpenWindow('Баланс не пополнен.<br> Ошибка!!!!', false);
+//                closeAndOpenWindow('Баланс не пополнен.<br> Ошибка!!!!', false);
             });
         }
         timerStarted = false;
@@ -206,7 +206,7 @@ function refillSocketOnMessage(e) {
                 let timerText = `${minutes}:${seconds}`
                 setTimeout(setCountdown, 0, "#modalManualBtn", timerText, function () {
 //                    closeAndOpenWindow('Баланс не пополнен.<br> Ошибка (стр 201)', false);
-                      closeAndOpenWindow(`Баланс не пополнен.<br> Ошибка #${request_id1}`, false);
+//                      closeAndOpenWindow(`Баланс не пополнен.<br> Ошибка #${request_id1}`, false);
                 });
                 // модалка открывается
                 popupOpen(modalManual);
@@ -350,7 +350,7 @@ function withdrawSocketOnMessage(e) {
         span.innerHTML = `<b>${botNameW}</b>`;
         if (!timerStartedW) {
             setTimeout(setCountdown, 0, "#modalManualBtn2", "10:00", function () {
-                closeAndOpenWindowWithdraw('Баланс не пополнен.<br> Ошибка', false);
+//                closeAndOpenWindowWithdraw('Баланс не пополнен.<br> Ошибка', false);
             });
         }
     } else if (data.hasOwnProperty('status')) {
@@ -403,7 +403,7 @@ function withdrawSocketOnMessage(e) {
                 let seconds = (timeToStop % 60).toLocaleString('en-US', {minimumIntegerDigits: 2});
                 let timerText = `${minutes}:${seconds}`
                 setTimeout(setCountdown, 0, "#modalManualBtn2", timerText, function () {
-                    closeAndOpenWindowWithdraw('Время заявки вышло.', false);
+//                    closeAndOpenWindowWithdraw('Время заявки вышло.', false);
                 });
                 // модалка открывается
                 popupOpen(modalWithdraw);

@@ -288,7 +288,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
             # удаляет из redis запись о занятии пользователем бота
             r.delete(f"bot:{bot_id}")
-            # отложенное задание - проверить статус заявки через 15 минут
+            # отложенное задание - проверить статус заявки через 11 минут
             setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, self.scope['user'].pk, 11*60)
             # операции с балансом
             await self.freeze_balance(amount)
@@ -374,6 +374,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         message = {"status": "error", "detail": "user banned"}
                         await self.send(json.dumps(message))
                         user_request.status = 'fail'
+                        user_request.save()
                         await sync_to_async(user_request.save)()
                         return
                     else:
@@ -413,7 +414,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
     async def process_balance(self, user_request, response):
         """Производит операции с балансом пользователя"""
         # начисление на баланс пользователя полученных кредитов
-        user_request.amount = response.get('refill')
+        user_request.amount = response.get('refiil')
         if user_request.amount > 0:
             # detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
             # detail_user.balance += user_request.amount
