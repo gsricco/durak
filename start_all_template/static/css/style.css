@@ -4197,6 +4197,7 @@ h3 {
 }
 
 .honesty__block {
+  -webkit-text-size-adjust: 100%;
   background: #212121;
   border-radius: 15px;
   margin-top: 15px;
