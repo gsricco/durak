@@ -4,6 +4,7 @@ from django.db.models import Sum
 from rangefilter.filters import DateTimeRangeFilter
 
 from . import models
+from .models import RefillRequest
 
 
 class StatusListFilter(admin.SimpleListFilter):
@@ -11,7 +12,7 @@ class StatusListFilter(admin.SimpleListFilter):
     parameter_name = 'status'
 
     def lookups(self, request, model_admin):
-        
+
         return (
             ('open', 'Открытые заявки'),
             ('succfail', 'Закрытые заявки (все)'),
@@ -43,6 +44,50 @@ class MyChangeListKorney(ChangeList):
         super(MyChangeListKorney, self).get_results(*args, **kwargs)
         q = self.result_list.filter(status='succ').aggregate(asum=Sum('amount'))
         self.sum_count = q['asum']
+        self.su_prof = self.earnings() - self.get_loss()
+        if self.sum_count is None:
+            self.sum_count = 0
+
+    def get_loss(self) -> int:
+        """Возвращает убыток от обыгрышей бота на пополнение"""
+        # заметка заявки на пополнение при убытке начинается с "Убыток". Пример: "Убыток: 23"
+        LOSS_REQ_START = "Убыток"
+        # получает заявки с убытком
+        loss_requests_notes = self.result_list.filter(note__startswith=LOSS_REQ_START).values_list("note")
+        if loss_requests_notes:
+            int_loss = 0
+            for loss_note in loss_requests_notes:
+                try:
+                    # парсит строку с заметкой об убытке и получает из неё числовое значение убытка
+                    str_loss = loss_note[0].split()[1]
+                    int_loss += int(str_loss)
+                except (ValueError, IndexError) as err:
+                    # пропускает заметку с неправильным форматом заметки об убытке
+                    continue
+            return int_loss
+        else:
+            # УБыток равен нулю, если нет заявок с убытком
+            return 0
+
+    def earnings(self) -> int:
+        LOSS_REQ_START = "Профит"
+        # получает заявки с Профит
+        loss_requests_notes = self.result_list.filter(note__startswith=LOSS_REQ_START).values_list("note")
+        if loss_requests_notes:
+            int_loss = 0
+            for loss_note in loss_requests_notes:
+                try:
+                    # парсит строку с заметкой об Профит и получает из неё числовое значение Профит
+                    str_loss = loss_note[0].split()[1]
+                    int_loss += int(str_loss)
+                except (ValueError, IndexError) as err:
+                    # пропускает заметку с неправильным форматом заметки об Профит
+                    continue
+            return int_loss
+        else:
+            # УБыток равен нулю, если нет заявок с Профит
+            return 0
+
 
 
 @admin.register(models.RefillRequest)
@@ -51,7 +96,7 @@ class RefillRequestAdmin(admin.ModelAdmin):
     list_editable = 'note', 'status'
     search_fields = 'user__username', 'amount', 'note'
     search_help_text = 'Поиск по имени пользователя, сумме пополнения и заметке'
-    list_filter = 'date_closed', ('date_closed', DateTimeRangeFilter), RefillStatusListFilter,
+    list_filter = RefillStatusListFilter, 'date_closed', ('date_closed', DateTimeRangeFilter),
     list_per_page = 100
 
     def get_changelist(self, request):
@@ -65,6 +110,8 @@ class MyChangeList(ChangeList):
         super(MyChangeList, self).get_results(*args, **kwargs)
         q = self.result_list.filter(status='succ').aggregate(asum=Sum('amount'))
         self.sum_count = q['asum']
+        if self.sum_count is None:
+            self.sum_count = 0
 
 
 @admin.register(models.WithdrawalRequest)
@@ -73,7 +120,7 @@ class WithdrawalRequestAdmin(admin.ModelAdmin):
     list_editable = 'note', 'status'
     search_fields = 'user__username', 'amount', 'note'
     search_help_text = 'Поиск по имени пользователя, сумме пополнения и заметке'
-    list_filter = 'date_closed', ('date_closed', DateTimeRangeFilter), WithdrawStatusListFilter,
+    list_filter = WithdrawStatusListFilter, 'date_closed', ('date_closed', DateTimeRangeFilter),
     list_per_page = 100
 
     def get_changelist(self, request):

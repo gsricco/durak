@@ -57,6 +57,10 @@
       <div class="changelist-form-container">
 <h2>
 ОБЩЯЯ СУММА: {{ cl.sum_count }}
+    {% if cl.su_prof %}
+<br>
+ЗАРАБОТОК С НАРУШИТЕЛЕЙ: {{ cl.su_prof }}
+    {% endif %}
 </h2>
         {% block search %}{% search_form cl %}{% endblock %}
         {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}

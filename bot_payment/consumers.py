@@ -220,7 +220,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 # получает имя бота по его id 
                 url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
                 # получает список ботов из ответа сервера
-                print(url_get_bot_info)
                 spisok = []
                 try:
                     resp = await session.get(url_get_bot_info)
@@ -327,25 +326,30 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 except aiohttp.ClientError as err:
                     await self.send(json.dumps({"status": "process", "detail": f"Error while fetching request status from bot server. {type(err)}"}))
                 # пересылает ответ сервера на фронт для обработки
+
                 if req_txt:
                     await self.send(req_txt)
                 else:
                     await self.send(json.dumps({"status": "process", "detail": f"{type(err)}"}))
                     await asyncio.sleep(delay)
                     continue
-
+                try:
+                    user_request = await self.model.objects.aget(pk=request_pk)
+                except self.model.DoesNotExist as err:
+                    user_request = self.model(request_id=request_pk+ID_SHIFT)
+                    user_request.user = self.scope.get('user')
+                    await self.send(json.dumps({"status": "process", "detail": "Can't find user request. New one is created"}))
+                except Error as err:
+                    await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
+                    return
+                if info.get('close_reason') == 'ClientBanned':
+                    ban = await Ban.objects.aget(user_id=user_request.user_id)
+                    ban.ban_site = True
+                    ban.ban_chat = True
+                    await sync_to_async(ban.save)()
                 # проверяет статус заявки
                 if info.get('done'):
                     # достаёт заявку из бд
-                    try:
-                        user_request = await self.model.objects.aget(pk=request_pk)
-                    except self.model.DoesNotExist as err:
-                        user_request = self.model(request_id=request_pk+ID_SHIFT)
-                        user_request.user = self.scope.get('user')
-                        await self.send(json.dumps({"status": "process", "detail": "Can't find user request. New one is created"}))
-                    except Error as err:
-                        await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
-                        return
                     # проверяет, не была ли заявка закрыта ранее
                     if user_request.status != 'open' or r.getex(f'close_{request_pk}:{self.operation}:bool', ex=10*60):
                         serializer = self.model_serializer(user_request)
@@ -404,6 +408,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         # закрываем соединение
                         await self.close(1000)
                         return
+
                 # задержка перед следующим опросом сервера
                 await asyncio.sleep(delay)
 

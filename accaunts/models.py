@@ -361,7 +361,6 @@ class UserBonus(models.Model):
         d_user = DetailUser.objects.get(user_id=self.detail_user_id)
         d_user.total_balance += self.total_bonus
         d_user.save()
-        d = DetailUser.objects.get(user_id=self.detail_user_id)
 
     def save(self, *args, **kwargs):
         if self.id is None and self.is_from_referal_activated is not None:

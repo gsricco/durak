@@ -28,16 +28,18 @@ def give_bonus(request, ref_code):
                     activation_referal.user_with_bonus = referal_code.user  # != request.user
                     detail_user = get_object_or_404(DetailUser, user=referal_code.user)
                     detail_user.free_balance += activation_referal.bonus_sum
-                    request.user.detailuser.free_balance += activation_referal.bonus_sum
+                    request.user.detailuser.balance += activation_referal.bonus_sum
                     # request.user -> user who activating, detail_user -> user who owns code
                     FreeBalanceHistory.objects.create(detail_user=request.user.detailuser,
+                                                      is_active=False,
                                                       bonus_sum=activation_referal.bonus_sum,
                                                       activated_by=1)
                     FreeBalanceHistory.objects.create(detail_user=detail_user,
                                                       bonus_sum=activation_referal.bonus_sum)
                     UserBonus.objects.create(detail_user=request.user.detailuser,
                                              _bonus_to_win_back=activation_referal.bonus_sum * 3,
-                                             total_bonus=activation_referal.bonus_sum)
+                                             total_bonus=activation_referal.bonus_sum,
+                                             is_active=True)
                     UserBonus.objects.create(detail_user=detail_user,
                                              _bonus_to_win_back=activation_referal.bonus_sum * 2,
                                              total_bonus=activation_referal.bonus_sum)
