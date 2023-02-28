@@ -427,7 +427,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                                                     total_bonus=user_request.amount,
                                                     is_active=True,
                                                     is_from_referal_activated=False,
-                                                    detail_user=user_request.user_id)
+                                                    detail_user_id=user_request.user_id)
             # await sync_to_async(detail_user.save)()
 
     async def send_ban(self, event):
