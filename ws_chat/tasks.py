@@ -675,7 +675,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         info = resp.json()
     except (requests.ConnectionError, requests.Timeout):
         # планирование следующей попытки обновления статуса заявки
-        setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
+        setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
         return
     # проверяет статус заявки
     if info.get('done'):
@@ -691,7 +691,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         except model.DoesNotExist as err:
             return
         except Error:
-            setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
+            setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
             return
         # проверяет, не была ли заявка закрыта ранее
         if user_request.status != 'open': #or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
@@ -728,7 +728,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 return
             user_request.save()
         except Error as err:
-            setup_check_request_status(host_url, operation, id_shift, request_pk, 2*60)
+            setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
             return
         # банит пользователя, если его забанил сервер
         if info.get('ban'):

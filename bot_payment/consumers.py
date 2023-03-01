@@ -58,7 +58,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                 return
             # отправляет имя бота на фронт
-            message = {"status": "get_name","detail": user_request.bot_name}
+            message = {"status": "get_name", "detail": user_request.bot_name}
             await self.send(json.dumps(message))
             # посылает заявку на фронт
             serializer = self.model_serializer(user_request)
