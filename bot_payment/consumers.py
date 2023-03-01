@@ -419,7 +419,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def get_ban_obj(self, user):
-        ban = Ban.objects.get_or_create(user_id=user.user.id)
+        ban, created = Ban.objects.get_or_create(user_id=user.user.id)
         ban.ban_site = True
         ban.save()
 
