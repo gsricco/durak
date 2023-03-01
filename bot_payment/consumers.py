@@ -372,9 +372,10 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     # производит проверку количества аккаунтов у одного game_id(не более 4)
                     if await WithdrawalRequest.objects.filter(game_id=user_request.game_id).distinct(
                             'user').acount() >= 4:
-                        ban = await Ban.objects.aget(user=user_request.user)
-                        ban.ban_site = True
-                        await sync_to_async(ban.save)()
+                        # ban = await Ban.objects.aget(user=user_request.user)
+                        await self.get_ban_obj(user_request)
+                        # ban.ban_site = True
+                        # await sync_to_async(ban.save)()
                         message = {"status": "error", "detail": "user banned"}
                         await self.send(json.dumps(message))
                         user_request.status = 'fail'
@@ -415,6 +416,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
         # отрабатывает если цикл выше закончился по причине большого количества повторений
         message = {"status": "error", "detail": "Превышено максимальное количество запросов на сервер ботов."}
         await self.send(json.dumps(message))
+
+    @sync_to_async
+    def get_ban_obj(self, user):
+        ban = Ban.objects.get_or_create(user_id=user.user.id)
+        ban.ban_site = True
+        ban.save()
 
     async def process_balance(self, user_request, response):
         """Производит операции с балансом пользователя"""
