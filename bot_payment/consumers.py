@@ -379,7 +379,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         message = {"status": "error", "detail": "user banned"}
                         await self.send(json.dumps(message))
                         user_request.status = 'fail'
-                        user_request.save()
                         await sync_to_async(user_request.save)()
                         return
                     else:
