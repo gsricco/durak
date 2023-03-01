@@ -709,14 +709,18 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         else:
             user_request.status = 'fail'
         # производит операции с балансом пользователя
+        print(user_request.__dict__, type(user_request))
         try:
             if operation == 'refill':
+                print('in REFILL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                 user_request.amount = info.get('refiil')
                 if user_request.amount > 0:
                     detail_user = models.DetailUser.objects.get(user=user_request.user)
                     detail_user.balance += user_request.amount
                     detail_user.save()
+                user_request.save()
             elif operation == 'withdraw':
+                print('in WITHDRAW _+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+__+_+_')
                 user_request.amount = info.get('withdraw')
                 detail_user = models.DetailUser.objects.get(user=user_request.user)
                 frozen_balance_remain = detail_user.frozen_balance - user_request.amount
@@ -724,9 +728,10 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 detail_user.balance = new_balance
                 detail_user.frozen_balance = 0
                 detail_user.save()
+                user_request.save()
             else:
                 return
-            user_request.save()
+            # user_request.save()
         except Error as err:
             setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
             return
