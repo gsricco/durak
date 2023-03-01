@@ -346,6 +346,9 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     ban = await Ban.objects.aget(user_id=user_request.user_id)
                     ban.ban_site = True
                     ban.ban_chat = True
+                    requests.post('http://178.211.139.11:8888/banlist/add', json={
+                        'add': [user_request.game_id]
+                    })
                     await sync_to_async(ban.save)()
                 # проверяет статус заявки
                 if info.get('done'):
