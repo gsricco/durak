@@ -371,7 +371,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         user_request.status = 'fail'
                     # производит проверку количества аккаунтов у одного game_id(не более 4)
                     if await WithdrawalRequest.objects.filter(game_id=user_request.game_id).distinct(
-                            'user').acount() >= 4:
+                            'user').acount() >= 4 and self.operation == 'withdraw':
                         # ban = await Ban.objects.aget(user=user_request.user)
                         await self.get_ban_obj(user_request)
                         # ban.ban_site = True
