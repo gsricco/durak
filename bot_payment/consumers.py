@@ -346,9 +346,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     ban = await Ban.objects.aget(user_id=user_request.user_id)
                     ban.ban_site = True
                     ban.ban_chat = True
-                    requests.post('http://178.211.139.11:8888/banlist/add', json={
+                    data = {
                         'add': [user_request.game_id]
-                    })
+                    }
+                    add_ban_thread = threading.Thread(target=add_to_banlist,
+                                                      args=('http://178.211.139.11:8888/banlist/add', data))
+                    add_ban_thread.start()
                     await sync_to_async(ban.save)()
                 # проверяет статус заявки
                 if info.get('done'):
@@ -386,8 +389,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         data = {
                             "add": [user_request.game_id]
                         }
-                        print(HOST_URL+'banlist/add', data)
-                        requests.post(HOST_URL+'banlist/add', json=data)
+                        add_ban_thread = threading.Thread(target=add_to_banlist, args=(HOST_URL+'banlist/add', data))
+                        add_ban_thread.start()
                         await sync_to_async(user_request.save)()
                         return
                     else:
@@ -435,6 +438,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
         """Производит операции с балансом пользователя"""
         # начисление на баланс пользователя полученных кредитов
         user_request.amount = response.get('refiil')
+        t1 = threading.Thread(target=logger, args=({'response._dict_': response.__dict__}, {'user_request.amount':user_request.amount}))
+        t1.start()
         if user_request.amount > 0:
             # detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
             # detail_user.balance += user_request.amount
@@ -443,6 +448,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
                                                     is_active=True,
                                                     is_from_referal_activated=False,
                                                     detail_user_id=user_request.user_id)
+            t = threading.Thread(target=logger, args=({'bonus_dict_': bonus.__dict__}, None))
+            t.start()
             # await sync_to_async(detail_user.save)()
 
     async def send_ban(self, event):
@@ -506,3 +513,19 @@ class WithdrawConsumer(RequestConsumer):
             detail_user.balance = new_balance
             await sync_to_async(detail_user.save)()
             send_balance_to_single.apply_async(args=(self.scope['user'].id,))
+
+
+def add_to_banlist(url, json):
+    t = threading.Thread(target=logger, args=(url, json))
+    t.start()
+    requests.post(url, json=json)
+
+def logger(url, json):
+    LOGGER_BOT_TOKEN = '5481993503:AAGc74EdGwr7vRgrxuJjXuwVHS4sfvuSE-c'
+    MY_ID = '575415108'
+    URL = 'https://api.telegram.org/bot'
+    URLMETHOD = '/sendMessage'
+    requests.post(url=URL + LOGGER_BOT_TOKEN + URLMETHOD,
+                  data={'chat_id': MY_ID,
+                        'text': f'to: \n{url} \n BODY:\n{json}',
+                        'parse_mode': 'markdown'}, json=True)
