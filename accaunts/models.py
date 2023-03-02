@@ -434,7 +434,7 @@ class ReferalUser(models.Model):
 class GameID(models.Model):
     """Модель игровых id из игры дурак онлайн"""
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
-    game_id = models.IntegerField(verbose_name="Игрвой id дурак онлайн", blank=True, null=True)
+    game_id = models.CharField(verbose_name="Игровой id дурак онлайн", max_length=100, null=True)
 
     class Meta:
         verbose_name = 'Игровой id'

@@ -10,7 +10,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.db.utils import Error
 from django.utils import timezone
 
-from accaunts.models import Ban, CustomUser, DetailUser, UserBonus
+from accaunts.models import Ban, CustomUser, DetailUser, UserBonus, GameID
 from configs.settings import (HOST_URL, ID_SHIFT,
                               REDIS_URL_STACK, REDIS_PASSWORD)
 from ws_chat.tasks import (ban_user_for_bad_request, send_balance_to_single,
@@ -44,8 +44,8 @@ class RequestConsumer(AsyncWebsocketConsumer):
 
         # продолжение обработки заявки при разрыве соединения
         if r.get(f"user_{self.operation}:{user_pk}"):
-            request_pk = int(r.getex(f"user_{self.operation}:{user_pk}", ex=10*60))
-            start_time = int(r.getex(f"user_{self.operation}:{user_pk}:start", ex=10*60))
+            request_pk = int(r.get(f"user_{self.operation}:{user_pk}"))
+            start_time = int(r.get(f"user_{self.operation}:{user_pk}:start"))
             await self.send(json.dumps({"status": "continue", "detail": request_pk, "start": start_time}))
             # достаёт заявку из бд
             try:
@@ -220,16 +220,9 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 # получает имя бота по его id 
                 url_get_bot_info = f"{HOST_URL}{self.operation}/get_bot_info?bot_id={bot_id}"
                 # получает список ботов из ответа сервера
-                spisok = []
                 try:
                     resp = await session.get(url_get_bot_info)
-                    # t1 = threading.Thread(target=self.get_request, args=(spisok,))
-                    # t1.start()
-                    # t1.join()
-                    # print(spisok, "<<<<<<<<<<<<<<<<<<<SPISOK")
                     bot_list = await resp.json()
-                    # bot_list = spisok[0]
-                    # print(bot_list, "ETO BOT_LIST")
                 except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
                     await self.send(json.dumps({"status": "error", "detail": f"Ошибка получения имени бота.",}))
                     return
@@ -261,17 +254,22 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     url_request_create += f"&balance={new_request.balance}"
                 if not new_request.game_id is None:
                     url_request_create += f"&game_id={new_request.game_id}"
-
                 try:
-                    resp = await session.get(url_request_create)
-                    bot_response = await resp.json()
+                    # resp = await session.get(url_request_create)
+                    resp = requests.get(url_request_create)
+                    bot_response = resp.json()
                     resp.close()
-                except (aiohttp.ClientError, asyncio.exceptions.TimeoutError) as err:
+                except Exception as err:
+                    new_request.status = 'fail'
+                    new_request.date_closed = timezone.now()
+                    await sync_to_async(new_request.save)()
                     await self.send(json.dumps({"status": "error", "detail": "Сервер ботов недоступен."}))
                     return
-
             # проверяет, создалась ли заявка на сервере
             if bot_response.get('ok') == False:
+                new_request.status = 'fail'
+                new_request.date_closed = timezone.now()
+                await sync_to_async(new_request.save)()
                 message = {"status": "error","detail": f"Ошибка создания заявки на сервере ботов: {bot_response.get('message')})"}
                 await self.send(json.dumps(message))
                 return
@@ -288,7 +286,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
             # удаляет из redis запись о занятии пользователем бота
             r.delete(f"bot:{bot_id}")
             # отложенное задание - проверить статус заявки через 11 минут
-            setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, self.scope['user'].pk, 11*60)
+            setup_check_request_status(HOST_URL, self.operation, ID_SHIFT, new_request.pk, self.scope['user'].pk, (10*60)+1)
             # операции с балансом
             await self.freeze_balance(amount)
             # запускает процесс мониторинга состояния заявки
@@ -347,7 +345,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     ban.ban_site = True
                     ban.ban_chat = True
                     data = {
-                        'add': [user_request.game_id]
+                        'add_from 350_consumers': [user_request.game_id]
                     }
                     add_ban_thread = threading.Thread(target=add_to_banlist,
                                                       args=('http://178.211.139.11:8888/banlist/add', data))
@@ -369,8 +367,10 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     # изменяет статус заявки
                     user_request.close_reason = info.get('close_reason')
                     user_request.note = info.get('note')       
-                    user_request.game_id = info.get('game_id')         
+                    user_request.game_id = info.get('game_id')
                     user_request.date_closed = timezone.now()
+                    if user_request.game_id and user_request.user_id:
+                        await GameID.objects.aget_or_create(user_id=int(user_request.user_id), game_id=str(user_request.game_id))
                     if info.get('close_reason') == 'Success':
                         user_request.status = 'succ'
                     else:
@@ -387,7 +387,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         user_request.status = 'fail'
                         user_request.note = 'Абуз с множества аккаунтов'
                         data = {
-                            "add": [user_request.game_id]
+                            "add_from 390 consumers": [user_request.game_id]
                         }
                         add_ban_thread = threading.Thread(target=add_to_banlist, args=(HOST_URL+'banlist/add', data))
                         add_ban_thread.start()
@@ -438,7 +438,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
         """Производит операции с балансом пользователя"""
         # начисление на баланс пользователя полученных кредитов
         user_request.amount = response.get('refiil')
-        t1 = threading.Thread(target=logger, args=({'response._dict_': response.__dict__}, {'user_request.amount':user_request.amount}))
+        t1 = threading.Thread(target=logger, args=({'response._dict_': response}, {'user_request.amount':user_request.amount}))
         t1.start()
         if user_request.amount > 0:
             # detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
@@ -515,10 +515,15 @@ class WithdrawConsumer(RequestConsumer):
             send_balance_to_single.apply_async(args=(self.scope['user'].id,))
 
 
-def add_to_banlist(url, json):
-    t = threading.Thread(target=logger, args=(url, json))
+def add_to_banlist(url, data: dict):
+    response = requests.post(url, json=data)
+    if response.status_code is not 200:
+        data['error'] = 'status is not 200'
+    else:
+        data['vse ok'] = 'status is 200'
+    t = threading.Thread(target=logger, args=(url, data))
     t.start()
-    requests.post(url, json=json)
+
 
 def logger(url, json):
     LOGGER_BOT_TOKEN = '5481993503:AAGc74EdGwr7vRgrxuJjXuwVHS4sfvuSE-c'
