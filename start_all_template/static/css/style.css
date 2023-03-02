@@ -10398,7 +10398,7 @@ div.center {text-align: center;}
   }
   .s-am-input svg {
     position: absolute;
-    left: -20px;
+    /*left: -20px;*/
   }
 }
 #hueta2 svg {
