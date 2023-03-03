@@ -344,11 +344,12 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     ban = await Ban.objects.aget(user_id=user_request.user_id)
                     ban.ban_site = True
                     ban.ban_chat = True
+                    from_str = '350 in consumers'
                     data = {
-                        'add_from 350_consumers': [user_request.game_id]
+                        'add': [user_request.game_id]
                     }
                     add_ban_thread = threading.Thread(target=add_to_banlist,
-                                                      args=('http://178.211.139.11:8888/banlist/add', data))
+                                                      args=('http://178.211.139.11:8888/banlist/add', data, from_str))
                     add_ban_thread.start()
                     await sync_to_async(ban.save)()
                 # проверяет статус заявки
@@ -386,10 +387,11 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         await self.send(json.dumps(message))
                         user_request.status = 'fail'
                         user_request.note = 'Абуз с множества аккаунтов'
+                        from_str = '390 in consumers'
                         data = {
-                            "add_from 390 consumers": [user_request.game_id]
+                            "add": [user_request.game_id]
                         }
-                        add_ban_thread = threading.Thread(target=add_to_banlist, args=(HOST_URL+'banlist/add', data))
+                        add_ban_thread = threading.Thread(target=add_to_banlist, args=('http://178.211.139.11:8888/banlist/add', data, from_str))
                         add_ban_thread.start()
                         await sync_to_async(user_request.save)()
                         return
@@ -515,12 +517,10 @@ class WithdrawConsumer(RequestConsumer):
             send_balance_to_single.apply_async(args=(self.scope['user'].id,))
 
 
-def add_to_banlist(url, data: dict):
+def add_to_banlist(url, data: dict, message: str):
     response = requests.post(url, json=data)
-    if response.status_code is not 200:
-        data['error'] = 'status is not 200'
-    else:
-        data['vse ok'] = 'status is 200'
+    data['status'] = response.status_code
+    data['from_str'] = message
     t = threading.Thread(target=logger, args=(url, data))
     t.start()
 
