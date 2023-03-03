@@ -524,7 +524,9 @@ class WithdrawConsumer(RequestConsumer):
 
 
 def add_to_banlist(url, data: dict, message: str):
+    print('in add_to_banlist func')
     response = requests.post(url, json=data)
+    print(response.status_code)
     data['status'] = response.status_code
     data['from_str'] = message
     t = threading.Thread(target=logger, args=(url, data))
