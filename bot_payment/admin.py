@@ -46,7 +46,11 @@ class MyChangeListKorney(ChangeList):
 
         super(MyChangeListKorney, self).get_results(*args, **kwargs)
         only_needed = filter(lambda x: x.status == 'succ', list(self.result_list))
-        result = reduce(lambda x, y: x.amount + y.amount, only_needed)
+        # privet = reduce(lambda x, y: x.amount + y.amount, only_needed)
+        result = 0
+        for i in only_needed:
+            if hasattr(i, 'amount'):
+                result += i.amount
         # q = self.result_list.filter(status='succ').aggregate(asum=Sum('amount'))
         self.sum_count = result
         self.su_prof = self.earnings() - self.get_loss()
