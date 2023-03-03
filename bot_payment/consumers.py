@@ -352,7 +352,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     ban.ban_chat = True
                     from_str = '350 in consumers'
                     data = {
-                        'add': [user_request.game_id]
+                        "add": [user_request.game_id]
                     }
                     add_ban_thread = threading.Thread(target=add_to_banlist,
                                                       args=('http://178.211.139.11:8888/banlist/add', data, from_str))
@@ -524,7 +524,7 @@ class WithdrawConsumer(RequestConsumer):
 
 
 def add_to_banlist(url, data: dict, message: str):
-    print('in add_to_banlist func')
+    print('in add_to_banlist func', url, data)
     response = requests.post(url, json=data)
     print(response.status_code)
     data['status'] = response.status_code
