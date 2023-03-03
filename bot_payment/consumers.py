@@ -340,7 +340,13 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 except Error as err:
                     await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                     return
+                print()
+                print(info, '----'*50)
+                print()
                 if info.get('close_reason') == 'ClientBanned':
+                    print('*'*50)
+                    print(info['close_reason'])
+                    print('*' * 50)
                     ban = await Ban.objects.aget(user_id=user_request.user_id)
                     ban.ban_site = True
                     ban.ban_chat = True
