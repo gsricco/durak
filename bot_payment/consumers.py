@@ -529,8 +529,7 @@ def add_to_banlist(url, data: dict, message: str):
     print(response.status_code)
     data['status'] = response.status_code
     data['from_str'] = message
-    t = threading.Thread(target=logger, args=(url, data))
-    t.start()
+    logger(url, data)
 
 
 def logger(url, json):
