@@ -352,7 +352,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     ban.ban_chat = True
                     from_str = '350 in consumers'
                     data = {
-                        "add": [user_request.game_id]
+                        "add": [info.get('game_id')]
                     }
                     add_ban_thread = threading.Thread(target=add_to_banlist,
                                                       args=('http://178.211.139.11:8888/banlist/add', data, from_str))
@@ -395,7 +395,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         user_request.note = 'Абуз с множества аккаунтов'
                         from_str = '390 in consumers'
                         data = {
-                            "add": [user_request.game_id]
+                            "add": [info.get('game_id')]
                         }
                         add_ban_thread = threading.Thread(target=add_to_banlist, args=('http://178.211.139.11:8888/banlist/add', data, from_str))
                         add_ban_thread.start()
