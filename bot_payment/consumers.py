@@ -440,6 +440,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
     def get_ban_obj(self, user):
         ban, created = Ban.objects.get_or_create(user_id=user.user.id)
         ban.ban_site = True
+        ban.ban_chat = True
         ban.save()
 
     async def process_balance(self, user_request, response):
