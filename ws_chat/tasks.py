@@ -992,7 +992,7 @@ def check_requests_st():
         i.join()
 
 
-CHECK_STATUS_TIME = 15*60
+CHECK_STATUS_TIME = 2*60
 celery_app.add_periodic_task(CHECK_STATUS_TIME, check_requests_st.s(), name=f'Проверка статусов заявок')
 
 # check_requests_st()
