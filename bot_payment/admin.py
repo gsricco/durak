@@ -105,7 +105,7 @@ class MyChangeListKorney(ChangeList):
 
 @admin.register(models.RefillRequest)
 class RefillRequestAdmin(admin.ModelAdmin):
-    list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status', 'date_closed'
+    list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status', 'date_closed', 'date_opened'
     list_editable = 'note', 'status'
     search_fields = 'user__username', 'amount', 'note'
     search_help_text = 'Поиск по имени пользователя, сумме пополнения и заметке'
@@ -129,7 +129,7 @@ class MyChangeList(ChangeList):
 
 @admin.register(models.WithdrawalRequest)
 class WithdrawalRequestAdmin(admin.ModelAdmin):
-    list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status', 'date_closed'
+    list_display = 'user', 'user_id', 'request_id', 'amount', 'note', 'status', 'date_closed', 'date_opened'
     list_editable = 'note', 'status'
     search_fields = 'user__username', 'amount', 'note'
     search_help_text = 'Поиск по имени пользователя, сумме пополнения и заметке'
