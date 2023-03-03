@@ -340,13 +340,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                 except Error as err:
                     await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных."}))
                     return
-                print()
-                print(info, '----'*50)
-                print()
                 if info.get('close_reason') == 'ClientBanned':
-                    print('*'*50)
-                    print(info['close_reason'])
-                    print('*' * 50)
                     ban = await Ban.objects.aget(user_id=user_request.user_id)
                     ban.ban_site = True
                     ban.ban_chat = True
@@ -359,10 +353,20 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     add_ban_thread.start()
                     await sync_to_async(ban.save)()
                 # проверяет статус заявки
+                print('*'*100)
+                print(info, 'ETO INFO')
+                print('*'*100)
                 if info.get('done'):
+                    print()
+                    print('DONE TRUE')
+                    print(info.get('done'))
+                    print()
                     # достаёт заявку из бд
                     # проверяет, не была ли заявка закрыта ранее
                     if user_request.status != 'open' or r.getex(f'close_{request_pk}:{self.operation}:bool', ex=10*60):
+                        print()
+                        print('in line 367 consumers')
+                        print()
                         serializer = self.model_serializer(user_request)
                         serializer_data = await sync_to_async(getattr)(serializer, 'data')
                         await self.send(json.dumps(serializer_data))
@@ -385,6 +389,9 @@ class RequestConsumer(AsyncWebsocketConsumer):
                     # производит проверку количества аккаунтов у одного game_id(не более 4)
                     if await WithdrawalRequest.objects.filter(game_id=user_request.game_id).distinct(
                             'user').acount() >= 4 and self.operation == 'withdraw':
+                        print()
+                        print('check ban success')
+                        print()
                         # ban = await Ban.objects.aget(user=user_request.user)
                         await self.get_ban_obj(user_request)
                         # ban.ban_site = True
@@ -402,13 +409,19 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         await sync_to_async(user_request.save)()
                         return
                     else:
+                        print()
+                        print('in else -> savit zayavku!!!!!!!!!!!!!')
+                        print()
                         # производит операции с балансом пользователя
                         try:
                             await self.process_balance(user_request, info)
                             await sync_to_async(user_request.save)()
                         except Error as err:
+                            await sync_to_async(user_request.save)()
                             await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных. Заявка не сохранена."}))
                             return
+                        finally:
+                            await sync_to_async(user_request.save)()
                         # банит пользователя, если его забанил сервер
                         if info.get('ban'):
                             try:
