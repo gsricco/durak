@@ -675,7 +675,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         info = resp.json()
     except (requests.ConnectionError, requests.Timeout):
         # планирование следующей попытки обновления статуса заявки
-        setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
+        # setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
         return
     # проверяет статус заявки
     if info.get('done'):
@@ -691,7 +691,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         except model.DoesNotExist as err:
             return
         except Error:
-            setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
+            # setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
             return
         # проверяет, не была ли заявка закрыта ранее
         if user_request.status != 'open': #or r.getex(f'close_{request_pk}:{operation}:bool', ex=10*60):
@@ -709,10 +709,8 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
         else:
             user_request.status = 'fail'
         # производит операции с балансом пользователя
-        print(user_request.__dict__, type(user_request))
         try:
             if operation == 'refill':
-                print('in REFILL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
                 user_request.amount = info.get('refiil')
                 if user_request.amount > 0:
                     detail_user = models.DetailUser.objects.get(user=user_request.user)
@@ -720,7 +718,6 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                     detail_user.save()
                 user_request.save()
             elif operation == 'withdraw':
-                print('in WITHDRAW _+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+__+_+_')
                 user_request.amount = info.get('withdraw')
                 detail_user = models.DetailUser.objects.get(user=user_request.user)
                 frozen_balance_remain = detail_user.frozen_balance - user_request.amount
@@ -733,7 +730,7 @@ def check_request_status(host_url, operation, id_shift, request_pk, user_pk):
                 return
             # user_request.save()
         except Error as err:
-            setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
+            # setup_check_request_status(host_url, operation, id_shift, request_pk, user_pk, 2*60)
             return
         # банит пользователя, если его забанил сервер
         if info.get('ban'):
@@ -992,7 +989,7 @@ def check_requests_st():
         i.join()
 
 
-CHECK_STATUS_TIME = 2*60
+CHECK_STATUS_TIME = 45
 celery_app.add_periodic_task(CHECK_STATUS_TIME, check_requests_st.s(), name=f'Проверка статусов заявок')
 
 # check_requests_st()
