@@ -10400,6 +10400,9 @@ div.center {text-align: center;}
     position: absolute;
     left: -20px;
   }
+  #svg_in_modal{
+    left: 10px;
+  }
   .s-am-input__title{
     margin-bottom: 8px;
   }
