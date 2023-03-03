@@ -1,3 +1,5 @@
+from functools import reduce
+
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models import Sum
@@ -41,9 +43,12 @@ class MyChangeListKorney(ChangeList):
     """Заявки на пополнение"""
 
     def get_results(self, *args, **kwargs):
+
         super(MyChangeListKorney, self).get_results(*args, **kwargs)
-        q = self.result_list.filter(status='succ').aggregate(asum=Sum('amount'))
-        self.sum_count = q['asum']
+        only_needed = filter(lambda x: x.status == 'succ', list(self.result_list))
+        result = reduce(lambda x, y: x.amount + y.amount, only_needed)
+        # q = self.result_list.filter(status='succ').aggregate(asum=Sum('amount'))
+        self.sum_count = result
         self.su_prof = self.earnings() - self.get_loss()
         if self.sum_count is None:
             self.sum_count = 0
@@ -53,39 +58,43 @@ class MyChangeListKorney(ChangeList):
         # заметка заявки на пополнение при убытке начинается с "Убыток". Пример: "Убыток: 23"
         LOSS_REQ_START = "Убыток"
         # получает заявки с убытком
-        loss_requests_notes = self.result_list.filter(note__startswith=LOSS_REQ_START).values_list("note")
+        # loss_requests_notes = self.result_list.filter(note__startswith=LOSS_REQ_START).values_list("note")
+        loss_requests_notes = filter(lambda x: x.note.startswith(LOSS_REQ_START) if x.note else False, self.result_list)
+        loss_requests_notes = list(map(lambda x: x.note, list(loss_requests_notes)))
         if loss_requests_notes:
             int_loss = 0
             for loss_note in loss_requests_notes:
                 try:
                     # парсит строку с заметкой об убытке и получает из неё числовое значение убытка
-                    str_loss = loss_note[0].split()[1]
-                    int_loss += int(str_loss)
+                    str_loss = loss_note.split()[1]
+                    int_loss += abs(int(str_loss))
                 except (ValueError, IndexError) as err:
                     # пропускает заметку с неправильным форматом заметки об убытке
                     continue
             return int_loss
         else:
-            # УБыток равен нулю, если нет заявок с убытком
+            # Убыток равен нулю, если нет заявок с "Убыток"
             return 0
 
     def earnings(self) -> int:
         LOSS_REQ_START = "Профит"
         # получает заявки с Профит
-        loss_requests_notes = self.result_list.filter(note__startswith=LOSS_REQ_START).values_list("note")
+        # loss_requests_notes = self.result_list.filter(note__startswith=LOSS_REQ_START).values_list("note")
+        loss_requests_notes = filter(lambda x: x.note.startswith(LOSS_REQ_START) if x.note else False, self.result_list)
+        loss_requests_notes = list(map(lambda x: x.note, list(loss_requests_notes)))
         if loss_requests_notes:
             int_loss = 0
             for loss_note in loss_requests_notes:
                 try:
                     # парсит строку с заметкой об Профит и получает из неё числовое значение Профит
-                    str_loss = loss_note[0].split()[1]
-                    int_loss += int(str_loss)
+                    str_loss = loss_note.split()[1]
+                    int_loss += abs(int(str_loss))
                 except (ValueError, IndexError) as err:
                     # пропускает заметку с неправильным форматом заметки об Профит
                     continue
             return int_loss
         else:
-            # УБыток равен нулю, если нет заявок с Профит
+            # Убыток равен нулю, если нет заявок с "Профит"
             return 0
 
 
