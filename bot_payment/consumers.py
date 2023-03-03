@@ -391,7 +391,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         # await sync_to_async(ban.save)()
                         message = {"status": "error", "detail": "user banned"}
                         await self.send(json.dumps(message))
-                        user_request.status = 'succ'
+                        # user_request.status = 'succ'
                         user_request.note = 'Абуз с множества аккаунтов'
                         from_str = '390 in consumers'
                         data = {
