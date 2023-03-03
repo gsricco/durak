@@ -325,7 +325,7 @@ def get_loss() -> int:
             try:
                 # парсит строку с заметкой об убытке и получает из неё числовое значение убытка
                 str_loss = loss_note[0].split()[1]
-                int_loss += int(str_loss)
+                int_loss += abs(int(str_loss))
             except (ValueError, IndexError) as err:
                 # пропускает заметку с неправильным форматом заметки об убытке
                 continue
@@ -345,7 +345,7 @@ def earnings() -> int:
             try:
                 # парсит строку с заметкой об Профит и получает из неё числовое значение Профит
                 str_loss = loss_note[0].split()[1]
-                int_loss += int(str_loss)
+                int_loss += abs(int(str_loss))
             except (ValueError, IndexError) as err:
                 # пропускает заметку с неправильным форматом заметки об Профит
                 continue
@@ -405,6 +405,6 @@ def info(request):
         "ss": difference_all_vs_winners_bets,
         "ss2": full_profit_with_credits_exclude_items,
         "loss_requests_notes": loss_requests_notes,
-        "sum_gain":sum_gain
+        "sum_gain": sum_gain
     }
     return render(request, 'admin/info.html', context)
