@@ -94,8 +94,8 @@ def record_work_time(function):
 
 @shared_task
 def sender():
-    tg_thread = threading.Thread(target=tg_logger)
-    tg_thread.start()
+    # tg_thread = threading.Thread(target=tg_logger)
+    # tg_thread.start()
     t = timezone.now()
     # r.incr('round', 1)
     r.set('state', 'countdown', ex=30)
@@ -111,8 +111,8 @@ def sender():
 
 @shared_task
 def debug_task():
-    tg_thread = threading.Thread(target=tg_logger)
-    tg_thread.start()
+    # tg_thread = threading.Thread(target=tg_logger)
+    # tg_thread.start()
     z = timezone.now()
     t = datetime.datetime.now()
     sender.apply_async()
@@ -125,8 +125,8 @@ def debug_task():
 
 @shared_task
 def roll():
-    tg_thread = threading.Thread(target=tg_logger)
-    tg_thread.start()
+    # tg_thread = threading.Thread(target=tg_logger)
+    # tg_thread.start()
     t = timezone.now()
     r.set('state', 'rolling', ex=30)
     r.set(f'start:time', str(int(t.timestamp() * 1000)), ex=30)
@@ -164,8 +164,8 @@ def roll():
     r.json().arrappend('last_winners', '.', result)
     if arr_len := r.json().arrlen('last_winners') > 8:
         r.json().arrtrim('last_winners', '.', arr_len - 9, -1)
-    tg_thread = threading.Thread(target=tg_logger)
-    tg_thread.start()
+    # tg_thread = threading.Thread(target=tg_logger)
+    # tg_thread.start()
 
 @shared_task
 def go_back():
@@ -194,8 +194,8 @@ def go_back():
                                                 'type': 'go_back',
                                                 'previous_rolls': r.json().get('last_winners')
                                             })
-    tg_thread = threading.Thread(target=tg_logger)
-    tg_thread.start()
+    # tg_thread = threading.Thread(target=tg_logger)
+    # tg_thread.start()
 
 
 @shared_task
@@ -209,8 +209,8 @@ def stop():
                                                 'type': 'stopper',
                                                 'winner': winner
                                             })
-    tg_thread = threading.Thread(target=tg_logger)
-    tg_thread.start()
+    # tg_thread = threading.Thread(target=tg_logger)
+    # tg_thread.start()
 
 # @shared_task()
 async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info: dict) -> bool:

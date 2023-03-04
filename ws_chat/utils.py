@@ -10,9 +10,6 @@ from accaunts.models import (BonusVKandYoutube, CustomUser, DetailUser,
 from configs.settings import VK_TOKEN, YOUTUBE_API_KEY
 from content_manager.models import SiteContent
 
-# YOUTUBE
-if YOUTUBE_API_KEY is None:
-    YOUTUBE_API_KEY = 'AIzaSyBxKAi_XTdjMX3NLK1AfjwA_017G7v-bc0' # my API_KEY
 BASE_URL = 'https://youtube.googleapis.com/youtube/v3/subscriptions?part=snippet%2CcontentDetails'
 
 CHANNEL_ID = '&channelId='
