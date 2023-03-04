@@ -23,8 +23,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 #DEBUG = bool(os.getenv("DEBUG"))
 DEBUG = False
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split()
 # ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGIN = ["https://durak-roll.itec.by"]#, "https://durak-roll.itec.by", "0.0.0.0:8888", ]
 # CSRF_TRUSTED_ORIGIN = os.getenv("CSRF_TRUSTED_ORIGIN")
