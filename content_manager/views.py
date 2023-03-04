@@ -2,14 +2,15 @@ import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Sum, Value, IntegerField, CharField
+from django.db.models import CharField, Count, F, IntegerField, Sum, Value
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from social_django.models import UserSocialAuth
 
 from accaunts.forms import UserEditName
-from accaunts.models import (CustomUser, DayHash, DetailUser, ItemForUser,
-                             Level, ReferalUser, UserAgent, UserBet, UserIP, BonusVKandYoutube, FreeBalanceHistory)
+from accaunts.models import (BonusVKandYoutube, CustomUser, DayHash,
+                             DetailUser, FreeBalanceHistory, ItemForUser,
+                             Level, ReferalUser, UserAgent, UserBet, UserIP)
 from bot_payment.models import RefillRequest, WithdrawalRequest
 from pay.models import Popoln, RefillBotSum, WithdrawBotSum
 

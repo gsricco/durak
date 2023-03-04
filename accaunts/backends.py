@@ -42,9 +42,6 @@ class CustomGoogleOAuth2(GoogleOAuth2):
         for idx, name in enumerate(pipeline[pipeline_index:]):
             out['pipeline_index'] = pipeline_index + idx
             func = module_member(name)
-            print(func, "ETO FUNC")
-            print(out, '@'*100)
-            print(args, '#'*100)
             result = func(*args, **out) or {}
             if not isinstance(result, dict):
                 return result
@@ -59,8 +56,6 @@ class CustomVKOAuth2(VKOAuth2):
             first_name=response.get('first_name'),
             last_name=response.get('last_name')
         )
-        print(response, 'ETO RESPONSE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        print(self.__dict__)
         photo = (response.get('photo', ''))
         screen_name = (response.get('screen_name', ''))
         return {
@@ -72,11 +67,6 @@ class CustomVKOAuth2(VKOAuth2):
                 'photo': photo,
                 'vk_url': 'https://vk.com/' + screen_name}
 
-    # def process_error(self, data):
-    #     print('*' * 100)
-    #     print(self)
-    #     print(data)
-    #     print('*' * 100)
 
     def run_pipeline(self, pipeline, pipeline_index=0, *args, **kwargs):
         out = kwargs.copy()
@@ -93,9 +83,6 @@ class CustomVKOAuth2(VKOAuth2):
         for idx, name in enumerate(pipeline[pipeline_index:]):
             out['pipeline_index'] = pipeline_index + idx
             func = module_member(name)
-            print(func, "ETO FUNC")
-            print(out, '@'*100)
-            print(args, '#'*100)
             result = func(*args, **out) or {}
             if not isinstance(result, dict):
                 return result

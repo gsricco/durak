@@ -6,7 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import DetailUser, ReferalCode, ReferalUser, UserBonus, FreeBalanceHistory
+from .models import (DetailUser, FreeBalanceHistory, ReferalCode, ReferalUser,
+                     UserBonus)
 from .serializers import ReferalCodeModelSerializer
 
 

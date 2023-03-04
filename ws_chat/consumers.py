@@ -14,7 +14,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from accaunts.models import (AvatarProfile, Ban, CustomUser, DetailUser,
-                             ItemForUser, Level, UserBet, UserBonus, FreeBalanceHistory)
+                             FreeBalanceHistory, ItemForUser, Level, UserBet,
+                             UserBonus)
 from caseapp.models import Case, Item, ItemForCase, OwnedCase
 from caseapp.serializers import (CaseAndCaseItemSerializer,
                                  ItemForUserSerializer,
