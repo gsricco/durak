@@ -571,15 +571,6 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // if (document.querySelector('.support__chat-message-text')) {
-    // 	let lineString = document.querySelector('.support__chat-message-text span');
-    // 	let lineBlock = document.querySelector('.support__chat-message-text');
-    // 	let tagText = lineString.clientWidth;
-    // 	console.log(tagText);
-    // 	console.log(lineString.offsetWidth + 'px');
-    // 	lineBlock.style.width = lineString.offsetWidth + 'px';
-    // }
-
     //!футер
     if (document.querySelector("main") && document.querySelector("footer")) {
         function footerHeigth() {
@@ -624,27 +615,6 @@ window.addEventListener("DOMContentLoaded", () => {
                     FOOTER.classList.remove("footer_dofix");
                 }
             }
-
-            // let footerHeight = document.querySelector('footer').offsetHeight;
-            // console.log(mainHeight + '||' + headerHeight + '||' + winHeight)
-            // console.log(footerHeight)
-            // console.log(winHeight - (mainHeight + footerHeight))
-
-            //if ((mainHeight < winHeight) && (mainHeight + 5 > winHeight)) {
-            // if ((mainHeight < winHeight) && (mainHeight + footerHeight > winHeight)) {
-            // 	FOOTER.classList.add('footer_dofix');
-            // 	FOOTER.classList.remove('footer_fix');
-            // 	// console.log('d');
-            // }
-            // else if (mainHeight + footerHeight <= winHeight) {
-            // 	FOOTER.classList.add('footer_fix');
-            // 	FOOTER.classList.remove('footer_dofix');
-            // 	// console.log('f');
-            // }
-            // else {
-            // 	FOOTER.classList.remove('footer_fix');
-            // 	FOOTER.classList.remove('footer_dofix');
-            // }
         }
 
         footerHeigth();
@@ -927,15 +897,6 @@ window.addEventListener("DOMContentLoaded", () => {
             whereRouletteMsg.append(rouletteMsg);
         }
     }
-
-    // //! скроллбар в конце
-    // if (document.querySelector(".online-chat__list")) {
-    // 	document.querySelector('.chat-open-btn').addEventListener('click', () => {
-    // 		console.log(1)
-    // 		let scrollBlock = document.body;
-    // 		setTimeout(() => scrollBlock.scrollTo(0, 10000))
-    // 	})
-    // }
 
     //! Медиазапросы рулетка
     if (document.querySelector(".roulette")) {

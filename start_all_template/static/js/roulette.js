@@ -1,7 +1,6 @@
 function generateItems(winnerCard, cardNumber) {
     const list = document.querySelector('.list');
     let cells = cardNumber
-    console.log(cardNumber, winnerCard)
     let h = 14;
     let p = 0;
     // четные элементы красные, нечетные черные, каждая 8 карта coin
