@@ -7,7 +7,7 @@ If you use https: https://github.com/ITec-Company/durak_rulles.git
 
 Enter next command:
 
-python3 -m venv venv
+python3 -m venv venv 
 
 source venv/bin/activate(for MacOs/Linux)
 
