@@ -35,6 +35,7 @@ services:
     volumes:
       - durak_static:/app/start_all_template/static
       - durak_media:/app/media
+      - /../templates/:/app/templates
     command:
       - /start
   durak_redis_stack:
@@ -85,7 +86,6 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt/:ro
       - /var/lib/letsencrypt:/var/lib/letsencrypt/:ro
       - durak_static:/app/start_all_template/static
-      - /../templates/:/app/templates
       - durak_media:/app/media
     depends_on:
       - durak_backend
