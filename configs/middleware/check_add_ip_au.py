@@ -11,6 +11,7 @@ class BanIPandAgentMiddleware:
     def __call__(self, request):
         agent = request.META.get('HTTP_USER_AGENT')
         ip = request.META.get("HTTP_X_REAL_IP")
+        print(ip)
         if CustomUser.objects.filter(userip__userip=ip, useragent__useragent=agent, ban__ban_ip=True).exists():
             raise PermissionDenied
         if request.user.is_authenticated:
