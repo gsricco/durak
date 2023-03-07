@@ -68,7 +68,9 @@ def pay_user(request):
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{order_id}'.encode('utf-8')).hexdigest()
     po = request.GET.get('SIGN')
     print()
-    print(sign == po )
+    print(sign == po)
+    print(sign)
+    print(po)
     print()
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
