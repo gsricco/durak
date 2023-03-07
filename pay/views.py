@@ -54,7 +54,8 @@ def balance(request):
 def get_ip(request_data):
     if request_data.META.get("HTTP_X_REAL_IP"):
         return request_data.META.get("HTTP_X_REAL_IP")
-    return request_data.META['REMOTE_ADDR']
+    return request_data.META.get('REMOTE_ADDR')
+
 
 @api_view(['GET'])
 def pay_user(request):
