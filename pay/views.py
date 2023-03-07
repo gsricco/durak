@@ -67,9 +67,17 @@ def pay_user(request):
     intid = request.GET.get('intid', '')
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{order_id}'.encode('utf-8')).hexdigest()
     po = request.GET.get('SIGN')
+    print()
+    print(sign == po )
+    print()
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
+    print()
+    print()
     print(FREEKASSA_IPS)
+    print(ip)
+    print()
+    print()
     if ip not in FREEKASSA_IPS:  # проверка ip
         return response.Response(status=status.HTTP_403_FORBIDDEN)
     # r = requests.post(f'https://api.freekassa.ru/v1/orders', json={})
@@ -86,4 +94,7 @@ def pay_user(request):
         det_user._reserve += order.pay
         det_user.balance += order.pay
         det_user.save()
+        print()
+        print('all is ok SAVED !!!!!!!!!')
+        print()
     return response.Response(status=status.HTTP_200_OK, data={})
