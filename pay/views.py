@@ -68,16 +68,6 @@ def pay_user(request):
     intid = request.GET.get('intid', '')
     sign = hashlib.md5(f'{merchant_id}:{order_amount}:winsert1:{order_id}'.encode('utf-8')).hexdigest()
     po = request.GET.get('SIGN')
-    print()
-    print(sign == po)
-    print(sign)
-    print(po)
-    print()
-    print()
-    print()
-    print(FREEKASSA_IPS)
-    print(ip)
-    print()
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -86,7 +76,6 @@ def pay_user(request):
     # r = requests.post(f'https://api.freekassa.ru/v1/orders', json={})
     order = get_object_or_404(Popoln, pk=order_id)
     if order.status_pay or int(order_amount) != int(order.sum):
-        print(order_amount, order.sum)
         return response.Response(status=status.HTTP_412_PRECONDITION_FAILED, data={})
     with transaction.atomic():
         order.status_pay = True
@@ -97,7 +86,4 @@ def pay_user(request):
         det_user._reserve += order.pay
         det_user.balance += order.pay
         det_user.save()
-        print()
-        print('all is ok SAVED !!!!!!!!!')
-        print()
     return response.Response(status=status.HTTP_200_OK, data={})
