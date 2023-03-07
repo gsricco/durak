@@ -66,7 +66,7 @@ def pay_user(request):
     order_amount = request.GET.get('AMOUNT', '')
     order_id = request.GET.get('MERCHANT_ORDER_ID', '')
     intid = request.GET.get('intid', '')
-    sign = hashlib.md5(f'{merchant_id}:{order_amount}:{secret_word}:{order_id}'.encode('utf-8')).hexdigest()
+    sign = hashlib.md5(f'{merchant_id}:{order_amount}:winsert1:{order_id}'.encode('utf-8')).hexdigest()
     po = request.GET.get('SIGN')
     print()
     print(sign == po)
@@ -77,7 +77,6 @@ def pay_user(request):
     print()
     print(FREEKASSA_IPS)
     print(ip)
-    print()
     print()
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
