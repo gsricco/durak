@@ -87,6 +87,7 @@ def pay_user(request):
     order = get_object_or_404(Popoln, pk=order_id)
     if order.status_pay or order_amount != order.sum:
         print(order_amount, order.sum)
+        print(type(order_amount), type(order.sum))
         return response.Response(status=status.HTTP_412_PRECONDITION_FAILED, data={})
     with transaction.atomic():
         order.status_pay = True
