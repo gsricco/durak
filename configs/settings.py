@@ -210,7 +210,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 """freekassa"""
 MERCHANT_ID = os.getenv('MERCHANT_ID')  # ID Вашего магазина
 SECRET_WORD = os.getenv('SECRET_WORD')  # Секретное слово
-
+FREEKASSA_IPS = os.getenv('FREEKASSA_IPS').split()
 # bot payment
 HOST_URL = os.getenv('HOST_URL')
 ID_SHIFT = int(os.getenv('ID_SHIFT'))

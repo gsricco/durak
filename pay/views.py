@@ -1,15 +1,15 @@
 import hashlib
 import math
 
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect
 from psycopg2.extras import NumericRange
 from rest_framework import response, status
 from rest_framework.decorators import api_view
 
 from accaunts.models import DetailUser
-from configs.settings import MERCHANT_ID, SECRET_WORD
+from configs.settings import MERCHANT_ID, SECRET_WORD, FREEKASSA_IPS
 from pay.models import BalPay, PayOff, Popoln
-
 
 # Создается форма платежа
 def rub_to_pay(rub):
@@ -51,12 +51,17 @@ def balance(request):
         f'https://pay.freekassa.ru/?m={merchant_id}&oa={order_amount}&currency={currency}&o={order_id}&pay=PAY&s={sign}&i={i}')
 
 
+def get_ip(request_data):
+    if request_data.META.get("HTTP_X_REAL_IP"):
+        return request_data.META.get("HTTP_X_REAL_IP")
+    return request_data.META['REMOTE_ADDR']
+
 @api_view(['GET'])
 def pay_user(request):
     """Логика оплаты"""
     merchant_id = MERCHANT_ID  # ID Вашего магазина
     secret_word = SECRET_WORD  # Секретное слово
-    ip = (request.META['REMOTE_ADDR'])
+    ip = get_ip(request)
     order_amount = request.GET.get('AMOUNT', '')
     order_id = request.GET.get('MERCHANT_ORDER_ID', '')
     intid = request.GET.get('intid', '')
@@ -64,18 +69,21 @@ def pay_user(request):
     po = request.GET.get('SIGN')
     if sign != po:
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
-    if ip in ['168.119.157.136', '168.119.60.227', '138.201.88.124', '178.154.197.79']:  # проверка ip
+    print(FREEKASSA_IPS)
+    if ip not in FREEKASSA_IPS:  # проверка ip
         return response.Response(status=status.HTTP_403_FORBIDDEN)
     # r = requests.post(f'https://api.freekassa.ru/v1/orders', json={})
     order = get_object_or_404(Popoln, pk=order_id)
-    if order.status_pay:
+    if order.status_pay or order_amount != order.sum:
+        print(order_amount, order.sum)
         return response.Response(status=status.HTTP_412_PRECONDITION_FAILED, data={})
-    order.status_pay = True
-    order.url_ok = True
-    order.intid = intid
-    order.save()
-    det_user = DetailUser.objects.get(user=order.user_game)
-    det_user._reserve += order.pay
-    det_user.balance += order.pay
-    det_user.save()
+    with transaction.atomic():
+        order.status_pay = True
+        order.url_ok = True
+        order.intid = intid
+        order.save()
+        det_user = DetailUser.objects.get(user=order.user_game)
+        det_user._reserve += order.pay
+        det_user.balance += order.pay
+        det_user.save()
     return response.Response(status=status.HTTP_200_OK, data={})
