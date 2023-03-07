@@ -73,14 +73,15 @@ def pay_user(request):
     print(sign)
     print(po)
     print()
-    if sign != po:
-        return response.Response(status=status.HTTP_400_BAD_REQUEST)
     print()
     print()
     print(FREEKASSA_IPS)
     print(ip)
     print()
     print()
+    if sign != po:
+        return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
     if ip not in FREEKASSA_IPS:  # проверка ip
         return response.Response(status=status.HTTP_403_FORBIDDEN)
     # r = requests.post(f'https://api.freekassa.ru/v1/orders', json={})
