@@ -1,5 +1,5 @@
 /* Создание бонусного кода */
-
+console.log('privet Oleg')
 const inviteBtn = document.querySelector('.invite__btn');
 const textStatus = document.querySelectorAll('.form__msg');
 const inviteInput = document.querySelector('.invite__input');
