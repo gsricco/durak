@@ -34,6 +34,7 @@ services:
       - durak_redis_stack
     volumes:
       - durak_static:/app/start_all_template/static
+      - ../start_all_template/static:/app/start_all_template/static
       - durak_media:/app/media
       - ../templates:/app/templates
     command:
