@@ -33,7 +33,7 @@ services:
       - durak_db
       - durak_redis_stack
     volumes:
-      - durak_static:/app/start_all_template/static
+#      - durak_static:/app/start_all_template/static
       - ../start_all_template/static:/app/start_all_template/static
       - durak_media:/app/media
       - ../templates:/app/templates
@@ -86,7 +86,8 @@ services:
       - ./certbot/www:/var/www/certbot/:ro
       - /etc/letsencrypt:/etc/letsencrypt/:ro
       - /var/lib/letsencrypt:/var/lib/letsencrypt/:ro
-      - durak_static:/app/start_all_template/static
+#      - durak_static:/app/start_all_template/static
+      - ../start_all_template/static:/app/start_all_template/static
       - durak_media:/app/media
     depends_on:
       - durak_backend
@@ -97,6 +98,6 @@ services:
       - ./certbot/conf/:/etc/letsencrypt/:rw
 volumes:
   durak_pgdata:
-  durak_static:
+#  durak_static:
   durak_media:
   durak_redis:
