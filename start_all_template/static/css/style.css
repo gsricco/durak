@@ -1,3 +1,56 @@
+.content {
+	transition: max-height 0.2s;
+	overflow: hidden;
+	&[aria-hidden="true"] {
+		max-height: 0;
+	}
+	&[aria-hidden="false"] {
+		max-height: var(--containerHeight, 1000px);
+	}
+}
+
+/* Everything after this is merely aesthetics */
+* {
+	box-sizing: border-box;
+}
+
+.container {
+	font-family: sans-serif;
+	line-height: 1.2;
+}
+
+.trigger {
+	font-size: 1em;
+	display: flex;
+	align-items: center;
+	padding: 0 10px;
+	min-height: 30px;
+	border: 2px solid #fff;
+	border-radius: 6px;
+	background-color: transparent;
+	color: #212121;
+	&:focus {
+		border: 2px solid #222;
+		outline: 0;
+	}
+	[data-drawer-showing="true"] & {
+		background-color: #E95656;
+		border: 2px solid transparent;
+	}
+}
+
+.container + .container {
+	margin-top: 20px;
+}
+
+.content {
+	display: flex;
+	margin: 1em;
+	line-height: 1.4;
+	max-width: 800px;
+}
+
+
 *:after, *:before {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
