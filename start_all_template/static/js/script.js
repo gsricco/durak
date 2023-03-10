@@ -6,13 +6,8 @@ if (UserBalance1) {
 else {
     let maxNumber = 0
 }
-window.addEventListener("DOMContentLoaded", () => {
-    const BODY = document.querySelector("body");
-    const MAIN = document.querySelector("main");
-    const FOOTER = document.querySelector("footer");
 
-    // Что такое кредиты
-    var containers;
+var containers;
 function initDrawers() {
 	// Get the containing elements
 	containers = document.querySelectorAll(".container");
@@ -60,7 +55,12 @@ function wireUpTriggers() {
 	});
 }
 
-    
+
+window.addEventListener("DOMContentLoaded", () => {
+    const BODY = document.querySelector("body");
+    const MAIN = document.querySelector("main");
+    const FOOTER = document.querySelector("footer");
+
     //Отображение смайла 25%
   if (document.querySelector(".amount-selection__form")) {
     let randomSmileNum = Math.floor(Math.random() * 4);
