@@ -11,6 +11,14 @@ window.addEventListener("DOMContentLoaded", () => {
     const MAIN = document.querySelector("main");
     const FOOTER = document.querySelector("footer");
 
+    //Отображение смайла 25%
+  if (document.querySelector(".amount-selection__form")) {
+    let randomSmileNum = Math.floor(Math.random() * 4);
+    var smileView = document.querySelector(".amount-selection__smiley");
+    if(randomSmileNum==0){smileView.style.display = "";}
+          else {smileView.style.display = "none";}
+  }
+    
     // !Бургер
     if (document.querySelector(".burger-menu")) {
         (function () {
