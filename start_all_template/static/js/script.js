@@ -30,9 +30,9 @@ function setHeights() {
 		// Needed if this is being fired after a resize
 		
 		// Height of content to show/hide
-		let heightOfContent = content.getBoundingClientRect().height;
+		
 		// Set a CSS custom property with the height of content
-		container.style.setProperty("--containerHeight", `${heightOfContent}px`);
+		
 		// Once height is read and set
 		setTimeout(e => {
 			container.classList.add("height-is-set");
@@ -59,6 +59,7 @@ function wireUpTriggers() {
 		});
 	});
 }
+
     
     //Отображение смайла 25%
   if (document.querySelector(".amount-selection__form")) {
