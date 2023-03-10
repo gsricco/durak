@@ -28,7 +28,7 @@ function setHeights() {
 		// Get content
 		let content = container.querySelector(".content");
 		// Needed if this is being fired after a resize
-		content.removeAttribute("aria-hidden");
+		
 		// Height of content to show/hide
 		let heightOfContent = content.getBoundingClientRect().height;
 		// Set a CSS custom property with the height of content
