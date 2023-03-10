@@ -1,53 +1,51 @@
-.content {
-	transition: max-height 0.2s;
-	overflow: hidden;
-	&[aria-hidden="true"] {
-		max-height: 0;
-	}
-	&[aria-hidden="false"] {
-		max-height: var(--containerHeight, 1000px);
-	}
+body{background: #fff;}
+details{
+  display:block;
+  background: #fff;
+  width:400px;
+  box-shadow: 0 10px 15px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  overflow:hidden;
+  margin-bottom: 1.5rem;
 }
-
-/* Everything after this is merely aesthetics */
-* {
-	box-sizing: border-box;
+summary::-webkit-details-marker{display:none;}
+summary::-moz-list-bullet{list-style-type:none;}
+summary::marker{display:none;} 
+summary {
+   display:block;
+   padding: .3em 1em .3em .9em;
+   border-bottom: 1px solid #e2e8f0;
+   font-size:1.4em;
+   cursor: pointer;
+   position: relative;
 }
-
-.container {
-	font-family: sans-serif;
-	line-height: 1.2;
+summary:before {  
+  top: .4em;
+  right: .3em;
+  color: transparent;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTYuNTkgOC41OUwxMiAxMy4xNyA3LjQxIDguNTkgNiAxMGw2IDYgNi02eiIvPjxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48L3N2Zz4=") no-repeat 50% 50% / 1em 1em;
+  width: 1em;
+  height: 1em;  
+  content: "";
+  position: absolute;
+  transition: transform .5s;
 }
-
-.trigger {
-	font-size: 1em;
-	display: flex;
-	align-items: center;
-	padding: 0 10px;
-	min-height: 30px;
-	border: 2px solid #fff;
-	border-radius: 6px;
-	background-color: transparent;
-	color: #212121;
-	&:focus {
-		border: 2px solid #222;
-		outline: 0;
-	}
-	[data-drawer-showing="true"] & {
-		background-color: #E95656;
-		border: 2px solid transparent;
-	}
+details[open] > summary:before {
+  transform: scale(1,-1);
 }
-
-.container + .container {
-	margin-top: 20px;
+summary ~ * {
+   padding: 0 1em 10px 1.4em;
 }
-
-.content {
-	display: flex;
-	margin: 1em;
-	line-height: 1.4;
-	max-width: 800px;
+details[open] summary ~ *{ 
+  animation: sweep .5s ease-in-out;
+}
+@keyframes sweep {
+  0%    {opacity: 0;}
+  100%  {opacity: 1;}
+}
+summary:focus {
+  outline:0;
+  box-shadow: inset 0 0 1px rgba(0,0,0,0.3), inset 0 0 2px rgba(0,0,0,0.3);
 }
 
 
