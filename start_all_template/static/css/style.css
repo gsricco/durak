@@ -1738,6 +1738,15 @@ h3 {
   object-fit: contain;
 }
 
+.payment-system__title2 {
+  font-weight: 10000;
+  font-size: 12.8753px;
+  line-height: 96%;
+	width: 82%;
+  pointer-events: none;
+  color: #c8c8c8;
+}
+
 .payment-system__title {
   font-weight: 600;
   font-size: 12.8753px;
