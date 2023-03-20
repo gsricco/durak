@@ -1700,8 +1700,8 @@ h3 {
 .payment-system {
   background: #212121;
   border-radius: 8.04709px;
-  width: 140px;
-  height: 105px;
+  width: 583px;
+  height: 224px;
   padding: 15px 15px 20px 15px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -1712,6 +1712,7 @@ h3 {
   height: 48px;
   margin-bottom: 12px;
   pointer-events: none;
+  margin: 0 auto;
 }
 
 .payment-system__img_big {
