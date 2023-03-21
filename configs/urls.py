@@ -42,7 +42,8 @@ urlpatterns = [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('admin/', admin.site.urls),
+    path('Gtt56fgutedghuuteesgy43f/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('ws_chat/', include('ws_chat.urls')),
     path('refill_chat/', include('bot_payment.urls')),
     path('pay/', include('pay.urls')),  # оплата через карты и др.
