@@ -14,7 +14,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	
 	// Футер убираем на Пользовательском соглашении
   if (document.querySelector(".agreement__title")){
-	  let FooterParam = document.querySelector(".footer footer_dofix");
+	  let FooterParam = document.querySelector(".footer");
 	  FooterParam.style.display = "none";
   }
 	
