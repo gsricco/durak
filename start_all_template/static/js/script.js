@@ -1090,6 +1090,10 @@ window.addEventListener("DOMContentLoaded", () => {
                 tabsLinkTarget.classList.add("tabs__link_active");
                 tabsPaneTarget.classList.add("tabs__pane_show");
                 document.dispatchEvent(_eventTabsShow);
+		    if (document.querySelector(".agreement__title")){
+			let FooterParam = document.querySelector(".footer footer_dofix");
+			FooterParam.style.display = "none";
+		}
             },
             _switchTabTo = function (tabsLinkIndex) {
                 var tabsLinks = _elemTabs.querySelectorAll(".tabs__link");
