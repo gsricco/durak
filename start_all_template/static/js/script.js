@@ -12,6 +12,12 @@ window.addEventListener("DOMContentLoaded", () => {
     const MAIN = document.querySelector("main");
     const FOOTER = document.querySelector("footer");
 	
+	// Футер убираем на Пользовательском соглашении
+  if (document.querySelector(".agreement__title")){
+	  let FooterParam = document.querySelector(".footer footer_dofix");
+	  FooterParam.style.display = "none";
+  }
+	
     //Отображение смайла 25%
   if (document.querySelector(".amount-selection__form")) {
     let randomSmileNum = Math.floor(Math.random() * 4);
