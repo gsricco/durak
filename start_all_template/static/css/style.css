@@ -12,7 +12,7 @@ details{
 }
 
 @media (max-width: 575px)
-details{
+.details{
 display:block;
   background: #212121;
   width:280px;
