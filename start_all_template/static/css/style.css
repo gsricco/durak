@@ -10,6 +10,21 @@ details{
   margin-top: 20px;
   margin-inline: auto;
 }
+
+@media (max-width: 575px)
+details{
+display:block;
+  background: #212121;
+  width:280px;
+  
+  border-radius: 8px;
+  overflow:hidden;
+  margin-bottom: 1.5rem;
+  margin-top: 20px;
+  margin-inline: auto;	
+}
+
+
 summary::-webkit-details-marker{display:none;}
 summary::-moz-list-bullet{list-style-type:none;}
 summary::marker{display:none;} 
