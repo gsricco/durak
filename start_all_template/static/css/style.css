@@ -1,4 +1,3 @@
-
 details{
   display:block;
   background: #212121;
@@ -11,8 +10,8 @@ details{
   margin-inline: auto;
 }
 
-@media (max-width: 575px)
-.details{
+@media (max-width: 575px){
+details{
 display:block;
   background: #212121;
   width:280px;
@@ -22,6 +21,7 @@ display:block;
   margin-bottom: 1.5rem;
   margin-top: 20px;
   margin-inline: auto;	
+}
 }
 
 
