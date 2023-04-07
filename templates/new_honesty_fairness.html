@@ -81,8 +81,8 @@
                                 <div class="transactions__item-hash transactions__item-info">
                                     {% if day_hash.date_generated == today or not day_hash.show_hash%}
                                         <span>ХЕШ КОД НАХОДИТСЯ В РАБОТЕ</span>
-{#                                    {% elif day_hash.date_generated == today %}#}
-{#                                        <span class="transactions__item-text_red">{{ day_hash.private_key_hashed }}</span>#}
+                                    {% elif day_hash.date_generated == today %}
+                                        <span class="transactions__item-text_red">{{ day_hash.private_key_hashed }}</span>
                                     {% else %}
                                     <span>{{ day_hash.private_key }}</span>
                                     {% endif %}
