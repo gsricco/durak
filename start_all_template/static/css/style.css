@@ -6654,7 +6654,9 @@ margin-top: 36px;
   .support-faq .online-chat {
     display: none;
   }
-
+  .profil-main__content {
+    height: auto;
+  }
   .support-faq .profil-main__content {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 100%;
