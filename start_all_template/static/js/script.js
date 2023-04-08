@@ -631,10 +631,9 @@ window.addEventListener("DOMContentLoaded", () => {
                 }
             }
         }
-        if (window.location.href !== 'https://durakroll.com/faq/') {
-            footerHeigth();
-            window.addEventListener("resize", footerHeigth);
-        }
+
+        footerHeigth();
+        window.addEventListener("resize", footerHeigth);
     }
 
     //! При нажатии на чат
