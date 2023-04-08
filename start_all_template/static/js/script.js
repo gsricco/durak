@@ -13,10 +13,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const FOOTER = document.querySelector("footer");
 	
 	// Футер убираем на Пользовательском соглашении
-  if (document.querySelector(".agreement__title")){
-	  let FooterParam = document.querySelector(".footer");
-	  FooterParam.style.display = "none";
-  }
+  // if (document.querySelector(".agreement__title")){
+	//   let FooterParam = document.querySelector(".footer");
+	//   FooterParam.style.display = "none";
+  // }
 	
     //Отображение смайла 25%
   if (document.querySelector(".amount-selection__form")) {
