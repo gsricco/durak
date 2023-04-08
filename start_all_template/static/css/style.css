@@ -6664,7 +6664,9 @@ margin-top: 36px;
     max-width: 100%;
     margin-left: 0;
   }
-
+.main_wrapper {
+  height: auto;!important;
+}
   .add-bonus__item {
     height: 253px;
     max-width: 216px;
