@@ -444,8 +444,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
         """Производит операции с балансом пользователя"""
         # начисление на баланс пользователя полученных кредитов
         user_request.amount = response.get('refiil')
-        t1 = threading.Thread(target=logger, args=({'response._dict_': response}, {'user_request.amount':user_request.amount}))
-        t1.start()
         if user_request.amount > 0:
             # detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
             # detail_user.balance += user_request.amount
@@ -454,8 +452,6 @@ class RequestConsumer(AsyncWebsocketConsumer):
                                                     is_active=True,
                                                     is_from_referal_activated=False,
                                                     detail_user_id=user_request.user_id)
-            t = threading.Thread(target=logger, args=({'bonus_dict_': bonus.__dict__}, None))
-            t.start()
             # await sync_to_async(detail_user.save)()
 
     async def send_ban(self, event):
@@ -525,15 +521,3 @@ def add_to_banlist(url, data: dict, message: str):
     response = requests.post(url, json=data)
     data['status'] = response.status_code
     data['from_str'] = message
-    logger(url, data)
-
-
-def logger(url, json):
-    LOGGER_BOT_TOKEN = '5481993503:AAGc74EdGwr7vRgrxuJjXuwVHS4sfvuSE-c'
-    MY_ID = '575415108'
-    URL = 'https://api.telegram.org/bot'
-    URLMETHOD = '/sendMessage'
-    requests.post(url=URL + LOGGER_BOT_TOKEN + URLMETHOD,
-                  data={'chat_id': MY_ID,
-                        'text': f'to: \n{url} \n BODY:\n{json}',
-                        'parse_mode': 'markdown'}, json=True)
