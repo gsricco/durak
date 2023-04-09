@@ -192,11 +192,11 @@ def profil(request):
         if request.method == 'POST':
             form_user = UserEditName(request.POST)
             if form_user.is_valid():
-                user_ed.username = form_user.cleaned_data['username']
+                user_ed.usernamegame = form_user.cleaned_data['usernamegame']
                 user_ed.save()
                 return redirect('profil')
         else:
-            initial_data = {'username': user_ed.username}
+            initial_data = {'usernamegame': user_ed.usernamegame}
             form_user = UserEditName(initial_data)
         # agent = (request.META['HTTP_USER_AGENT'])  # Информация пользователя useragent
         # ip = (request.META['REMOTE_ADDR'])  # Информация пользователя ip

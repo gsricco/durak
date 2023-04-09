@@ -44,7 +44,7 @@ Welcome to Chat<br>
             if(is_auth === true) {
                 chatSocket.send(JSON.stringify({
                     'message': message,
-                    'user': username,
+                    'user': usernamegame,
                 }));
             }
             else {

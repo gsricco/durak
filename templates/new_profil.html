@@ -48,7 +48,7 @@
                                                     </svg>
 
                                                     {% if user.is_authenticated %}
-                                                    <span>{{ user.username }}</span>
+                                                    <span>{{ user.usernamegame }}</span>
                                                     <p class="profil__progressbar-lvl-num-mob">{{ level_data.level }} LVL</p>
 
                                                     {% else %}
@@ -353,11 +353,11 @@
                     {% if user.is_authenticated %}
                     <div class="profile-settings__item">
                         <div class="profile-settings__title"> Сменить никнейм</div>
-                        {{ form_user.username }}
+                        {{ form_user.usernamegame }}
                         <!--                <input type="text" class="form__input form profile-settings__name" value="{{user.username}}" {{ form_user.username }}-->
                         {% endif %}
 
-{#                        {% if user.username == username %}#}
+{#                        {% if user.username == usernamegame %}#}
 
                         <div id="username_error" class="profile-settings__error" style="display: none;">Попробуйте ввести другое имя..</div>
 {#                        {% endif %}#}
@@ -412,7 +412,7 @@
                         </div>
                         <div class="choice-object__in-block">
                             <input type="text" id="modal-forward-username-input"
-                                   class="choice-object__input form__input" placeholder="input Username">
+                                   class="choice-object__input form__input" placeholder="input usernamegame">
                         </div>
                     </li>
                 </ul>
