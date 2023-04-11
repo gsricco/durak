@@ -49,12 +49,12 @@ def index(request):
             'sitecontent': sitecontent,
             'detail_user': detail_user,
             # 'level_data': level_data,
-            'title': 'Рулетка',
+            'title': 'Лента Мастей',
         }
     else:
         context = {
             'sitecontent': sitecontent,
-            'title': 'Рулетка',
+            'title': 'Лента Мастей',
         }
     context['show_modal'] = show_modal
     add_pay_buttons(context)
