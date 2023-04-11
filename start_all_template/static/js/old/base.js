@@ -75,7 +75,7 @@ chatSocket.onmessage = function (e) {
     }
 
     // 7) ЛОГИКА РУЛЕТКА ВСЯ
-    if (document.title === 'Рулетка') {
+    if (document.title === 'Лента Мастей') {
         if (data.init) {
             if (data.init.state === 'countdown') {
                 let timeNow = Date.now()
