@@ -107,7 +107,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
         pass
 
     def get_request(self, spisok):
-        response = requests.get("http://178.211.139.11:8888/refill/get_bot_info?bot_id=0").json()
+        response = requests.get("http://77.73.129.51:8888/refill/get_bot_info?bot_id=0").json()
         spisok.append(response)
 
     async def create_request(self, text_data_json):
@@ -349,7 +349,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         "add": [info.get('game_id')]
                     }
                     add_ban_thread = threading.Thread(target=add_to_banlist,
-                                                      args=('http://178.211.139.11:8888/banlist/add', data, from_str))
+                                                      args=('http://77.73.129.51:8888/banlist/add', data, from_str))
                     add_ban_thread.start()
                     await sync_to_async(ban.save)()
                 # проверяет статус заявки
@@ -391,7 +391,7 @@ class RequestConsumer(AsyncWebsocketConsumer):
                         data = {
                             "add": [info.get('game_id')]
                         }
-                        add_ban_thread = threading.Thread(target=add_to_banlist, args=('http://178.211.139.11:8888/banlist/add', data, from_str))
+                        add_ban_thread = threading.Thread(target=add_to_banlist, args=('http://77.73.129.51:8888/banlist/add', data, from_str))
                         add_ban_thread.start()
                         await sync_to_async(user_request.save)()
                         return
