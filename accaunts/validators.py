@@ -16,7 +16,7 @@ def validate_referal(value):
     if value in ['12345', 'halyava']:
         raise ValidationError(f'Промокод "{value}" уже занят.')
     # не должно быть содержания следующих слов
-    words = ('durak', 'money', 'credit', 'monet', 'free', '2021', '2020')
+    words = ('money', 'credit', 'monet', 'free', '2021', '2020')
     for word in words:
         if word in value:
             raise ValidationError(f'Промокод "{value}" не должен содержать подстроку "{word}".')
