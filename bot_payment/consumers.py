@@ -20,7 +20,7 @@ from . import models, serializers
 from .models import BanTime, BotWork, RefillRequest, WithdrawalRequest
 
 r = redis.Redis(encoding="utf-8", decode_responses=True, host=REDIS_URL_STACK, password=REDIS_PASSWORD)  # подключаемся к редису
-
+HOST_URL = 77.73.129.51
 
 class RequestConsumer(AsyncWebsocketConsumer):
     """Базовый класс для создания заявок"""
