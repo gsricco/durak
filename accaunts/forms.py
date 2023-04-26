@@ -9,12 +9,12 @@ from accaunts.models import CustomUser, Level
 
 class UserEditName(forms.ModelForm):
     """Форма для изменении имени в profil пользователя"""
-    username = forms.CharField(max_length=20, widget=forms.TextInput(
+    usernamegame = forms.CharField(max_length=20, widget=forms.TextInput(
         attrs={'id': 'new_username', 'class': "form__input form profile-settings__name", 'type': "text", }))
 
     class Meta:
         model = CustomUser
-        fields = 'username',
+        fields = 'usernamegame',
 
 
 class LevelForm(forms.ModelForm):

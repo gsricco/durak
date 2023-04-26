@@ -6,7 +6,12 @@ from .models import Case, Item, ItemForCase, OwnedCase
 
 @admin.register(OwnedCase)
 class OwnedCase(admin.ModelAdmin):
-    list_display = 'owner', 'owner_id', 'case', 'item', 'date_opened'
+    def ung(self, obj):
+        return obj.owner.usernamegame
+
+    ung.short_description = 'Имя пользователя в игре'
+
+    list_display = 'owner', 'ung', 'owner_id', 'case', 'item', 'date_opened'
     list_filter = 'case', 'date_opened'
     search_fields = 'owner__username', 'owner__id'
     search_help_text = 'Поиск по имени пользователя и id пользователя'

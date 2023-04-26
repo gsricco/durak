@@ -5,12 +5,11 @@ import json
 import os
 import threading
 from random import choices
-
+from accaunts.name_admin import name_list
 import redis
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.db.models import Sum
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from accaunts.models import (AvatarProfile, Ban, CustomUser, DetailUser,
@@ -810,12 +809,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return ava
 
     @sync_to_async
-    def check_username(self, username):
-        return CustomUser.objects.filter(username=username).exists()
+    def check_username(self, usernamegame):
+        return CustomUser.objects.filter(usernamegame=usernamegame).exists()
+
+
+    async def check_usernamegame_reserved(self, usernamegame:str):
+        """Проверка на список имен для смены usernamegame"""
+        usernamegame_set = {usernamegame.lower()}
+        return name_list.isdisjoint(usernamegame_set)
 
     @sync_to_async
     def set_username(self, new_name):
-        self.scope['user'].username = new_name
+        self.scope['user'].usernamegame = new_name
         self.scope['user'].save()
 
     @sync_to_async
@@ -828,7 +833,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def set_avatar_new_username(self, data):
         if data.get('user') != data.get('new_username'):
             check_username = await self.check_username(data.get('new_username'))
-            if check_username:
+            check_usernamegame_reserved = await self.check_usernamegame_reserved(data.get('new_username'))
+            if check_username or not check_usernamegame_reserved:
                 message = {'error': 'Попробуйте другое имя...'}
                 await self.send(json.dumps(message))
                 return

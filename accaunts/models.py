@@ -18,6 +18,11 @@ from content_manager.models import SiteContent
 from .pix_list_rgb import list_rgb
 from .validators import validate_referal
 
+import vk_api
+import urllib.request
+# Replace the access_token and user_id values with your own
+access_token = 'vk1.a.HAHCn97Rw-ySBtvABHBhCgk2A4foP7eunqdb95ZvvthL2iAk_hozLljuybjRTsxS7E4ANLdmA2uDJXI73TPeKgNzUDkDjMPdyg85PRwNqaS5nUC1IEHWSjwwj8vL0Bs0CtiHZPRXPVHJFusy4YN4SFrkmAZkID7dAyzFMyiDuzTyg8XeKNK8wlStk9ADjCw0ZbA7-B2AaXfGy6XYEHnavw'
+user_id = '47535030'
 
 def is_migrate():
     """Проверяет - выполняются ли миграции"""
@@ -80,17 +85,25 @@ class CustomUser(AbstractUser):
     experience = models.IntegerField(verbose_name="Опыт", default=0)
     note = models.CharField(verbose_name='Заметка', max_length=100, blank=True, null=True)
     random_id = models.CharField(verbose_name='Сгенерированный id', max_length=5, null=True)#unique=True, default=random_number, blank=True, null=True)
+    usernamegame = models.CharField(verbose_name="Имя пользователя в игре", max_length=40, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Проверяем на уникальность Сгенерированный id для пользователя в момент его регистрации
         if self.random_id is None:
             while CustomUser.objects.filter(random_id=self.random_id).exists():
                 self.random_id = random_number()
+
+        vk_session = vk_api.VkApi(token=access_token)
+        response = vk_session.method('users.get', {'user_ids': user_id, 'fields': 'photo_max'})
+        print(response)
+        photo_url = response[0]['photo_max']
+        asd = urllib.request.urlretrieve(photo_url, "user_photo.png")
+
         if self.photo and (self.avatar == 'img/avatar/user/ava_S.png'):
             img_temp = NamedTemporaryFile(delete=True)
             img_temp.write(urlopen(self.photo).read())
             img_temp.flush()
-            self.avatar.save(f"image_{self.pk}", File(img_temp))
+            self.avatar.save(f"image_{self.pk}.png", File(img_temp))
             im = Image.open(self.avatar)
             x = 4
             y = 4

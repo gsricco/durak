@@ -234,7 +234,7 @@
                         </a>
                         {% elif user %}
                         <a href="{% url 'profil' %}" class="header__profile-name" >
-                                <span>{{ request.user.username }}</span>
+                                <span>{{ request.user.usernamegame }}</span>
                                 <svg class="header__profile-settings">
                                     <use xlink:href="{% static 'img/icons/sprite.svg' %}#setings"></use>
                                 </svg>
@@ -435,7 +435,7 @@
                     {{ user.is_authenticated|json_script:"auth-user" }}
                     {{ user.is_staff|json_script:"staffed" }}
                     {{ user.id|json_script:'current_user_id' }}
-                    {{ user.username|json_script:"username" }}
+                    {{ user.usernamegame|json_script:"usernamegame" }}
                     {{ user.level.img_name|json_script:"kamen" }}
                     {{ user.pk|json_script:"user_pk" }}
                     {% block maincontent %}
@@ -744,11 +744,11 @@
                         <li>1. Добавьте наш аккаунт в друзья, никнейм - <span id="bot-nickname-r">(отобразится после начала)</span>. 
                             Заявка принимается в течении 5-10 секунд.</li>
                         <li id="li-p2-less-2M">2. Отправьте нам в личные сообщения в игре ваш айди с сайта 
-                            ({{ user.username }}, Ваш ID: {{ user.random_id }}), примите приглашение
+                            ({{ user.usernamegame }}, Ваш ID: {{ user.random_id }}), примите приглашение
                              от нашего аккаунта и сразу проиграйте игру. Если вы не успели зайти/нажать готов
                               - повторите этот пункт с начала, пока ваша заявка открыта.</li>
                         <li id="li-p2-ge-2M">2. Отправьте нам в личные сообщения в игре
-                            ваш айди с сайта ({{ user.username }}, Ваш ID: {{ user.random_id }}), примите приглашение
+                            ваш айди с сайта ({{ user.usernamegame }}, Ваш ID: {{ user.random_id }}), примите приглашение
                              на 1м от нашего аккаунта и проиграйте <span id="number-of-games">X</span> игр. Если вы не успели 
                              зайти/нажать готов - повторите этот пункт с начала, пока ваша заявка открыта.</li>
                         <li id="bot_message_refill" style="visibility: hidden;" class="modal-manual__footnote"></li>
@@ -814,7 +814,7 @@
                     <ul>
                         <li>1. Добавьте наш аккаунт в друзья, никнейм - <span id="withdraw_nickname">(отобразится после начала)</span>.
                              Заявка принимается в течение 5-10 секунд.</li>
-                        <li>2. Отправьте нам в личные сообщения в игре ваш айди с сайта. ({{ user.username }}, Ваш ID: {{ user.random_id }}).
+                        <li>2. Отправьте нам в личные сообщения в игре ваш айди с сайта. ({{ user.usernamegame }}, Ваш ID: {{ user.random_id }}).
                             Мы будем приглашать вас в игру и проигрывать, пока общая сумма проигрышей 
                             не будет равна сумме вывода (игровую комиссию мы не доплачиваем).  Выходить из лобби нужно 
                             только после нас!</li>

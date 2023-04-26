@@ -67,7 +67,12 @@ class MyChangeListOleg(ChangeList):
 
 @admin.register(ReferalUser)
 class ReferalUserAdmin(admin.ModelAdmin):
-    list_display = 'user_with_bonus', 'user_with_bonus_id', 'invited_user', 'invited_user_id', 'bonus_sum', 'date',
+    def ung(self, obj):
+        return obj.user_with_bonus.usernamegame
+
+    ung.short_description = 'Имя пользователя в игре'
+
+    list_display = 'user_with_bonus', 'ung', 'user_with_bonus_id', 'invited_user', 'invited_user_id', 'bonus_sum', 'date',
     list_filter = 'date', ('date', DateTimeRangeFilter),
     search_fields = 'user_with_bonus__username', 'user_with_bonus__id',
     search_help_text = 'Поиск по имени пользователя который пригласил и его id'
@@ -79,7 +84,7 @@ class ReferalUserAdmin(admin.ModelAdmin):
 
 class DetailUserInline(admin.TabularInline):
     model = DetailUser
-    readonly_fields = "balance", "_reserve",  "free_balance", "frozen_balance",
+    readonly_fields = "balance", "_reserve", "free_balance", "frozen_balance",
     extra = 0
 
     def has_delete_permission(self, request, obj=None):
@@ -184,7 +189,7 @@ class CustomUserModelForm(UserChangeForm):
 class CustomUserAdmin(UserAdmin):
     """Класс отображения в админке пользователей(модель CustomUser)"""
     form = CustomUserModelForm
-    list_display = 'usernameinfo', 'id', 'random_id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
+    list_display = 'usernameinfo', 'usernamegame', 'id', 'random_id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
     list_editable = 'note',
     search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id', 'random_id'
     search_help_text = 'Поиск по имени пользователя, id пользователя, id c дурак онлайн, ссылки на vk, замтеки пользователя, ip пользователя И cгенерированного id'
@@ -193,7 +198,7 @@ class CustomUserAdmin(UserAdmin):
     readonly_fields = 'preview', 'random_id',
     list_select_related = "level", "avatar_default",
     fieldsets = (
-        ('ИНФОРМАЦИЯ', {'fields': ('random_id', 'username', 'password', 'last_login', 'date_joined')}),
+        ('ИНФОРМАЦИЯ', {'fields': ('random_id', 'usernamegame', 'username', 'password', 'last_login', 'date_joined')}),
         ('ПЕРСОНАЛЬНЫЕ ДАННЫЕ', {'classes': ('collapse',), 'fields': ('first_name', 'last_name', 'email', 'vk_url',)}),
         ('АВАТАРКИ ПОЛЬЗОВАТЕЛЯ',
          {'classes': ('collapse',), 'fields': ('preview', 'avatar', 'use_avatar', 'avatar_default',)}),
@@ -262,7 +267,12 @@ class LevelAdmin(admin.ModelAdmin):
 
 @admin.register(Ban)
 class BanUserAdmin(admin.ModelAdmin):
-    list_display = 'user', 'user_id', 'ban_site', 'ban_chat', 'ban_ip'
+    def ung(self, obj):
+        return obj.user.usernamegame
+
+    ung.short_description = 'Имя пользователя в игре'
+
+    list_display = 'user', 'ung', 'user_id', 'ban_site', 'ban_chat', 'ban_ip'
     search_fields = 'user__username', 'user__id'
     search_help_text = 'Поиск по имени пользователя и id пользователя'
     list_editable = 'ban_site', 'ban_chat', 'ban_ip'
@@ -292,8 +302,13 @@ class DayHashAdmin(admin.ModelAdmin):
 
 @admin.register(UserBet)
 class UserBetAdmin(admin.ModelAdmin):
-    list_display = 'user', 'user_id', 'round_number', 'sum', 'sum_win', 'date', 'win'
-    list_filter = 'win', 'date',  ('date', DateTimeRangeFilter)
+    def ung(self, obj):
+        return obj.user.usernamegame
+
+    ung.short_description = 'Имя пользователя в игре'
+
+    list_display = 'user', 'ung', 'user_id', 'round_number', 'sum', 'sum_win', 'date', 'win'
+    list_filter = 'win', 'date', ('date', DateTimeRangeFilter)
     search_fields = 'user__username', 'user__id', 'sum_win'
     search_help_text = 'Поиск по имени пользователя id пользователя и сумме выйгрыша'
     fields = "sum", "sum_win", "win", "round_number", "placed_on", "user"
@@ -319,7 +334,12 @@ class MyChangeList(ChangeList):
 
 @admin.register(ItemForUser)
 class ItemForUser(admin.ModelAdmin):
-    list_display = 'user', 'user_item', 'is_used', 'is_forwarded', 'date_modified'
+    def ung(self, obj):
+        return obj.user.usernamegame
+
+    ung.short_description = 'Имя пользователя в игре'
+
+    list_display = 'user', 'ung', 'user_item', 'is_used', 'is_forwarded', 'date_modified'
     list_filter = 'date_modified', ('date_modified', DateTimeRangeFilter), 'is_used', 'is_forwarded', 'user_item'
     search_fields = 'user__username',
     search_help_text = 'Поиск по имени пользователя'

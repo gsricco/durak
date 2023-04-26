@@ -5951,7 +5951,7 @@ margin-top: 36px;
 }
 
 .s-am-input svg {
-  position: absolute;
+  position: fixed;
   top: 10px;
   left: 10px;
   width: 15px;

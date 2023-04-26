@@ -23,7 +23,12 @@ class MyChangeList(ChangeList):
 
 @admin.register(Popoln)
 class PopolnAdmin(NumericFilterModelAdmin):
-    list_display = 'id', 'user_game', 'sum', 'pay', 'status_pay', 'date',
+    def ung(self, obj):
+        return obj.user_game.usernamegame
+
+    ung.short_description = 'Имя пользователя в игре'
+
+    list_display = 'id', 'ung', 'user_game', 'sum', 'pay', 'status_pay', 'date',
     list_filter = 'date', ('date', DateTimeRangeFilter), 'status_pay', ('pay', RangeNumericFilter), ('sum', RangeNumericFilter),
     search_fields = 'user_game__username', 'sum'
     search_help_text = 'Поиск по имени игрока или сумме пополнения'
