@@ -2,7 +2,8 @@ const sendBtn = document.querySelector('.support__input-block-arrow')
 let inputValue = document.querySelector('.support__chat-input')
 let inputFile = document.querySelector('#file-add')
 const chatBlock = document.querySelector('.support__chat-block')
-const username = JSON.parse(document.getElementById('usernamegame').textContent)
+const username = JSON.parse(document.getElementById('username').textContent)
+const usernamegame = JSON.parse(document.getElementById("usernamegame").textContent)
 let room_id = ''
 let room_name = ''
 let byteFile
@@ -49,6 +50,7 @@ function checkFileSize(elem) {
 
 function newSellItemMessage(message, user) {
     if (user === username || user === room_name) {
+        console.log(message)
         let dataList = message.split(';')
         const li = document.createElement('li')
         if (user !== username) {
@@ -155,7 +157,7 @@ const newRoom = (data) => {
                       if(data.user.username === room_name){
                 room.classList.add('active_room')
             }
-            room.innerHTML = data.user.username
+            room.innerHTML = data.user.usernamegame
 
             room.addEventListener('click', (e) => {
                 let room_value = room.innerText

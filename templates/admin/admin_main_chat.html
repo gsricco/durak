@@ -51,6 +51,7 @@
         </div>
     </div>
     {{ user.usernamegame|json_script:'usernamegame' }}
+    {{ user.username|json_script:'username' }}
     <script src="{% static 'js/admin_chat.js' %}"></script>
 {% endblock %}
 
