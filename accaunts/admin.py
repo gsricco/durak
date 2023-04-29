@@ -191,7 +191,7 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserModelForm
     list_display = 'usernameinfo', 'usernamegame', 'id', 'random_id', 'preview', 'user_info', 'level', 'email', 'vk_url', 'note',
     list_editable = 'note',
-    search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id', 'random_id'
+    search_fields = 'username', 'id', 'vk_url', 'note', 'userip__userip', 'gameid__game_id', 'random_id', 'usernamegame'
     search_help_text = 'Поиск по имени пользователя, id пользователя, id c дурак онлайн, ссылки на vk, замтеки пользователя, ip пользователя И cгенерированного id'
     inlines = [PopolnInline, DetailUserInline, AdminBalanceEditor, BonusVKandYoutubeInLine, UserAgentInline, UserIPInline, ReferalCodeInline, GameIDInline,
                BanInline, ItemForUserInline, RefillRequestInline, WithdrawalRequestInline]
@@ -273,7 +273,7 @@ class BanUserAdmin(admin.ModelAdmin):
     ung.short_description = 'Имя пользователя в игре'
 
     list_display = 'user', 'ung', 'user_id', 'ban_site', 'ban_chat', 'ban_ip'
-    search_fields = 'user__username', 'user__id'
+    search_fields = 'user__username', 'user__id', 'user__usernamegame',
     search_help_text = 'Поиск по имени пользователя и id пользователя'
     list_editable = 'ban_site', 'ban_chat', 'ban_ip'
     list_filter = 'ban_site', 'ban_chat', 'ban_ip'
@@ -309,7 +309,7 @@ class UserBetAdmin(admin.ModelAdmin):
 
     list_display = 'user', 'ung', 'user_id', 'round_number', 'sum', 'sum_win', 'date', 'win'
     list_filter = 'win', 'date', ('date', DateTimeRangeFilter)
-    search_fields = 'user__username', 'user__id', 'sum_win'
+    search_fields = 'user__username', 'user__id', 'sum_win', 'user_usernamegame'
     search_help_text = 'Поиск по имени пользователя id пользователя и сумме выйгрыша'
     fields = "sum", "sum_win", "win", "round_number", "placed_on", "user"
     readonly_fields = "sum", "sum_win", "win", "round_number", "placed_on", "user"
@@ -341,7 +341,7 @@ class ItemForUser(admin.ModelAdmin):
 
     list_display = 'user', 'ung', 'user_item', 'is_used', 'is_forwarded', 'date_modified'
     list_filter = 'date_modified', ('date_modified', DateTimeRangeFilter), 'is_used', 'is_forwarded', 'user_item'
-    search_fields = 'user__username',
+    search_fields = 'user__username', 'user__usernamegame'
     search_help_text = 'Поиск по имени пользователя'
     list_per_page = 100
 
