@@ -493,6 +493,13 @@ class WithdrawConsumer(RequestConsumer):
 
     async def process_balance(self, user_request, response):
         """Производит операции с балансом пользователя"""
+        print()
+        print('*'*20)
+        print(user_request)
+        print()
+        print(response)
+        print('*'*20)
+        print()
         # начисление на баланс пользователя полученных кредитов
         user_request.amount = response.get('withdraw')
         detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
