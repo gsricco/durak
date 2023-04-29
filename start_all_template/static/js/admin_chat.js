@@ -210,6 +210,7 @@ chatS.onmessage = function (e) {
                }
     if (data.chat_type === 'support') {
         if (data.list_message) {
+            console.log(data.list_message)
             data.list_message.forEach((mess) => {
                     if (mess.is_sell_item) {
                         newSellItemMessage(mess.message, mess.user_posted.username)
