@@ -225,13 +225,14 @@ chatS.onmessage = function (e) {
                 }
             )
         } else {
+            console.log(data, 'in ELSE!!!!!!!!!!!!!!!!!!!!!')
             if (data.is_sell_item) {
                 newSellItemMessage(data.message, data.user)
             } else {
                 if (data.file_path !== '/') {
-                    newUserMessage(`${data.message}`, data.user, data.file_path)
+                    newUserMessage(`${data.message}`, data.user, data.usernamegame, data.file_path)
                 } else {
-                    newUserMessage(`${data.message}`, data.user)
+                    newUserMessage(`${data.message}`, data.user, data.usernamegame)
                 }
             }
         }
