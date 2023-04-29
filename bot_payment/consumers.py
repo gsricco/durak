@@ -496,6 +496,8 @@ class WithdrawConsumer(RequestConsumer):
         print()
         print('*'*20)
         print(user_request)
+        print(type(user_request))
+        print(user_request.__dict__)
         print()
         print(response)
         print('*'*20)
