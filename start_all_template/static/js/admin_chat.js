@@ -12,7 +12,7 @@ let onlineAdmin = document.querySelector('#onlineAdmin')
 let host_url = window.location.host
 let notReadAllCount = 0
 document.title = 'Админ ЧАТ'
-
+console.log(host_url, "HOST URL !@#!@#!@#!@#!@#")
 document.querySelector('#content h1').innerHTML = 'Выберите ЧАТ'
 function checkFileSize(elem) {
     //проверка размера файла
