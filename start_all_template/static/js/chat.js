@@ -1,7 +1,8 @@
 const list = document.querySelector('.list');
 const rubin = JSON.parse(document.getElementById('kamen').textContent);
 const is_auth = JSON.parse(document.getElementById('auth-user').textContent);
-const username = JSON.parse(document.getElementById('usernamegame').textContent);
+const usernamegame = JSON.parse(document.getElementById('usernamegame').textContent);
+const username = JSON.parse(document.getElementById('username').textContent);
 const messageBlock = document.querySelector('.online-chat__list')
 const buttonSend = document.querySelector('.online-chat__icon-arrow')
 const messageInput = document.querySelector('.online-chat__input');
@@ -295,7 +296,7 @@ buttonSend.onclick = function (e) {
             chatSocket.send(JSON.stringify({
                 "chat_type": "all_chat",
                 'message': message.trim(),
-                'user': username,
+                'user': usernamegame,
                 'avatar': ava,
                 'rubin': rubin,
                 't': Date.now(),
