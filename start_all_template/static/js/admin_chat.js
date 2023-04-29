@@ -48,7 +48,7 @@ function checkFileSize(elem) {
     }
 }
 
-function newSellItemMessage(message, user) {
+function newSellItemMessage(message, user, usernamegame) {
     if (user === username || user === room_name) {
         console.log(message)
         let dataList = message.split(';')
@@ -84,7 +84,7 @@ const room_cleaner = () => {
     clear_room.forEach(item => item.remove())
 }
 
-function newUserMessage(message, user, file_path) {
+function newUserMessage(message, user, usernamegame, file_path) {
     if (user === username || user === room_name) {
         const li = document.createElement('li')
         li.className = 'support__chat-message support__chat-message_your'
@@ -110,7 +110,7 @@ function newUserMessage(message, user, file_path) {
             spanUser.style.textAlign = 'left'
         }
         chatBlock.appendChild(li)
-        spanUser.innerHTML = user
+        spanUser.innerHTML = usernamegame
         span.innerHTML = message
         div.appendChild(span)
         fullDiv.appendChild(spanUser)
@@ -213,12 +213,12 @@ chatS.onmessage = function (e) {
             console.log(data.list_message)
             data.list_message.forEach((mess) => {
                     if (mess.is_sell_item) {
-                        newSellItemMessage(mess.message, mess.user_posted.username)
+                        newSellItemMessage(mess.message, mess.user_posted.username, mess.user_posted.usernamegame)
                     } else {
                         if (mess.file_message) {
-                            newUserMessage(mess.message, mess.user_posted.username, mess.file_message)
+                            newUserMessage(mess.message, mess.user_posted.username, mess.user_posted.usernamegame, mess.file_message)
                         } else {
-                            newUserMessage(mess.message, mess.user_posted.username)
+                            newUserMessage(mess.message, mess.user_posted.username, mess.user_posted.usernamegame)
                         }
                     }
                 }
