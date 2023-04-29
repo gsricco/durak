@@ -109,6 +109,7 @@ function newUserMessage(message, user, usernamegame, file_path) {
             div.style.borderRadius = '15px 15px 15px 0px'
             spanUser.style.textAlign = 'left'
         }
+        console.log(usernamegame, 'eto username game <<<<<<<<<<<<<<<<<<<<<<<<')
         chatBlock.appendChild(li)
         spanUser.innerHTML = usernamegame
         span.innerHTML = message
