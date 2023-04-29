@@ -503,16 +503,20 @@ class WithdrawConsumer(RequestConsumer):
         print('*'*20)
         print()
         # начисление на баланс пользователя полученных кредитов
+        diff_to_return = user_request.amount - response.get('withdraw')
+
         user_request.amount = response.get('withdraw')
         detail_user = await DetailUser.objects.aget(user_id=user_request.user_id)
         result = await detail_user.do_withdraw(user_request.amount)
+        detail_user.frozen_balance = 0
+        detail_user.balance += diff_to_return
+        await sync_to_async(detail_user.save)()
         if not result:
             await self.send(json.dumps({"status": "error", "detail": f"Ошибка базы данных. Заявка не сохранена."}))
             return
         # frozen_balance_remain = detail_user.frozen_balance - user_request.amount
         # new_balance = max(0, detail_user.balance + frozen_balance_remain)
         # detail_user.balance = new_balance
-        detail_user.frozen_balance = 0
         await sync_to_async(detail_user.save)()
 
     async def freeze_balance(self, amount):
