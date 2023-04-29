@@ -61,8 +61,8 @@ function newUserMessage(message, user, file_path) {
         fullDiv.style.display = 'flex'
         fullDiv.style.flexDirection = 'column'
         spanUser.style.textAlign = 'right'
-        console.log(username, 'ETO V SUPPORT CHATE')
-    console.log(user)
+        console.log(username, 'USERNAME')
+        console.log(user, "USER")
         if (user !== username) {
             // spanUser.innerHTML = user
             li.style.flexDirection = ''
