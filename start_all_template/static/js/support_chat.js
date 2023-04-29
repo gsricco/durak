@@ -138,6 +138,7 @@ function super_new(f) {
 
         if (data.chat_type === 'support') {
             if (data.list_message) {
+                console.log(data, "SUPPORT WS")
                 data.list_message.forEach((mess) => {
                         if (mess.is_sell_item) {
                             newSellItemMessage(mess.message,mess.user_posted.username)
