@@ -9,7 +9,7 @@ from .models import Message, UserChatRoom
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ("id", "username", "avatar")
+        fields = ("id", "username", "usernamegame", "avatar")
 
 
 class MessageGetSerializer(serializers.Serializer):
