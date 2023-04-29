@@ -286,12 +286,10 @@ chatSocket.onmessage = function (e) {
         }
     }
     if (data.current_balance) {
-        console.log(data.current_balance, 'CURRENT BALANCE')
         UserBalance.innerHTML = `${data.current_balance}`
     }
 
     if (data.bid) {
-        console.log(data.bid, 'eto data bid!!!!!!!!!!!!!!!')
         createBidItemRow(data.bid)
     }
     if (data.roll) {
@@ -312,7 +310,6 @@ chatSocket.onmessage = function (e) {
             bidsNumber.forEach(el => {
                 //обновление баланса user////
                 let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
                 // /////////////////////
                 el.style.color = 'green'
                 document.querySelector('.hearts').style.opacity = '1'
@@ -323,7 +320,6 @@ chatSocket.onmessage = function (e) {
             bidsNumber.forEach(el => {
                 //обновление баланса user////
                 let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
                 // /////////////////////
                 el.style.color = 'green'
                 document.querySelector('.coin').style.opacity = '1'
@@ -334,7 +330,6 @@ chatSocket.onmessage = function (e) {
             bidsNumber.forEach(el => {
                 //обновление баланса user////
                 let balanceUser = document.querySelector('.header__profile-sum>span').innerText;
-                console.log(balanceUser)
                 // /////////////////////
                 el.style.color = 'green'
                 document.querySelector('.spades').style.opacity = '1'
@@ -364,7 +359,6 @@ chatSocket.onmessage = function (e) {
         ////////////////////////////
     }
         if (data.lvlup) {
-            console.log("You have a new level: " + data.lvlup.new_lvl)
             level_data_next = document.querySelector('.level_data_next')
             level_data_back = document.querySelector('.level_data_back')
             level_data_back.innerHTML = data.lvlup.levels + 'ур.'
@@ -437,7 +431,6 @@ chatSocket.onmessage = function (e) {
     }
     if (data.chat_type === 'all_chat_list') {
         const set = new Set(data.list);
-        console.log("list_50")
         for (let count of set) {
             const data = count
 
@@ -452,8 +445,6 @@ chatSocket.onmessage = function (e) {
             const divRub = document.createElement('div')
             divRub.className = 'online-chat__li-rubin'
             divWrap.appendChild(divRub)
-            console.log(data.rubin, 'ETO RUBIN')
-            console.log(data.avatar, 'ETO AVATAR')
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
             svg.innerHTML = `<use xlink:href="${static_prefix}/img/icons/sprite.svg#${data.rubin}"></use>`
             divRub.appendChild(svg)

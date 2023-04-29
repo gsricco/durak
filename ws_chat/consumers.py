@@ -183,13 +183,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user_to_ban.ban_chat = True
         user_to_ban.save()
 
-    async def send_support_chat_message(self, channel_name, message, user, file_path=None):
-        """Отправка сообщения в суппорт чат . Аргументы channel_name,message,user """
+    async def send_support_chat_message(self, channel_name, message, user, usernamegame, file_path=None):
+        """Отправка сообщения в суппорт чат . Аргументы channel_name,message,user, usernamegame """
         await self.channel_layer.send(
             channel_name, {"type": "support_chat_message",
                            "chat_type": "support",
                            "message": message,
                            "user": user,
+                           "usernamegame": usernamegame,
                            "file_path": f'/{file_path}'
                            })
 
@@ -406,6 +407,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'type': 'support_chat_message',
                         'chat_type': 'support',
                         'user': user.username,
+                        'usernamegame': user.usernamegame,
                         'message': f'{durak_username};{item_name};{svg_name}',
                         'is_sell_item': True
                     }
@@ -566,11 +568,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     if not user.is_staff:
                         await self.send_support_chat_message(self.channel_name,
                                                              text_data_json["message"],
-                                                             user.username, file_path)  # из супорт чата на сайте себе
+                                                             user.username,
+                                                             user.usernamegame,
+                                                             file_path)  # из супорт чата на сайте себе
                     await self.channel_layer.group_send('admin_group', {"type": "support_chat_message",
                                                                         "chat_type": "support",
                                                                         "message": text_data_json["message"],
                                                                         "user": user.username,
+                                                                        "usernamegame": user.usernamegame,
                                                                         "file_path": f'/{file_path}'
                                                                         })  # отправка сообщения пользователя админам
             elif text_data_json.get('chat_type') == 'support_admin':
@@ -591,14 +596,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     await self.save_user_message(room, user.id,
                                                  text_data_json["message"], file_path)  # сохранении сообщение админа в бд
                     not_read = await self.get_not_read(room)
-                    await self.send_support_chat_message(self.channel_name, text_data_json["message"],
+                    await self.send_support_chat_message(self.channel_name,
+                                                         text_data_json["message"],
                                                          user.username,
+                                                         user.usernamegame,
                                                          file_path)  # отправка сообщения самому себе в админку
                     await self.channel_layer.group_send(f'{receive}_room', {"type": "support_chat_message",
                                                                             "chat_type": "support",
                                                                             "message": text_data_json["message"],
                                                                             "file_path": f'/{file_path}',
-                                                                            "user": user.username, })  # отправка сообщения пользователю в рум
+                                                                            "user": user.username,
+                                                                            "usernamegame": user.usernamegame})  # отправка сообщения пользователю в рум
                     await self.channel_layer.group_send(f'{receive}_room', {"type": "not_read",
                                                                             'not_read': not_read,
                                                                             })
@@ -661,6 +669,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "list_message": event.get('list_message'),
                 "chat_type": event.get('chat_type'),
                 "user": event.get('user'),
+                "usernamegame": event.get("usernamegame"),
                 "file_path": event.get('file_path'),
                 'is_sell_item': event.get('is_sell_item')
             }

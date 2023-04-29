@@ -436,6 +436,7 @@
                     {{ user.is_staff|json_script:"staffed" }}
                     {{ user.id|json_script:'current_user_id' }}
                     {{ user.usernamegame|json_script:"usernamegame" }}
+                    {{ user.username|json_script:'username' }}
                     {{ user.level.img_name|json_script:"kamen" }}
                     {{ user.pk|json_script:"user_pk" }}
                     {% block maincontent %}
