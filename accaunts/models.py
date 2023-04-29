@@ -95,7 +95,6 @@ class CustomUser(AbstractUser):
 
         vk_session = vk_api.VkApi(token=access_token)
         response = vk_session.method('users.get', {'user_ids': user_id, 'fields': 'photo_max'})
-        print(response)
         photo_url = response[0]['photo_max']
         asd = urllib.request.urlretrieve(photo_url, "user_photo.png")
 
