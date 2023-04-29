@@ -163,6 +163,7 @@ const createBidItems = (data) => {
         let avatar = data[user]['avatar']
         let rubin = data[user]['rubin']
         let userName = data[user]['userName']
+        let userNameGame = data[user]['userNameGame']
 
         keys.map(card => {
             user = {
@@ -170,7 +171,8 @@ const createBidItems = (data) => {
                 bidCard: card,
                 bidCount: objAmount[card],
                 rubin: rubin,
-                userName: userName
+                userName: userName,
+                userNameGame: userNameGame
             }
             usersBids.push(user)//создание массива всех ставок
             usersBids.sort((a, b) => b.bidCount - a.bidCount)//сортировка по ставкам
@@ -220,7 +222,7 @@ const createBidItems = (data) => {
 
         const itemUserName = document.createElement('div')
         itemUserName.className = 'roulette__item-username'
-        itemUserName.innerHTML = `${el.userName}`
+        itemUserName.innerHTML = `${el.userNameGame}`
         bidItemLeftBlock.appendChild(itemUserName)
     })
     switch (userCountHearts){
@@ -316,6 +318,7 @@ const itemsClick = (bidCard) => {
                 'bet': {
                     'bidCount': bidCount,
                     'userName': username,
+                    'userNameGame': usernamegame,
                     'avatar': ava,
                     'rubin': rubin,
                     'bidCard': bidCard

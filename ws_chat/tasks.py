@@ -5,6 +5,7 @@ import threading
 import time
 import uuid
 from hashlib import sha256
+from typing import Union
 
 import psutil
 import requests
@@ -181,7 +182,7 @@ def stop():
                                             })
 
 # @shared_task()
-async def save_as_nested(keys_storage_name: str, dict_key: (str | int), bet_info: dict) -> bool:
+async def save_as_nested(keys_storage_name: str, dict_key: Union[int, str], bet_info: dict) -> bool:
     """
     Записывает ставку пользователя в redis.json()
 
