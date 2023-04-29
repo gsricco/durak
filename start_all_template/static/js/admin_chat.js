@@ -50,7 +50,6 @@ function checkFileSize(elem) {
 
 function newSellItemMessage(message, user, usernamegame) {
     if (user === username || user === room_name) {
-        console.log(message)
         let dataList = message.split(';')
         const li = document.createElement('li')
         if (user !== username) {
@@ -109,7 +108,6 @@ function newUserMessage(message, user, usernamegame, file_path) {
             div.style.borderRadius = '15px 15px 15px 0px'
             spanUser.style.textAlign = 'left'
         }
-        console.log(usernamegame, 'eto username game <<<<<<<<<<<<<<<<<<<<<<<<')
         chatBlock.appendChild(li)
         spanUser.innerHTML = usernamegame
         span.innerHTML = message
@@ -211,7 +209,6 @@ chatS.onmessage = function (e) {
                }
     if (data.chat_type === 'support') {
         if (data.list_message) {
-            console.log(data.list_message)
             data.list_message.forEach((mess) => {
                     if (mess.is_sell_item) {
                         newSellItemMessage(mess.message, mess.user_posted.username, mess.user_posted.usernamegame)
@@ -225,7 +222,6 @@ chatS.onmessage = function (e) {
                 }
             )
         } else {
-            console.log(data, 'in ELSE!!!!!!!!!!!!!!!!!!!!!')
             if (data.is_sell_item) {
                 newSellItemMessage(data.message, data.user)
             } else {
