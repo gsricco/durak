@@ -63,6 +63,8 @@ const createBidItems = (data) => {
                 heartsCountsShowMob = `${heartsCountsMob}`
             }
             document.querySelector('#spanCardHeartsMob').innerHTML = `${heartsCountsShowMob}`
+            document.querySelector('#roulHearts').style.border = '1px solid #5F5F5F';
+            document.querySelector('#roulHearts').style.borderRadius = '5px';
         }
         if (data[user]['amount']['coin']) {
             userCountCoin += 1
@@ -79,7 +81,8 @@ const createBidItems = (data) => {
                 coinCountsShowMob = `${coinCountsMob}`
             }
             document.querySelector('#spanCardCoinMob').innerHTML = `${coinCountsShowMob}`
-
+            document.querySelector('#roulCoin').style.border = '1px solid #5F5F5F';
+            document.querySelector('#roulCoin').style.borderRadius = '5px';
         }
         if (data[user]['amount']['spades']) {
             userCountSpades += 1
@@ -96,6 +99,8 @@ const createBidItems = (data) => {
                 spadesCountsShowMob = `${spadesCountsMob}`
             }
             document.querySelector('#spanCardSpadesMob').innerHTML = `${spadesCountsShowMob}`
+            document.querySelector('#roulSpades').style.border = '1px solid #5F5F5F';
+            document.querySelector('#roulSpades').style.borderRadius = '5px';
         }
 
 //суммирование в заголовке
@@ -224,57 +229,56 @@ const createBidItems = (data) => {
         itemUserName.className = 'roulette__item-username'
         itemUserName.innerHTML = `${el.userNameGame}`
         bidItemLeftBlock.appendChild(itemUserName)
+
     })
-    switch (userCountHearts){
+
+    switch (userCountHearts) {
         case 1: {
             memberHeartsShow = 'участник';
             break;
         }
         case 2:
         case 3:
-        case 4:
-        {
+        case 4: {
             memberHeartsShow = 'участника';
             break;
         }
-            default:{
-                memberHeartsShow = 'участников';
-                break;
-            }
+        default: {
+            memberHeartsShow = 'участников';
+            break;
+        }
     }
-switch (userCountCoin){
+    switch (userCountCoin) {
         case 1: {
             memberCoinShow = 'участник';
             break;
         }
         case 2:
         case 3:
-        case 4:
-        {
+        case 4: {
             memberCoinShow = 'участника';
             break;
         }
-            default:{
-                memberCoinShow = 'участников';
-                break;
-            }
+        default: {
+            memberCoinShow = 'участников';
+            break;
+        }
     }
-switch (userCountSpades){
+    switch (userCountSpades) {
         case 1: {
             memberSpadesShow = 'участник';
             break;
         }
         case 2:
         case 3:
-        case 4:
-        {
+        case 4: {
             memberSpadesShow = 'участника';
             break;
         }
-            default:{
-                memberSpadesShow = 'участников';
-                break;
-            }
+        default: {
+            memberSpadesShow = 'участников';
+            break;
+        }
     }
 
 
@@ -295,7 +299,7 @@ const itemsClick = (bidCard) => {
         modalAuth.classList.add("open");
         modalAuth.addEventListener("click", function (e) {
             if (!e.target.closest(".popup__content")) {
-                if(document.querySelector('.popup.open')){
+                if (document.querySelector('.popup.open')) {
                     document.querySelector('.popup.open').classList.remove("open");
                 }
             }
@@ -304,14 +308,14 @@ const itemsClick = (bidCard) => {
 
         let userBalFront = document.querySelector('.header__profile-sum>span')
         let userBal = userBalFront.textContent;
-        let lastSymbol = userBal[userBal.length-1];
+        let lastSymbol = userBal[userBal.length - 1];
         let balanceUser;
 
-        if(lastSymbol === 'M'){
-            balanceUser=Number(userBal.slice(0,userBal.length-1))*1000000
-        } else if(lastSymbol === 'K'){
-            balanceUser=Number(userBal.slice(0,userBal.length-1))*1000
-        }else balanceUser=Number(userBal)
+        if (lastSymbol === 'M') {
+            balanceUser = Number(userBal.slice(0, userBal.length - 1)) * 1000000
+        } else if (lastSymbol === 'K') {
+            balanceUser = Number(userBal.slice(0, userBal.length - 1)) * 1000
+        } else balanceUser = Number(userBal)
 
         if (balanceUser + 1 >= Number(bidCount)) {
             chatSocket.send(JSON.stringify({
@@ -328,10 +332,20 @@ const itemsClick = (bidCard) => {
             if (bidCard === 'hearts') {
                 bidsButtons[2].style.opacity = '0.3'
                 items[2].style.pointerEvents = 'none';
+                document.querySelector('#roulHearts').style.border = '1px solid #5F5F5F';
+                document.querySelector('#roulHearts').style.borderRadius = '5px';
             } else if (bidCard === 'spades') {
                 bidsButtons[0].style.opacity = '0.3'
                 items[0].style.pointerEvents = 'none';
+                document.querySelector('#roulSpades').style.border = '1px solid #5F5F5F';
+                document.querySelector('#roulSpades').style.borderRadius = '5px';
+
             }
+            if (bidCard === 'coin') {
+                document.querySelector('#roulCoin').style.border = '1px solid #5F5F5F';
+                document.querySelector('#roulCoin').style.borderRadius = '5px';
+            }
+
 
             ///////////////////////////////////////////////
             //логика БЭК отнимания ставки от баланса/////////
@@ -353,7 +367,7 @@ const itemsClick = (bidCard) => {
 
             document.querySelector('.header__profile-sum>span').innerHTML = `${balanceUserShow}`
             document.querySelector('#userBalMob').innerHTML = `${balanceUserShow}`
-            // items[0].style.pointerEvents = 'none';
+
             /////////////////////////////////////////////////
         } else {
             //вывод сообщения НЕДОСТАТОЧНО СРЕДСТВ

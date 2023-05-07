@@ -449,6 +449,7 @@ body.lock {
 }
 
 .panel {
+  height: auto!important;
   /*max-height: 0;*/
   /*overflow: hidden;*/
   -webkit-transition: max-height 0.3s ease-out;
@@ -585,6 +586,7 @@ main {
   padding: 114px 0px 0px 0px;
   position: relative;
   min-height: 100vh;
+  height: auto!important;
 }
 
 .section-nomargin {
@@ -4642,7 +4644,7 @@ h3 {
 
 .roulette__item {
   max-height: 56vh;   /* из учета 7vh на одного участника*/
-  height: auto;
+  /*height: auto;*/
   -webkit-box-flex: 0;
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
@@ -4783,7 +4785,7 @@ h3 {
 #spanCardHearts,#spanCardCoin, #spanCardSpades{
   margin-left: 2px;
   color:#FFECA8;
-  font-size: 0.9375em;
+  font-size: 0.8125em;
   line-height: 133.3333333333%;
   font-weight: 400;
 }
